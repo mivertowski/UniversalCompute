@@ -3,7 +3,7 @@
 //                           Copyright (c) 2022 ILGPU Project
 //                                    www.ilgpu.net
 //
-// File: LicenseCopyrighParser.cs
+// File: LicenseCopyrightParser.cs
 //
 // This file is part of ILGPU and is distributed under the University of Illinois Open
 // Source License. See LICENSE.txt for details.
@@ -23,7 +23,7 @@ namespace CopyrightUpdateTool.Parsers
     /// <summary>
     /// Updates copyright for LICENSE.txt.
     /// </summary>
-    class LicenseCopyrighParser : BaseCopyrightParser
+    class LicenseCopyrightParser : BaseCopyrightParser
     {
         #region Instance
 
@@ -31,7 +31,7 @@ namespace CopyrightUpdateTool.Parsers
         /// Constructs a new parser instance.
         /// </summary>
         /// <param name="versionControlService">The version control service.</param>
-        public LicenseCopyrighParser(IVersionControlService versionControlService)
+        public LicenseCopyrightParser(IVersionControlService versionControlService)
             : base(versionControlService)
         { }
 

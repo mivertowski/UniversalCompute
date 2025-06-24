@@ -15,6 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Numerics;
+using ILGPU.Runtime;
 using ILGPU.Runtime.Scheduling;
 using System;
 using System.Collections.Generic;
@@ -41,7 +43,7 @@ namespace ILGPU.ML.Integration
         /// <param name="availableAccelerators">Available compute accelerators.</param>
         /// <param name="options">Execution provider options.</param>
         public ILGPUUniversalExecutionProvider(
-            IReadOnlyDictionary<ComputeDevice, IAccelerator> availableAccelerators,
+            IReadOnlyDictionary<ComputeDevice, Accelerator> availableAccelerators,
             ExecutionProviderOptions options = null)
         {
             options ??= new ExecutionProviderOptions();

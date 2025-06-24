@@ -37,7 +37,7 @@ namespace CopyrightUpdateTool
             services.AddSingleton<IVersionControlService, VersionControlService>();
             services.AddSingleton<ICopyrightParser, SourceCodeCopyrightParser>();
             services.AddSingleton<ICopyrightParser, NuspecCopyrightParser>();
-            services.AddSingleton<ICopyrightParser, LicenseCopyrighParser>();
+            services.AddSingleton<ICopyrightParser, LicenseCopyrightParser>();
             services.AddSingleton<ICopyrightParser, ReadmeCopyrightParser>();
 
             // Perform copyright update.

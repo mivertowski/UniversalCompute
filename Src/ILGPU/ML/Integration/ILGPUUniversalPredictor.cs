@@ -16,8 +16,10 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Numerics;
+using ILGPU.Runtime;
 using ILGPU.Runtime.Scheduling;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ILGPU.ML.Integration
@@ -316,7 +318,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets the available accelerators for computation.
         /// </summary>
-        public IReadOnlyDictionary<ComputeDevice, IAccelerator> AvailableAccelerators { get; }
+        public IReadOnlyDictionary<ComputeDevice, Accelerator> AvailableAccelerators { get; }
 
         /// <summary>
         /// Gets the tensor factory for data conversion.
@@ -332,7 +334,7 @@ namespace ILGPU.ML.Integration
         /// Initializes a new instance of the PredictionContext class.
         /// </summary>
         public PredictionContext(
-            IReadOnlyDictionary<ComputeDevice, IAccelerator> accelerators,
+            IReadOnlyDictionary<ComputeDevice, Accelerator> accelerators,
             ITensorFactory tensorFactory,
             IMemoryManager memoryManager)
         {

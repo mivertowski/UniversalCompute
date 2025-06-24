@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Runtime;
+using ILGPU.Runtime.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace ILGPU.Runtime.Scheduling
     /// </summary>
     public class AdaptiveScheduler : IDisposable
     {
-        private readonly IReadOnlyDictionary<ComputeDevice, IAccelerator> _devices;
+        private readonly IReadOnlyDictionary<ComputeDevice, Accelerator> _devices;
         private readonly PerformanceProfiler _profiler;
         private readonly LoadBalancer _loadBalancer;
         private readonly SchedulingPolicy _policy;
@@ -42,7 +43,7 @@ namespace ILGPU.Runtime.Scheduling
         /// <param name="devices">Available compute devices and their accelerators.</param>
         /// <param name="policy">Scheduling policy to use.</param>
         public AdaptiveScheduler(
-            IReadOnlyDictionary<ComputeDevice, IAccelerator> devices,
+            IReadOnlyDictionary<ComputeDevice, Accelerator> devices,
             SchedulingPolicy policy = SchedulingPolicy.PerformanceOptimized)
         {
             _devices = devices ?? throw new ArgumentNullException(nameof(devices));

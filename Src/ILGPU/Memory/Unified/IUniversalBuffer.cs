@@ -70,7 +70,7 @@ namespace ILGPU.Memory.Unified
         /// <param name="width">The width of the 2D view.</param>
         /// <param name="height">The height of the 2D view.</param>
         /// <returns>A 2D array view.</returns>
-        ArrayView2D<T> As2DView(int width, int height);
+        ArrayView2D<T, Stride2D.DenseX> As2DView(int width, int height);
 
         /// <summary>
         /// Gets a 3D view of this buffer with the specified dimensions.
@@ -79,7 +79,7 @@ namespace ILGPU.Memory.Unified
         /// <param name="height">The height of the 3D view.</param>
         /// <param name="depth">The depth of the 3D view.</param>
         /// <returns>A 3D array view.</returns>
-        ArrayView3D<T> As3DView(int width, int height, int depth);
+        ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth);
 
         /// <summary>
         /// Copies data from a CPU array to this buffer.
