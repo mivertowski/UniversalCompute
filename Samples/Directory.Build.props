@@ -1,0 +1,20 @@
+﻿<Project>
+  <PropertyGroup Condition="'$(MSBuildVersion)' &gt;= '17.8'">
+    <LibrarySamplesTargetFrameworks>net8.0</LibrarySamplesTargetFrameworks>
+    <LibrarySamplesTargetFrameworksWindows>net8.0-windows</LibrarySamplesTargetFrameworksWindows>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildVersion)' &gt;= '17.4' AND '$(MSBuildVersion)' &lt; '17.8' ">
+    <LibrarySamplesTargetFrameworks>net7.0</LibrarySamplesTargetFrameworks>
+    <LibrarySamplesTargetFrameworksWindows>net7.0-windows</LibrarySamplesTargetFrameworksWindows>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildVersion)' &lt; '17.4'">
+    <LibrarySamplesTargetFrameworks>net6.0</LibrarySamplesTargetFrameworks>
+    <LibrarySamplesTargetFrameworksWindows>net6.0-windows</LibrarySamplesTargetFrameworksWindows>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <LibrarySamplesTargetFrameworks>net6.0;net7.0;net8.0</LibrarySamplesTargetFrameworks>
+    <LibrarySamplesTargetFrameworksWindows>net6.0-windows;net7.0-windows;net8.0-windows</LibrarySamplesTargetFrameworksWindows>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,475 @@
+// Copyright (c) 2025 Michael Ivertowski, Ernst & Young Ltd. Switzerland
+// Licensed under the Business Source License 1.1 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://github.com/mivertowsi/ILGPU/blob/main/LICENSE
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// NOTICE: This software is NOT licensed for commercial or production use.
+// Change Date: 2029-06-24
+// Change License: Apache License, Version 2.0
+
+using ILGPU.Apple.NeuralEngine.Native;
+using System;
+
+namespace ILGPU.Apple.NeuralEngine
+{
+    /// <summary>
+    /// Represents the capabilities of the Apple Neural Engine.
+    /// </summary>
+    public readonly struct ANECapabilities
+    {
+        /// <summary>
+        /// Initializes a new instance of the ANECapabilities struct.
+        /// </summary>
+        /// <param name="isAvailable">Whether ANE is available.</param>
+        /// <param name="generation">The ANE generation.</param>
+        /// <param name="maxTOPS">Maximum TOPS performance.</param>
+        /// <param name="supportsFloat16">Whether Float16 is supported.</param>
+        /// <param name="supportsInt8">Whether INT8 is supported.</param>
+        /// <param name="supportsConvolution">Whether convolution operations are supported.</param>
+        /// <param name="supportsAttention">Whether attention operations are supported.</param>
+        /// <param name="supportsTransformer">Whether transformer models are supported.</param>
+        /// <param name="supportsCoreML">Whether Core ML integration is supported.</param>
+        /// <param name="maxBatchSize">Maximum batch size.</param>
+        public ANECapabilities(
+            bool isAvailable,
+            ANEGeneration generation,
+            double maxTOPS,
+            bool supportsFloat16,
+            bool supportsInt8,
+            bool supportsConvolution,
+            bool supportsAttention,
+            bool supportsTransformer,
+            bool supportsCoreML,
+            int maxBatchSize)
+        {
+            IsAvailable = isAvailable;
+            Generation = generation;
+            MaxTOPS = maxTOPS;
+            SupportsFloat16 = supportsFloat16;
+            SupportsInt8 = supportsInt8;
+            SupportsConvolution = supportsConvolution;
+            SupportsAttention = supportsAttention;
+            SupportsTransformer = supportsTransformer;
+            SupportsCoreML = supportsCoreML;
+            MaxBatchSize = maxBatchSize;
+        }
+
+        /// <summary>
+        /// Gets whether the Apple Neural Engine is available.
+        /// </summary>
+        public bool IsAvailable { get; }
+
+        /// <summary>
+        /// Gets the Neural Engine generation.
+        /// </summary>
+        public ANEGeneration Generation { get; }
+
+        /// <summary>
+        /// Gets the maximum TOPS (Tera Operations Per Second) performance.
+        /// </summary>
+        public double MaxTOPS { get; }
+
+        /// <summary>
+        /// Gets whether Float16 operations are supported.
+        /// </summary>
+        public bool SupportsFloat16 { get; }
+
+        /// <summary>
+        /// Gets whether INT8 quantization is supported.
+        /// </summary>
+        public bool SupportsInt8 { get; }
+
+        /// <summary>
+        /// Gets whether convolution operations are accelerated.
+        /// </summary>
+        public bool SupportsConvolution { get; }
+
+        /// <summary>
+        /// Gets whether attention mechanisms are accelerated.
+        /// </summary>
+        public bool SupportsAttention { get; }
+
+        /// <summary>
+        /// Gets whether transformer models are optimized.
+        /// </summary>
+        public bool SupportsTransformer { get; }
+
+        /// <summary>
+        /// Gets whether Core ML integration is supported.
+        /// </summary>
+        public bool SupportsCoreML { get; }
+
+        /// <summary>
+        /// Gets the maximum supported batch size.
+        /// </summary>
+        public int MaxBatchSize { get; }
+
+        /// <summary>
+        /// Queries the Neural Engine capabilities of the current system.
+        /// </summary>
+        /// <returns>ANE capabilities structure.</returns>
+        public static ANECapabilities Query()
+        {
+            if (!DetectNeuralEngine())
+                return new ANECapabilities();
+
+            try
+            {
+                var nativeCapabilities = ANENative.QueryCapabilities();
+                return MapFromNative(nativeCapabilities);
+            }
+            catch
+            {
+                return new ANECapabilities();
+            }
+        }
+
+        /// <summary>
+        /// Detects whether Apple Neural Engine is available on the current system.
+        /// </summary>
+        /// <returns>True if ANE is available; otherwise, false.</returns>
+        public static bool DetectNeuralEngine()
+        {
+            try
+            {
+                // Check if we're on macOS with Apple Silicon
+                if (!OperatingSystem.IsMacOS())
+                    return false;
+
+                // Check for Neural Engine availability
+                return ANENative.IsNeuralEngineAvailable();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the optimal batch size for the given model complexity.
+        /// </summary>
+        /// <param name="modelComplexity">The model complexity (number of parameters).</param>
+        /// <returns>The recommended batch size.</returns>
+        public int GetOptimalBatchSize(long modelComplexity)
+        {
+            // ANE is optimized for low-latency inference, typically batch size 1
+            return Generation switch
+            {
+                ANEGeneration.ANE1 => 1, // A11, A12 - optimized for single inference
+                ANEGeneration.ANE2 => modelComplexity < 1000000 ? 2 : 1, // A13, A14
+                ANEGeneration.ANE3 => modelComplexity < 1000000 ? 4 : 2, // A15, A16, M1, M2
+                ANEGeneration.ANE4 => modelComplexity < 1000000 ? 8 : 4, // Future generations
+                _ => 1
+            };
+        }
+
+        /// <summary>
+        /// Gets the estimated power consumption for the given utilization.
+        /// </summary>
+        /// <param name="utilizationPercent">The ANE utilization percentage.</param>
+        /// <returns>The estimated power consumption in watts.</returns>
+        public double GetEstimatedPower(double utilizationPercent)
+        {
+            var basePower = Generation switch
+            {
+                ANEGeneration.ANE1 => 0.5, // A11, A12
+                ANEGeneration.ANE2 => 0.8, // A13, A14
+                ANEGeneration.ANE3 => 1.2, // A15, A16, M1, M2
+                ANEGeneration.ANE4 => 1.5, // Future generations
+                _ => 0.3
+            };
+
+            return basePower * (utilizationPercent / 100.0);
+        }
+
+        /// <summary>
+        /// Gets the power efficiency in TOPS/Watt.
+        /// </summary>
+        /// <returns>The power efficiency.</returns>
+        public double GetPowerEfficiency()
+        {
+            return Generation switch
+            {
+                ANEGeneration.ANE1 => 11.0, // ~5.5 TOPS / 0.5W
+                ANEGeneration.ANE2 => 13.75, // ~11 TOPS / 0.8W
+                ANEGeneration.ANE3 => 13.33, // ~16 TOPS / 1.2W
+                ANEGeneration.ANE4 => 20.0, // Estimated future efficiency
+                _ => 10.0
+            };
+        }
+
+        /// <summary>
+        /// Checks if the specified model type is optimally supported.
+        /// </summary>
+        /// <param name="modelType">The model type to check.</param>
+        /// <returns>True if optimally supported; otherwise, false.</returns>
+        public bool IsModelTypeOptimal(ANEModelType modelType)
+        {
+            return modelType switch
+            {
+                ANEModelType.ConvolutionalNeuralNetwork => SupportsConvolution,
+                ANEModelType.RecurrentNeuralNetwork => Generation >= ANEGeneration.ANE2,
+                ANEModelType.Transformer => SupportsTransformer && SupportsAttention,
+                ANEModelType.ObjectDetection => SupportsConvolution && Generation >= ANEGeneration.ANE2,
+                ANEModelType.NaturalLanguageProcessing => SupportsAttention && Generation >= ANEGeneration.ANE3,
+                ANEModelType.ComputerVision => SupportsConvolution,
+                _ => false
+            };
+        }
+
+        private static ANECapabilities MapFromNative(ANENativeCapabilities native)
+        {
+            var generation = (ANEGeneration)native.Generation;
+            
+            return new ANECapabilities(
+                native.IsAvailable != 0,
+                generation,
+                native.MaxTOPS,
+                native.SupportsFloat16 != 0,
+                native.SupportsInt8 != 0,
+                native.SupportsConvolution != 0,
+                native.SupportsAttention != 0,
+                native.SupportsTransformer != 0,
+                native.SupportsCoreML != 0,
+                native.MaxBatchSize
+            );
+        }
+
+        /// <summary>
+        /// Returns a string representation of the ANE capabilities.
+        /// </summary>
+        /// <returns>A string describing the ANE capabilities.</returns>
+        public override string ToString()
+        {
+            return $"Apple Neural Engine {Generation}: {MaxTOPS:F1} TOPS, " +
+                   $"FP16={SupportsFloat16}, INT8={SupportsInt8}, " +
+                   $"Conv={SupportsConvolution}, Attn={SupportsAttention}, " +
+                   $"Efficiency={GetPowerEfficiency():F1} TOPS/W";
+        }
+    }
+
+    /// <summary>
+    /// Apple Neural Engine generations.
+    /// </summary>
+    public enum ANEGeneration
+    {
+        /// <summary>
+        /// No Neural Engine available.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// First generation ANE (A11, A12).
+        /// </summary>
+        ANE1 = 1,
+
+        /// <summary>
+        /// Second generation ANE (A13, A14).
+        /// </summary>
+        ANE2 = 2,
+
+        /// <summary>
+        /// Third generation ANE (A15, A16, M1, M2).
+        /// </summary>
+        ANE3 = 3,
+
+        /// <summary>
+        /// Fourth generation ANE (future chips).
+        /// </summary>
+        ANE4 = 4
+    }
+
+    /// <summary>
+    /// Model types optimized for Apple Neural Engine.
+    /// </summary>
+    public enum ANEModelType
+    {
+        /// <summary>
+        /// Convolutional Neural Network.
+        /// </summary>
+        ConvolutionalNeuralNetwork,
+
+        /// <summary>
+        /// Recurrent Neural Network.
+        /// </summary>
+        RecurrentNeuralNetwork,
+
+        /// <summary>
+        /// Transformer model.
+        /// </summary>
+        Transformer,
+
+        /// <summary>
+        /// Object detection model.
+        /// </summary>
+        ObjectDetection,
+
+        /// <summary>
+        /// Natural language processing model.
+        /// </summary>
+        NaturalLanguageProcessing,
+
+        /// <summary>
+        /// Computer vision model.
+        /// </summary>
+        ComputerVision
+    }
+
+    /// <summary>
+    /// Performance metrics for Apple Neural Engine.
+    /// </summary>
+    public readonly struct ANEPerformanceMetrics
+    {
+        /// <summary>
+        /// Initializes a new instance of the ANEPerformanceMetrics struct.
+        /// </summary>
+        /// <param name="utilizationPercent">Current ANE utilization percentage.</param>
+        /// <param name="throughputTOPS">Current throughput in TOPS.</param>
+        /// <param name="powerConsumption">Current power consumption in watts.</param>
+        /// <param name="inferenceLatency">Average inference latency in milliseconds.</param>
+        /// <param name="modelCacheHitRate">Model cache hit rate percentage.</param>
+        public ANEPerformanceMetrics(
+            double utilizationPercent,
+            double throughputTOPS,
+            double powerConsumption,
+            double inferenceLatency,
+            double modelCacheHitRate)
+        {
+            UtilizationPercent = utilizationPercent;
+            ThroughputTOPS = throughputTOPS;
+            PowerConsumption = powerConsumption;
+            InferenceLatency = inferenceLatency;
+            ModelCacheHitRate = modelCacheHitRate;
+        }
+
+        /// <summary>
+        /// Gets the current ANE utilization percentage.
+        /// </summary>
+        public double UtilizationPercent { get; }
+
+        /// <summary>
+        /// Gets the current throughput in TOPS.
+        /// </summary>
+        public double ThroughputTOPS { get; }
+
+        /// <summary>
+        /// Gets the current power consumption in watts.
+        /// </summary>
+        public double PowerConsumption { get; }
+
+        /// <summary>
+        /// Gets the average inference latency in milliseconds.
+        /// </summary>
+        public double InferenceLatency { get; }
+
+        /// <summary>
+        /// Gets the model cache hit rate percentage.
+        /// </summary>
+        public double ModelCacheHitRate { get; }
+    }
+
+    /// <summary>
+    /// Power information for Apple Neural Engine.
+    /// </summary>
+    public readonly struct ANEPowerInfo
+    {
+        /// <summary>
+        /// Initializes a new instance of the ANEPowerInfo struct.
+        /// </summary>
+        /// <param name="currentPower">Current power consumption in watts.</param>
+        /// <param name="thermalState">Current thermal state.</param>
+        /// <param name="powerEfficiency">Current power efficiency in TOPS/Watt.</param>
+        /// <param name="batteryImpact">Battery impact level.</param>
+        public ANEPowerInfo(
+            double currentPower,
+            ANEThermalState thermalState,
+            double powerEfficiency,
+            ANEBatteryImpact batteryImpact)
+        {
+            CurrentPower = currentPower;
+            ThermalState = thermalState;
+            PowerEfficiency = powerEfficiency;
+            BatteryImpact = batteryImpact;
+        }
+
+        /// <summary>
+        /// Gets the current power consumption in watts.
+        /// </summary>
+        public double CurrentPower { get; }
+
+        /// <summary>
+        /// Gets the current thermal state.
+        /// </summary>
+        public ANEThermalState ThermalState { get; }
+
+        /// <summary>
+        /// Gets the current power efficiency in TOPS/Watt.
+        /// </summary>
+        public double PowerEfficiency { get; }
+
+        /// <summary>
+        /// Gets the battery impact level.
+        /// </summary>
+        public ANEBatteryImpact BatteryImpact { get; }
+    }
+
+    /// <summary>
+    /// Apple Neural Engine thermal states.
+    /// </summary>
+    public enum ANEThermalState
+    {
+        /// <summary>
+        /// Normal operation.
+        /// </summary>
+        Normal,
+
+        /// <summary>
+        /// Fair thermal state.
+        /// </summary>
+        Fair,
+
+        /// <summary>
+        /// Serious thermal state.
+        /// </summary>
+        Serious,
+
+        /// <summary>
+        /// Critical thermal state.
+        /// </summary>
+        Critical
+    }
+
+    /// <summary>
+    /// Battery impact levels for ANE operations.
+    /// </summary>
+    public enum ANEBatteryImpact
+    {
+        /// <summary>
+        /// Minimal battery impact.
+        /// </summary>
+        Minimal,
+
+        /// <summary>
+        /// Low battery impact.
+        /// </summary>
+        Low,
+
+        /// <summary>
+        /// Medium battery impact.
+        /// </summary>
+        Medium,
+
+        /// <summary>
+        /// High battery impact.
+        /// </summary>
+        High
+    }
+}

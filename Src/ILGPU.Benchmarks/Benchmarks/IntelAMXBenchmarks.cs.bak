@@ -1,0 +1,426 @@
+// ---------------------------------------------------------------------------------------
+//                                     ILGPU-AOT
+//                        Copyright (c) 2024-2025 ILGPU-AOT Project
+//
+// Developed by:           Michael Ivertowski
+//
+// File: IntelAMXBenchmarks.cs
+//
+// This file is part of ILGPU-AOT and is distributed under the University of Illinois Open
+// Source License. See LICENSE.txt for details.
+// ---------------------------------------------------------------------------------------
+
+using BenchmarkDotNet.Attributes;
+using ILGPU;
+using ILGPU.Runtime;
+using System;
+
+#if ENABLE_INTEL_AMX
+using ILGPU.Intel.AMX;
+#endif
+
+namespace ILGPU.Benchmarks.Benchmarks
+{
+    /// <summary>
+    /// Benchmarks for Intel Advanced Matrix Extensions (AMX) Phase 7 AI acceleration capabilities.
+    /// </summary>
+    [MemoryDiagnoser]
+    [SimpleJob]
+    public class IntelAMXBenchmarks : IDisposable
+    {
+        private Context? context;
+        private Accelerator? cpuAccelerator;
+        private Accelerator? gpuAccelerator;
+#if ENABLE_INTEL_AMX
+        private AMXAccelerator? amxAccelerator;
+#endif
+        private float[]? inputData;
+        private float[]? weightsData;
+        private sbyte[]? int8Data;
+        private short[]? int16Data;
+
+        [Params(16, 32, 64, 128)]
+        public int TileSize { get; set; }
+
+        [Params(1, 4, 8, 16)]
+        public int BatchSize { get; set; }
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            context = Context.CreateDefault();
+            cpuAccelerator = context.GetPreferredDevice(preferCPU: true).CreateAccelerator(context);
+
+            // Try to get GPU accelerator
+            foreach (var device in context.Devices)
+            {
+                if (device.AcceleratorType != AcceleratorType.CPU)
+                {
+                    gpuAccelerator = device.CreateAccelerator(context);
+                    break;
+                }
+            }
+
+#if ENABLE_INTEL_AMX
+            // Try to get Intel AMX
+            try
+            {
+                if (AMXCapabilities.DetectAMX() != AMXGeneration.None)
+                {
+                    amxAccelerator = new AMXAccelerator(context);
+                }
+            }
+            catch
+            {
+                amxAccelerator = null;
+            }
+#endif
+
+            // Initialize test data
+            var totalElements = TileSize * TileSize * BatchSize;
+            inputData = new float[totalElements];
+            weightsData = new float[totalElements];
+            int8Data = new sbyte[totalElements];
+            int16Data = new short[totalElements];
+
+            var random = new Random(42);
+            for (int i = 0; i < totalElements; i++)
+            {
+                inputData[i] = (float)(random.NextDouble() * 2.0 - 1.0); // Range [-1, 1]
+                weightsData[i] = (float)random.NextGaussian(0, 0.1); // Xavier initialization
+                int8Data[i] = (sbyte)(random.Next(-128, 127));
+                int16Data[i] = (short)(random.Next(-32768, 32767));
+            }
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+#if ENABLE_INTEL_AMX
+            amxAccelerator?.Dispose();
+#endif
+            gpuAccelerator?.Dispose();
+            cpuAccelerator?.Dispose();
+            context?.Dispose();
+        }
+
+        [Benchmark(Baseline = true)]
+        public float CPU_MatrixMultiplication()
+        {
+            // Standard CPU matrix multiplication for baseline
+            var kernel = cpuAccelerator!.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, int>(
+                (index, a, b, c, size) =>
+                {
+                    var sum = 0.0f;
+                    for (int k = 0; k < size; k++)
+                    {
+                        sum += a[index.X, k] * b[k, index.Y];
+                    }
+                    c[index.X, index.Y] = sum;
+                });
+
+            using var matrixA = cpuAccelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+            using var matrixB = cpuAccelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+            using var result = cpuAccelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+
+            matrixA.CopyFromCPU(inputData!.AsSpan(0, TileSize * TileSize));
+            matrixB.CopyFromCPU(weightsData!.AsSpan(0, TileSize * TileSize));
+
+            kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, result.View, TileSize);
+            cpuAccelerator.Synchronize();
+
+            var output = result.GetAsArray2D();
+            return output[0, 0];
+        }
+
+        [Benchmark]
+        public float GPU_MatrixMultiplication()
+        {
+            if (gpuAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            var kernel = gpuAccelerator.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, int>(
+                (index, a, b, c, size) =>
+                {
+                    var sum = 0.0f;
+                    for (int k = 0; k < size; k++)
+                    {
+                        sum += a[index.X, k] * b[k, index.Y];
+                    }
+                    c[index.X, index.Y] = sum;
+                });
+
+            using var matrixA = gpuAccelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+            using var matrixB = gpuAccelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+            using var result = gpuAccelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+
+            matrixA.CopyFromCPU(inputData!.AsSpan(0, TileSize * TileSize));
+            matrixB.CopyFromCPU(weightsData!.AsSpan(0, TileSize * TileSize));
+
+            kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, result.View, TileSize);
+            gpuAccelerator.Synchronize();
+
+            var output = result.GetAsArray2D();
+            return output[0, 0];
+        }
+
+#if ENABLE_INTEL_AMX
+        [Benchmark]
+        public float AMX_TMUL_FP32()
+        {
+            if (amxAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                var tileSize = Math.Min(TileSize, 16); // AMX tiles are typically 16x16 for FP32
+
+                var operation = new AMXMatrixMultiplyOperation(
+                    tileRows: tileSize,
+                    tileCols: tileSize,
+                    dataType: AMXDataType.FP32
+                );
+
+                using var tileA = amxAccelerator.CreateTile<float>(tileSize, tileSize);
+                using var tileB = amxAccelerator.CreateTile<float>(tileSize, tileSize);
+                using var tileC = amxAccelerator.CreateTile<float>(tileSize, tileSize);
+
+                tileA.LoadFromHost(inputData!.AsSpan(0, tileSize * tileSize));
+                tileB.LoadFromHost(weightsData!.AsSpan(0, tileSize * tileSize));
+
+                amxAccelerator.Execute(operation, new[] { tileA, tileB }, new[] { tileC });
+                amxAccelerator.Synchronize();
+
+                var result = tileC.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float AMX_TMUL_BF16()
+        {
+            if (amxAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                var tileSize = Math.Min(TileSize, 32); // AMX can handle 32x32 BF16 tiles
+
+                var operation = new AMXMatrixMultiplyOperation(
+                    tileRows: tileSize,
+                    tileCols: tileSize,
+                    dataType: AMXDataType.BF16
+                );
+
+                using var tileA = amxAccelerator.CreateTile<ushort>(tileSize, tileSize); // BF16 as ushort
+                using var tileB = amxAccelerator.CreateTile<ushort>(tileSize, tileSize);
+                using var tileC = amxAccelerator.CreateTile<float>(tileSize, tileSize); // Output accumulator in FP32
+
+                // Convert FP32 to BF16 format
+                var bf16InputA = new ushort[tileSize * tileSize];
+                var bf16InputB = new ushort[tileSize * tileSize];
+                for (int i = 0; i < Math.Min(bf16InputA.Length, inputData!.Length); i++)
+                {
+                    bf16InputA[i] = FloatToBF16(inputData[i]);
+                    bf16InputB[i] = FloatToBF16(weightsData![i]);
+                }
+
+                tileA.LoadFromHost(bf16InputA);
+                tileB.LoadFromHost(bf16InputB);
+
+                amxAccelerator.Execute(operation, new[] { tileA, tileB }, new[] { tileC });
+                amxAccelerator.Synchronize();
+
+                var result = tileC.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float AMX_TMUL_INT8()
+        {
+            if (amxAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                var tileSize = Math.Min(TileSize, 64); // AMX can handle larger INT8 tiles
+
+                var operation = new AMXMatrixMultiplyOperation(
+                    tileRows: tileSize,
+                    tileCols: tileSize,
+                    dataType: AMXDataType.INT8
+                );
+
+                using var tileA = amxAccelerator.CreateTile<sbyte>(tileSize, tileSize);
+                using var tileB = amxAccelerator.CreateTile<sbyte>(tileSize, tileSize);
+                using var tileC = amxAccelerator.CreateTile<int>(tileSize, tileSize); // INT32 accumulator
+
+                tileA.LoadFromHost(int8Data!.AsSpan(0, tileSize * tileSize));
+                tileB.LoadFromHost(int8Data.AsSpan(0, tileSize * tileSize));
+
+                amxAccelerator.Execute(operation, new[] { tileA, tileB }, new[] { tileC });
+                amxAccelerator.Synchronize();
+
+                var result = tileC.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float AMX_BatchedOperations()
+        {
+            if (amxAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                var tileSize = Math.Min(TileSize, 16);
+                var batchCount = Math.Min(BatchSize, 8);
+
+                var operation = new AMXBatchedMatrixMultiplyOperation(
+                    tileRows: tileSize,
+                    tileCols: tileSize,
+                    batchSize: batchCount,
+                    dataType: AMXDataType.FP32
+                );
+
+                using var batchedTilesA = amxAccelerator.CreateBatchedTiles<float>(batchCount, tileSize, tileSize);
+                using var batchedTilesB = amxAccelerator.CreateBatchedTiles<float>(batchCount, tileSize, tileSize);
+                using var batchedTilesC = amxAccelerator.CreateBatchedTiles<float>(batchCount, tileSize, tileSize);
+
+                // Load batch data
+                for (int b = 0; b < batchCount; b++)
+                {
+                    var offset = b * tileSize * tileSize;
+                    var size = Math.Min(tileSize * tileSize, inputData!.Length - offset);
+                    if (size > 0)
+                    {
+                        batchedTilesA[b].LoadFromHost(inputData.AsSpan(offset, size));
+                        batchedTilesB[b].LoadFromHost(weightsData!.AsSpan(offset, Math.Min(size, weightsData.Length - offset)));
+                    }
+                }
+
+                amxAccelerator.Execute(operation, batchedTilesA, batchedTilesB, batchedTilesC);
+                amxAccelerator.Synchronize();
+
+                var result = batchedTilesC[0].CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float AMX_TileConfig_Performance()
+        {
+            if (amxAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                // Test different tile configurations
+                var configs = new[]
+                {
+                    new AMXTileConfig { Rows = 16, Cols = 16, DataType = AMXDataType.FP32 },
+                    new AMXTileConfig { Rows = 32, Cols = 16, DataType = AMXDataType.BF16 },
+                    new AMXTileConfig { Rows = 64, Cols = 16, DataType = AMXDataType.INT8 }
+                };
+
+                var bestResult = 0.0f;
+                
+                foreach (var config in configs)
+                {
+                    if (config.Rows > TileSize) continue;
+
+                    var operation = new AMXMatrixMultiplyOperation(
+                        tileRows: config.Rows,
+                        tileCols: config.Cols,
+                        dataType: config.DataType
+                    );
+
+                    if (config.DataType == AMXDataType.FP32)
+                    {
+                        using var tileA = amxAccelerator.CreateTile<float>(config.Rows, config.Cols);
+                        using var tileB = amxAccelerator.CreateTile<float>(config.Rows, config.Cols);
+                        using var tileC = amxAccelerator.CreateTile<float>(config.Rows, config.Cols);
+
+                        var dataSize = config.Rows * config.Cols;
+                        tileA.LoadFromHost(inputData!.AsSpan(0, Math.Min(dataSize, inputData.Length)));
+                        tileB.LoadFromHost(weightsData!.AsSpan(0, Math.Min(dataSize, weightsData.Length)));
+
+                        amxAccelerator.Execute(operation, new[] { tileA, tileB }, new[] { tileC });
+                        amxAccelerator.Synchronize();
+
+                        var result = tileC.CopyToHost();
+                        bestResult = Math.Max(bestResult, Math.Abs(result[0]));
+                    }
+                }
+
+                return bestResult;
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+#else
+        [Benchmark]
+        public float AMX_NotAvailable()
+        {
+            // AMX not available on this platform
+            return CPU_MatrixMultiplication();
+        }
+#endif
+
+        private static ushort FloatToBF16(float value)
+        {
+            // Simple BF16 conversion (truncate FP32 mantissa)
+            var bits = BitConverter.SingleToUInt32Bits(value);
+            return (ushort)(bits >> 16);
+        }
+
+        public void Dispose()
+        {
+            Cleanup();
+        }
+    }
+}
+
+
+#if ENABLE_INTEL_AMX
+/// <summary>
+/// AMX tile configuration for different data types and sizes.
+/// </summary>
+public struct AMXTileConfig
+{
+    public int Rows;
+    public int Cols;
+    public AMXDataType DataType;
+}
+
+/// <summary>
+/// AMX data types supported by Intel AMX.
+/// </summary>
+public enum AMXDataType
+{
+    FP32,
+    BF16,
+    INT8,
+    INT16
+}
+#endif

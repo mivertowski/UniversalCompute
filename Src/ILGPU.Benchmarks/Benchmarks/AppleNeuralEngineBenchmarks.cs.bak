@@ -1,0 +1,334 @@
+// ---------------------------------------------------------------------------------------
+//                                     ILGPU-AOT
+//                        Copyright (c) 2024-2025 ILGPU-AOT Project
+//
+// Developed by:           Michael Ivertowski
+//
+// File: AppleNeuralEngineBenchmarks.cs
+//
+// This file is part of ILGPU-AOT and is distributed under the University of Illinois Open
+// Source License. See LICENSE.txt for details.
+// ---------------------------------------------------------------------------------------
+
+using BenchmarkDotNet.Attributes;
+using ILGPU;
+using ILGPU.Runtime;
+using System;
+
+#if ENABLE_APPLE_ACCELERATOR
+using ILGPU.Apple.NeuralEngine;
+#endif
+
+namespace ILGPU.Benchmarks.Benchmarks
+{
+    /// <summary>
+    /// Benchmarks for Apple Neural Engine (ANE) Phase 7 AI acceleration capabilities.
+    /// </summary>
+    [MemoryDiagnoser]
+    [SimpleJob]
+    public class AppleNeuralEngineBenchmarks : IDisposable
+    {
+        private Context? context;
+        private Accelerator? cpuAccelerator;
+        private Accelerator? gpuAccelerator;
+#if ENABLE_APPLE_ACCELERATOR
+        private ANEAccelerator? aneAccelerator;
+#endif
+        private float[]? inputData;
+        private float[]? weightsData;
+
+        [Params(128, 512, 1024, 2048)]
+        public int MatrixSize { get; set; }
+
+        [Params(16, 32, 64)]
+        public int BatchSize { get; set; }
+
+        [GlobalSetup]
+        public void Setup()
+        {
+            context = Context.CreateDefault();
+            cpuAccelerator = context.GetPreferredDevice(preferCPU: true).CreateAccelerator(context);
+
+            // Try to get GPU accelerator
+            foreach (var device in context.Devices)
+            {
+                if (device.AcceleratorType != AcceleratorType.CPU)
+                {
+                    gpuAccelerator = device.CreateAccelerator(context);
+                    break;
+                }
+            }
+
+#if ENABLE_APPLE_ACCELERATOR
+            // Try to get Apple Neural Engine
+            try
+            {
+                if (ANECapabilities.DetectNeuralEngine() != ANEGeneration.None)
+                {
+                    aneAccelerator = new ANEAccelerator(context);
+                }
+            }
+            catch
+            {
+                aneAccelerator = null;
+            }
+#endif
+
+            // Initialize test data
+            var totalElements = MatrixSize * MatrixSize;
+            inputData = new float[totalElements];
+            weightsData = new float[totalElements];
+
+            var random = new Random(42);
+            for (int i = 0; i < totalElements; i++)
+            {
+                inputData[i] = (float)random.NextGaussian(0, 1);
+                weightsData[i] = (float)random.NextGaussian(0, 0.1);
+            }
+        }
+
+        [GlobalCleanup]
+        public void Cleanup()
+        {
+#if ENABLE_APPLE_ACCELERATOR
+            aneAccelerator?.Dispose();
+#endif
+            gpuAccelerator?.Dispose();
+            cpuAccelerator?.Dispose();
+            context?.Dispose();
+        }
+
+        [Benchmark(Baseline = true)]
+        public float CPU_MatrixMultiplication()
+        {
+            var kernel = cpuAccelerator!.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, int>(
+                (index, a, b, c, size) =>
+                {
+                    var sum = 0.0f;
+                    for (int k = 0; k < size; k++)
+                    {
+                        sum += a[index.X, k] * b[k, index.Y];
+                    }
+                    c[index.X, index.Y] = sum;
+                });
+
+            using var bufferA = cpuAccelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+            using var bufferB = cpuAccelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+            using var result = cpuAccelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+
+            bufferA.CopyFromCPU(inputData!);
+            bufferB.CopyFromCPU(weightsData!);
+
+            kernel(new Index2D(MatrixSize, MatrixSize), bufferA.View, bufferB.View, result.View, MatrixSize);
+            cpuAccelerator.Synchronize();
+
+            var output = result.GetAsArray2D();
+            return output[0, 0];
+        }
+
+        [Benchmark]
+        public float GPU_MatrixMultiplication()
+        {
+            if (gpuAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            var kernel = gpuAccelerator.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, int>(
+                (index, a, b, c, size) =>
+                {
+                    var sum = 0.0f;
+                    for (int k = 0; k < size; k++)
+                    {
+                        sum += a[index.X, k] * b[k, index.Y];
+                    }
+                    c[index.X, index.Y] = sum;
+                });
+
+            using var bufferA = gpuAccelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+            using var bufferB = gpuAccelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+            using var result = gpuAccelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+
+            bufferA.CopyFromCPU(inputData!);
+            bufferB.CopyFromCPU(weightsData!);
+
+            kernel(new Index2D(MatrixSize, MatrixSize), bufferA.View, bufferB.View, result.View, MatrixSize);
+            gpuAccelerator.Synchronize();
+
+            var output = result.GetAsArray2D();
+            return output[0, 0];
+        }
+
+#if ENABLE_APPLE_ACCELERATOR
+        [Benchmark]
+        public float ANE_MatrixMultiplication()
+        {
+            if (aneAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                // Create neural network operation for matrix multiplication
+                var operation = new MatrixMultiplicationOperation(MatrixSize, MatrixSize, MatrixSize);
+                
+                using var inputTensor = aneAccelerator.CreateTensor<float>(new[] { MatrixSize, MatrixSize });
+                using var weightTensor = aneAccelerator.CreateTensor<float>(new[] { MatrixSize, MatrixSize });
+                using var outputTensor = aneAccelerator.CreateTensor<float>(new[] { MatrixSize, MatrixSize });
+
+                inputTensor.CopyFromHost(inputData!);
+                weightTensor.CopyFromHost(weightsData!);
+
+                aneAccelerator.Execute(operation, new[] { inputTensor, weightTensor }, new[] { outputTensor });
+                aneAccelerator.Synchronize();
+
+                var result = outputTensor.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float ANE_Convolution2D()
+        {
+            if (aneAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                var inputChannels = 3;
+                var outputChannels = 16;
+                var kernelSize = 3;
+                var imageSize = Math.Min(224, MatrixSize); // Limit for performance
+
+                var operation = new Convolution2DOperation(
+                    inputChannels, outputChannels, kernelSize, kernelSize,
+                    stride: 1, padding: 1);
+
+                using var inputTensor = aneAccelerator.CreateTensor<float>(new[] { BatchSize, inputChannels, imageSize, imageSize });
+                using var kernelTensor = aneAccelerator.CreateTensor<float>(new[] { outputChannels, inputChannels, kernelSize, kernelSize });
+                using var outputTensor = aneAccelerator.CreateTensor<float>(new[] { BatchSize, outputChannels, imageSize, imageSize });
+
+                // Initialize with subset of data
+                var inputSize = BatchSize * inputChannels * imageSize * imageSize;
+                var kernelSizeTotal = outputChannels * inputChannels * kernelSize * kernelSize;
+                
+                inputTensor.CopyFromHost(inputData!.AsSpan(0, Math.Min(inputSize, inputData.Length)));
+                kernelTensor.CopyFromHost(weightsData!.AsSpan(0, Math.Min(kernelSizeTotal, weightsData.Length)));
+
+                aneAccelerator.Execute(operation, new[] { inputTensor, kernelTensor }, new[] { outputTensor });
+                aneAccelerator.Synchronize();
+
+                var result = outputTensor.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float ANE_FullyConnected()
+        {
+            if (aneAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                var inputSize = MatrixSize;
+                var outputSize = MatrixSize / 2;
+
+                var operation = new FullyConnectedOperation(inputSize, outputSize);
+
+                using var inputTensor = aneAccelerator.CreateTensor<float>(new[] { BatchSize, inputSize });
+                using var weightTensor = aneAccelerator.CreateTensor<float>(new[] { outputSize, inputSize });
+                using var outputTensor = aneAccelerator.CreateTensor<float>(new[] { BatchSize, outputSize });
+
+                var weightSize = outputSize * inputSize;
+                inputTensor.CopyFromHost(inputData!.AsSpan(0, Math.Min(BatchSize * inputSize, inputData.Length)));
+                weightTensor.CopyFromHost(weightsData!.AsSpan(0, Math.Min(weightSize, weightsData.Length)));
+
+                aneAccelerator.Execute(operation, new[] { inputTensor, weightTensor }, new[] { outputTensor });
+                aneAccelerator.Synchronize();
+
+                var result = outputTensor.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+
+        [Benchmark]
+        public float ANE_BatchedInference()
+        {
+            if (aneAccelerator == null)
+                return CPU_MatrixMultiplication();
+
+            try
+            {
+                // Simple neural network: input -> fully connected -> activation -> output
+                var hiddenSize = MatrixSize / 4;
+                var outputSize = MatrixSize / 8;
+
+                var fc1 = new FullyConnectedOperation(MatrixSize, hiddenSize);
+                var activation = new ActivationOperation(ActivationType.ReLU);
+                var fc2 = new FullyConnectedOperation(hiddenSize, outputSize);
+
+                using var input = aneAccelerator.CreateTensor<float>(new[] { BatchSize, MatrixSize });
+                using var hidden = aneAccelerator.CreateTensor<float>(new[] { BatchSize, hiddenSize });
+                using var activated = aneAccelerator.CreateTensor<float>(new[] { BatchSize, hiddenSize });
+                using var output = aneAccelerator.CreateTensor<float>(new[] { BatchSize, outputSize });
+
+                using var weights1 = aneAccelerator.CreateTensor<float>(new[] { hiddenSize, MatrixSize });
+                using var weights2 = aneAccelerator.CreateTensor<float>(new[] { outputSize, hiddenSize });
+
+                // Initialize data
+                input.CopyFromHost(inputData!.AsSpan(0, Math.Min(BatchSize * MatrixSize, inputData.Length)));
+                weights1.CopyFromHost(weightsData!.AsSpan(0, Math.Min(hiddenSize * MatrixSize, weightsData.Length)));
+                weights2.CopyFromHost(weightsData!.AsSpan(0, Math.Min(outputSize * hiddenSize, weightsData.Length)));
+
+                // Execute pipeline
+                aneAccelerator.Execute(fc1, new[] { input, weights1 }, new[] { hidden });
+                aneAccelerator.Execute(activation, new[] { hidden }, new[] { activated });
+                aneAccelerator.Execute(fc2, new[] { activated, weights2 }, new[] { output });
+                aneAccelerator.Synchronize();
+
+                var result = output.CopyToHost();
+                return result[0];
+            }
+            catch
+            {
+                return CPU_MatrixMultiplication();
+            }
+        }
+#else
+        [Benchmark]
+        public float ANE_NotAvailable()
+        {
+            // ANE not available on this platform
+            return CPU_MatrixMultiplication();
+        }
+#endif
+
+        public void Dispose()
+        {
+            Cleanup();
+        }
+    }
+}
+
+// Extension method for random number generation
+public static class RandomExtensions
+{
+    public static double NextGaussian(this Random random, double mean = 0, double stdDev = 1)
+    {
+        // Box-Muller transform
+        var u1 = 1.0 - random.NextDouble();
+        var u2 = 1.0 - random.NextDouble();
+        var randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+        return mean + stdDev * randStdNormal;
+    }
+}

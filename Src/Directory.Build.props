@@ -1,0 +1,30 @@
+﻿<Project>
+  <!-- Library Project Configuration -->
+  <PropertyGroup>
+    <LibraryTargetFrameworks>net9.0</LibraryTargetFrameworks>
+    <LibraryLatestTargetFramework>$(LibraryTargetFrameworks)</LibraryLatestTargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <LibraryTargetFrameworks>$(LibraryTargetFrameworks);net8.0;net6.0;net7.0</LibraryTargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LibraryVersionPrefix>2.0.0-beta1</LibraryVersionPrefix>
+    <LibraryAssemblyVersion>2.0.0.0</LibraryAssemblyVersion>
+    <LibraryFileVersion>2.0.0.0</LibraryFileVersion>
+    <LibraryPackageValidationBaselineVersion>1.5.0</LibraryPackageValidationBaselineVersion>
+  </PropertyGroup>
+
+  <!-- Unit Test Project Configuration -->
+  <PropertyGroup>
+    <LibraryUnitTestTargetFrameworks>net9.0</LibraryUnitTestTargetFrameworks>
+    <LibraryLatestUnitTestTargetFramework>$(LibraryUnitTestTargetFrameworks)</LibraryLatestUnitTestTargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <LibraryUnitTestTargetFrameworks>$(LibraryUnitTestTargetFrameworks);net8.0;net6.0;net7.0</LibraryUnitTestTargetFrameworks>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+
+  <Import Project="..\Tools\CheckStyles\ILGPU.CheckStyles.targets" />
+</Project>

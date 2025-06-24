@@ -1,0 +1,37 @@
+---
+# Add this header to tell Jekyll to process the file
+---
+
+// loading partials from _sass/
+@import 'colors';
+@import 'override-colors';
+@import 'sidebar-collapse';
+
+#breadcrumbs .container, #breadcrumbs .container.sidebar-collapsed {
+  margin-left: 85px;
+}
+
+@media (min-width: 576px) {
+  #breadcrumbs .container {
+    margin-left: 340px;
+  }
+}
+
+#breadcrumbs .container.sidebar-animated {
+  @include sidebar-collapse-transition(margin-left);
+}
+
+{% if site.search.enabled %}
+#search .empty-message {
+  padding: 5px 10px;
+  text-align: center;
+}
+
+#search .tt-suggestion {
+  padding: 5px 10px;
+  text-align: left;
+  &:hover {
+    color: $primaryColor;
+  }
+}
+{% endif %}
