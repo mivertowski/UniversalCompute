@@ -1,4 +1,4 @@
-# ILGPU - Universal Compute Platform for .NET
+# ILGPU - Universal Compute Platform for .NET - WORK IN PROGRESS
 
 > **Forked from**: [ILGPU](https://github.com/m4rs-mt/ILGPU) - Enhanced with comprehensive modernization and universal cross-platform AI acceleration
 
@@ -6,7 +6,7 @@
 [![.NET 9](https://img.shields.io/badge/.NET-9.0-purple.svg)](https://dotnet.microsoft.com/)
 [![AOT Compatible](https://img.shields.io/badge/AOT-Compatible-green.svg)](https://docs.microsoft.com/en-us/dotnet/core/deploying/native-aot/)
 
-ILGPU is the world's first **Universal Compute Platform** for .NET, providing write-once, run-anywhere acceleration across all hardware platforms. Originally a JIT compiler, ILGPU has evolved through an 8-phase modernization into a comprehensive compute acceleration ecosystem that intelligently leverages every available hardware capability.
+ILGPU is a **Universal Compute Platform** for .NET, providing write-once, run-anywhere acceleration across all hardware platforms. Originally a JIT compiler, ILGPU has evolved through comprehensive modernization into a compute acceleration ecosystem that intelligently leverages every available hardware capability.
 
 ## 🚀 **Universal Platform Support**
 
@@ -47,9 +47,7 @@ ILGPU now provides a **single, unified API** that automatically optimizes across
 | **iOS/iPadOS** | ✅ NEON | ✅ Metal | ❌ | ✅ ANE | ✅ Apple AMX |
 | **Android ARM64** | ✅ NEON | ✅ OpenCL/Vulkan | ❌ | Varies | ❌ |
 
-## 🏗️ **8-Phase Evolution Complete**
-
-### ✅ **Phase 1-4: Foundation to Advanced GPU Programming (100%)**
+### ✅ Foundation to Advanced GPU Programming**
 - **Native AOT Compatibility**: Complete elimination of System.Reflection.Emit
 - **Unified Memory System**: Generic programming with IUnifiedMemoryBuffer interface
 - **Device API Modernization**: Consistent DeviceId, Status, and Memory properties
@@ -57,7 +55,7 @@ ILGPU now provides a **single, unified API** that automatically optimizes across
 - **Dependency Injection**: Full Microsoft DI integration
 - **Enhanced Error Handling**: Comprehensive GPU exception hierarchy with recovery strategies
 
-### ✅ **Phase 5-6: Cross-Platform & Tensor Core Integration (100%)**
+### ✅ Cross-Platform & Tensor Core Integration**
 - **Cross-Platform Deployment**: Universal Windows, Linux, macOS, iOS, Android support
 - **Direct Tensor Core Bindings**: Native PTX WMMA intrinsics with extern methods
 - **.NET SIMD Unification**: System.Numerics.Vector integration with platform-specific optimizations
@@ -66,7 +64,7 @@ ILGPU now provides a **single, unified API** that automatically optimizes across
 - **Hybrid Processing**: Intelligent CPU/GPU workload distribution
 - **BFloat16 Implementation**: Full Brain Floating Point support for ML workloads
 
-### ✅ **Phase 7-8: Emerging Platforms & Universal Computing (100%)**
+### ✅ Emerging Platforms & Universal Computing**
 - **Apple Neural Engine**: M-series chip AI acceleration with CoreML integration
 - **Intel NPU/AMX**: Advanced Matrix Extensions and Neural Processing Unit support
 - **Quantum Computing**: Hybrid quantum-classical computing simulation
@@ -139,7 +137,7 @@ var predictor = new ILGPUTensorPredictor(hybridProcessor);
 var result = await predictor.PredictAsync(input);
 ```
 
-### Phase 6: Tensor Core & SIMD Integration
+### Tensor Core & SIMD Integration
 ```csharp
 // Direct tensor core operations with mixed precision
 using var context = Context.Create(builder => builder.Cuda().EnableTensorCores());
@@ -237,7 +235,7 @@ var optimized = await processor.ProcessAsync(input, operation, HybridStrategy.Au
 - **[Beginner Tutorials](Docs/02_Beginner/)**: Context, memory management, and basic kernels
 - **[Advanced Features](Docs/03_Advanced/)**: Shared memory, math functions, profiling
 
-### **🚀 8-Phase Evolution Guide**
+### **🚀 Evolution Guide**
 - **[Phase 1-4: Foundation](Docs/05_Evolution/)**: GPU programming basics to advanced features
 - **[Phase 5: Cross-Platform](Docs/05_Evolution/05_Cross-Platform.md)**: Universal deployment strategies
 - **[Phase 6: Tensor Cores](Docs/05_Evolution/06_Tensor-Cores.md)**: AI/ML acceleration with .NET SIMD
@@ -319,7 +317,7 @@ Transform ILGPU into a **premier compute acceleration framework for .NET**:
 - **Copyright**: (c) 2025 Michael Ivertowski, Ernst & Young Ltd. Switzerland
 - **Commercial Use**: Restricted until 2029-06-24
 - **Future License**: Transitions to Apache License 2.0 after change date
-- **Commercial Licensing**: Available for production use through licensed resellers
+- **Commercial Licensing**: Available for production use. Contact Michael Ivertowski if you have an interest.
 
 ### **Key Licensing Terms**
 - **Non-Production Use**: Freely available for development, testing, and educational purposes
