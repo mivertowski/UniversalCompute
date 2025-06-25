@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore Src
+      run: dotnet restore Src/ILGPU.sln
     - name: Build
-      run: dotnet build Src --configuration Release --no-restore
+      run: dotnet build Src/ILGPU.sln --configuration Release --no-restore
     - name: Basic validation (build successful)
       run: echo "Build completed successfully - full test suite runs in CI workflow"
