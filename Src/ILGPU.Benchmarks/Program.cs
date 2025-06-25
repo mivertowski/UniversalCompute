@@ -98,49 +98,53 @@ public class Program
                         .PageSize(10)
                         .AddChoices(new[]
                         {
-                            "🚀 Quick Performance Suite",
-                            "🎯 Tensor Core Benchmarks",
-                            "⚡ SIMD Performance Tests",
-                            "🔄 Hybrid Processing Benchmarks",
-                            "💾 Memory Operations Benchmarks",
-                            "🔥 Burn-in Test (Maximum Load)",
-                            "📊 Comprehensive Benchmark Suite",
-                            "🤖 Unattended Benchmarks (GitHub Ready)",
-                            "⚙️ System Information",
-                            "❌ Exit"
+                            "Quick Performance Suite",
+                            "Tensor Core Benchmarks",
+                            "SIMD Performance Tests",
+                            "Hybrid Processing Benchmarks",
+                            "Memory Operations Benchmarks",
+                            "Specialized Hardware Benchmarks",
+                            "Burn-in Test (Maximum Load)",
+                            "Comprehensive Benchmark Suite",
+                            "Unattended Benchmarks (GitHub Ready)",
+                            "System Information",
+                            "Exit"
                         }));
 
                 switch (choice)
                 {
-                    case "🚀 Quick Performance Suite":
+                    case "Quick Performance Suite":
                         await benchmarkRunner.RunQuickSuiteAsync();
                         break;
-                    case "🎯 Tensor Core Benchmarks":
+                    case "Tensor Core Benchmarks":
                         await benchmarkRunner.RunTensorCoreBenchmarksAsync();
                         break;
-                    case "⚡ SIMD Performance Tests":
+                    case "SIMD Performance Tests":
                         await benchmarkRunner.RunSimdBenchmarksAsync();
                         break;
-                    case "🔄 Hybrid Processing Benchmarks":
+                    case "Hybrid Processing Benchmarks":
                         await benchmarkRunner.RunHybridBenchmarksAsync();
                         break;
-                    case "💾 Memory Operations Benchmarks":
+                    case "Memory Operations Benchmarks":
                         await benchmarkRunner.RunMemoryBenchmarksAsync();
                         break;
-                    case "🔥 Burn-in Test (Maximum Load)":
+                    case "Specialized Hardware Benchmarks":
+                        await benchmarkRunner.RunSpecializedHardwareBenchmarksAsync();
+                        break;
+                    case "Burn-in Test (Maximum Load)":
                         await burnInRunner.RunBurnInTestAsync();
                         break;
-                    case "📊 Comprehensive Benchmark Suite":
+                    case "Comprehensive Benchmark Suite":
                         await benchmarkRunner.RunComprehensiveSuiteAsync();
                         break;
-                    case "🤖 Unattended Benchmarks (GitHub Ready)":
+                    case "Unattended Benchmarks (GitHub Ready)":
                         var unattendedRunner = host.Services.GetRequiredService<UnattendedBenchmarkRunner>();
                         await unattendedRunner.RunUnattendedBenchmarksAsync();
                         break;
-                    case "⚙️ System Information":
+                    case "System Information":
                         SystemInfo.DisplaySystemInformation();
                         break;
-                    case "❌ Exit":
+                    case "Exit":
                         AnsiConsole.MarkupLine("[green]Thank you for using ILGPU Phase 6 Benchmarks![/]");
                         return 0;
                 }
@@ -177,23 +181,23 @@ public class Program
             await unattendedRunner.RunUnattendedBenchmarksAsync();
 
             Console.WriteLine();
-            Console.WriteLine("✅ Unattended benchmarks completed successfully!");
-            Console.WriteLine($"📁 Results saved to: {Path.Combine(Environment.CurrentDirectory, "BenchmarkResults")}");
+            Console.WriteLine("Unattended benchmarks completed successfully!");
+            Console.WriteLine($"Results saved to: {Path.Combine(Environment.CurrentDirectory, "BenchmarkResults")}");
             Console.WriteLine();
             Console.WriteLine("Output files:");
-            Console.WriteLine("  📄 README_Benchmarks.md    - GitHub README-ready benchmark results");
-            Console.WriteLine("  📊 benchmark_results.json  - JSON data for programmatic consumption");
-            Console.WriteLine("  📈 benchmark_results.csv   - CSV data for analysis");
-            Console.WriteLine("  📋 comprehensive_report.md - Detailed technical report");
+            Console.WriteLine("  README_Benchmarks.md    - GitHub README-ready benchmark results");
+            Console.WriteLine("  benchmark_results.json  - JSON data for programmatic consumption");
+            Console.WriteLine("  benchmark_results.csv   - CSV data for analysis");
+            Console.WriteLine("  comprehensive_report.md - Detailed technical report");
             Console.WriteLine();
-            Console.WriteLine("💡 Use '--help' for more command-line options");
+            Console.WriteLine("Use '--help' for more command-line options");
 
             return 0;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"❌ Error during unattended benchmark execution: {ex.Message}");
-            Console.WriteLine($"📝 Stack trace: {ex.StackTrace}");
+            Console.WriteLine($"Error during unattended benchmark execution: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
             return 1;
         }
     }

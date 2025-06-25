@@ -73,8 +73,8 @@ public class BenchmarkRunner
                 task.Increment(25);
 
                 // AI performance primitives
-                task.Description = "[green]AI Performance Primitives[/]";
-                BenchmarkDotNet.Running.BenchmarkRunner.Run<AIPerformancePrimitivesBenchmarks>(config.QuickConfig);
+                task.Description = "[green]GPU-Only Operations[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<GpuOnlyBenchmarks>(config.QuickConfig);
                 task.Increment(25);
 
                 task.Description = "[green]Quick suite completed![/]";
@@ -201,11 +201,47 @@ public class BenchmarkRunner
                 BenchmarkDotNet.Running.BenchmarkRunner.Run<MemoryLayoutBenchmarks>(config.StandardConfig);
                 task.Increment(33);
 
-                task.Description = "[orange1]Memory Performance[/]";
-                BenchmarkDotNet.Running.BenchmarkRunner.Run<MemoryBenchmarks>(config.StandardConfig);
+                task.Description = "[orange1]Unified Memory Operations[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<UnifiedMemoryBenchmarks>(config.StandardConfig);
                 task.Increment(34);
 
                 task.Description = "[orange1]Memory benchmarks completed![/]";
+                await Task.Delay(500);
+            });
+    }
+
+    /// <summary>
+    /// Runs specialized hardware benchmarks (NPU, AMX, Apple Neural Engine).
+    /// </summary>
+    public async Task RunSpecializedHardwareBenchmarksAsync()
+    {
+        AnsiConsole.Write(
+            new Panel("[cyan1]Specialized Hardware Benchmarks[/]")
+                .Border(BoxBorder.Rounded)
+                .BorderColor(Color.Purple));
+
+        await AnsiConsole.Progress()
+            .StartAsync(async ctx =>
+            {
+                var task = ctx.AddTask("[magenta]Running specialized hardware benchmarks...[/]", maxValue: 100);
+
+                task.Description = "[magenta]Intel NPU Operations[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<IntelNPUBenchmarks>(config.StandardConfig);
+                task.Increment(25);
+
+                task.Description = "[magenta]Intel AMX Matrix Operations[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<IntelAMXBenchmarks>(config.StandardConfig);
+                task.Increment(25);
+
+                task.Description = "[magenta]Apple Neural Engine Operations[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<AppleNeuralEngineBenchmarks>(config.StandardConfig);
+                task.Increment(25);
+
+                task.Description = "[magenta]GPU-Only Performance[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<GpuOnlyBenchmarks>(config.StandardConfig);
+                task.Increment(25);
+
+                task.Description = "[magenta]Specialized hardware benchmarks completed![/]";
                 await Task.Delay(500);
             });
     }
@@ -245,11 +281,11 @@ public class BenchmarkRunner
 
                 mainTask.Description = "[red]Memory Benchmarks[/]";
                 await RunMemoryBenchmarksAsync();
-                mainTask.Increment(100);
+                mainTask.Increment(80);
 
-                mainTask.Description = "[red]Performance Scaling Tests[/]";
-                BenchmarkDotNet.Running.BenchmarkRunner.Run<ScalabilityBenchmarks>(config.ComprehensiveConfig);
-                mainTask.Increment(100);
+                mainTask.Description = "[red]Specialized Hardware Benchmarks[/]";
+                await RunSpecializedHardwareBenchmarksAsync();
+                mainTask.Increment(120);
 
                 mainTask.Description = "[red]All benchmarks completed![/]";
                 await Task.Delay(1000);
