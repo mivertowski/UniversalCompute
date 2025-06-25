@@ -17,23 +17,26 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
+using ILGPU.Benchmarks.Infrastructure;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 
 /// <summary>
-/// Benchmarks for Intel Neural Processing Unit (NPU) operations.
-/// NPU operations are simulated when actual NPU hardware is not available.
+/// Benchmarks for Intel Neural Processing Unit (NPU) operations using real NPU hardware via OpenVINO.
+/// Falls back to ILGPU simulation when actual NPU hardware is not available.
 /// </summary>
 [MemoryDiagnoser]
 [SimpleJob]
 public class IntelNPUBenchmarks : IDisposable
 {
     private Context? context;
-    private Accelerator? accelerator;
+    private Accelerator? ilgpuAccelerator;
+    private ISpecializedAccelerator? npuAccelerator;
     private MemoryBuffer1D<float, Stride1D.Dense>? inputBuffer;
     private MemoryBuffer1D<float, Stride1D.Dense>? weightBuffer;
     private MemoryBuffer1D<float, Stride1D.Dense>? biasBuffer;
     private MemoryBuffer1D<float, Stride1D.Dense>? outputBuffer;
+    private bool hasRealNPU;
 
     [Params(256, 512, 1024, 2048)]
     public int NetworkSize { get; set; }
@@ -46,21 +49,44 @@ public class IntelNPUBenchmarks : IDisposable
     {
         try
         {
-            context = Context.CreateDefault();
+            // Check for real Intel NPU hardware first
+            var hardwareInfo = HardwareDetection.GetHardwareInfo();
+            hasRealNPU = hardwareInfo.Capabilities.HasFlag(HardwareCapabilities.IntelNPU);
             
-            // Prefer GPU for NPU simulation, fall back to CPU
+            if (hasRealNPU)
+            {
+                Console.WriteLine("🚀 Detected Intel NPU - using real hardware acceleration!");
+                npuAccelerator = SpecializedAcceleratorFactory.CreateIntelNPUAccelerator();
+                
+                if (npuAccelerator?.IsAvailable != true)
+                {
+                    Console.WriteLine("⚠️ Intel NPU hardware detected but not accessible, falling back to simulation");
+                    hasRealNPU = false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ Intel NPU not detected - using ILGPU simulation");
+            }
+
+            // Always set up ILGPU for fallback/comparison
+            context = Context.CreateDefault();
             var device = context.GetPreferredDevice(preferCPU: false) ?? 
                         context.GetPreferredDevice(preferCPU: true);
-            accelerator = device.CreateAccelerator(context);
+            ilgpuAccelerator = device.CreateAccelerator(context);
 
             // Allocate memory for neural network operations
             var totalElements = NetworkSize * NetworkSize;
-            inputBuffer = accelerator.Allocate1D<float>(totalElements);
-            weightBuffer = accelerator.Allocate1D<float>(totalElements);
-            biasBuffer = accelerator.Allocate1D<float>(NetworkSize);
-            outputBuffer = accelerator.Allocate1D<float>(NetworkSize * BatchSize);
+            inputBuffer = ilgpuAccelerator.Allocate1D<float>(totalElements);
+            weightBuffer = ilgpuAccelerator.Allocate1D<float>(totalElements);
+            biasBuffer = ilgpuAccelerator.Allocate1D<float>(NetworkSize);
+            outputBuffer = ilgpuAccelerator.Allocate1D<float>(NetworkSize * BatchSize);
 
             InitializeTestData();
+            
+            // Print hardware info
+            Console.WriteLine($"💻 Processor: {hardwareInfo.ProcessorName}");
+            Console.WriteLine($"🔧 Available devices: {string.Join(", ", hardwareInfo.AvailableDevices)}");
         }
         catch (Exception ex)
         {
@@ -103,7 +129,7 @@ public class IntelNPUBenchmarks : IDisposable
     [Benchmark(Baseline = true)]
     public float StandardNeuralNetwork()
     {
-        var kernel = accelerator!.LoadAutoGroupedStreamKernel<
+        var kernel = ilgpuAccelerator!.LoadAutoGroupedStreamKernel<
             Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
             StandardNeuralNetworkKernel);
 
@@ -111,7 +137,7 @@ public class IntelNPUBenchmarks : IDisposable
             return 0.0f;
             
         kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
-        accelerator!.Synchronize();
+        ilgpuAccelerator!.Synchronize();
         
         var result = new float[1];
         outputBuffer.View.SubView(0, 1).CopyToCPU(result);
@@ -119,10 +145,42 @@ public class IntelNPUBenchmarks : IDisposable
     }
 
     [Benchmark]
+    public async Task<float> NPURealHardware()
+    {
+        if (!hasRealNPU || npuAccelerator?.IsAvailable != true)
+        {
+            // Fall back to simulation when real NPU not available
+            return NPUSimulatedInference();
+        }
+
+        try
+        {
+            // Use real Intel NPU hardware via OpenVINO
+            var inputData = inputBuffer!.GetAsArray1D();
+            var weightData = weightBuffer!.GetAsArray1D();
+            
+            // Execute matrix multiplication on real NPU
+            var result = await npuAccelerator.ExecuteMatrixMultiplyAsync(
+                inputData.Take(NetworkSize * NetworkSize).ToArray(),
+                weightData.Take(NetworkSize * NetworkSize).ToArray(),
+                NetworkSize);
+            
+            Console.WriteLine("🚀 Executed on real Intel NPU hardware");
+            return result.Length > 0 ? result[0] : 0.0f;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Real NPU execution failed: {ex.Message}");
+            // Fall back to simulation
+            return NPUSimulatedInference();
+        }
+    }
+
+    [Benchmark]
     public float NPUSimulatedInference()
     {
-        // Simulate NPU-optimized inference with reduced precision
-        var kernel = accelerator!.LoadAutoGroupedStreamKernel<
+        // ILGPU simulation of NPU-optimized inference with reduced precision
+        var kernel = ilgpuAccelerator!.LoadAutoGroupedStreamKernel<
             Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
             NPUInferenceKernel);
 
@@ -130,7 +188,7 @@ public class IntelNPUBenchmarks : IDisposable
             return 0.0f;
             
         kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
-        accelerator!.Synchronize();
+        ilgpuAccelerator!.Synchronize();
         
         var result = new float[1];
         outputBuffer.View.SubView(0, 1).CopyToCPU(result);
@@ -141,7 +199,7 @@ public class IntelNPUBenchmarks : IDisposable
     public float NPUQuantizedInference()
     {
         // Simulate INT8 quantized inference typical of NPU operations
-        var kernel = accelerator!.LoadAutoGroupedStreamKernel<
+        var kernel = ilgpuAccelerator!.LoadAutoGroupedStreamKernel<
             Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
             QuantizedInferenceKernel);
 
@@ -149,7 +207,7 @@ public class IntelNPUBenchmarks : IDisposable
             return 0.0f;
             
         kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
-        accelerator!.Synchronize();
+        ilgpuAccelerator!.Synchronize();
         
         var result = new float[1];
         outputBuffer.View.SubView(0, 1).CopyToCPU(result);
@@ -160,7 +218,7 @@ public class IntelNPUBenchmarks : IDisposable
     public float NPUConvolutionalLayer()
     {
         // Simulate NPU-optimized convolution
-        var kernel = accelerator!.LoadAutoGroupedStreamKernel<
+        var kernel = ilgpuAccelerator!.LoadAutoGroupedStreamKernel<
             Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
             ConvolutionalKernel);
 
@@ -169,7 +227,7 @@ public class IntelNPUBenchmarks : IDisposable
             
         var kernelSize = Math.Min(64, NetworkSize / 8); // Small convolution for simulation
         kernel(kernelSize * kernelSize, inputBuffer.View, weightBuffer.View, outputBuffer.View, kernelSize);
-        accelerator!.Synchronize();
+        ilgpuAccelerator!.Synchronize();
         
         var result = new float[1];
         outputBuffer.View.SubView(0, 1).CopyToCPU(result);
@@ -180,7 +238,7 @@ public class IntelNPUBenchmarks : IDisposable
     public float NPUTransformerAttention()
     {
         // Simulate NPU-optimized transformer attention
-        var kernel = accelerator!.LoadAutoGroupedStreamKernel<
+        var kernel = ilgpuAccelerator!.LoadAutoGroupedStreamKernel<
             Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int, int>(
             TransformerAttentionKernel);
 
@@ -191,7 +249,7 @@ public class IntelNPUBenchmarks : IDisposable
         var hiddenSize = Math.Min(256, NetworkSize / 4);
         
         kernel(sequenceLength, inputBuffer.View, weightBuffer.View, outputBuffer.View, sequenceLength, hiddenSize);
-        accelerator!.Synchronize();
+        ilgpuAccelerator!.Synchronize();
         
         var result = new float[1];
         outputBuffer.View.SubView(0, 1).CopyToCPU(result);
@@ -448,7 +506,8 @@ public class IntelNPUBenchmarks : IDisposable
         weightBuffer?.Dispose();
         biasBuffer?.Dispose();
         outputBuffer?.Dispose();
-        accelerator?.Dispose();
+        npuAccelerator?.Dispose();
+        ilgpuAccelerator?.Dispose();
         context?.Dispose();
     }
 }
