@@ -127,12 +127,12 @@ namespace ILGPU.Numerics.AI
         /// <summary>
         /// Gets or sets the dropout probability.
         /// </summary>
-        public float Dropout { get; set; } = 0.0f;
+        public float Dropout { get; set; }
 
         /// <summary>
         /// Gets or sets whether to use causal masking.
         /// </summary>
-        public bool CausalMask { get; set; } = false;
+        public bool CausalMask { get; set; }
 
         /// <summary>
         /// Gets or sets the scaling factor.
@@ -178,7 +178,7 @@ namespace ILGPU.Numerics.AI
         /// <summary>
         /// Gets or sets the beta scalar.
         /// </summary>
-        public float Beta { get; set; } = 0.0f;
+        public float Beta { get; set; }
     }
 
     /// <summary>
@@ -199,7 +199,7 @@ namespace ILGPU.Numerics.AI
         /// <summary>
         /// Gets or sets whether to enable pruning.
         /// </summary>
-        public bool EnablePruning { get; set; } = false;
+        public bool EnablePruning { get; set; }
 
         /// <summary>
         /// Gets or sets the pruning ratio.

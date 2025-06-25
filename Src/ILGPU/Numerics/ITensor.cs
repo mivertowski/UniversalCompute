@@ -224,10 +224,7 @@ namespace ILGPU.Numerics
         /// Returns a string representation of the TensorShape.
         /// </summary>
         /// <returns>A string representation of the shape.</returns>
-        public override string ToString()
-        {
-            return $"[{string.Join(", ", _dimensions)}]";
-        }
+        public override string ToString() => $"[{string.Join(", ", _dimensions)}]";
     }
 
     /// <summary>
@@ -273,15 +270,12 @@ namespace ILGPU.Numerics
         /// <param name="shape">The shape of the tensor.</param>
         /// <param name="location">The compute location for the tensor.</param>
         /// <returns>A new tensor instance.</returns>
-        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged
+        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged => location switch
         {
-            return location switch
-            {
-                ComputeLocation.Cpu or ComputeLocation.CpuSimd => new CpuTensor<T>(shape),
-                ComputeLocation.Unified => throw new NotSupportedException("Unified tensor creation requires accelerator"),
-                _ => throw new NotSupportedException($"Compute location {location} not yet implemented")
-            };
-        }
+            ComputeLocation.Cpu or ComputeLocation.CpuSimd => new CpuTensor<T>(shape),
+            ComputeLocation.Unified => throw new NotSupportedException("Unified tensor creation requires accelerator"),
+            _ => throw new NotSupportedException($"Compute location {location} not yet implemented")
+        };
 
         /// <summary>
         /// Creates a new tensor with the specified shape, location, and accelerator.
@@ -291,15 +285,12 @@ namespace ILGPU.Numerics
         /// <param name="location">The compute location for the tensor.</param>
         /// <param name="accelerator">The accelerator for GPU/unified tensors.</param>
         /// <returns>A new tensor instance.</returns>
-        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location, Runtime.Accelerator accelerator) where T : unmanaged, INumber<T>
+        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location, Runtime.Accelerator accelerator) where T : unmanaged, INumber<T> => location switch
         {
-            return location switch
-            {
-                ComputeLocation.Cpu or ComputeLocation.CpuSimd => new CpuTensor<T>(shape),
-                ComputeLocation.Gpu => new UnifiedTensor<T>(accelerator, shape, MemoryLayoutMode.GpuOptimized),
-                ComputeLocation.Unified => new UnifiedTensor<T>(accelerator, shape, MemoryLayoutMode.Unified),
-                _ => throw new NotSupportedException($"Compute location {location} not yet implemented")
-            };
-        }
+            ComputeLocation.Cpu or ComputeLocation.CpuSimd => new CpuTensor<T>(shape),
+            ComputeLocation.Gpu => new UnifiedTensor<T>(accelerator, shape, MemoryLayoutMode.GpuOptimized),
+            ComputeLocation.Unified => new UnifiedTensor<T>(accelerator, shape, MemoryLayoutMode.Unified),
+            _ => throw new NotSupportedException($"Compute location {location} not yet implemented")
+        };
     }
 }

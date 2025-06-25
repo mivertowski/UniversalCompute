@@ -26,7 +26,11 @@ namespace ILGPU.Backends.OpenCL
     /// Constructs mappings for CL kernels.
     /// </summary>
     /// <remarks>Members of this class are not thread safe.</remarks>
-    public sealed class CLArgumentMapper : ViewArgumentMapper
+    /// <remarks>
+    /// Constructs a new OpenCL argument mapper.
+    /// </remarks>
+    /// <param name="context">The current context.</param>
+    public sealed class CLArgumentMapper(Context context) : ViewArgumentMapper(context)
     {
         #region Static
 
@@ -46,28 +50,39 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// Implements the actual argument mapping.
         /// </summary>
-        private readonly struct MappingHandler : IMappingHandler
+        /// <remarks>
+        /// Constructs a new mapping handler.
+        /// </remarks>
+        /// <param name="parent">The parent mapper.</param>
+        /// <param name="kernelLocal">
+        /// The local variable holding the associated kernel reference.
+        /// </param>
+        /// <param name="resultLocal">
+        /// The local variable holding the result API status.
+        /// </param>
+        /// <param name="startIndex">The start argument index.</param>
+        private readonly struct MappingHandler(
+            CLArgumentMapper parent,
+            ILLocal kernelLocal,
+            ILLocal resultLocal,
+            int startIndex) : IMappingHandler
         {
             /// <summary>
             /// A source mapper.
             /// </summary>
             /// <typeparam name="TSource">The internal source type.</typeparam>
-            private readonly struct MapperSource<TSource> : ISource
+            /// <remarks>
+            /// Constructs a new source mapper.
+            /// </remarks>
+            /// <param name="source">The underlying source.</param>
+            private readonly struct MapperSource<TSource>(TSource source) : ISource
                 where TSource : struct, ISource
             {
-                /// <summary>
-                /// Constructs a new source mapper.
-                /// </summary>
-                /// <param name="source">The underlying source.</param>
-                public MapperSource(TSource source)
-                {
-                    Source = source;
-                }
 
                 /// <summary>
                 /// Returns the associated source.
                 /// </summary>
-                public TSource Source { get; }
+                public TSource Source { get; } = source;
 
                 /// <summary cref="ArgumentMapper.ISource.SourceType"/>
                 public Type SourceType => Source.SourceType;
@@ -90,48 +105,25 @@ namespace ILGPU.Backends.OpenCL
             }
 
             /// <summary>
-            /// Constructs a new mapping handler.
-            /// </summary>
-            /// <param name="parent">The parent mapper.</param>
-            /// <param name="kernelLocal">
-            /// The local variable holding the associated kernel reference.
-            /// </param>
-            /// <param name="resultLocal">
-            /// The local variable holding the result API status.
-            /// </param>
-            /// <param name="startIndex">The start argument index.</param>
-            public MappingHandler(
-                CLArgumentMapper parent,
-                ILLocal kernelLocal,
-                ILLocal resultLocal,
-                int startIndex)
-            {
-                Parent = parent;
-                KernelLocal = kernelLocal;
-                ResultLocal = resultLocal;
-                StartIndex = startIndex;
-            }
-
-            /// <summary>
             /// Returns the underlying ABI.
             /// </summary>
-            public CLArgumentMapper Parent { get; }
+            public CLArgumentMapper Parent { get; } = parent;
 
             /// <summary>
             /// Returns the associated kernel local.
             /// </summary>
-            public ILLocal KernelLocal { get; }
+            public ILLocal KernelLocal { get; } = kernelLocal;
 
             /// <summary>
             /// Returns the associated result variable which is
             /// used to accumulate all intermediate method return values.
             /// </summary>
-            public ILLocal ResultLocal { get; }
+            public ILLocal ResultLocal { get; } = resultLocal;
 
             /// <summary>
             /// Returns the start argument index.
             /// </summary>
-            public int StartIndex { get; }
+            public int StartIndex { get; } = startIndex;
 
             /// <summary>
             /// Emits code to set an individual argument.
@@ -153,32 +145,42 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// Implements the actual argument mapping.
         /// </summary>
-        private readonly struct ViewMappingHandler : ISeparateViewMappingHandler
+        /// <remarks>
+        /// Constructs a new mapping handler.
+        /// </remarks>
+        /// <param name="parent">The parent mapper.</param>
+        /// <param name="kernelLocal">
+        /// The local variable holding the associated kernel reference.
+        /// </param>
+        /// <param name="resultLocal">
+        /// The local variable holding the result API status.
+        /// </param>
+        /// <param name="startIndex">The start argument index.</param>
+        private readonly struct ViewMappingHandler(
+            CLArgumentMapper parent,
+            ILLocal kernelLocal,
+            ILLocal resultLocal,
+            int startIndex) : ISeparateViewMappingHandler
         {
             /// <summary>
             /// A source mapper.
             /// </summary>
             /// <typeparam name="TSource">The internal source type.</typeparam>
-            private readonly struct MapperSource<TSource> : ISource
+            /// <remarks>
+            /// Constructs a new source mapper.
+            /// </remarks>
+            /// <param name="source">The underlying source.</param>
+            /// <param name="viewParameter">The view parameter.</param>
+            private readonly struct MapperSource<TSource>(
+                TSource source,
+                in SeparateViewEntryPoint.ViewParameter viewParameter) : ISource
                 where TSource : struct, ISource
             {
-                /// <summary>
-                /// Constructs a new source mapper.
-                /// </summary>
-                /// <param name="source">The underlying source.</param>
-                /// <param name="viewParameter">The view parameter.</param>
-                public MapperSource(
-                    TSource source,
-                    in SeparateViewEntryPoint.ViewParameter viewParameter)
-                {
-                    Source = source;
-                    Parameter = viewParameter;
-                }
 
                 /// <summary>
                 /// Returns the associated source.
                 /// </summary>
-                public TSource Source { get; }
+                public TSource Source { get; } = source;
 
                 /// <summary cref="ArgumentMapper.ISource.SourceType"/>
                 public Type SourceType => typeof(IntPtr);
@@ -186,7 +188,7 @@ namespace ILGPU.Backends.OpenCL
                 /// <summary>
                 /// The associated parameter.
                 /// </summary>
-                public SeparateViewEntryPoint.ViewParameter Parameter { get; }
+                public SeparateViewEntryPoint.ViewParameter Parameter { get; } = viewParameter;
 
                 /// <summary>
                 /// Emits a source local that contains the native view pointer.
@@ -233,48 +235,25 @@ namespace ILGPU.Backends.OpenCL
             }
 
             /// <summary>
-            /// Constructs a new mapping handler.
-            /// </summary>
-            /// <param name="parent">The parent mapper.</param>
-            /// <param name="kernelLocal">
-            /// The local variable holding the associated kernel reference.
-            /// </param>
-            /// <param name="resultLocal">
-            /// The local variable holding the result API status.
-            /// </param>
-            /// <param name="startIndex">The start argument index.</param>
-            public ViewMappingHandler(
-                CLArgumentMapper parent,
-                ILLocal kernelLocal,
-                ILLocal resultLocal,
-                int startIndex)
-            {
-                Parent = parent;
-                KernelLocal = kernelLocal;
-                ResultLocal = resultLocal;
-                StartIndex = startIndex;
-            }
-
-            /// <summary>
             /// Returns the underlying ABI.
             /// </summary>
-            public CLArgumentMapper Parent { get; }
+            public CLArgumentMapper Parent { get; } = parent;
 
             /// <summary>
             /// Returns the associated kernel local.
             /// </summary>
-            public ILLocal KernelLocal { get; }
+            public ILLocal KernelLocal { get; } = kernelLocal;
 
             /// <summary>
             /// Returns the associated result variable which is
             /// used to accumulate all intermediate method return values.
             /// </summary>
-            public ILLocal ResultLocal { get; }
+            public ILLocal ResultLocal { get; } = resultLocal;
 
             /// <summary>
             /// Returns the start argument index.
             /// </summary>
-            public int StartIndex { get; }
+            public int StartIndex { get; } = startIndex;
 
             /// <summary>
             /// Maps a view input argument.
@@ -295,16 +274,7 @@ namespace ILGPU.Backends.OpenCL
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new OpenCL argument mapper.
-        /// </summary>
-        /// <param name="context">The current context.</param>
-        public CLArgumentMapper(Context context)
-            : base(context)
-        { }
 
         #endregion
 

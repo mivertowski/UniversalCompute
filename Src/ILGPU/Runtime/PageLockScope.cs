@@ -90,20 +90,17 @@ namespace ILGPU.Runtime
     /// <summary>
     /// A null/no-op page lock scope.
     /// </summary>
-    internal sealed class NullPageLockScope<T> : PageLockScope<T>
+    /// <remarks>
+    /// Constructs a page lock scope for the accelerator.
+    /// </remarks>
+    /// <param name="accelerator">The associated accelerator.</param>
+    /// <param name="hostPtr">The host buffer pointer to page lock.</param>
+    /// <param name="numElements">The number of elements in the buffer.</param>
+    internal sealed class NullPageLockScope<T>(
+        Accelerator accelerator,
+        IntPtr hostPtr,
+        long numElements) : PageLockScope<T>(accelerator, hostPtr, numElements)
         where T : unmanaged
     {
-        /// <summary>
-        /// Constructs a page lock scope for the accelerator.
-        /// </summary>
-        /// <param name="accelerator">The associated accelerator.</param>
-        /// <param name="hostPtr">The host buffer pointer to page lock.</param>
-        /// <param name="numElements">The number of elements in the buffer.</param>
-        public NullPageLockScope(
-            Accelerator accelerator,
-            IntPtr hostPtr,
-            long numElements)
-            : base(accelerator, hostPtr, numElements)
-        { }
     }
 }

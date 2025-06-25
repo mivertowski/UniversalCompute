@@ -69,18 +69,15 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public PredictionStats PerformanceStats => ConvertToPredictionStats(_orchestrator.GetPerformanceStats());
 
-        private PredictionStats ConvertToPredictionStats(PerformanceAnalysis analysis)
+        private PredictionStats ConvertToPredictionStats(PerformanceAnalysis analysis) => new PredictionStats
         {
-            return new PredictionStats
-            {
-                InferenceTimeMs = analysis.TotalExecutionTimeMs,
-                PreprocessingTimeMs = 0.0,
-                PostprocessingTimeMs = 0.0,
-                DeviceUsed = "Auto",
-                BatchSize = 1,
-                ThroughputPerSecond = 1000.0 / analysis.TotalExecutionTimeMs
-            };
-        }
+            InferenceTimeMs = analysis.TotalExecutionTimeMs,
+            PreprocessingTimeMs = 0.0,
+            PostprocessingTimeMs = 0.0,
+            DeviceUsed = "Auto",
+            BatchSize = 1,
+            ThroughputPerSecond = 1000.0 / analysis.TotalExecutionTimeMs
+        };
 
         /// <summary>
         /// Predicts output for a single input using optimal hardware acceleration.
@@ -207,12 +204,10 @@ namespace ILGPU.ML.Integration
             return _orchestrator.AnalyzePerformance();
         }
 
-        private async Task<ITensor<float>> ConvertToTensorAsync(TInput input)
-        {
+        private async Task<ITensor<float>> ConvertToTensorAsync(TInput input) =>
             // Implementation would depend on the specific input type
             // This is a simplified version that assumes conversion is possible
-            return await _context.TensorFactory.CreateFromInputAsync(input);
-        }
+            await _context.TensorFactory.CreateFromInputAsync(input);
 
         private async Task<ITensor<float>[]> ConvertToTensorBatchAsync(TInput[] inputs)
         {
@@ -226,11 +221,9 @@ namespace ILGPU.ML.Integration
             return tensors;
         }
 
-        private async Task<TOutput> ConvertFromTensorAsync(ITensor<float> tensor)
-        {
+        private async Task<TOutput> ConvertFromTensorAsync(ITensor<float> tensor) =>
             // Implementation would depend on the specific output type
-            return await _context.TensorFactory.CreateOutputFromTensorAsync<TOutput>(tensor);
-        }
+            await _context.TensorFactory.CreateOutputFromTensorAsync<TOutput>(tensor);
 
         private async Task<TOutput[]> ConvertFromTensorBatchAsync(ITensor<float>[] tensors)
         {
@@ -328,35 +321,28 @@ namespace ILGPU.ML.Integration
     /// <summary>
     /// Provides context information for ML predictions.
     /// </summary>
-    public class PredictionContext
+    /// <remarks>
+    /// Initializes a new instance of the PredictionContext class.
+    /// </remarks>
+    public class PredictionContext(
+        IReadOnlyDictionary<ComputeDevice, Accelerator> accelerators,
+        ITensorFactory tensorFactory,
+        IMemoryManager memoryManager)
     {
         /// <summary>
         /// Gets the available accelerators for computation.
         /// </summary>
-        public IReadOnlyDictionary<ComputeDevice, Accelerator> AvailableAccelerators { get; }
+        public IReadOnlyDictionary<ComputeDevice, Accelerator> AvailableAccelerators { get; } = accelerators ?? throw new ArgumentNullException(nameof(accelerators));
 
         /// <summary>
         /// Gets the tensor factory for data conversion.
         /// </summary>
-        public ITensorFactory TensorFactory { get; }
+        public ITensorFactory TensorFactory { get; } = tensorFactory ?? throw new ArgumentNullException(nameof(tensorFactory));
 
         /// <summary>
         /// Gets the memory manager for efficient data handling.
         /// </summary>
-        public IMemoryManager MemoryManager { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the PredictionContext class.
-        /// </summary>
-        public PredictionContext(
-            IReadOnlyDictionary<ComputeDevice, Accelerator> accelerators,
-            ITensorFactory tensorFactory,
-            IMemoryManager memoryManager)
-        {
-            AvailableAccelerators = accelerators ?? throw new ArgumentNullException(nameof(accelerators));
-            TensorFactory = tensorFactory ?? throw new ArgumentNullException(nameof(tensorFactory));
-            MemoryManager = memoryManager ?? throw new ArgumentNullException(nameof(memoryManager));
-        }
+        public IMemoryManager MemoryManager { get; } = memoryManager ?? throw new ArgumentNullException(nameof(memoryManager));
     }
 
     /// <summary>

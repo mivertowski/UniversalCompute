@@ -31,26 +31,21 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Remaps source to target blocks.
         /// </summary>
-        private readonly struct Remapper : TerminatorValue.ITargetRemapper
+        /// <remarks>
+        /// Constructs a new remapper.
+        /// </remarks>
+        private readonly struct Remapper(BasicBlock source, BasicBlock target) : TerminatorValue.ITargetRemapper
         {
-            /// <summary>
-            /// Constructs a new remapper.
-            /// </summary>
-            public Remapper(BasicBlock source, BasicBlock target)
-            {
-                Source = source;
-                Target = target;
-            }
 
             /// <summary>
             /// Returns the source block.
             /// </summary>
-            public BasicBlock Source { get; }
+            public BasicBlock Source { get; } = source;
 
             /// <summary>
             /// Returns the new target block.
             /// </summary>
-            public BasicBlock Target { get; }
+            public BasicBlock Target { get; } = target;
 
             /// <summary>
             /// Returns true if the given block span contains the source block.

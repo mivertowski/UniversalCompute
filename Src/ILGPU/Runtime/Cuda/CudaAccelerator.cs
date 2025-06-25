@@ -379,13 +379,13 @@ namespace ILGPU.Runtime.Cuda
 
         /// <inheritdoc/>
         protected override CudaKernel CreateKernel(PTXCompiledKernel compiledKernel) =>
-            new CudaKernel(this, compiledKernel, null);
+            new(this, compiledKernel, null);
 
         /// <inheritdoc/>
         protected override CudaKernel CreateKernel(
             PTXCompiledKernel compiledKernel,
             MethodInfo launcher) =>
-            new CudaKernel(this, compiledKernel, launcher);
+            new(this, compiledKernel, launcher);
 
         /// <summary>
         /// Create a Cuda stream with the flag
@@ -400,7 +400,7 @@ namespace ILGPU.Runtime.Cuda
         /// </summary>
         /// <param name="flag">The flag to use.</param>
         /// <returns>The created stream.</returns>
-        public CudaStream CreateStream(StreamFlags flag) => new CudaStream(this, flag);
+        public CudaStream CreateStream(StreamFlags flag) => new(this, flag);
 
         /// <summary>
         /// Creates a <see cref="CudaStream"/> object using an externally created stream.
@@ -411,7 +411,7 @@ namespace ILGPU.Runtime.Cuda
         /// </param>
         /// <returns>The created stream.</returns>
         public CudaStream CreateStream(IntPtr ptr, bool responsible) =>
-            new CudaStream(this, ptr, responsible);
+            new(this, ptr, responsible);
 
         /// <summary cref="Accelerator.Synchronize"/>
         protected override void SynchronizeInternal() =>

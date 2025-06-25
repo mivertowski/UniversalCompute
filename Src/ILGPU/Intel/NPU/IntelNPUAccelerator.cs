@@ -481,29 +481,23 @@ namespace ILGPU.Intel.NPU
             return result;
         }
 
-        private NPUMatMulConfig CreateOptimalMatMulConfig(TensorShape aShape, TensorShape bShape)
+        private NPUMatMulConfig CreateOptimalMatMulConfig(TensorShape aShape, TensorShape bShape) => new NPUMatMulConfig(new MatMulConfiguration
         {
-            return new NPUMatMulConfig(new MatMulConfiguration
-            {
-                M = aShape[0],
-                K = aShape[1],
-                N = bShape[1],
-                UseBF16 = Capabilities.SupportsBF16,
-                UseSparsity = Capabilities.SupportsSparsity
-            });
-        }
+            M = aShape[0],
+            K = aShape[1],
+            N = bShape[1],
+            UseBF16 = Capabilities.SupportsBF16,
+            UseSparsity = Capabilities.SupportsSparsity
+        });
 
-        private IModelLoader CreateModelLoader(ModelFormat format)
+        private IModelLoader CreateModelLoader(ModelFormat format) => format switch
         {
-            return format switch
-            {
-                ModelFormat.ONNX => new ONNXModelLoader(),
-                ModelFormat.OpenVINO => new OpenVINOModelLoader(),
-                ModelFormat.TensorFlow => new TensorFlowModelLoader(),
-                ModelFormat.PyTorch => new PyTorchModelLoader(),
-                _ => throw new NotSupportedException($"Model format {format} not supported")
-            };
-        }
+            ModelFormat.ONNX => new ONNXModelLoader(),
+            ModelFormat.OpenVINO => new OpenVINOModelLoader(),
+            ModelFormat.TensorFlow => new TensorFlowModelLoader(),
+            ModelFormat.PyTorch => new PyTorchModelLoader(),
+            _ => throw new NotSupportedException($"Model format {format} not supported")
+        };
 
         #endregion
 

@@ -344,16 +344,10 @@ namespace ILGPU.Apple.NeuralEngine.Native
     /// ANE 2D size structure.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct ANESize2D
+    public struct ANESize2D(int width, int height)
     {
-        public int Width;
-        public int Height;
-
-        public ANESize2D(int width, int height)
-        {
-            Width = width;
-            Height = height;
-        }
+        public int Width = width;
+        public int Height = height;
     }
 
     /// <summary>

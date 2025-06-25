@@ -19,23 +19,18 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks compare intrinsics that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class ConvertIntriniscAttribute : IntrinsicAttribute
+    sealed class ConvertIntriniscAttribute(ConvertFlags intrinsicFlags) : IntrinsicAttribute
     {
         public ConvertIntriniscAttribute()
             : this(ConvertFlags.None)
         { }
-
-        public ConvertIntriniscAttribute(ConvertFlags intrinsicFlags)
-        {
-            IntrinsicFlags = intrinsicFlags;
-        }
 
         public override IntrinsicType Type => IntrinsicType.Convert;
 
         /// <summary>
         /// Returns the associated intrinsic flags.
         /// </summary>
-        public ConvertFlags IntrinsicFlags { get; }
+        public ConvertFlags IntrinsicFlags { get; } = intrinsicFlags;
     }
 
     partial class Intrinsics

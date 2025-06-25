@@ -26,22 +26,16 @@ namespace ILGPU.Runtime.LINQ
     /// <summary>
     /// Executes GPU LINQ queries by compiling expression trees to GPU kernels.
     /// </summary>
-    internal sealed class GPUQueryExecutor
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="GPUQueryExecutor"/> class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator.</param>
+    internal sealed class GPUQueryExecutor(Accelerator accelerator)
     {
         #region Instance
 
-        private readonly Accelerator accelerator;
-        private readonly AcceleratorStream stream;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GPUQueryExecutor"/> class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator.</param>
-        public GPUQueryExecutor(Accelerator accelerator)
-        {
-            this.accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            stream = accelerator.CreateStream();
-        }
+        private readonly Accelerator accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+        private readonly AcceleratorStream stream = accelerator.CreateStream();
 
         #endregion
 
@@ -111,23 +105,17 @@ namespace ILGPU.Runtime.LINQ
     /// <summary>
     /// Expression visitor that converts LINQ expressions to GPU operations.
     /// </summary>
-    internal sealed class GPUQueryExpressionVisitor : ExpressionVisitor
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="GPUQueryExpressionVisitor"/> class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator.</param>
+    /// <param name="stream">The accelerator stream.</param>
+    internal sealed class GPUQueryExpressionVisitor(Accelerator accelerator, AcceleratorStream stream) : ExpressionVisitor
     {
         #region Instance
 
-        private readonly Accelerator accelerator;
-        private readonly AcceleratorStream stream;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GPUQueryExpressionVisitor"/> class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator.</param>
-        /// <param name="stream">The accelerator stream.</param>
-        public GPUQueryExpressionVisitor(Accelerator accelerator, AcceleratorStream stream)
-        {
-            this.accelerator = accelerator;
-            this.stream = stream;
-        }
+        private readonly Accelerator accelerator = accelerator;
+        private readonly AcceleratorStream stream = stream;
 
         #endregion
 

@@ -91,7 +91,7 @@ namespace ILGPU.IR.Intrinsics
             #region Instance
 
             private readonly List<IntrinsicImplementation> implementations =
-                new List<IntrinsicImplementation>();
+                new();
 
             #endregion
 
@@ -117,7 +117,7 @@ namespace ILGPU.IR.Intrinsics
             /// Returns a new enumerator to iterate over all implementations.
             /// </summary>
             /// <returns>The resolved enumerator.</returns>
-            public Enumerator GetEnumerator() => new Enumerator(implementations);
+            public Enumerator GetEnumerator() => new(implementations);
 
             /// <summary cref="IEnumerable{T}.GetEnumerator"/>
             IEnumerator<IntrinsicImplementation>
@@ -141,7 +141,7 @@ namespace ILGPU.IR.Intrinsics
             /// Creates a new backend container.
             /// </summary>
             public static BackendContainer Create() =>
-                new BackendContainer()
+                new()
                 {
                     matchers = IntrinsicMatcher.CreateMatchers<ImplementationEntry>()
                 };

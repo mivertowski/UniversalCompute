@@ -395,16 +395,13 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         /// <param name="primitive">The primitive type.</param>
         /// <returns>True if accelerated; otherwise, false.</returns>
-        public bool IsPrimitiveAccelerated(PrimitiveType primitive)
+        public bool IsPrimitiveAccelerated(PrimitiveType primitive) => primitive switch
         {
-            return primitive switch
-            {
-                PrimitiveType.MatrixMultiplication => SupportsAcceleratedGemm,
-                PrimitiveType.Convolution => SupportsAcceleratedConvolution,
-                PrimitiveType.Attention => SupportsAcceleratedAttention,
-                _ => false
-            };
-        }
+            PrimitiveType.MatrixMultiplication => SupportsAcceleratedGemm,
+            PrimitiveType.Convolution => SupportsAcceleratedConvolution,
+            PrimitiveType.Attention => SupportsAcceleratedAttention,
+            _ => false
+        };
     }
 
     /// <summary>
@@ -658,34 +655,26 @@ namespace ILGPU.Runtime.AI
     /// <summary>
     /// Generic fallback implementation of performance primitives.
     /// </summary>
-    public sealed class GenericPerformancePrimitives : PerformancePrimitivesBase
+    /// <remarks>
+    /// Initializes a new instance of the GenericPerformancePrimitives class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator.</param>
+    public sealed class GenericPerformancePrimitives(Accelerator accelerator) : PerformancePrimitivesBase(accelerator)
     {
-        /// <summary>
-        /// Initializes a new instance of the GenericPerformancePrimitives class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator.</param>
-        public GenericPerformancePrimitives(Accelerator accelerator)
-            : base(accelerator)
+        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new PerformancePrimitiveCapabilities
         {
-        }
-
-        protected override PerformancePrimitiveCapabilities InitializeCapabilities()
-        {
-            return new PerformancePrimitiveCapabilities
-            {
-                SupportsAcceleratedGemm = false,
-                SupportsAcceleratedConvolution = false,
-                SupportsAcceleratedAttention = false,
-                SupportsFP16 = false,
-                SupportsBFloat16 = false,
-                SupportsInt8 = false,
-                HasTensorCores = false,
-                PreferredBatchSize = 1,
-                MaxTensorRank = 8,
-                SupportsUnifiedMemory = Accelerator.SupportsUnifiedMemory,
-                PeakTFLOPS = 0.1 // Fallback implementation
-            };
-        }
+            SupportsAcceleratedGemm = false,
+            SupportsAcceleratedConvolution = false,
+            SupportsAcceleratedAttention = false,
+            SupportsFP16 = false,
+            SupportsBFloat16 = false,
+            SupportsInt8 = false,
+            HasTensorCores = false,
+            PreferredBatchSize = 1,
+            MaxTensorRank = 8,
+            SupportsUnifiedMemory = Accelerator.SupportsUnifiedMemory,
+            PeakTFLOPS = 0.1 // Fallback implementation
+        };
 
         public override Task GemmAsync<T>(
             ITensor<T> a,
@@ -693,18 +682,17 @@ namespace ILGPU.Runtime.AI
             ITensor<T> c,
             T alpha,
             T beta,
-            CancellationToken cancellationToken = default)
-        {
+            CancellationToken cancellationToken = default) =>
             // Generic CPU-based implementation
-            return Task.Run(() =>
+            Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                
+
                 // Basic matrix multiplication C = alpha * A * B + beta * C
                 var M = a.Shape[0];
                 var K = a.Shape[1];
                 var N = b.Shape[1];
-                
+
                 for (int i = 0; i < M; i++)
                 {
                     for (int j = 0; j < N; j++)
@@ -721,184 +709,174 @@ namespace ILGPU.Runtime.AI
                     }
                 }
             }, cancellationToken);
-        }
 
         public override Task BatchedGemmAsync<T>(
             ITensor<T> a,
             ITensor<T> b,
             ITensor<T> c,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Batched matrix multiplication for tensors with batch dimension
-                var batchSize = a.Shape[0];
-                var M = a.Shape[1];
-                var K = a.Shape[2];
-                var N = b.Shape[2];
-                
-                for (int batch = 0; batch < batchSize; batch++)
-                {
-                    for (int i = 0; i < M; i++)
-                    {
-                        for (int j = 0; j < N; j++)
-                        {
-                            var sum = GetZero<T>();
-                            for (int k = 0; k < K; k++)
-                            {
-                                var aVal = a[batch, i, k];
-                                var bVal = b[batch, k, j];
-                                sum = Add(sum, Multiply(aVal, bVal));
-                            }
-                            c[batch, i, j] = sum;
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Batched matrix multiplication for tensors with batch dimension
+                                                                           var batchSize = a.Shape[0];
+                                                                           var M = a.Shape[1];
+                                                                           var K = a.Shape[2];
+                                                                           var N = b.Shape[2];
+
+                                                                           for (int batch = 0; batch < batchSize; batch++)
+                                                                           {
+                                                                               for (int i = 0; i < M; i++)
+                                                                               {
+                                                                                   for (int j = 0; j < N; j++)
+                                                                                   {
+                                                                                       var sum = GetZero<T>();
+                                                                                       for (int k = 0; k < K; k++)
+                                                                                       {
+                                                                                           var aVal = a[batch, i, k];
+                                                                                           var bVal = b[batch, k, j];
+                                                                                           sum = Add(sum, Multiply(aVal, bVal));
+                                                                                       }
+                                                                                       c[batch, i, j] = sum;
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task Conv2DAsync<T>(
             ITensor<T> input,
             ITensor<T> kernel,
             ITensor<T> output,
             ConvolutionParameters parameters,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Basic 2D convolution implementation
-                var batchSize = input.Shape[0];
-                var inputChannels = input.Shape[1];
-                var inputHeight = input.Shape[2];
-                var inputWidth = input.Shape[3];
-                
-                var outputChannels = kernel.Shape[0];
-                var kernelHeight = kernel.Shape[2];
-                var kernelWidth = kernel.Shape[3];
-                
-                var outputHeight = (inputHeight + 2 * parameters.Padding.Height - kernelHeight) / parameters.Stride.Height + 1;
-                var outputWidth = (inputWidth + 2 * parameters.Padding.Width - kernelWidth) / parameters.Stride.Width + 1;
-                
-                for (int b = 0; b < batchSize; b++)
-                {
-                    for (int oc = 0; oc < outputChannels; oc++)
-                    {
-                        for (int oh = 0; oh < outputHeight; oh++)
-                        {
-                            for (int ow = 0; ow < outputWidth; ow++)
-                            {
-                                var sum = GetZero<T>();
-                                
-                                for (int ic = 0; ic < inputChannels; ic++)
-                                {
-                                    for (int kh = 0; kh < kernelHeight; kh++)
-                                    {
-                                        for (int kw = 0; kw < kernelWidth; kw++)
-                                        {
-                                            var ih = oh * parameters.Stride.Height - parameters.Padding.Height + kh;
-                                            var iw = ow * parameters.Stride.Width - parameters.Padding.Width + kw;
-                                            
-                                            if (ih >= 0 && ih < inputHeight && iw >= 0 && iw < inputWidth)
-                                            {
-                                                var inputVal = input[b, ic, ih, iw];
-                                                var kernelVal = kernel[oc, ic, kh, kw];
-                                                sum = Add(sum, Multiply(inputVal, kernelVal));
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                output[b, oc, oh, ow] = sum;
-                            }
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Basic 2D convolution implementation
+                                                                           var batchSize = input.Shape[0];
+                                                                           var inputChannels = input.Shape[1];
+                                                                           var inputHeight = input.Shape[2];
+                                                                           var inputWidth = input.Shape[3];
+
+                                                                           var outputChannels = kernel.Shape[0];
+                                                                           var kernelHeight = kernel.Shape[2];
+                                                                           var kernelWidth = kernel.Shape[3];
+
+                                                                           var outputHeight = (inputHeight + 2 * parameters.Padding.Height - kernelHeight) / parameters.Stride.Height + 1;
+                                                                           var outputWidth = (inputWidth + 2 * parameters.Padding.Width - kernelWidth) / parameters.Stride.Width + 1;
+
+                                                                           for (int b = 0; b < batchSize; b++)
+                                                                           {
+                                                                               for (int oc = 0; oc < outputChannels; oc++)
+                                                                               {
+                                                                                   for (int oh = 0; oh < outputHeight; oh++)
+                                                                                   {
+                                                                                       for (int ow = 0; ow < outputWidth; ow++)
+                                                                                       {
+                                                                                           var sum = GetZero<T>();
+
+                                                                                           for (int ic = 0; ic < inputChannels; ic++)
+                                                                                           {
+                                                                                               for (int kh = 0; kh < kernelHeight; kh++)
+                                                                                               {
+                                                                                                   for (int kw = 0; kw < kernelWidth; kw++)
+                                                                                                   {
+                                                                                                       var ih = oh * parameters.Stride.Height - parameters.Padding.Height + kh;
+                                                                                                       var iw = ow * parameters.Stride.Width - parameters.Padding.Width + kw;
+
+                                                                                                       if (ih >= 0 && ih < inputHeight && iw >= 0 && iw < inputWidth)
+                                                                                                       {
+                                                                                                           var inputVal = input[b, ic, ih, iw];
+                                                                                                           var kernelVal = kernel[oc, ic, kh, kw];
+                                                                                                           sum = Add(sum, Multiply(inputVal, kernelVal));
+                                                                                                       }
+                                                                                                   }
+                                                                                               }
+                                                                                           }
+
+                                                                                           output[b, oc, oh, ow] = sum;
+                                                                                       }
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task DepthwiseConv2DAsync<T>(
             ITensor<T> input,
             ITensor<T> kernel,
             ITensor<T> output,
             ConvolutionParameters parameters,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Generic depthwise convolution implementation
-                // Depthwise conv applies one filter per input channel
-                var batchSize = input.Shape[0];
-                var inChannels = input.Shape[1];
-                var inHeight = input.Shape[2];
-                var inWidth = input.Shape[3];
-                
-                var kernelHeight = kernel.Shape[2];
-                var kernelWidth = kernel.Shape[3];
-                
-                var outHeight = (inHeight + 2 * parameters.Padding.Height - kernelHeight) / parameters.Stride.Height + 1;
-                var outWidth = (inWidth + 2 * parameters.Padding.Width - kernelWidth) / parameters.Stride.Width + 1;
-                
-                unsafe
-                {
-                    var inputPtr = (T*)input.GetDataPointer();
-                    var kernelPtr = (T*)kernel.GetDataPointer();
-                    var outputPtr = (T*)output.GetDataPointer();
-                    
-                    for (int b = 0; b < batchSize; b++)
-                    {
-                        for (int c = 0; c < inChannels; c++)
-                        {
-                            for (int oh = 0; oh < outHeight; oh++)
-                            {
-                                for (int ow = 0; ow < outWidth; ow++)
-                                {
-                                    T sum = default(T);
-                                    
-                                    for (int kh = 0; kh < kernelHeight; kh++)
-                                    {
-                                        for (int kw = 0; kw < kernelWidth; kw++)
-                                        {
-                                            int ih = oh * parameters.Stride.Height + kh - parameters.Padding.Height;
-                                            int iw = ow * parameters.Stride.Width + kw - parameters.Padding.Width;
-                                            
-                                            if (ih >= 0 && ih < inHeight && iw >= 0 && iw < inWidth)
-                                            {
-                                                var inputIdx = b * inChannels * inHeight * inWidth + 
-                                                             c * inHeight * inWidth + ih * inWidth + iw;
-                                                var kernelIdx = c * kernelHeight * kernelWidth + kh * kernelWidth + kw;
-                                                
-                                                if (typeof(T) == typeof(float))
-                                                {
-                                                    var inputVal = (float)(object)inputPtr[inputIdx];
-                                                    var kernelVal = (float)(object)kernelPtr[kernelIdx];
-                                                    sum = (T)(object)((float)(object)sum + inputVal * kernelVal);
-                                                }
-                                                else if (typeof(T) == typeof(double))
-                                                {
-                                                    var inputVal = (double)(object)inputPtr[inputIdx];
-                                                    var kernelVal = (double)(object)kernelPtr[kernelIdx];
-                                                    sum = (T)(object)((double)(object)sum + inputVal * kernelVal);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    
-                                    var outputIdx = b * inChannels * outHeight * outWidth + 
-                                                  c * outHeight * outWidth + oh * outWidth + ow;
-                                    outputPtr[outputIdx] = sum;
-                                }
-                            }
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Generic depthwise convolution implementation
+                                                                           // Depthwise conv applies one filter per input channel
+                                                                           var batchSize = input.Shape[0];
+                                                                           var inChannels = input.Shape[1];
+                                                                           var inHeight = input.Shape[2];
+                                                                           var inWidth = input.Shape[3];
+
+                                                                           var kernelHeight = kernel.Shape[2];
+                                                                           var kernelWidth = kernel.Shape[3];
+
+                                                                           var outHeight = (inHeight + 2 * parameters.Padding.Height - kernelHeight) / parameters.Stride.Height + 1;
+                                                                           var outWidth = (inWidth + 2 * parameters.Padding.Width - kernelWidth) / parameters.Stride.Width + 1;
+
+                                                                           unsafe
+                                                                           {
+                                                                               var inputPtr = (T*)input.GetDataPointer();
+                                                                               var kernelPtr = (T*)kernel.GetDataPointer();
+                                                                               var outputPtr = (T*)output.GetDataPointer();
+
+                                                                               for (int b = 0; b < batchSize; b++)
+                                                                               {
+                                                                                   for (int c = 0; c < inChannels; c++)
+                                                                                   {
+                                                                                       for (int oh = 0; oh < outHeight; oh++)
+                                                                                       {
+                                                                                           for (int ow = 0; ow < outWidth; ow++)
+                                                                                           {
+                                                                                               T sum = default(T);
+
+                                                                                               for (int kh = 0; kh < kernelHeight; kh++)
+                                                                                               {
+                                                                                                   for (int kw = 0; kw < kernelWidth; kw++)
+                                                                                                   {
+                                                                                                       int ih = oh * parameters.Stride.Height + kh - parameters.Padding.Height;
+                                                                                                       int iw = ow * parameters.Stride.Width + kw - parameters.Padding.Width;
+
+                                                                                                       if (ih >= 0 && ih < inHeight && iw >= 0 && iw < inWidth)
+                                                                                                       {
+                                                                                                           var inputIdx = b * inChannels * inHeight * inWidth +
+                                                                                                                        c * inHeight * inWidth + ih * inWidth + iw;
+                                                                                                           var kernelIdx = c * kernelHeight * kernelWidth + kh * kernelWidth + kw;
+
+                                                                                                           if (typeof(T) == typeof(float))
+                                                                                                           {
+                                                                                                               var inputVal = (float)(object)inputPtr[inputIdx];
+                                                                                                               var kernelVal = (float)(object)kernelPtr[kernelIdx];
+                                                                                                               sum = (T)(object)((float)(object)sum + inputVal * kernelVal);
+                                                                                                           }
+                                                                                                           else if (typeof(T) == typeof(double))
+                                                                                                           {
+                                                                                                               var inputVal = (double)(object)inputPtr[inputIdx];
+                                                                                                               var kernelVal = (double)(object)kernelPtr[kernelIdx];
+                                                                                                               sum = (T)(object)((double)(object)sum + inputVal * kernelVal);
+                                                                                                           }
+                                                                                                       }
+                                                                                                   }
+                                                                                               }
+
+                                                                                               var outputIdx = b * inChannels * outHeight * outWidth +
+                                                                                                             c * outHeight * outWidth + oh * outWidth + ow;
+                                                                                               outputPtr[outputIdx] = sum;
+                                                                                           }
+                                                                                       }
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task MultiHeadAttentionAsync<T>(
             ITensor<T> query,
@@ -906,56 +884,53 @@ namespace ILGPU.Runtime.AI
             ITensor<T> value,
             ITensor<T> output,
             AttentionParameters parameters,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Simplified multi-head attention implementation
-                var batchSize = query.Shape[0];
-                var seqLength = query.Shape[1];
-                var headDim = query.Shape[2] / parameters.NumHeads;
-                
-                // For simplicity, implement single-head attention and replicate
-                for (int b = 0; b < batchSize; b++)
-                {
-                    for (int head = 0; head < parameters.NumHeads; head++)
-                    {
-                        var headOffset = head * headDim;
-                        
-                        // Compute attention scores for this head
-                        for (int i = 0; i < seqLength; i++)
-                        {
-                            for (int j = 0; j < seqLength; j++)
-                            {
-                                var score = GetZero<T>();
-                                
-                                // Dot product between query and key
-                                for (int d = 0; d < headDim; d++)
-                                {
-                                    var qVal = query[b, i, headOffset + d];
-                                    var kVal = key[b, j, headOffset + d];
-                                    score = Add(score, Multiply(qVal, kVal));
-                                }
-                                
-                                // Scale by sqrt(head_dim)
-                                var scale = CreateScalar<T>(1.0f / MathF.Sqrt(headDim));
-                                score = Multiply(score, scale);
-                                
-                                // Apply to output (simplified - would normally apply softmax)
-                                for (int d = 0; d < headDim; d++)
-                                {
-                                    var vVal = value[b, j, headOffset + d];
-                                    var weightedVal = Multiply(score, vVal);
-                                    output[b, i, headOffset + d] = Add(output[b, i, headOffset + d], weightedVal);
-                                }
-                            }
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Simplified multi-head attention implementation
+                                                                           var batchSize = query.Shape[0];
+                                                                           var seqLength = query.Shape[1];
+                                                                           var headDim = query.Shape[2] / parameters.NumHeads;
+
+                                                                           // For simplicity, implement single-head attention and replicate
+                                                                           for (int b = 0; b < batchSize; b++)
+                                                                           {
+                                                                               for (int head = 0; head < parameters.NumHeads; head++)
+                                                                               {
+                                                                                   var headOffset = head * headDim;
+
+                                                                                   // Compute attention scores for this head
+                                                                                   for (int i = 0; i < seqLength; i++)
+                                                                                   {
+                                                                                       for (int j = 0; j < seqLength; j++)
+                                                                                       {
+                                                                                           var score = GetZero<T>();
+
+                                                                                           // Dot product between query and key
+                                                                                           for (int d = 0; d < headDim; d++)
+                                                                                           {
+                                                                                               var qVal = query[b, i, headOffset + d];
+                                                                                               var kVal = key[b, j, headOffset + d];
+                                                                                               score = Add(score, Multiply(qVal, kVal));
+                                                                                           }
+
+                                                                                           // Scale by sqrt(head_dim)
+                                                                                           var scale = CreateScalar<T>(1.0f / MathF.Sqrt(headDim));
+                                                                                           score = Multiply(score, scale);
+
+                                                                                           // Apply to output (simplified - would normally apply softmax)
+                                                                                           for (int d = 0; d < headDim; d++)
+                                                                                           {
+                                                                                               var vVal = value[b, j, headOffset + d];
+                                                                                               var weightedVal = Multiply(score, vVal);
+                                                                                               output[b, i, headOffset + d] = Add(output[b, i, headOffset + d], weightedVal);
+                                                                                           }
+                                                                                       }
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task ScaledDotProductAttentionAsync<T>(
             ITensor<T> query,
@@ -964,184 +939,172 @@ namespace ILGPU.Runtime.AI
             ITensor<T> output,
             T scale,
             ITensor<bool>? mask = null,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Simplified scaled dot-product attention: output = softmax(QK^T / scale) * V
-                var batchSize = query.Shape[0];
-                var seqLength = query.Shape[1];
-                var headDim = query.Shape[2];
-                
-                for (int b = 0; b < batchSize; b++)
-                {
-                    // Compute attention scores: Q * K^T
-                    for (int i = 0; i < seqLength; i++)
-                    {
-                        // Compute scores for position i
-                        var scores = new T[seqLength];
-                        var maxScore = GetZero<T>();
-                        
-                        for (int j = 0; j < seqLength; j++)
-                        {
-                            var score = GetZero<T>();
-                            for (int d = 0; d < headDim; d++)
-                            {
-                                var qVal = query[b, i, d];
-                                var kVal = key[b, j, d];
-                                score = Add(score, Multiply(qVal, kVal));
-                            }
-                            score = Multiply(score, scale);
-                            
-                            // Apply mask if provided
-                            if (mask != null && !mask[b, i, j])
-                                score = CreateScalar<T>(-1e9f); // Large negative value
-                            
-                            scores[j] = score;
-                            if (j == 0 || IsGreaterThan(score, maxScore))
-                                maxScore = score;
-                        }
-                        
-                        // Apply softmax
-                        var sumExp = GetZero<T>();
-                        for (int j = 0; j < seqLength; j++)
-                        {
-                            var expVal = Exp(Subtract(scores[j], maxScore));
-                            scores[j] = expVal;
-                            sumExp = Add(sumExp, expVal);
-                        }
-                        
-                        // Normalize and compute output
-                        for (int d = 0; d < headDim; d++)
-                        {
-                            var outputVal = GetZero<T>();
-                            for (int j = 0; j < seqLength; j++)
-                            {
-                                var weight = Divide(scores[j], sumExp);
-                                var vVal = value[b, j, d];
-                                outputVal = Add(outputVal, Multiply(weight, vVal));
-                            }
-                            output[b, i, d] = outputVal;
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Simplified scaled dot-product attention: output = softmax(QK^T / scale) * V
+                                                                           var batchSize = query.Shape[0];
+                                                                           var seqLength = query.Shape[1];
+                                                                           var headDim = query.Shape[2];
+
+                                                                           for (int b = 0; b < batchSize; b++)
+                                                                           {
+                                                                               // Compute attention scores: Q * K^T
+                                                                               for (int i = 0; i < seqLength; i++)
+                                                                               {
+                                                                                   // Compute scores for position i
+                                                                                   var scores = new T[seqLength];
+                                                                                   var maxScore = GetZero<T>();
+
+                                                                                   for (int j = 0; j < seqLength; j++)
+                                                                                   {
+                                                                                       var score = GetZero<T>();
+                                                                                       for (int d = 0; d < headDim; d++)
+                                                                                       {
+                                                                                           var qVal = query[b, i, d];
+                                                                                           var kVal = key[b, j, d];
+                                                                                           score = Add(score, Multiply(qVal, kVal));
+                                                                                       }
+                                                                                       score = Multiply(score, scale);
+
+                                                                                       // Apply mask if provided
+                                                                                       if (mask != null && !mask[b, i, j])
+                                                                                           score = CreateScalar<T>(-1e9f); // Large negative value
+
+                                                                                       scores[j] = score;
+                                                                                       if (j == 0 || IsGreaterThan(score, maxScore))
+                                                                                           maxScore = score;
+                                                                                   }
+
+                                                                                   // Apply softmax
+                                                                                   var sumExp = GetZero<T>();
+                                                                                   for (int j = 0; j < seqLength; j++)
+                                                                                   {
+                                                                                       var expVal = Exp(Subtract(scores[j], maxScore));
+                                                                                       scores[j] = expVal;
+                                                                                       sumExp = Add(sumExp, expVal);
+                                                                                   }
+
+                                                                                   // Normalize and compute output
+                                                                                   for (int d = 0; d < headDim; d++)
+                                                                                   {
+                                                                                       var outputVal = GetZero<T>();
+                                                                                       for (int j = 0; j < seqLength; j++)
+                                                                                       {
+                                                                                           var weight = Divide(scores[j], sumExp);
+                                                                                           var vVal = value[b, j, d];
+                                                                                           outputVal = Add(outputVal, Multiply(weight, vVal));
+                                                                                       }
+                                                                                       output[b, i, d] = outputVal;
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task ReLUAsync<T>(
             ITensor<T> input,
             ITensor<T> output,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // ReLU: output = max(0, input)
-                var totalElements = input.Length;
-                for (long i = 0; i < totalElements; i++)
-                {
-                    var flatIndex = ComputeFlatIndex(input.Shape, i);
-                    var inputVal = GetElementAtFlatIndex(input, flatIndex);
-                    var zero = GetZero<T>();
-                    var result = IsGreaterThan(inputVal, zero) ? inputVal : zero;
-                    SetElementAtFlatIndex(output, flatIndex, result);
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // ReLU: output = max(0, input)
+                                                                           var totalElements = input.Length;
+                                                                           for (long i = 0; i < totalElements; i++)
+                                                                           {
+                                                                               var flatIndex = ComputeFlatIndex(input.Shape, i);
+                                                                               var inputVal = GetElementAtFlatIndex(input, flatIndex);
+                                                                               var zero = GetZero<T>();
+                                                                               var result = IsGreaterThan(inputVal, zero) ? inputVal : zero;
+                                                                               SetElementAtFlatIndex(output, flatIndex, result);
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task GELUAsync<T>(
             ITensor<T> input,
             ITensor<T> output,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // GELU: x * 0.5 * (1 + tanh(sqrt(2/π) * (x + 0.044715 * x^3)))
-                var totalElements = input.Length;
-                var sqrt2OverPi = CreateScalar<T>(0.7978845608f); // sqrt(2/π)
-                var coefficient = CreateScalar<T>(0.044715f);
-                var half = CreateScalar<T>(0.5f);
-                var one = CreateScalar<T>(1.0f);
-                
-                for (long i = 0; i < totalElements; i++)
-                {
-                    var flatIndex = ComputeFlatIndex(input.Shape, i);
-                    var x = GetElementAtFlatIndex(input, flatIndex);
-                    
-                    // Compute x^3
-                    var x3 = Multiply(Multiply(x, x), x);
-                    
-                    // Compute inner expression: sqrt(2/π) * (x + 0.044715 * x^3)
-                    var inner = Multiply(sqrt2OverPi, Add(x, Multiply(coefficient, x3)));
-                    
-                    // Approximate tanh using (exp(2x) - 1) / (exp(2x) + 1)
-                    var exp2x = Exp(Multiply(CreateScalar<T>(2.0f), inner));
-                    var tanh = Divide(Subtract(exp2x, one), Add(exp2x, one));
-                    
-                    // Final GELU computation
-                    var result = Multiply(x, Multiply(half, Add(one, tanh)));
-                    SetElementAtFlatIndex(output, flatIndex, result);
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // GELU: x * 0.5 * (1 + tanh(sqrt(2/π) * (x + 0.044715 * x^3)))
+                                                                           var totalElements = input.Length;
+                                                                           var sqrt2OverPi = CreateScalar<T>(0.7978845608f); // sqrt(2/π)
+                                                                           var coefficient = CreateScalar<T>(0.044715f);
+                                                                           var half = CreateScalar<T>(0.5f);
+                                                                           var one = CreateScalar<T>(1.0f);
+
+                                                                           for (long i = 0; i < totalElements; i++)
+                                                                           {
+                                                                               var flatIndex = ComputeFlatIndex(input.Shape, i);
+                                                                               var x = GetElementAtFlatIndex(input, flatIndex);
+
+                                                                               // Compute x^3
+                                                                               var x3 = Multiply(Multiply(x, x), x);
+
+                                                                               // Compute inner expression: sqrt(2/π) * (x + 0.044715 * x^3)
+                                                                               var inner = Multiply(sqrt2OverPi, Add(x, Multiply(coefficient, x3)));
+
+                                                                               // Approximate tanh using (exp(2x) - 1) / (exp(2x) + 1)
+                                                                               var exp2x = Exp(Multiply(CreateScalar<T>(2.0f), inner));
+                                                                               var tanh = Divide(Subtract(exp2x, one), Add(exp2x, one));
+
+                                                                               // Final GELU computation
+                                                                               var result = Multiply(x, Multiply(half, Add(one, tanh)));
+                                                                               SetElementAtFlatIndex(output, flatIndex, result);
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task SoftmaxAsync<T>(
             ITensor<T> input,
             ITensor<T> output,
             int axis = -1,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Simple 1D softmax implementation
-                if (input.Rank == 1)
-                {
-                    var length = input.Shape[0];
-                    
-                    // Find max for numerical stability
-                    var maxVal = input[0];
-                    for (int i = 1; i < length; i++)
-                    {
-                        var val = input[i];
-                        if (IsGreaterThan(val, maxVal))
-                            maxVal = val;
-                    }
-                    
-                    // Compute exp(x - max) and sum
-                    var sum = GetZero<T>();
-                    for (int i = 0; i < length; i++)
-                    {
-                        var expVal = Exp(Subtract(input[i], maxVal));
-                        output[i] = expVal;
-                        sum = Add(sum, expVal);
-                    }
-                    
-                    // Normalize
-                    for (int i = 0; i < length; i++)
-                    {
-                        output[i] = Divide(output[i], sum);
-                    }
-                }
-                else
-                {
-                    // For multi-dimensional tensors, copy input to output as placeholder
-                    var totalElements = input.Length;
-                    for (long i = 0; i < totalElements; i++)
-                    {
-                        var flatIndex = ComputeFlatIndex(input.Shape, i);
-                        var val = GetElementAtFlatIndex(input, flatIndex);
-                        SetElementAtFlatIndex(output, flatIndex, val);
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Simple 1D softmax implementation
+                                                                           if (input.Rank == 1)
+                                                                           {
+                                                                               var length = input.Shape[0];
+
+                                                                               // Find max for numerical stability
+                                                                               var maxVal = input[0];
+                                                                               for (int i = 1; i < length; i++)
+                                                                               {
+                                                                                   var val = input[i];
+                                                                                   if (IsGreaterThan(val, maxVal))
+                                                                                       maxVal = val;
+                                                                               }
+
+                                                                               // Compute exp(x - max) and sum
+                                                                               var sum = GetZero<T>();
+                                                                               for (int i = 0; i < length; i++)
+                                                                               {
+                                                                                   var expVal = Exp(Subtract(input[i], maxVal));
+                                                                                   output[i] = expVal;
+                                                                                   sum = Add(sum, expVal);
+                                                                               }
+
+                                                                               // Normalize
+                                                                               for (int i = 0; i < length; i++)
+                                                                               {
+                                                                                   output[i] = Divide(output[i], sum);
+                                                                               }
+                                                                           }
+                                                                           else
+                                                                           {
+                                                                               // For multi-dimensional tensors, copy input to output as placeholder
+                                                                               var totalElements = input.Length;
+                                                                               for (long i = 0; i < totalElements; i++)
+                                                                               {
+                                                                                   var flatIndex = ComputeFlatIndex(input.Shape, i);
+                                                                                   var val = GetElementAtFlatIndex(input, flatIndex);
+                                                                                   SetElementAtFlatIndex(output, flatIndex, val);
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task LayerNormAsync<T>(
             ITensor<T> input,
@@ -1149,53 +1112,50 @@ namespace ILGPU.Runtime.AI
             ITensor<T> gamma,
             ITensor<T> beta,
             T epsilon,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Layer normalization across the last dimension
-                var batchSize = input.Shape[0];
-                var featureSize = input.Shape[input.Rank - 1];
-                var numElements = (int)(input.Length / featureSize);
-                
-                for (int i = 0; i < numElements; i++)
-                {
-                    // Compute mean
-                    var sum = GetZero<T>();
-                    for (int j = 0; j < featureSize; j++)
-                    {
-                        var indices = ComputeIndicesFromFlat(input.Shape, i * featureSize + j);
-                        sum = Add(sum, GetElementAtFlatIndex(input, indices));
-                    }
-                    var mean = Divide(sum, CreateScalar<T>(featureSize));
-                    
-                    // Compute variance
-                    var variance = GetZero<T>();
-                    for (int j = 0; j < featureSize; j++)
-                    {
-                        var indices = ComputeIndicesFromFlat(input.Shape, i * featureSize + j);
-                        var diff = Subtract(GetElementAtFlatIndex(input, indices), mean);
-                        variance = Add(variance, Multiply(diff, diff));
-                    }
-                    variance = Divide(variance, CreateScalar<T>(featureSize));
-                    
-                    // Compute normalized output
-                    var stdDev = Sqrt(Add(variance, epsilon));
-                    for (int j = 0; j < featureSize; j++)
-                    {
-                        var indices = ComputeIndicesFromFlat(input.Shape, i * featureSize + j);
-                        var normalized = Divide(Subtract(GetElementAtFlatIndex(input, indices), mean), stdDev);
-                        
-                        // Apply scale and shift
-                        var scaled = Multiply(normalized, gamma[j]);
-                        var result = Add(scaled, beta[j]);
-                        SetElementAtFlatIndex(output, indices, result);
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Layer normalization across the last dimension
+                                                                           var batchSize = input.Shape[0];
+                                                                           var featureSize = input.Shape[input.Rank - 1];
+                                                                           var numElements = (int)(input.Length / featureSize);
+
+                                                                           for (int i = 0; i < numElements; i++)
+                                                                           {
+                                                                               // Compute mean
+                                                                               var sum = GetZero<T>();
+                                                                               for (int j = 0; j < featureSize; j++)
+                                                                               {
+                                                                                   var indices = ComputeIndicesFromFlat(input.Shape, i * featureSize + j);
+                                                                                   sum = Add(sum, GetElementAtFlatIndex(input, indices));
+                                                                               }
+                                                                               var mean = Divide(sum, CreateScalar<T>(featureSize));
+
+                                                                               // Compute variance
+                                                                               var variance = GetZero<T>();
+                                                                               for (int j = 0; j < featureSize; j++)
+                                                                               {
+                                                                                   var indices = ComputeIndicesFromFlat(input.Shape, i * featureSize + j);
+                                                                                   var diff = Subtract(GetElementAtFlatIndex(input, indices), mean);
+                                                                                   variance = Add(variance, Multiply(diff, diff));
+                                                                               }
+                                                                               variance = Divide(variance, CreateScalar<T>(featureSize));
+
+                                                                               // Compute normalized output
+                                                                               var stdDev = Sqrt(Add(variance, epsilon));
+                                                                               for (int j = 0; j < featureSize; j++)
+                                                                               {
+                                                                                   var indices = ComputeIndicesFromFlat(input.Shape, i * featureSize + j);
+                                                                                   var normalized = Divide(Subtract(GetElementAtFlatIndex(input, indices), mean), stdDev);
+
+                                                                                   // Apply scale and shift
+                                                                                   var scaled = Multiply(normalized, gamma[j]);
+                                                                                   var result = Add(scaled, beta[j]);
+                                                                                   SetElementAtFlatIndex(output, indices, result);
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task BatchNormAsync<T>(
             ITensor<T> input,
@@ -1205,72 +1165,69 @@ namespace ILGPU.Runtime.AI
             ITensor<T> gamma,
             ITensor<T> beta,
             T epsilon,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Generic batch normalization implementation
-                // BatchNorm formula: y = (x - mean) / sqrt(variance + epsilon) * gamma + beta
-                var batchSize = input.Shape[0];
-                var channels = input.Shape[1];
-                var height = input.Shape[2];
-                var width = input.Shape[3];
-                
-                unsafe
-                {
-                    var inputPtr = (T*)input.GetDataPointer();
-                    var outputPtr = (T*)output.GetDataPointer();
-                    var meanPtr = (T*)mean.GetDataPointer();
-                    var variancePtr = (T*)variance.GetDataPointer();
-                    var gammaPtr = (T*)gamma.GetDataPointer();
-                    var betaPtr = (T*)beta.GetDataPointer();
-                    
-                    for (int b = 0; b < batchSize; b++)
-                    {
-                        for (int c = 0; c < channels; c++)
-                        {
-                            for (int h = 0; h < height; h++)
-                            {
-                                for (int w = 0; w < width; w++)
-                                {
-                                    var inputIdx = b * channels * height * width + 
-                                                 c * height * width + h * width + w;
-                                    
-                                    if (typeof(T) == typeof(float))
-                                    {
-                                        var x = (float)(object)inputPtr[inputIdx];
-                                        var mu = (float)(object)meanPtr[c];
-                                        var sigma2 = (float)(object)variancePtr[c];
-                                        var g = (float)(object)gammaPtr[c];
-                                        var b_val = (float)(object)betaPtr[c];
-                                        var eps = (float)(object)epsilon;
-                                        
-                                        var normalized = (x - mu) / MathF.Sqrt(sigma2 + eps);
-                                        var result = normalized * g + b_val;
-                                        outputPtr[inputIdx] = (T)(object)result;
-                                    }
-                                    else if (typeof(T) == typeof(double))
-                                    {
-                                        var x = (double)(object)inputPtr[inputIdx];
-                                        var mu = (double)(object)meanPtr[c];
-                                        var sigma2 = (double)(object)variancePtr[c];
-                                        var g = (double)(object)gammaPtr[c];
-                                        var b_val = (double)(object)betaPtr[c];
-                                        var eps = (double)(object)epsilon;
-                                        
-                                        var normalized = (x - mu) / Math.Sqrt(sigma2 + eps);
-                                        var result = normalized * g + b_val;
-                                        outputPtr[inputIdx] = (T)(object)result;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Generic batch normalization implementation
+                                                                           // BatchNorm formula: y = (x - mean) / sqrt(variance + epsilon) * gamma + beta
+                                                                           var batchSize = input.Shape[0];
+                                                                           var channels = input.Shape[1];
+                                                                           var height = input.Shape[2];
+                                                                           var width = input.Shape[3];
+
+                                                                           unsafe
+                                                                           {
+                                                                               var inputPtr = (T*)input.GetDataPointer();
+                                                                               var outputPtr = (T*)output.GetDataPointer();
+                                                                               var meanPtr = (T*)mean.GetDataPointer();
+                                                                               var variancePtr = (T*)variance.GetDataPointer();
+                                                                               var gammaPtr = (T*)gamma.GetDataPointer();
+                                                                               var betaPtr = (T*)beta.GetDataPointer();
+
+                                                                               for (int b = 0; b < batchSize; b++)
+                                                                               {
+                                                                                   for (int c = 0; c < channels; c++)
+                                                                                   {
+                                                                                       for (int h = 0; h < height; h++)
+                                                                                       {
+                                                                                           for (int w = 0; w < width; w++)
+                                                                                           {
+                                                                                               var inputIdx = b * channels * height * width +
+                                                                                                            c * height * width + h * width + w;
+
+                                                                                               if (typeof(T) == typeof(float))
+                                                                                               {
+                                                                                                   var x = (float)(object)inputPtr[inputIdx];
+                                                                                                   var mu = (float)(object)meanPtr[c];
+                                                                                                   var sigma2 = (float)(object)variancePtr[c];
+                                                                                                   var g = (float)(object)gammaPtr[c];
+                                                                                                   var b_val = (float)(object)betaPtr[c];
+                                                                                                   var eps = (float)(object)epsilon;
+
+                                                                                                   var normalized = (x - mu) / MathF.Sqrt(sigma2 + eps);
+                                                                                                   var result = normalized * g + b_val;
+                                                                                                   outputPtr[inputIdx] = (T)(object)result;
+                                                                                               }
+                                                                                               else if (typeof(T) == typeof(double))
+                                                                                               {
+                                                                                                   var x = (double)(object)inputPtr[inputIdx];
+                                                                                                   var mu = (double)(object)meanPtr[c];
+                                                                                                   var sigma2 = (double)(object)variancePtr[c];
+                                                                                                   var g = (double)(object)gammaPtr[c];
+                                                                                                   var b_val = (double)(object)betaPtr[c];
+                                                                                                   var eps = (double)(object)epsilon;
+
+                                                                                                   var normalized = (x - mu) / Math.Sqrt(sigma2 + eps);
+                                                                                                   var result = normalized * g + b_val;
+                                                                                                   outputPtr[inputIdx] = (T)(object)result;
+                                                                                               }
+                                                                                           }
+                                                                                       }
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task MaxPool2DAsync<T>(
             ITensor<T> input,
@@ -1278,57 +1235,54 @@ namespace ILGPU.Runtime.AI
             Size2D poolSize,
             Size2D stride,
             Size2D padding,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                var batchSize = input.Shape[0];
-                var channels = input.Shape[1];
-                var inputHeight = input.Shape[2];
-                var inputWidth = input.Shape[3];
-                
-                var outputHeight = (inputHeight + 2 * padding.Height - poolSize.Height) / stride.Height + 1;
-                var outputWidth = (inputWidth + 2 * padding.Width - poolSize.Width) / stride.Width + 1;
-                
-                for (int b = 0; b < batchSize; b++)
-                {
-                    for (int c = 0; c < channels; c++)
-                    {
-                        for (int oh = 0; oh < outputHeight; oh++)
-                        {
-                            for (int ow = 0; ow < outputWidth; ow++)
-                            {
-                                var maxVal = CreateScalar<T>(-1e9f); // Large negative value
-                                bool hasValidValue = false;
-                                
-                                for (int ph = 0; ph < poolSize.Height; ph++)
-                                {
-                                    for (int pw = 0; pw < poolSize.Width; pw++)
-                                    {
-                                        var ih = oh * stride.Height - padding.Height + ph;
-                                        var iw = ow * stride.Width - padding.Width + pw;
-                                        
-                                        if (ih >= 0 && ih < inputHeight && iw >= 0 && iw < inputWidth)
-                                        {
-                                            var val = input[b, c, ih, iw];
-                                            if (!hasValidValue || IsGreaterThan(val, maxVal))
-                                            {
-                                                maxVal = val;
-                                                hasValidValue = true;
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                output[b, c, oh, ow] = hasValidValue ? maxVal : GetZero<T>();
-                            }
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           var batchSize = input.Shape[0];
+                                                                           var channels = input.Shape[1];
+                                                                           var inputHeight = input.Shape[2];
+                                                                           var inputWidth = input.Shape[3];
+
+                                                                           var outputHeight = (inputHeight + 2 * padding.Height - poolSize.Height) / stride.Height + 1;
+                                                                           var outputWidth = (inputWidth + 2 * padding.Width - poolSize.Width) / stride.Width + 1;
+
+                                                                           for (int b = 0; b < batchSize; b++)
+                                                                           {
+                                                                               for (int c = 0; c < channels; c++)
+                                                                               {
+                                                                                   for (int oh = 0; oh < outputHeight; oh++)
+                                                                                   {
+                                                                                       for (int ow = 0; ow < outputWidth; ow++)
+                                                                                       {
+                                                                                           var maxVal = CreateScalar<T>(-1e9f); // Large negative value
+                                                                                           bool hasValidValue = false;
+
+                                                                                           for (int ph = 0; ph < poolSize.Height; ph++)
+                                                                                           {
+                                                                                               for (int pw = 0; pw < poolSize.Width; pw++)
+                                                                                               {
+                                                                                                   var ih = oh * stride.Height - padding.Height + ph;
+                                                                                                   var iw = ow * stride.Width - padding.Width + pw;
+
+                                                                                                   if (ih >= 0 && ih < inputHeight && iw >= 0 && iw < inputWidth)
+                                                                                                   {
+                                                                                                       var val = input[b, c, ih, iw];
+                                                                                                       if (!hasValidValue || IsGreaterThan(val, maxVal))
+                                                                                                       {
+                                                                                                           maxVal = val;
+                                                                                                           hasValidValue = true;
+                                                                                                       }
+                                                                                                   }
+                                                                                               }
+                                                                                           }
+
+                                                                                           output[b, c, oh, ow] = hasValidValue ? maxVal : GetZero<T>();
+                                                                                       }
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task AvgPool2DAsync<T>(
             ITensor<T> input,
@@ -1336,141 +1290,132 @@ namespace ILGPU.Runtime.AI
             Size2D poolSize,
             Size2D stride,
             Size2D padding,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                var batchSize = input.Shape[0];
-                var channels = input.Shape[1];
-                var inputHeight = input.Shape[2];
-                var inputWidth = input.Shape[3];
-                
-                var outputHeight = (inputHeight + 2 * padding.Height - poolSize.Height) / stride.Height + 1;
-                var outputWidth = (inputWidth + 2 * padding.Width - poolSize.Width) / stride.Width + 1;
-                
-                for (int b = 0; b < batchSize; b++)
-                {
-                    for (int c = 0; c < channels; c++)
-                    {
-                        for (int oh = 0; oh < outputHeight; oh++)
-                        {
-                            for (int ow = 0; ow < outputWidth; ow++)
-                            {
-                                var sum = GetZero<T>();
-                                int validCount = 0;
-                                
-                                for (int ph = 0; ph < poolSize.Height; ph++)
-                                {
-                                    for (int pw = 0; pw < poolSize.Width; pw++)
-                                    {
-                                        var ih = oh * stride.Height - padding.Height + ph;
-                                        var iw = ow * stride.Width - padding.Width + pw;
-                                        
-                                        if (ih >= 0 && ih < inputHeight && iw >= 0 && iw < inputWidth)
-                                        {
-                                            sum = Add(sum, input[b, c, ih, iw]);
-                                            validCount++;
-                                        }
-                                    }
-                                }
-                                
-                                output[b, c, oh, ow] = validCount > 0 ? Divide(sum, CreateScalar<T>(validCount)) : GetZero<T>();
-                            }
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           var batchSize = input.Shape[0];
+                                                                           var channels = input.Shape[1];
+                                                                           var inputHeight = input.Shape[2];
+                                                                           var inputWidth = input.Shape[3];
+
+                                                                           var outputHeight = (inputHeight + 2 * padding.Height - poolSize.Height) / stride.Height + 1;
+                                                                           var outputWidth = (inputWidth + 2 * padding.Width - poolSize.Width) / stride.Width + 1;
+
+                                                                           for (int b = 0; b < batchSize; b++)
+                                                                           {
+                                                                               for (int c = 0; c < channels; c++)
+                                                                               {
+                                                                                   for (int oh = 0; oh < outputHeight; oh++)
+                                                                                   {
+                                                                                       for (int ow = 0; ow < outputWidth; ow++)
+                                                                                       {
+                                                                                           var sum = GetZero<T>();
+                                                                                           int validCount = 0;
+
+                                                                                           for (int ph = 0; ph < poolSize.Height; ph++)
+                                                                                           {
+                                                                                               for (int pw = 0; pw < poolSize.Width; pw++)
+                                                                                               {
+                                                                                                   var ih = oh * stride.Height - padding.Height + ph;
+                                                                                                   var iw = ow * stride.Width - padding.Width + pw;
+
+                                                                                                   if (ih >= 0 && ih < inputHeight && iw >= 0 && iw < inputWidth)
+                                                                                                   {
+                                                                                                       sum = Add(sum, input[b, c, ih, iw]);
+                                                                                                       validCount++;
+                                                                                                   }
+                                                                                               }
+                                                                                           }
+
+                                                                                           output[b, c, oh, ow] = validCount > 0 ? Divide(sum, CreateScalar<T>(validCount)) : GetZero<T>();
+                                                                                       }
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task QuantizeToInt8Async<T>(
             ITensor<T> input,
             ITensor<sbyte> output,
             T scale,
             sbyte zeroPoint,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Generic quantization implementation
-                // Quantization formula: q = round(x / scale) + zero_point
-                var totalElements = input.Length;
-                
-                unsafe
-                {
-                    var inputPtr = (T*)input.GetDataPointer();
-                    var outputPtr = (sbyte*)output.GetDataPointer();
-                    
-                    for (long i = 0; i < totalElements; i++)
-                    {
-                        if (typeof(T) == typeof(float))
-                        {
-                            var x = (float)(object)inputPtr[i];
-                            var scaleVal = (float)(object)scale;
-                            var quantized = (int)MathF.Round(x / scaleVal) + zeroPoint;
-                            
-                            // Clamp to int8 range
-                            quantized = Math.Max(-128, Math.Min(127, quantized));
-                            outputPtr[i] = (sbyte)quantized;
-                        }
-                        else if (typeof(T) == typeof(double))
-                        {
-                            var x = (double)(object)inputPtr[i];
-                            var scaleVal = (double)(object)scale;
-                            var quantized = (int)Math.Round(x / scaleVal) + zeroPoint;
-                            
-                            // Clamp to int8 range
-                            quantized = Math.Max(-128, Math.Min(127, quantized));
-                            outputPtr[i] = (sbyte)quantized;
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Generic quantization implementation
+                                                                           // Quantization formula: q = round(x / scale) + zero_point
+                                                                           var totalElements = input.Length;
+
+                                                                           unsafe
+                                                                           {
+                                                                               var inputPtr = (T*)input.GetDataPointer();
+                                                                               var outputPtr = (sbyte*)output.GetDataPointer();
+
+                                                                               for (long i = 0; i < totalElements; i++)
+                                                                               {
+                                                                                   if (typeof(T) == typeof(float))
+                                                                                   {
+                                                                                       var x = (float)(object)inputPtr[i];
+                                                                                       var scaleVal = (float)(object)scale;
+                                                                                       var quantized = (int)MathF.Round(x / scaleVal) + zeroPoint;
+
+                                                                                       // Clamp to int8 range
+                                                                                       quantized = Math.Max(-128, Math.Min(127, quantized));
+                                                                                       outputPtr[i] = (sbyte)quantized;
+                                                                                   }
+                                                                                   else if (typeof(T) == typeof(double))
+                                                                                   {
+                                                                                       var x = (double)(object)inputPtr[i];
+                                                                                       var scaleVal = (double)(object)scale;
+                                                                                       var quantized = (int)Math.Round(x / scaleVal) + zeroPoint;
+
+                                                                                       // Clamp to int8 range
+                                                                                       quantized = Math.Max(-128, Math.Min(127, quantized));
+                                                                                       outputPtr[i] = (sbyte)quantized;
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         public override Task DequantizeFromInt8Async<T>(
             ITensor<sbyte> input,
             ITensor<T> output,
             T scale,
             sbyte zeroPoint,
-            CancellationToken cancellationToken = default)
-        {
-            return Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                
-                // Generic dequantization implementation
-                // Dequantization formula: x = (q - zero_point) * scale
-                var totalElements = input.Length;
-                
-                unsafe
-                {
-                    var inputPtr = (sbyte*)input.GetDataPointer();
-                    var outputPtr = (T*)output.GetDataPointer();
-                    
-                    for (long i = 0; i < totalElements; i++)
-                    {
-                        var quantized = inputPtr[i];
-                        
-                        if (typeof(T) == typeof(float))
-                        {
-                            var scaleVal = (float)(object)scale;
-                            var dequantized = (quantized - zeroPoint) * scaleVal;
-                            outputPtr[i] = (T)(object)dequantized;
-                        }
-                        else if (typeof(T) == typeof(double))
-                        {
-                            var scaleVal = (double)(object)scale;
-                            var dequantized = (quantized - zeroPoint) * scaleVal;
-                            outputPtr[i] = (T)(object)dequantized;
-                        }
-                    }
-                }
-            }, cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => Task.Run(() =>
+                                                                       {
+                                                                           cancellationToken.ThrowIfCancellationRequested();
+
+                                                                           // Generic dequantization implementation
+                                                                           // Dequantization formula: x = (q - zero_point) * scale
+                                                                           var totalElements = input.Length;
+
+                                                                           unsafe
+                                                                           {
+                                                                               var inputPtr = (sbyte*)input.GetDataPointer();
+                                                                               var outputPtr = (T*)output.GetDataPointer();
+
+                                                                               for (long i = 0; i < totalElements; i++)
+                                                                               {
+                                                                                   var quantized = inputPtr[i];
+
+                                                                                   if (typeof(T) == typeof(float))
+                                                                                   {
+                                                                                       var scaleVal = (float)(object)scale;
+                                                                                       var dequantized = (quantized - zeroPoint) * scaleVal;
+                                                                                       outputPtr[i] = (T)(object)dequantized;
+                                                                                   }
+                                                                                   else if (typeof(T) == typeof(double))
+                                                                                   {
+                                                                                       var scaleVal = (double)(object)scale;
+                                                                                       var dequantized = (quantized - zeroPoint) * scaleVal;
+                                                                                       outputPtr[i] = (T)(object)dequantized;
+                                                                                   }
+                                                                               }
+                                                                           }
+                                                                       }, cancellationToken);
 
         // Helper methods for generic arithmetic operations
         private static T GetZero<T>() where T : unmanaged
@@ -1546,15 +1491,9 @@ namespace ILGPU.Runtime.AI
             return indices;
         }
 
-        private static T GetElementAtFlatIndex<T>(ITensor<T> tensor, int[] indices) where T : unmanaged
-        {
-            return tensor[indices];
-        }
+        private static T GetElementAtFlatIndex<T>(ITensor<T> tensor, int[] indices) where T : unmanaged => tensor[indices];
 
-        private static void SetElementAtFlatIndex<T>(ITensor<T> tensor, int[] indices, T value) where T : unmanaged
-        {
-            tensor[indices] = value;
-        }
+        private static void SetElementAtFlatIndex<T>(ITensor<T> tensor, int[] indices, T value) where T : unmanaged => tensor[indices] = value;
 
         private static T CreateScalar<T>(float value) where T : unmanaged
         {

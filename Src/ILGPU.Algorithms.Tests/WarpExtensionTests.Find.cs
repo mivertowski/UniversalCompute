@@ -25,22 +25,16 @@ namespace ILGPU.Algorithms.Tests
 {
     partial class WarpExtensionTests
     {
-        internal readonly struct LaneEntry :
+        internal readonly struct LaneEntry(int distance, int laneIndex) :
             IScanReduceOperation<LaneEntry>,
             IAtomicOperation<LaneEntry>,
             ICompareExchangeOperation<LaneEntry>
         {
-            public LaneEntry(int distance, int laneIndex)
-            {
-                Distance = distance;
-                LaneIndex = laneIndex;
-            }
-
             public string CLCommand => string.Empty;
-            public LaneEntry Identity => new LaneEntry(int.MaxValue, int.MaxValue);
+            public LaneEntry Identity => new(int.MaxValue, int.MaxValue);
 
-            public int Distance { get; }
-            public int LaneIndex { get; }
+            public int Distance { get; } = distance;
+            public int LaneIndex { get; } = laneIndex;
 
             public LaneEntry Apply(LaneEntry first, LaneEntry second)
             {

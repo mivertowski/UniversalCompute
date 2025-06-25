@@ -20,7 +20,11 @@ namespace ILGPU.Backends.IL
     /// Constructs mappings for CPU kernels.
     /// </summary>
     /// <remarks>Members of this class are not thread safe.</remarks>
-    public sealed class ILArgumentMapper : ViewArgumentMapper
+    /// <remarks>
+    /// Constructs a new IL argument mapper.
+    /// </remarks>
+    /// <param name="context">The current context.</param>
+    public sealed class ILArgumentMapper(Context context) : ViewArgumentMapper(context)
     {
         #region Nested Types
 
@@ -42,16 +46,7 @@ namespace ILGPU.Backends.IL
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new IL argument mapper.
-        /// </summary>
-        /// <param name="context">The current context.</param>
-        public ILArgumentMapper(Context context)
-            : base(context)
-        { }
 
         #endregion
 

@@ -16,12 +16,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class ProfilingMarkers : TestBase
+    public abstract class ProfilingMarkers(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected ProfilingMarkers(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         private const int Length = 1024;
 
         internal static void ProfilingMarkerKernel(

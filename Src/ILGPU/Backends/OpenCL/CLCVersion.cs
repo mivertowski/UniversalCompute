@@ -16,40 +16,45 @@ namespace ILGPU.Backends.OpenCL
     /// <summary>
     /// Represents an OpenCL C version.
     /// </summary>
-    public readonly struct CLCVersion
+    /// <remarks>
+    /// Constructs a new OpenCL C version.
+    /// </remarks>
+    /// <param name="major">The major version.</param>
+    /// <param name="minor">The minor version.</param>
+    public readonly struct CLCVersion(int major, int minor)
     {
         #region Static
 
         /// <summary>
         /// The OpenCL C version 1.0.
         /// </summary>
-        public static readonly CLCVersion CL10 = new CLCVersion(1, 0);
+        public static readonly CLCVersion CL10 = new(1, 0);
 
         /// <summary>
         /// The OpenCL C version 1.1.
         /// </summary>
-        public static readonly CLCVersion CL11 = new CLCVersion(1, 1);
+        public static readonly CLCVersion CL11 = new(1, 1);
 
         /// <summary>
         /// The OpenCL C version 1.2.
         /// </summary>
-        public static readonly CLCVersion CL12 = new CLCVersion(1, 2);
+        public static readonly CLCVersion CL12 = new(1, 2);
 
         /// <summary>
         /// The OpenCL C version 2.0.
         /// </summary>
-        public static readonly CLCVersion CL20 = new CLCVersion(2, 0);
+        public static readonly CLCVersion CL20 = new(2, 0);
 
         /// <summary>
         /// The OpenCL C version 3.0.
         /// </summary>
-        public static readonly CLCVersion CL30 = new CLCVersion(3, 0);
+        public static readonly CLCVersion CL30 = new(3, 0);
 
         /// <summary>
         /// The internal regex that is used to parse OpenCL C versions.
         /// </summary>
         private static readonly Regex VersionRegex =
-            new Regex("\\s*(CL|OpenCL C)?\\s*([0-9]+).([0-9]+)");
+            new("\\s*(CL|OpenCL C)?\\s*([0-9]+).([0-9]+)");
 
         /// <summary>
         /// Tries to parse the given string expression into an OpenCL C version.
@@ -72,19 +77,7 @@ namespace ILGPU.Backends.OpenCL
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new OpenCL C version.
-        /// </summary>
-        /// <param name="major">The major version.</param>
-        /// <param name="minor">The minor version.</param>
-        public CLCVersion(int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
-        }
 
         #endregion
 
@@ -93,12 +86,12 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// The major OpenCL C Version.
         /// </summary>
-        public int Major { get; }
+        public int Major { get; } = major;
 
         /// <summary>
         /// The minor OpenCL C Version.
         /// </summary>
-        public int Minor { get; }
+        public int Minor { get; } = minor;
 
         #endregion
 

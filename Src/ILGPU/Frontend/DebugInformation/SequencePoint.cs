@@ -17,36 +17,30 @@ namespace ILGPU.Frontend.DebugInformation
     /// <summary>
     /// Represents a single sequence point of an instruction.
     /// </summary>
-    public sealed class SequencePoint : FileLocation
+    /// <remarks>
+    /// Constructs a new sequence point.
+    /// </remarks>
+    /// <param name="fileName">The file name.</param>
+    /// <param name="offset">The byte offset.</param>
+    /// <param name="startColumn">The start column.</param>
+    /// <param name="endColumn">The end column.</param>
+    /// <param name="startLine">The start line.</param>
+    /// <param name="endLine">The end line.</param>
+    public sealed class SequencePoint(
+        string fileName,
+        int offset,
+        int startColumn,
+        int endColumn,
+        int startLine,
+        int endLine) : FileLocation(
+              fileName,
+              startColumn,
+              endColumn,
+              startLine,
+              endLine)
     {
+
         #region Instance
-
-        /// <summary>
-        /// Constructs a new sequence point.
-        /// </summary>
-        /// <param name="fileName">The file name.</param>
-        /// <param name="offset">The byte offset.</param>
-        /// <param name="startColumn">The start column.</param>
-        /// <param name="endColumn">The end column.</param>
-        /// <param name="startLine">The start line.</param>
-        /// <param name="endLine">The end line.</param>
-        public SequencePoint(
-            string fileName,
-            int offset,
-            int startColumn,
-            int endColumn,
-            int startLine,
-            int endLine)
-            : base(
-                  fileName,
-                  startColumn,
-                  endColumn,
-                  startLine,
-                  endLine)
-        {
-
-            Offset = offset;
-        }
 
         #endregion
 
@@ -55,7 +49,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// Returns the associated offset (optional)
         /// </summary>
-        public int Offset { get; }
+        public int Offset { get; } = offset;
 
         #endregion
 

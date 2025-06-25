@@ -133,7 +133,7 @@ namespace ILGPU.IR.Intrinsics
         #region Instance
 
         private readonly Dictionary<MethodInfo, T?> entries =
-            new Dictionary<MethodInfo, T?>();
+            new();
 
         /// <summary>
         /// Constructs a new intrinsic matcher.
@@ -191,20 +191,16 @@ namespace ILGPU.IR.Intrinsics
     /// Represents an intrinsic matcher that matches values.
     /// </summary>
     /// <typeparam name="T">The matcher value type.</typeparam>
-    public abstract partial class BaseIntrinsicValueMatcher<T> :
+    /// <remarks>
+    /// Constructs a new abstract intrinsic value matcher.
+    /// </remarks>
+    /// <param name="valueKind">The value kind.</param>
+    public abstract partial class BaseIntrinsicValueMatcher<T>(ValueKind valueKind) :
         IntrinsicMatcher<T, Value>
         where T : class, IIntrinsicImplementation
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new abstract intrinsic value matcher.
-        /// </summary>
-        /// <param name="valueKind">The value kind.</param>
-        protected BaseIntrinsicValueMatcher(ValueKind valueKind)
-        {
-            ValueKind = valueKind;
-        }
+        #region Instance
 
         #endregion
 
@@ -213,7 +209,7 @@ namespace ILGPU.IR.Intrinsics
         /// <summary>
         /// Returns the target value kind.
         /// </summary>
-        public ValueKind ValueKind { get; }
+        public ValueKind ValueKind { get; } = valueKind;
 
         #endregion
     }

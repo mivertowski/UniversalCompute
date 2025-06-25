@@ -422,7 +422,7 @@ namespace ILGPU.IR.Types
             /// Returns an enumerator to enumerate all offsets in the parent type.
             /// </summary>
             /// <returns>The enumerator.</returns>
-            public Enumerator GetEnumerator() => new Enumerator(Parent);
+            public Enumerator GetEnumerator() => new(Parent);
 
             /// <summary>
             /// Returns an enumerator to enumerate all offsets in the parent type.
@@ -764,7 +764,7 @@ namespace ILGPU.IR.Types
         /// <summary>
         /// Returns a readonly collection of all field offsets.
         /// </summary>
-        public OffsetCollection Offsets => new OffsetCollection(this);
+        public OffsetCollection Offsets => new(this);
 
         /// <summary>
         /// Returns the number of associated fields.
@@ -789,7 +789,7 @@ namespace ILGPU.IR.Types
         /// <param name="maxSizeInBytes">The maximum vector size in bytes.</param>
         /// <returns>The vectorizable field collection.</returns>
         public VectorizableFieldCollection GetVectorizableFields(int maxSizeInBytes) =>
-            new VectorizableFieldCollection(this, maxSizeInBytes);
+            new(this, maxSizeInBytes);
 
         /// <summary>
         /// Gets a specific field offset in bytes from the beginning of the structure.
@@ -960,7 +960,7 @@ namespace ILGPU.IR.Types
         /// Returns an enumerator to enumerate all fields in this type.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public Enumerator GetEnumerator() => new Enumerator(this);
+        public Enumerator GetEnumerator() => new(this);
 
         /// <summary>
         /// Returns an enumerator to enumerate all fields in this type.

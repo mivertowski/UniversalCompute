@@ -14,22 +14,12 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class XMathTests : AlgorithmsTestBase
+    public abstract partial class XMathTests(ITestOutputHelper output, TestContext testContext) : AlgorithmsTestBase(output, testContext)
     {
-        protected XMathTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
-        internal readonly struct XMathTuple<T> where T : struct
+        internal readonly struct XMathTuple<T>(T x, T y) where T : struct
         {
-            public XMathTuple(T x, T y)
-            {
-                X = x;
-                Y = y;
-            }
-
-            public T X { get; }
-            public T Y { get; }
+            public T X { get; } = x;
+            public T Y { get; } = y;
         }
     }
 }

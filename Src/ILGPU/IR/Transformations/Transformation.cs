@@ -92,21 +92,17 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents an unordered executor.
         /// </summary>
-        private readonly struct Executor : ITransformExecutor
+        /// <remarks>
+        /// Constructs a new executor.
+        /// </remarks>
+        /// <param name="parent">The parent transformation.</param>
+        private readonly struct Executor(UnorderedTransformation parent) : ITransformExecutor
         {
-            /// <summary>
-            /// Constructs a new executor.
-            /// </summary>
-            /// <param name="parent">The parent transformation.</param>
-            public Executor(UnorderedTransformation parent)
-            {
-                Parent = parent;
-            }
 
             /// <summary>
             /// The associated parent transformation.
             /// </summary>
-            public UnorderedTransformation Parent { get; }
+            public UnorderedTransformation Parent { get; } = parent;
 
             /// <summary>
             /// Applies the parent transformation.
@@ -172,21 +168,17 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents an unordered executor.
         /// </summary>
-        private readonly struct Executor : ITransformExecutor
+        /// <remarks>
+        /// Constructs a new executor.
+        /// </remarks>
+        /// <param name="parent">The parent transformation.</param>
+        private readonly struct Executor(UnorderedTransformationWithPrePass parent) : ITransformExecutor
         {
-            /// <summary>
-            /// Constructs a new executor.
-            /// </summary>
-            /// <param name="parent">The parent transformation.</param>
-            public Executor(UnorderedTransformationWithPrePass parent)
-            {
-                Parent = parent;
-            }
 
             /// <summary>
             /// The associated parent transformation.
             /// </summary>
-            public UnorderedTransformationWithPrePass Parent { get; }
+            public UnorderedTransformationWithPrePass Parent { get; } = parent;
 
             /// <summary>
             /// Applies the parent transformation.
@@ -261,30 +253,25 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents an unordered executor.
         /// </summary>
-        private readonly struct Executor : ITransformExecutor
+        /// <remarks>
+        /// Constructs a new executor.
+        /// </remarks>
+        /// <param name="parent">The parent transformation.</param>
+        /// <param name="context">The context IR context.</param>
+        private readonly struct Executor(
+            SequentialUnorderedTransformation parent,
+            IRContext context) : ITransformExecutor
         {
-            /// <summary>
-            /// Constructs a new executor.
-            /// </summary>
-            /// <param name="parent">The parent transformation.</param>
-            /// <param name="context">The context IR context.</param>
-            public Executor(
-                SequentialUnorderedTransformation parent,
-                IRContext context)
-            {
-                Parent = parent;
-                Context = context;
-            }
 
             /// <summary>
             /// The associated parent transformation.
             /// </summary>
-            public SequentialUnorderedTransformation Parent { get; }
+            public SequentialUnorderedTransformation Parent { get; } = parent;
 
             /// <summary>
             /// Returns the current IR context in the scope of this transformation.
             /// </summary>
-            public IRContext Context { get; }
+            public IRContext Context { get; } = context;
 
             /// <summary>
             /// Applies the parent transformation.
@@ -339,30 +326,25 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents an unordered executor.
         /// </summary>
-        private readonly struct Executor : ITransformExecutor
+        /// <remarks>
+        /// Constructs a new executor.
+        /// </remarks>
+        /// <param name="parent">The parent transformation.</param>
+        /// <param name="intermediate">The intermediate value.</param>
+        private readonly struct Executor(
+            UnorderedTransformation<TIntermediate> parent,
+            TIntermediate intermediate) : ITransformExecutor
         {
-            /// <summary>
-            /// Constructs a new executor.
-            /// </summary>
-            /// <param name="parent">The parent transformation.</param>
-            /// <param name="intermediate">The intermediate value.</param>
-            public Executor(
-                UnorderedTransformation<TIntermediate> parent,
-                TIntermediate intermediate)
-            {
-                Parent = parent;
-                Intermediate = intermediate;
-            }
 
             /// <summary>
             /// The associated parent transformation.
             /// </summary>
-            public UnorderedTransformation<TIntermediate> Parent { get; }
+            public UnorderedTransformation<TIntermediate> Parent { get; } = parent;
 
             /// <summary>
             /// Returns the associated intermediate value.
             /// </summary>
-            public TIntermediate Intermediate { get; }
+            public TIntermediate Intermediate { get; } = intermediate;
 
             /// <summary>
             /// Applies the parent transformation.
@@ -445,54 +427,46 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents an ordered executor.
         /// </summary>
-        private readonly struct Executor : ITransformExecutor
+        /// <remarks>
+        /// Constructs a new executor.
+        /// </remarks>
+        /// <param name="parent">The parent transformation.</param>
+        /// <param name="context">The context IR context.</param>
+        /// <param name="intermediate">The intermediate value.</param>
+        /// <param name="landscape">The current landscape.</param>
+        /// <param name="entry">The current landscape entry.</param>
+        private readonly struct Executor(
+            OrderedTransformation<TIntermediate> parent,
+            IRContext context,
+            TIntermediate? intermediate,
+            Landscape landscape,
+            Landscape.Entry entry) : ITransformExecutor
         {
-            /// <summary>
-            /// Constructs a new executor.
-            /// </summary>
-            /// <param name="parent">The parent transformation.</param>
-            /// <param name="context">The context IR context.</param>
-            /// <param name="intermediate">The intermediate value.</param>
-            /// <param name="landscape">The current landscape.</param>
-            /// <param name="entry">The current landscape entry.</param>
-            public Executor(
-                OrderedTransformation<TIntermediate> parent,
-                IRContext context,
-                TIntermediate? intermediate,
-                Landscape landscape,
-                Landscape.Entry entry)
-            {
-                Parent = parent;
-                Context = context;
-                Intermediate = intermediate;
-                Landscape = landscape;
-                Entry = entry;
-            }
 
             /// <summary>
             /// The associated parent transformation.
             /// </summary>
-            public OrderedTransformation<TIntermediate> Parent { get; }
+            public OrderedTransformation<TIntermediate> Parent { get; } = parent;
 
             /// <summary>
             /// Returns the current IR context in the scope of this transformation.
             /// </summary>
-            public IRContext Context { get; }
+            public IRContext Context { get; } = context;
 
             /// <summary>
             /// Returns the associated intermediate value.
             /// </summary>
-            public TIntermediate? Intermediate { get; }
+            public TIntermediate? Intermediate { get; } = intermediate;
 
             /// <summary>
             /// Returns the current landscape.
             /// </summary>
-            public Landscape Landscape { get; }
+            public Landscape Landscape { get; } = landscape;
 
             /// <summary>
             /// Returns the current entry.
             /// </summary>
-            public Landscape.Entry Entry { get; }
+            public Landscape.Entry Entry { get; } = entry;
 
             /// <summary>
             /// Applies the parent transformation.

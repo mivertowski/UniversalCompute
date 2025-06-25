@@ -17,13 +17,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class LanguageTests : TestBase
+    public abstract class LanguageTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected LanguageTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
-
         internal static void PlainEmitKernel(
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> buffer)

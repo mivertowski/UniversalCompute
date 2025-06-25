@@ -21,8 +21,13 @@ namespace ILGPU.Backends.PointerViews
     /// native pointers.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
+    /// <remarks>
+    /// Constructs a new array view implementation.
+    /// </remarks>
+    /// <param name="ptr">The base pointer.</param>
+    /// <param name="length">The length information.</param>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe readonly struct ViewImplementation<T>
+    public unsafe readonly struct ViewImplementation<T>(void* ptr, long length)
         where T : unmanaged
     {
         #region Instance
@@ -34,7 +39,7 @@ namespace ILGPU.Backends.PointerViews
             "Microsoft.Design",
             "CA1051: DoNotDeclareVisibleInstanceFields",
             Justification = "Implementation type that simplifies code generation")]
-        public readonly void* Ptr;
+        public readonly void* Ptr = ptr;
 
         /// <summary>
         /// The length.
@@ -43,18 +48,7 @@ namespace ILGPU.Backends.PointerViews
             "Microsoft.Design",
             "CA1051: DoNotDeclareVisibleInstanceFields",
             Justification = "Implementation type that simplifies code generation")]
-        public readonly long Length;
-
-        /// <summary>
-        /// Constructs a new array view implementation.
-        /// </summary>
-        /// <param name="ptr">The base pointer.</param>
-        /// <param name="length">The length information.</param>
-        public ViewImplementation(void* ptr, long length)
-        {
-            Ptr = ptr;
-            Length = length;
-        }
+        public readonly long Length = length;
 
         /// <summary>
         /// Constructs a new array view implementation.

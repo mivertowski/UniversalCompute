@@ -15,12 +15,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class GetKernelTests : TestBase
+    public abstract class GetKernelTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected GetKernelTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         [Fact]
         public void LoadAutoGroupedKernel()
         {

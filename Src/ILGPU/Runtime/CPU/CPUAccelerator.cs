@@ -69,7 +69,7 @@ namespace ILGPU.Runtime.CPU
 
         // Task execution
 
-        private readonly object taskSynchronizationObject = new object();
+        private readonly object taskSynchronizationObject = new();
         private volatile CPUAcceleratorTask? currentTask;
 
         [SuppressMessage(
@@ -82,7 +82,7 @@ namespace ILGPU.Runtime.CPU
             "Microsoft.Usage",
             "CA2213: Disposable fields should be disposed",
             Justification = "This is disposed in DisposeAccelerator_SyncRoot")]
-        private readonly SemaphoreSlim taskConcurrencyLimit = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim taskConcurrencyLimit = new(1);
 
         /// <summary>
         /// Constructs a new CPU runtime.

@@ -371,22 +371,18 @@ namespace ILGPU.IR
     /// <summary>
     /// Marks value classes with specific value kinds.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new value kind attribute.
+    /// </remarks>
+    /// <param name="kind">The value kind.</param>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    internal sealed class ValueKindAttribute : Attribute
+    internal sealed class ValueKindAttribute(ValueKind kind) : Attribute
     {
-        /// <summary>
-        /// Constructs a new value kind attribute.
-        /// </summary>
-        /// <param name="kind">The value kind.</param>
-        public ValueKindAttribute(ValueKind kind)
-        {
-            Kind = kind;
-        }
 
         /// <summary>
         /// Returns the value kind.
         /// </summary>
-        public ValueKind Kind { get; }
+        public ValueKind Kind { get; } = kind;
     }
 
     /// <summary>

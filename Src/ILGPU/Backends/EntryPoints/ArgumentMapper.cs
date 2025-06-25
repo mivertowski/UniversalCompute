@@ -113,20 +113,19 @@ namespace ILGPU.Backends.EntryPoints
         /// A structure source.
         /// </summary>
         /// <typeparam name="TParentTarget">The parent source type.</typeparam>
-        protected readonly struct StructureTarget<TParentTarget> : ITarget
+        /// <remarks>
+        /// Constructs a new structure target.
+        /// </remarks>
+        /// <param name="parentTarget">The parent target.</param>
+        /// <param name="targetField">The target field.</param>
+        [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// A structure source.
+        /// </summary>
+        /// <typeparam name="TParentTarget">The parent source type.</typeparam>
+        protected readonly struct StructureTarget<TParentTarget>(in TParentTarget parentTarget, FieldInfo targetField) : ITarget
             where TParentTarget : struct, ITarget
         {
-            /// <summary>
-            /// Constructs a new structure target.
-            /// </summary>
-            /// <param name="parentTarget">The parent target.</param>
-            /// <param name="targetField">The target field.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public StructureTarget(in TParentTarget parentTarget, FieldInfo targetField)
-            {
-                ParentTarget = parentTarget;
-                TargetField = targetField;
-            }
 
             /// <summary cref="ITarget.TargetType"/>
             public Type TargetType => TargetField.FieldType;
@@ -134,12 +133,12 @@ namespace ILGPU.Backends.EntryPoints
             /// <summary>
             /// Returns the parent target.
             /// </summary>
-            public TParentTarget ParentTarget { get; }
+            public TParentTarget ParentTarget { get; } = parentTarget;
 
             /// <summary>
             /// Returns the target field.
             /// </summary>
-            public FieldInfo TargetField { get; }
+            public FieldInfo TargetField { get; } = targetField;
 
             /// <summary>
             /// Emits a target field address.
@@ -169,16 +168,12 @@ namespace ILGPU.Backends.EntryPoints
         /// <summary>
         /// A <see cref="ILLocal"/> target.
         /// </summary>
-        protected readonly struct LocalTarget : ITarget
+        /// <remarks>
+        /// Constructs a new local target.
+        /// </remarks>
+        /// <param name="local">The current local.</param>
+        protected readonly struct LocalTarget(ILLocal local) : ITarget
         {
-            /// <summary>
-            /// Constructs a new local target.
-            /// </summary>
-            /// <param name="local">The current local.</param>
-            public LocalTarget(ILLocal local)
-            {
-                Local = local;
-            }
 
             /// <summary cref="ITarget.TargetType"/>
             public Type TargetType => Local.VariableType;
@@ -186,7 +181,7 @@ namespace ILGPU.Backends.EntryPoints
             /// <summary>
             /// Returns the associated local variable.
             /// </summary>
-            public ILLocal Local { get; }
+            public ILLocal Local { get; } = local;
 
             /// <summary>
             /// Emits a target field address.
@@ -212,26 +207,21 @@ namespace ILGPU.Backends.EntryPoints
         /// <summary>
         /// An argument source.
         /// </summary>
-        protected readonly struct ArgumentSource : ISource
+        /// <remarks>
+        /// Constructs a new argument source.
+        /// </remarks>
+        /// <param name="type">The argument type.</param>
+        /// <param name="argumentIndex">The argument index.</param>
+        protected readonly struct ArgumentSource(Type type, int argumentIndex) : ISource
         {
-            /// <summary>
-            /// Constructs a new argument source.
-            /// </summary>
-            /// <param name="type">The argument type.</param>
-            /// <param name="argumentIndex">The argument index.</param>
-            public ArgumentSource(Type type, int argumentIndex)
-            {
-                SourceType = type;
-                ArgumentIndex = argumentIndex;
-            }
 
             /// <summary cref="ISource.SourceType"/>
-            public Type SourceType { get; }
+            public Type SourceType { get; } = type;
 
             /// <summary>
             /// Returns the argument index.
             /// </summary>
-            public int ArgumentIndex { get; }
+            public int ArgumentIndex { get; } = argumentIndex;
 
             /// <summary>
             /// Emits the address of an argument.
@@ -251,16 +241,12 @@ namespace ILGPU.Backends.EntryPoints
         /// <summary>
         /// A <see cref="ILLocal"/> source.
         /// </summary>
-        protected readonly struct LocalSource : ISource
+        /// <remarks>
+        /// Constructs a new local source.
+        /// </remarks>
+        /// <param name="local">The current local.</param>
+        protected readonly struct LocalSource(ILLocal local) : ISource
         {
-            /// <summary>
-            /// Constructs a new local source.
-            /// </summary>
-            /// <param name="local">The current local.</param>
-            public LocalSource(ILLocal local)
-            {
-                Local = local;
-            }
 
             /// <summary cref="ISource.SourceType"/>
             public Type SourceType => Local.VariableType;
@@ -268,7 +254,7 @@ namespace ILGPU.Backends.EntryPoints
             /// <summary>
             /// Returns the associated local variable.
             /// </summary>
-            public ILLocal Local { get; }
+            public ILLocal Local { get; } = local;
 
             /// <summary>
             /// Emits the address of a local variable.
@@ -289,19 +275,14 @@ namespace ILGPU.Backends.EntryPoints
         /// A structure source.
         /// </summary>
         /// <typeparam name="TParentSource">The parent source type.</typeparam>
-        protected readonly struct StructureSource<TParentSource> : ISource
+        /// <remarks>
+        /// Construct a new structure source.
+        /// </remarks>
+        /// <param name="parentSource">The parent source.</param>
+        /// <param name="sourceField">The source field.</param>
+        protected readonly struct StructureSource<TParentSource>(in TParentSource parentSource, FieldInfo sourceField) : ISource
             where TParentSource : struct, ISource
         {
-            /// <summary>
-            /// Construct a new structure source.
-            /// </summary>
-            /// <param name="parentSource">The parent source.</param>
-            /// <param name="sourceField">The source field.</param>
-            public StructureSource(in TParentSource parentSource, FieldInfo sourceField)
-            {
-                ParentSource = parentSource;
-                SourceField = sourceField;
-            }
 
             /// <summary cref="ISource.SourceType"/>
             public Type SourceType => SourceField.FieldType;
@@ -309,12 +290,12 @@ namespace ILGPU.Backends.EntryPoints
             /// <summary>
             /// Returns the parent source.
             /// </summary>
-            public TParentSource ParentSource { get; }
+            public TParentSource ParentSource { get; } = parentSource;
 
             /// <summary>
             /// Returns the source field.
             /// </summary>
-            public FieldInfo SourceField { get; }
+            public FieldInfo SourceField { get; } = sourceField;
 
             /// <summary>
             /// Emits the address of a structure field.
@@ -340,46 +321,39 @@ namespace ILGPU.Backends.EntryPoints
         /// <summary>
         /// A view-parameter source.
         /// </summary>
-        protected readonly struct ViewSource<TSource> : ISource
+        /// <remarks>
+        /// Constructs a new view source.
+        /// </remarks>
+        /// <param name="typeInformationManager">
+        /// The parent type information manager.
+        /// </param>
+        /// <param name="source">The underlying source.</param>
+        /// <param name="viewParameter">The view parameter to map.</param>
+        protected readonly struct ViewSource<TSource>(
+            TypeInformationManager typeInformationManager,
+            in TSource source,
+            in SeparateViewEntryPoint.ViewParameter viewParameter) : ISource
             where TSource : struct, ISource
         {
-            /// <summary>
-            /// Constructs a new view source.
-            /// </summary>
-            /// <param name="typeInformationManager">
-            /// The parent type information manager.
-            /// </param>
-            /// <param name="source">The underlying source.</param>
-            /// <param name="viewParameter">The view parameter to map.</param>
-            public ViewSource(
-                TypeInformationManager typeInformationManager,
-                in TSource source,
-                in SeparateViewEntryPoint.ViewParameter viewParameter)
-            {
-                Source = source;
-                SourceType = viewParameter.ViewType;
-                ParameterType = typeInformationManager.GetTypeInfo(
-                    viewParameter.ParameterType);
-                AccessChain = viewParameter.SourceChain;
-            }
 
             /// <summary>
             /// Returns the underlying source.
             /// </summary>
-            public TSource Source { get; }
+            public TSource Source { get; } = source;
 
             /// <summary cref="ISource.SourceType"/>
-            public Type SourceType { get; }
+            public Type SourceType { get; } = viewParameter.ViewType;
 
             /// <summary>
             /// Returns the parameter type.
             /// </summary>
-            public TypeInformationManager.TypeInformation ParameterType { get; }
+            public TypeInformationManager.TypeInformation ParameterType { get; } = typeInformationManager.GetTypeInfo(
+                    viewParameter.ParameterType);
 
             /// <summary>
             /// Returns the access chain to resolve the actual view instance.
             /// </summary>
-            public FieldAccessChain AccessChain { get; }
+            public FieldAccessChain AccessChain { get; } = viewParameter.SourceChain;
 
             /// <summary>
             /// Loads a nested access chain address.
@@ -526,7 +500,7 @@ namespace ILGPU.Backends.EntryPoints
         /// The internal type mapping (from old to new types).
         /// </summary>
         private readonly Dictionary<Type, Type> typeMapping =
-            new Dictionary<Type, Type>();
+            new();
 
         /// <summary>
         /// Constructs a new argument mapper.

@@ -281,17 +281,13 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits complex predicate instructions.
         /// </summary>
-        private readonly struct PredicateEmitter : IComplexCommandEmitter
+        private readonly struct PredicateEmitter(RegisterAllocator<PTXRegisterKind>.PrimitiveRegister predicateRegister) : IComplexCommandEmitter
         {
-            public PredicateEmitter(PrimitiveRegister predicateRegister)
-            {
-                PredicateRegister = predicateRegister;
-            }
 
             /// <summary>
             /// The current source type.
             /// </summary>
-            public PrimitiveRegister PredicateRegister { get; }
+            public PrimitiveRegister PredicateRegister { get; } = predicateRegister;
 
             /// <summary>
             /// Gets the actual select command.
@@ -416,27 +412,24 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits complex load instructions.
         /// </summary>
-        private readonly struct LoadEmitter : IVectorizedCommandEmitter
+        private readonly struct LoadEmitter(
+            PointerType sourceType,
+RegisterAllocator<PTXRegisterKind>.HardwareRegister addressRegister) : IVectorizedCommandEmitter
         {
-            private readonly struct IOEmitter : IIOEmitter<int>
+            private readonly struct IOEmitter(
+                PointerType sourceType,
+RegisterAllocator<PTXRegisterKind>.HardwareRegister addressRegister) : IIOEmitter<int>
             {
-                public IOEmitter(
-                    PointerType sourceType,
-                    HardwareRegister addressRegister)
-                {
-                    SourceType = sourceType;
-                    AddressRegister = addressRegister;
-                }
 
                 /// <summary>
                 /// The current source type.
                 /// </summary>
-                public PointerType SourceType { get; }
+                public PointerType SourceType { get; } = sourceType;
 
                 /// <summary>
                 /// Returns the associated address register.
                 /// </summary>
-                public HardwareRegister AddressRegister { get; }
+                public HardwareRegister AddressRegister { get; } = addressRegister;
 
                 /// <summary>
                 /// Emits nested loads.
@@ -457,17 +450,10 @@ namespace ILGPU.Backends.PTX
                 }
             }
 
-            public LoadEmitter(
-                PointerType sourceType,
-                HardwareRegister addressRegister)
-            {
-                Emitter = new IOEmitter(sourceType, addressRegister);
-            }
-
             /// <summary>
             /// The underlying IO emitter.
             /// </summary>
-            private IOEmitter Emitter { get; }
+            private IOEmitter Emitter { get; } = new IOEmitter(sourceType, addressRegister);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Emit(
@@ -516,27 +502,24 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits complex store instructions.
         /// </summary>
-        private readonly struct StoreEmitter : IVectorizedCommandEmitter
+        private readonly struct StoreEmitter(
+            PointerType targetType,
+RegisterAllocator<PTXRegisterKind>.HardwareRegister addressRegister) : IVectorizedCommandEmitter
         {
-            private readonly struct IOEmitter : IIOEmitter<int>
+            private readonly struct IOEmitter(
+                PointerType targetType,
+RegisterAllocator<PTXRegisterKind>.HardwareRegister addressRegister) : IIOEmitter<int>
             {
-                public IOEmitter(
-                    PointerType targetType,
-                    HardwareRegister addressRegister)
-                {
-                    TargetType = targetType;
-                    AddressRegister = addressRegister;
-                }
 
                 /// <summary>
                 /// The current source type.
                 /// </summary>
-                public PointerType TargetType { get; }
+                public PointerType TargetType { get; } = targetType;
 
                 /// <summary>
                 /// Returns the associated address register.
                 /// </summary>
-                public HardwareRegister AddressRegister { get; }
+                public HardwareRegister AddressRegister { get; } = addressRegister;
 
                 /// <summary>
                 /// Emits nested stores.
@@ -557,17 +540,10 @@ namespace ILGPU.Backends.PTX
                 }
             }
 
-            public StoreEmitter(
-                PointerType targetType,
-                HardwareRegister addressRegister)
-            {
-                Emitter = new IOEmitter(targetType, addressRegister);
-            }
-
             /// <summary>
             /// The underlying IO emitter.
             /// </summary>
-            private IOEmitter Emitter { get; }
+            private IOEmitter Emitter { get; } = new IOEmitter(targetType, addressRegister);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Emit(
@@ -1097,7 +1073,11 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits warp masks of <see cref="WarpShuffle"/> operations.
         /// </summary>
-        private readonly struct WarpShuffleEmitter : IShuffleEmitter
+        /// <remarks>
+        /// Constructs a new shuffle emitter.
+        /// </remarks>
+        /// <param name="shuffleKind">The current shuffle kind.</param>
+        private readonly struct WarpShuffleEmitter(ShuffleKind shuffleKind) : IShuffleEmitter
         {
             /// <summary>
             /// The basic mask that has be combined with an 'or' command
@@ -1113,18 +1093,9 @@ namespace ILGPU.Backends.PTX
             public const int BaseMaskShiftAmount = 8;
 
             /// <summary>
-            /// Constructs a new shuffle emitter.
-            /// </summary>
-            /// <param name="shuffleKind">The current shuffle kind.</param>
-            public WarpShuffleEmitter(ShuffleKind shuffleKind)
-            {
-                ShuffleKind = shuffleKind;
-            }
-
-            /// <summary>
             /// The shuffle kind.
             /// </summary>
-            public ShuffleKind ShuffleKind { get; }
+            public ShuffleKind ShuffleKind { get; } = shuffleKind;
 
             /// <summary cref="IShuffleEmitter.EmitWarpMask(CommandEmitter)"/>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1146,21 +1117,17 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits warp masks of <see cref="SubWarpShuffle"/> operations.
         /// </summary>
-        private readonly struct SubWarpShuffleEmitter : IShuffleEmitter
+        /// <remarks>
+        /// Constructs a new shuffle emitter.
+        /// </remarks>
+        /// <param name="warpMaskRegister">The current mask register.</param>
+        private readonly struct SubWarpShuffleEmitter(RegisterAllocator<PTXRegisterKind>.PrimitiveRegister warpMaskRegister) : IShuffleEmitter
         {
-            /// <summary>
-            /// Constructs a new shuffle emitter.
-            /// </summary>
-            /// <param name="warpMaskRegister">The current mask register.</param>
-            public SubWarpShuffleEmitter(PrimitiveRegister warpMaskRegister)
-            {
-                WarpMaskRegister = warpMaskRegister;
-            }
 
             /// <summary>
             /// Returns the current mask register.
             /// </summary>
-            public PrimitiveRegister WarpMaskRegister { get; }
+            public PrimitiveRegister WarpMaskRegister { get; } = warpMaskRegister;
 
             /// <summary cref="IShuffleEmitter.EmitWarpMask(CommandEmitter)"/>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

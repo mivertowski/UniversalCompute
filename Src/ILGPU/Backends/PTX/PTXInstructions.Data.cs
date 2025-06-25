@@ -110,7 +110,7 @@ namespace ILGPU.Backends.PTX
         public const uint AllThreadsInAWarpMemberMask = 0xffffffff;
 
         private static readonly Dictionary<ArithmeticBasicValueType, string> LEAMulOperations =
-            new Dictionary<ArithmeticBasicValueType, string>()
+            new()
             {
                 { ArithmeticBasicValueType.UInt32, "mul.u32" },
                 { ArithmeticBasicValueType.UInt64, "mul.wide.u32" },
@@ -157,7 +157,7 @@ namespace ILGPU.Backends.PTX
         };
 
         private static readonly Dictionary<BasicValueType, string> SelectValueOperations =
-            new Dictionary<BasicValueType, string>()
+            new()
             {
                 { BasicValueType.Int8, "selp.b16" },
                 { BasicValueType.Int16, "selp.b16" },
@@ -170,7 +170,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(CompareKind, ArithmeticBasicValueType), string> CompareOperations =
-            new Dictionary<(CompareKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 { (CompareKind.Equal, ArithmeticBasicValueType.Int8), "setp.eq.s16" },
                 { (CompareKind.Equal, ArithmeticBasicValueType.Int16), "setp.eq.s16" },
@@ -240,7 +240,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(CompareKind, ArithmeticBasicValueType), string> CompareUnorderedFloatOperations =
-            new Dictionary<(CompareKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 { (CompareKind.Equal, ArithmeticBasicValueType.Float16), "setp.equ.f16" },
                 { (CompareKind.Equal, ArithmeticBasicValueType.Float32), "setp.equ.f32" },
@@ -268,7 +268,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(ArithmeticBasicValueType, ArithmeticBasicValueType), string> ConvertOperations =
-            new Dictionary<(ArithmeticBasicValueType, ArithmeticBasicValueType), string>()
+            new()
             {
                 { (ArithmeticBasicValueType.Int8, ArithmeticBasicValueType.Int16), "cvt.s16.s8" },
                 { (ArithmeticBasicValueType.Int8, ArithmeticBasicValueType.Int32), "cvt.s32.s8" },
@@ -393,7 +393,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(UnaryArithmeticKind, ArithmeticBasicValueType), string> UnaryArithmeticOperations =
-            new Dictionary<(UnaryArithmeticKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 // Basic arithmetic
 
@@ -470,7 +470,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(UnaryArithmeticKind, ArithmeticBasicValueType), string> UnaryArithmeticOperationsFastMath =
-            new Dictionary<(UnaryArithmeticKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 { (UnaryArithmeticKind.RcpF, ArithmeticBasicValueType.Float32), "rcp.approx.ftz.f32" },
                 { (UnaryArithmeticKind.RcpF, ArithmeticBasicValueType.Float64), "rcp.approx.ftz.f64" },
@@ -489,7 +489,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(BinaryArithmeticKind, ArithmeticBasicValueType), string> BinaryArithmeticOperations =
-            new Dictionary<(BinaryArithmeticKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 // Basic arithmetic
 
@@ -632,7 +632,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(BinaryArithmeticKind, ArithmeticBasicValueType), string> BinaryArithmeticOperationsFastMath =
-            new Dictionary<(BinaryArithmeticKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 // Basic arithmetic
 
@@ -657,7 +657,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(TernaryArithmeticKind, ArithmeticBasicValueType), string> TernaryArithmeticOperations =
-            new Dictionary<(TernaryArithmeticKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 { (TernaryArithmeticKind.MultiplyAdd, ArithmeticBasicValueType.Int8), "mad.lo.s16" },
                 { (TernaryArithmeticKind.MultiplyAdd, ArithmeticBasicValueType.Int16), "mad.lo.s16" },
@@ -675,7 +675,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(AtomicKind, bool), string> AtomicOperations =
-            new Dictionary<(AtomicKind, bool), string>()
+            new()
             {
                 { (AtomicKind.Add, false), "red.add" },
                 { (AtomicKind.And, false), "red.and" },
@@ -694,7 +694,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<(AtomicKind, ArithmeticBasicValueType), string> AtomicOperationsTypes =
-            new Dictionary<(AtomicKind, ArithmeticBasicValueType), string>()
+            new()
             {
                 { (AtomicKind.Exchange, ArithmeticBasicValueType.Int32), "b32" },
                 { (AtomicKind.Exchange, ArithmeticBasicValueType.Int64), "b64" },
@@ -744,7 +744,7 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly Dictionary<int, string> VectorSuffixes =
-            new Dictionary<int, string>()
+            new()
             {
                 { 2, "v2" },
                 { 4, "v4" },

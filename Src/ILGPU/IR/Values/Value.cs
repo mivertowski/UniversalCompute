@@ -443,7 +443,7 @@ namespace ILGPU.IR
         /// Returns all current uses (to non-replaced values).
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        public UseCollection Uses => new UseCollection(this, uses);
+        public UseCollection Uses => new(this, uses);
 
         /// <summary>
         /// Accesses the child value with the given index.
@@ -764,17 +764,14 @@ namespace ILGPU.IR
     /// <summary>
     /// A parent value container that holds and manages values.
     /// </summary>
-    public abstract class ValueParent : Node
+    /// <remarks>
+    /// Constructs a new value parent.
+    /// </remarks>
+    /// <param name="location">The current location.</param>
+    public abstract class ValueParent(Location location) : Node(location)
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new value parent.
-        /// </summary>
-        /// <param name="location">The current location.</param>
-        protected ValueParent(Location location)
-            : base(location)
-        { }
+        #region Instance
 
         #endregion
 

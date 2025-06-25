@@ -14,12 +14,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class Indices : TestBase
+    public abstract class Indices(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected Indices(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         [Theory]
         [InlineData(1, 1_000_000, 1_000_000, 1, 0)]
         [InlineData(17, 10, 10, 7, 1)]

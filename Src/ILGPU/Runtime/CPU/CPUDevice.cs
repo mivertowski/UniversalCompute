@@ -86,7 +86,7 @@ namespace ILGPU.Runtime.CPU
         /// are implicitly associated with a parent CPU accelerator.
         /// </summary>
         internal static readonly CPUDevice Implicit =
-            new CPUDevice(
+            new(
                 numThreadsPerWarp: 0,
                 numWarpsPerMultiprocessor: 0,
                 numMultiprocessors: 0,
@@ -98,7 +98,7 @@ namespace ILGPU.Runtime.CPU
         /// multiprocessor.
         /// </summary>
         public static readonly CPUDevice Default =
-            new CPUDevice(
+            new(
                 DefaultWarpSize,
                 DefaultNumWarpsPerMultiprocessor,
                 DefaultNumMultiprocessors);
@@ -108,7 +108,7 @@ namespace ILGPU.Runtime.CPU
         /// 1 multiprocessor.
         /// </summary>
         public static readonly CPUDevice Nvidia =
-            new CPUDevice(
+            new(
                 numThreadsPerWarp: 32,
                 numWarpsPerMultiprocessor: 32,
                 numMultiprocessors: 1);
@@ -118,7 +118,7 @@ namespace ILGPU.Runtime.CPU
         /// multiprocessor.
         /// </summary>
         public static readonly CPUDevice AMD =
-            new CPUDevice(
+            new(
                 numThreadsPerWarp: 32,
                 numWarpsPerMultiprocessor: 8,
                 numMultiprocessors: 1);
@@ -126,7 +126,7 @@ namespace ILGPU.Runtime.CPU
         /// A CPU accelerator that simulates a common configuration of a legacy GCN AMD
         /// GPU with 1 multiprocessor.
         public static readonly CPUDevice LegacyAMD =
-            new CPUDevice(
+            new(
                 numThreadsPerWarp: 64,
                 numWarpsPerMultiprocessor: 4,
                 numMultiprocessors: 1);
@@ -136,7 +136,7 @@ namespace ILGPU.Runtime.CPU
         /// 1 multiprocessor.
         /// </summary>
         public static readonly CPUDevice Intel =
-            new CPUDevice(
+            new(
                 numThreadsPerWarp: 16,
                 numWarpsPerMultiprocessor: 8,
                 numMultiprocessors: 1);
@@ -346,7 +346,7 @@ namespace ILGPU.Runtime.CPU
             Context context,
             CPUAcceleratorMode mode,
             ThreadPriority threadPriority) =>
-            new CPUAccelerator(context, this, mode, threadPriority);
+            new(context, this, mode, threadPriority);
 
         #endregion
 

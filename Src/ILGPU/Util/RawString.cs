@@ -43,14 +43,14 @@ namespace ILGPU.Util
         /// </summary>
         /// <param name="value">The char value.</param>
         public static implicit operator RawString(char value) =>
-            new RawString(value);
+            new(value);
 
         /// <summary>
         /// Implicit conversion from string.
         /// </summary>
         /// <param name="value">The string value.</param>
         public static implicit operator RawString(string value) =>
-            new RawString(value);
+            new(value);
 
         /// <summary>
         /// Implicit conversion from <see cref="FormattableString"/>.
@@ -60,6 +60,6 @@ namespace ILGPU.Util
         /// </remarks>
         /// <param name="value">The string value.</param>
         public static implicit operator RawString(FormattableString value) =>
-            new RawString(value.ToString());
+            new(value.ToString());
     }
 }

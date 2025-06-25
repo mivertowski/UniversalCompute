@@ -22,7 +22,11 @@ namespace ILGPU.IR.Transformations
     /// Note that this class does not perform recursive specialization operations.
     /// </remarks>
     /// <typeparam name="TDelegate">The backend-specific delegate type.</typeparam>
-    public sealed class IntrinsicSpecializer<TDelegate> :
+    /// <remarks>
+    /// Constructs a new intrinsic specializer.
+    /// </remarks>
+    public sealed class IntrinsicSpecializer<TDelegate>(
+        IntrinsicImplementationProvider<TDelegate> implementationProvider) :
         SequentialUnorderedTransformation
         where TDelegate : Delegate
     {
@@ -52,16 +56,7 @@ namespace ILGPU.IR.Transformations
 
         #endregion
 
-        private readonly IntrinsicImplementationProvider<TDelegate> provider;
-
-        /// <summary>
-        /// Constructs a new intrinsic specializer.
-        /// </summary>
-        public IntrinsicSpecializer(
-            IntrinsicImplementationProvider<TDelegate> implementationProvider)
-        {
-            provider = implementationProvider;
-        }
+        private readonly IntrinsicImplementationProvider<TDelegate> provider = implementationProvider;
 
         /// <summary>
         /// Applies an intrinsic specialization.

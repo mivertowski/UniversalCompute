@@ -54,7 +54,7 @@ namespace ILGPU.SIMD
             /// <summary>
             /// Gets the default configuration.
             /// </summary>
-            public static SIMDConfig Default => new SIMDConfig
+            public static SIMDConfig Default => new()
             {
                 PreferredVectorWidth = Vector<float>.Count * sizeof(float),
                 AllowGPUVectorization = true,
@@ -1126,10 +1126,7 @@ namespace ILGPU.SIMD
         /// <summary>
         /// Checks if the current context supports hybrid CPU/GPU vectorization.
         /// </summary>
-        public static bool SupportsHybridVectorization(this Accelerator accelerator)
-        {
-            return accelerator.AcceleratorType == AcceleratorType.Cuda ||
+        public static bool SupportsHybridVectorization(this Accelerator accelerator) => accelerator.AcceleratorType == AcceleratorType.Cuda ||
                    accelerator.AcceleratorType == AcceleratorType.OpenCL;
-        }
     }
 }

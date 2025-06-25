@@ -15,12 +15,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class FormatStringTests : TestBase
+    public abstract class FormatStringTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected FormatStringTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         [Fact]
         public void EscapedArgument()
         {

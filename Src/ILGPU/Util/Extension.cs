@@ -86,7 +86,7 @@ namespace ILGPU.Util
         /// The associated backend extensions.
         /// </summary>
         private readonly Dictionary<Type, TExtension> extensions =
-            new Dictionary<Type, TExtension>();
+            new();
 
         #endregion
 

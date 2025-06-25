@@ -33,7 +33,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// </summary>
         private readonly Dictionary<MethodBase, MethodDebugInformation>
             debugInformation =
-            new Dictionary<MethodBase, MethodDebugInformation>();
+            new();
 
         /// <summary>
         /// The internal reader provider.
@@ -43,7 +43,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// The internal synchronization object.
         /// </summary>
-        private readonly object syncLock = new object();
+        private readonly object syncLock = new();
 
         /// <summary>
         /// Constructs new empty assembly debug information.
@@ -125,7 +125,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// </summary>
         /// <returns>The operation instance.</returns>
         MetadataReaderOperation IMetadataReaderOperationProvider.BeginOperation() =>
-            new MetadataReaderOperation(MetadataReader, syncLock);
+            new(MetadataReader, syncLock);
 
         /// <summary>
         /// Tries to resolve the given metadata token to a method.

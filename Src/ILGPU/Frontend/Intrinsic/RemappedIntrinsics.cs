@@ -43,7 +43,7 @@ namespace ILGPU.Frontend.Intrinsic
         /// </summary>
         private static readonly Dictionary<MethodBase, DeviceFunctionRemapper>
             FunctionRemappers =
-            new Dictionary<MethodBase, DeviceFunctionRemapper>();
+            new();
 
         static RemappedIntrinsics()
         {

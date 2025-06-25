@@ -72,7 +72,7 @@ namespace ILGPU.IR.Construction
         /// <returns>The created value initializer.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ValueInitializer GetInitializer(Location location) =>
-            new ValueInitializer(BaseContext, BasicBlock, location);
+            new(BaseContext, BasicBlock, location);
 
         /// <summary>
         /// Creates a node that represents an <see cref="Accelerator.CurrentType"/>

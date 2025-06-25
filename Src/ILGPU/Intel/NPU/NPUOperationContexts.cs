@@ -25,43 +25,34 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Context for NPU inference operations.
     /// </summary>
-    internal sealed class NPUInferenceContext : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the NPUInferenceContext class.
+    /// </remarks>
+    /// <param name="network">The neural network to execute.</param>
+    /// <param name="capabilities">The NPU capabilities.</param>
+    internal sealed class NPUInferenceContext(AppleNeuralNetwork network, NPUCapabilities capabilities) : IDisposable
     {
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the NPUInferenceContext class.
-        /// </summary>
-        /// <param name="network">The neural network to execute.</param>
-        /// <param name="capabilities">The NPU capabilities.</param>
-        public NPUInferenceContext(AppleNeuralNetwork network, NPUCapabilities capabilities)
-        {
-            Network = network ?? throw new ArgumentNullException(nameof(network));
-            Capabilities = capabilities;
-            NativeContext = CreateNativeContext(network, capabilities);
-        }
-
-        /// <summary>
         /// Gets the neural network.
         /// </summary>
-        public AppleNeuralNetwork Network { get; }
+        public AppleNeuralNetwork Network { get; } = network ?? throw new ArgumentNullException(nameof(network));
 
         /// <summary>
         /// Gets the NPU capabilities.
         /// </summary>
-        public NPUCapabilities Capabilities { get; }
+        public NPUCapabilities Capabilities { get; } = capabilities;
 
         /// <summary>
         /// Gets the native context handle.
         /// </summary>
-        public IntPtr NativeContext { get; private set; }
+        public IntPtr NativeContext { get; private set; } = CreateNativeContext(network, capabilities);
 
-        private static IntPtr CreateNativeContext(AppleNeuralNetwork network, NPUCapabilities capabilities)
-        {
+        private static IntPtr CreateNativeContext(AppleNeuralNetwork network, NPUCapabilities capabilities) =>
             // In a real implementation, this would create a native NPU context
             // For now, return a placeholder
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Disposes the context.
@@ -83,36 +74,29 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Configuration for NPU convolution operations.
     /// </summary>
-    internal sealed class NPUConvolutionConfig : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the NPUConvolutionConfig class.
+    /// </remarks>
+    /// <param name="parameters">The convolution parameters.</param>
+    /// <param name="capabilities">The NPU capabilities.</param>
+    internal sealed class NPUConvolutionConfig(ConvolutionParameters parameters, NPUCapabilities capabilities) : IDisposable
     {
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the NPUConvolutionConfig class.
-        /// </summary>
-        /// <param name="parameters">The convolution parameters.</param>
-        /// <param name="capabilities">The NPU capabilities.</param>
-        public NPUConvolutionConfig(ConvolutionParameters parameters, NPUCapabilities capabilities)
-        {
-            Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-            Capabilities = capabilities;
-            NativeConfig = CreateNativeConfig(parameters, capabilities);
-        }
-
-        /// <summary>
         /// Gets the convolution parameters.
         /// </summary>
-        public ConvolutionParameters Parameters { get; }
+        public ConvolutionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
         /// <summary>
         /// Gets the NPU capabilities.
         /// </summary>
-        public NPUCapabilities Capabilities { get; }
+        public NPUCapabilities Capabilities { get; } = capabilities;
 
         /// <summary>
         /// Gets the native configuration handle.
         /// </summary>
-        public IntPtr NativeConfig { get; private set; }
+        public IntPtr NativeConfig { get; private set; } = CreateNativeConfig(parameters, capabilities);
 
         /// <summary>
         /// Calculates the output shape for the given input and weights shapes.
@@ -146,11 +130,9 @@ namespace ILGPU.Intel.NPU
             return new TensorShape(batchSize, outputChannels, outputHeight, outputWidth);
         }
 
-        private static IntPtr CreateNativeConfig(ConvolutionParameters parameters, NPUCapabilities capabilities)
-        {
+        private static IntPtr CreateNativeConfig(ConvolutionParameters parameters, NPUCapabilities capabilities) =>
             // Create native convolution configuration
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Disposes the configuration.
@@ -172,35 +154,27 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Configuration for NPU matrix multiplication operations.
     /// </summary>
-    internal sealed class NPUMatMulConfig : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the NPUMatMulConfig class.
+    /// </remarks>
+    /// <param name="configuration">The matrix multiplication configuration.</param>
+    internal sealed class NPUMatMulConfig(MatMulConfiguration configuration) : IDisposable
     {
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the NPUMatMulConfig class.
-        /// </summary>
-        /// <param name="configuration">The matrix multiplication configuration.</param>
-        public NPUMatMulConfig(MatMulConfiguration configuration)
-        {
-            Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            NativeConfig = CreateNativeConfig(configuration);
-        }
-
-        /// <summary>
         /// Gets the matrix multiplication configuration.
         /// </summary>
-        public MatMulConfiguration Configuration { get; }
+        public MatMulConfiguration Configuration { get; } = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
         /// <summary>
         /// Gets the native configuration handle.
         /// </summary>
-        public IntPtr NativeConfig { get; private set; }
+        public IntPtr NativeConfig { get; private set; } = CreateNativeConfig(configuration);
 
-        private static IntPtr CreateNativeConfig(MatMulConfiguration configuration)
-        {
+        private static IntPtr CreateNativeConfig(MatMulConfiguration configuration) =>
             // Create native matrix multiplication configuration
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Disposes the configuration.
@@ -222,42 +196,33 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Configuration for NPU attention operations.
     /// </summary>
-    internal sealed class NPUAttentionConfig : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the NPUAttentionConfig class.
+    /// </remarks>
+    /// <param name="parameters">The attention parameters.</param>
+    /// <param name="capabilities">The NPU capabilities.</param>
+    internal sealed class NPUAttentionConfig(AttentionParameters parameters, NPUCapabilities capabilities) : IDisposable
     {
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the NPUAttentionConfig class.
-        /// </summary>
-        /// <param name="parameters">The attention parameters.</param>
-        /// <param name="capabilities">The NPU capabilities.</param>
-        public NPUAttentionConfig(AttentionParameters parameters, NPUCapabilities capabilities)
-        {
-            Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-            Capabilities = capabilities;
-            NativeConfig = CreateNativeConfig(parameters, capabilities);
-        }
-
-        /// <summary>
         /// Gets the attention parameters.
         /// </summary>
-        public AttentionParameters Parameters { get; }
+        public AttentionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
         /// <summary>
         /// Gets the NPU capabilities.
         /// </summary>
-        public NPUCapabilities Capabilities { get; }
+        public NPUCapabilities Capabilities { get; } = capabilities;
 
         /// <summary>
         /// Gets the native configuration handle.
         /// </summary>
-        public IntPtr NativeConfig { get; private set; }
+        public IntPtr NativeConfig { get; private set; } = CreateNativeConfig(parameters, capabilities);
 
-        private static IntPtr CreateNativeConfig(AttentionParameters parameters, NPUCapabilities capabilities)
-        {
+        private static IntPtr CreateNativeConfig(AttentionParameters parameters, NPUCapabilities capabilities) =>
             // Create native attention configuration
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Disposes the configuration.
@@ -279,18 +244,13 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Model optimizer for NPU execution.
     /// </summary>
-    internal sealed class NPUModelOptimizer
+    /// <remarks>
+    /// Initializes a new instance of the NPUModelOptimizer class.
+    /// </remarks>
+    /// <param name="capabilities">The NPU capabilities.</param>
+    internal sealed class NPUModelOptimizer(NPUCapabilities capabilities)
     {
-        private readonly NPUCapabilities _capabilities;
-
-        /// <summary>
-        /// Initializes a new instance of the NPUModelOptimizer class.
-        /// </summary>
-        /// <param name="capabilities">The NPU capabilities.</param>
-        public NPUModelOptimizer(NPUCapabilities capabilities)
-        {
-            _capabilities = capabilities;
-        }
+        private readonly NPUCapabilities _capabilities = capabilities;
 
         /// <summary>
         /// Optimizes a model for NPU execution.
@@ -373,11 +333,9 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the ONNX model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities)
-        {
+        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load ONNX model - placeholder implementation
-            return new AppleNeuralNetwork("ONNX_Model");
-        }
+            new AppleNeuralNetwork("ONNX_Model");
     }
 
     /// <summary>
@@ -391,11 +349,9 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the OpenVINO model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities)
-        {
+        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load OpenVINO model - placeholder implementation
-            return new AppleNeuralNetwork("OpenVINO_Model");
-        }
+            new AppleNeuralNetwork("OpenVINO_Model");
     }
 
     /// <summary>
@@ -409,11 +365,9 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the TensorFlow model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities)
-        {
+        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load TensorFlow model - placeholder implementation
-            return new AppleNeuralNetwork("TensorFlow_Model");
-        }
+            new AppleNeuralNetwork("TensorFlow_Model");
     }
 
     /// <summary>
@@ -427,10 +381,8 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the PyTorch model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities)
-        {
+        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load PyTorch model - placeholder implementation
-            return new AppleNeuralNetwork("PyTorch_Model");
-        }
+            new AppleNeuralNetwork("PyTorch_Model");
     }
 }

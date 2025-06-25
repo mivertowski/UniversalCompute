@@ -50,7 +50,7 @@ namespace ILGPU.Backends.PTX
             IntrinsicImplementationMode mode,
             CudaArchitecture? minArchitecture,
             CudaArchitecture maxArchitecture) =>
-            new PTXIntrinsic(
+            new(
                 PTXIntrinsicsType,
                 name,
                 mode,
@@ -66,7 +66,7 @@ namespace ILGPU.Backends.PTX
         private static PTXIntrinsic CreateIntrinsic(
             string name,
             IntrinsicImplementationMode mode) =>
-            new PTXIntrinsic(PTXIntrinsicsType, name, mode);
+            new(PTXIntrinsicsType, name, mode);
 
         /// <summary>
         /// Creates a new FP16 intrinsic.

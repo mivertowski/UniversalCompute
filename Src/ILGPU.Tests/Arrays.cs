@@ -25,15 +25,11 @@ using static ILGPU.Tests.EnumValues;
 
 namespace ILGPU.Tests
 {
-    public abstract class Arrays : TestBase
+    public abstract class Arrays(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected Arrays(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         public static TheoryData<object, object> ArraySimpleTestData =>
-            new TheoryData<object, object>
-        {
+            new()
+            {
             { sbyte.MinValue, default(Length1) },
             { byte.MaxValue, default(Length1) },
             { short.MinValue, default(Length1) },
@@ -298,7 +294,7 @@ namespace ILGPU.Tests
             Verify(buffer.View, expected);
         }
 
-        public static TheoryData<object> ArrayEmptyTestData => new TheoryData<object>
+        public static TheoryData<object> ArrayEmptyTestData => new()
         {
             { sbyte.MinValue },
             { byte.MaxValue },
@@ -389,15 +385,10 @@ namespace ILGPU.Tests
         /// Test structure for the <see cref="ArrayInStructure{T, TArraySize}
         /// (T, TArraySize)"/> test.
         /// </summary>
-        struct ArrayInStruct<T>
+        struct ArrayInStruct<T>(T[] data)
             where T : unmanaged
         {
-            public ArrayInStruct(T[] data)
-            {
-                Data = data;
-            }
-
-            public T[] Data { get; }
+            public T[] Data { get; } = data;
 
             public readonly ref T this[int index] => ref Data[index];
         }
@@ -483,8 +474,8 @@ namespace ILGPU.Tests
         // -----------------------------------------------------------------------
 
         public static TheoryData<object, object> MultiDimArraySimpleTestData =>
-            new TheoryData<object, object>
-        {
+            new()
+            {
             { sbyte.MinValue, default(Length1) },
             { byte.MaxValue, default(Length1) },
             { short.MinValue, default(Length1) },
@@ -649,8 +640,8 @@ namespace ILGPU.Tests
         // -----------------------------------------------------------------------
 
         public static TheoryData<object, object> ArrayViewConversionTestData =>
-            new TheoryData<object, object>
-        {
+            new()
+            {
             { sbyte.MinValue, default(Length1) },
             { byte.MaxValue, default(Length1) },
             { short.MinValue, default(Length1) },
@@ -850,8 +841,8 @@ namespace ILGPU.Tests
         {
             var staticInlineArray = new PairStruct<int, int>[]
             {
-                new PairStruct<int, int>(1, 2),
-                new PairStruct<int, int>(3, 4),
+                new(1, 2),
+                new(3, 4),
             };
             data[index] =
                 staticInlineArray[0].Val0 +

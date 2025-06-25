@@ -28,20 +28,16 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// An argument remapper for Phi values.
         /// </summary>
-        private readonly struct PhiArgumentRemapper : PhiValue.IArgumentRemapper
+        /// <remarks>
+        /// Initializes a new scope.
+        /// </remarks>
+        private readonly struct PhiArgumentRemapper(in HashSet<BasicBlock> blocks) : PhiValue.IArgumentRemapper
         {
-            /// <summary>
-            /// Initializes a new scope.
-            /// </summary>
-            public PhiArgumentRemapper(in HashSet<BasicBlock> blocks)
-            {
-                Blocks = blocks;
-            }
 
             /// <summary>
             /// Returns the associated scope.
             /// </summary>
-            private HashSet<BasicBlock> Blocks { get; }
+            private HashSet<BasicBlock> Blocks { get; } = blocks;
 
             /// <summary>
             /// Returns true if the given block is reachable.
@@ -144,7 +140,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<PhiArgumentRemapper> Rewriter =
-            new Rewriter<PhiArgumentRemapper>();
+            new();
 
         /// <summary>
         /// Registers all rewriting patterns.

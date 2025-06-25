@@ -300,7 +300,7 @@ namespace ILGPU.Runtime.Scheduling
                     .Where(d => CanExecuteOperation(d, node.Operation))
                     .ToList();
 
-                if (availableDevices.Any())
+                if (availableDevices.Count != 0)
                 {
                     var bestDevice = availableDevices
                         .OrderBy(d => deviceLoads[d])
@@ -369,35 +369,32 @@ namespace ILGPU.Runtime.Scheduling
                 .OrderByDescending(kvp => kvp.Value.AIPerformanceGOPS)
                 .ToList();
 
-            if (aiDevices.Any())
+            if (aiDevices.Count != 0)
                 return aiDevices.First().Key;
 
             // Fallback to best tensor device
             return SelectBestTensorDevice();
         }
 
-        private ComputeDevice SelectBestDevice(ComputeCapability capability)
+        private ComputeDevice SelectBestDevice(ComputeCapability capability) => capability switch
         {
-            return capability switch
-            {
-                ComputeCapability.MatrixExtensions => 
-                    GetBestDevice(kvp => kvp.Value.SupportsMatrixExtensions, 
-                                 kvp => kvp.Value.MatrixPerformanceGFLOPS, 
-                                 ComputeDevice.CPU),
+            ComputeCapability.MatrixExtensions =>
+                GetBestDevice(kvp => kvp.Value.SupportsMatrixExtensions,
+                             kvp => kvp.Value.MatrixPerformanceGFLOPS,
+                             ComputeDevice.CPU),
 
-                ComputeCapability.SIMD => 
-                    GetBestDevice(kvp => kvp.Value.SIMDWidthBits > 0,
-                                 kvp => kvp.Value.SIMDPerformanceGFLOPS,
-                                 ComputeDevice.CPU),
+            ComputeCapability.SIMD =>
+                GetBestDevice(kvp => kvp.Value.SIMDWidthBits > 0,
+                             kvp => kvp.Value.SIMDPerformanceGFLOPS,
+                             ComputeDevice.CPU),
 
-                ComputeCapability.HighBandwidth => 
-                    GetBestDevice(_ => true,
-                                 kvp => kvp.Value.MemoryBandwidthGBps,
-                                 ComputeDevice.GPU),
+            ComputeCapability.HighBandwidth =>
+                GetBestDevice(_ => true,
+                             kvp => kvp.Value.MemoryBandwidthGBps,
+                             ComputeDevice.GPU),
 
-                _ => ComputeDevice.Auto
-            };
-        }
+            _ => ComputeDevice.Auto
+        };
 
         private ComputeDevice GetBestDevice(
             Func<KeyValuePair<ComputeDevice, DevicePerformance>, bool> filter,
@@ -500,19 +497,15 @@ namespace ILGPU.Runtime.Scheduling
             }
         }
 
-        private async Task ExecuteMemoryTransferAsync(MemoryTransfer transfer)
-        {
+        private async Task ExecuteMemoryTransferAsync(MemoryTransfer transfer) =>
             // Implementation would perform actual memory transfer
             // between the specified devices
             await Task.Delay(1); // Placeholder
-        }
 
-        private async Task ExecuteNodeAsync(ScheduledNode node)
-        {
+        private async Task ExecuteNodeAsync(ScheduledNode node) =>
             // Implementation would execute the compute node
             // on the assigned device
             await Task.Delay((int)node.EstimatedTimeMs); // Placeholder
-        }
 
         private double EstimateExecutionTime(ComputeNode node, ComputeDevice device)
         {

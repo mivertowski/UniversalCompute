@@ -22,38 +22,32 @@ namespace ILGPU.Numerics
     /// <summary>
     /// Represents a 2D size with width and height dimensions.
     /// </summary>
-    public readonly struct Size2D : IEquatable<Size2D>
+    /// <remarks>
+    /// Initializes a new instance of the Size2D struct.
+    /// </remarks>
+    /// <param name="width">The width dimension.</param>
+    /// <param name="height">The height dimension.</param>
+    public readonly struct Size2D(int width, int height) : IEquatable<Size2D>
     {
         /// <summary>
         /// The width dimension.
         /// </summary>
-        public readonly int Width;
+        public readonly int Width = width;
 
         /// <summary>
         /// The height dimension.
         /// </summary>
-        public readonly int Height;
-
-        /// <summary>
-        /// Initializes a new instance of the Size2D struct.
-        /// </summary>
-        /// <param name="width">The width dimension.</param>
-        /// <param name="height">The height dimension.</param>
-        public Size2D(int width, int height)
-        {
-            Width = width;
-            Height = height;
-        }
+        public readonly int Height = height;
 
         /// <summary>
         /// Gets a Size2D with zero dimensions.
         /// </summary>
-        public static Size2D Zero => new Size2D(0, 0);
+        public static Size2D Zero => new(0, 0);
 
         /// <summary>
         /// Gets a Size2D with unit dimensions.
         /// </summary>
-        public static Size2D One => new Size2D(1, 1);
+        public static Size2D One => new(1, 1);
 
         /// <summary>
         /// Determines whether the specified object is equal to the current Size2D.

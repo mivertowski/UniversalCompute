@@ -22,29 +22,30 @@ namespace ILGPU.IR.Transformations
     /// <summary>
     /// Converts array values into structure values and allocations.
     /// </summary>
-    public sealed class LowerArrays : LowerTypes<ArrayType>
+    /// <remarks>
+    /// Constructs a new array type lowering transformation.
+    /// </remarks>
+    /// <param name="targetAddressSpace">
+    /// The target address space for all array values.
+    /// </param>
+    public sealed class LowerArrays(MemoryAddressSpace targetAddressSpace) : LowerTypes<ArrayType>
     {
         #region Nested Types
 
-        private sealed class ArrayTypeLowering : TypeLowering<ArrayType>
+        /// <summary>
+        /// Constructs a new array type lowering.
+        /// </summary>
+        /// <param name="builder">The parent builder.</param>
+        /// <param name="targetAddressSpace">The target address spacce.</param>
+        private sealed class ArrayTypeLowering(
+            Method.Builder builder,
+            MemoryAddressSpace targetAddressSpace) : TypeLowering<ArrayType>(builder)
         {
-            /// <summary>
-            /// Constructs a new array type lowering.
-            /// </summary>
-            /// <param name="builder">The parent builder.</param>
-            /// <param name="targetAddressSpace">The target address spacce.</param>
-            public ArrayTypeLowering(
-                Method.Builder builder,
-                MemoryAddressSpace targetAddressSpace)
-                : base(builder)
-            {
-                TargetAddressSpace = targetAddressSpace;
-            }
 
             /// <summary>
             /// Returns the target address space for all array values.
             /// </summary>
-            public MemoryAddressSpace TargetAddressSpace { get; }
+            public MemoryAddressSpace TargetAddressSpace { get; } = targetAddressSpace;
 
             /// <summary>
             /// Returns true if the given type depends on an array type.
@@ -342,7 +343,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<TypeLowering<ArrayType>> Rewriter =
-            new Rewriter<TypeLowering<ArrayType>>();
+            new();
 
         /// <summary>
         /// Initializes all rewriter patterns.
@@ -358,19 +359,7 @@ namespace ILGPU.IR.Transformations
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new array type lowering transformation.
-        /// </summary>
-        /// <param name="targetAddressSpace">
-        /// The target address space for all array values.
-        /// </param>
-        public LowerArrays(MemoryAddressSpace targetAddressSpace)
-        {
-            TargetAddressSpace = targetAddressSpace;
-        }
 
         #endregion
 
@@ -379,7 +368,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Returns the target address space for all array values.
         /// </summary>
-        public MemoryAddressSpace TargetAddressSpace { get; }
+        public MemoryAddressSpace TargetAddressSpace { get; } = targetAddressSpace;
 
         #endregion
 

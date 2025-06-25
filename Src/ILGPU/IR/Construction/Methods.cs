@@ -25,7 +25,7 @@ namespace ILGPU.IR.Construction
         /// <param name="target">The jump target.</param>
         /// <returns>A call builder.</returns>
         public MethodCall.Builder CreateCall(Location location, Method target) =>
-            new MethodCall.Builder(this, location, target);
+            new(this, location, target);
 
         /// <summary>
         /// Creates a new method call.

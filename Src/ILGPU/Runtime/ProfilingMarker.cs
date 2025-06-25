@@ -16,15 +16,12 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Represents a point-in-time marker used in profiling.
     /// </summary>
-    public abstract class ProfilingMarker : AcceleratorObject
+    /// <remarks>
+    /// Constructs a profiling marker.
+    /// </remarks>
+    /// <param name="accelerator">The associated accelerator.</param>
+    public abstract class ProfilingMarker(Accelerator accelerator) : AcceleratorObject(accelerator)
     {
-        /// <summary>
-        /// Constructs a profiling marker.
-        /// </summary>
-        /// <param name="accelerator">The associated accelerator.</param>
-        protected ProfilingMarker(Accelerator accelerator)
-            : base(accelerator)
-        { }
 
         /// <summary>
         /// Waits for the profiling marker to complete.

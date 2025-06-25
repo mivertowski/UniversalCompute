@@ -16,26 +16,19 @@ namespace ILGPU.Runtime.Velocity
     /// <summary>
     /// Represents an execution context for a single thread group.
     /// </summary>
-    sealed class VelocityGroupExecutionContext : DisposeBase
+    /// <remarks>
+    /// Constructs a new execution context.
+    /// </remarks>
+    /// <param name="accelerator">The parent velocity accelerator.</param>
+    sealed class VelocityGroupExecutionContext(VelocityAccelerator accelerator) : DisposeBase
     {
-        private readonly VelocityMemoryBufferPool sharedMemoryPool;
-        private readonly VelocityMemoryBufferPool localMemoryPool;
-        private readonly int warpSize;
-
-        /// <summary>
-        /// Constructs a new execution context.
-        /// </summary>
-        /// <param name="accelerator">The parent velocity accelerator.</param>
-        public VelocityGroupExecutionContext(VelocityAccelerator accelerator)
-        {
-            sharedMemoryPool = new VelocityMemoryBufferPool(
+        private readonly VelocityMemoryBufferPool sharedMemoryPool = new VelocityMemoryBufferPool(
                 accelerator,
                 accelerator.MaxSharedMemoryPerGroup);
-            localMemoryPool = new VelocityMemoryBufferPool(
+        private readonly VelocityMemoryBufferPool localMemoryPool = new VelocityMemoryBufferPool(
                 accelerator,
                 accelerator.MaxSharedMemoryPerGroup);
-            warpSize = accelerator.WarpSize;
-        }
+        private readonly int warpSize = accelerator.WarpSize;
 
         /// <summary>
         /// Returns a view to dynamic shared memory (if any).

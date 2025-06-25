@@ -177,7 +177,7 @@ namespace ILGPU.IR
             /// Returns an enumerator to enumerate all actual (not replaced) parameters.
             /// </summary>
             /// <returns>The enumerator.</returns>
-            public Enumerator GetEnumerator() => new Enumerator(parameters);
+            public Enumerator GetEnumerator() => new(parameters);
 
             /// <summary>
             /// Returns an enumerator to enumerator all actual (not replaced) parameters.
@@ -254,20 +254,15 @@ namespace ILGPU.IR
         /// <summary>
         /// Represents a method mapping.
         /// </summary>
-        public readonly struct MethodMapping
+        /// <remarks>
+        /// Constructs a new method mapping.
+        /// </remarks>
+        /// <param name="methodMapping">The method mapping.</param>
+        public readonly struct MethodMapping(Dictionary<Method, Method> methodMapping)
         {
             #region Instance
 
-            private readonly Dictionary<Method, Method> mapping;
-
-            /// <summary>
-            /// Constructs a new method mapping.
-            /// </summary>
-            /// <param name="methodMapping">The method mapping.</param>
-            public MethodMapping(Dictionary<Method, Method> methodMapping)
-            {
-                mapping = methodMapping;
-            }
+            private readonly Dictionary<Method, Method> mapping = methodMapping;
 
             #endregion
 
@@ -292,21 +287,17 @@ namespace ILGPU.IR
         /// <summary>
         /// Represents a location that is bound to a managed method.
         /// </summary>
-        public sealed class MethodLocation : Location
+        /// <remarks>
+        /// Constructs a new method location.
+        /// </remarks>
+        /// <param name="method">The target method (if any).</param>
+        public sealed class MethodLocation(MethodBase method) : Location
         {
-            /// <summary>
-            /// Constructs a new method location.
-            /// </summary>
-            /// <param name="method">The target method (if any).</param>
-            public MethodLocation(MethodBase method)
-            {
-                Method = method;
-            }
 
             /// <summary>
             /// Returns the managed method (if any).
             /// </summary>
-            public MethodBase Method { get; }
+            public MethodBase Method { get; } = method;
 
             /// <summary>
             /// Tries to include managed method information if possible.
@@ -481,7 +472,7 @@ namespace ILGPU.IR
         /// <summary>
         /// Returns all attached parameters.
         /// </summary>
-        public ParameterCollection Parameters => new ParameterCollection(parameters);
+        public ParameterCollection Parameters => new(parameters);
 
         /// <summary>
         /// Returns the number of attached parameters.
@@ -497,7 +488,7 @@ namespace ILGPU.IR
         /// Returns all attached blocks.
         /// </summary>
         public BasicBlockCollection<ReversePostOrder, Forwards> Blocks =>
-            new BasicBlockCollection<ReversePostOrder, Forwards>(EntryBlock, blocks);
+            new(EntryBlock, blocks);
 
         /// <summary>
         /// Returns all attached values.

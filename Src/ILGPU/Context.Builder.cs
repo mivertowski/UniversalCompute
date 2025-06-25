@@ -407,7 +407,7 @@ namespace ILGPU
             /// Converts this builder instance into a context instance.
             /// </summary>
             /// <returns>The created context instance.</returns>
-            public Context ToContext() => new Context(
+            public Context ToContext() => new(
                 this,
                 DeviceRegistry.ToImmutable());
 

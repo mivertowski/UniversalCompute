@@ -20,12 +20,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class DebugTests : TestBase
+    public abstract class DebugTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected DebugTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void DebugAssertKernel(
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data)

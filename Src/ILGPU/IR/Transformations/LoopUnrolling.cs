@@ -52,34 +52,28 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Remaps loop-specific target blocks and phi-value arguments.
         /// </summary>
-        private readonly struct LoopRemapper :
+        private readonly struct LoopRemapper(
+            BasicBlock source,
+            BasicBlock target,
+            Value? targetValue = null) :
             PhiValue.IArgumentRemapper,
             TerminatorValue.ITargetRemapper
         {
-            public LoopRemapper(
-                BasicBlock source,
-                BasicBlock target,
-                Value? targetValue = null)
-            {
-                Source = source;
-                Target = target;
-                TargetValue = targetValue;
-            }
 
             /// <summary>
             /// The loop entry.
             /// </summary>
-            public BasicBlock Source { get; }
+            public BasicBlock Source { get; } = source;
 
             /// <summary>
             /// The temporary predecessor branch.
             /// </summary>
-            public BasicBlock Target { get; }
+            public BasicBlock Target { get; } = target;
 
             /// <summary>
             /// Returns the target value to map phi operands to (if any).
             /// </summary>
-            public Value? TargetValue { get; }
+            public Value? TargetValue { get; } = targetValue;
 
             /// <summary>
             /// Returns true if the given span contains the loop entry.

@@ -30,7 +30,7 @@ namespace ILGPU.Frontend.DebugInformation
             "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes",
             Justification = "The empty sequence-point-enumerator is immutable")]
         public static readonly SequencePointEnumerator Empty =
-            new SequencePointEnumerator(ImmutableArray<SequencePoint>.Empty);
+            new(ImmutableArray<SequencePoint>.Empty);
 
         #endregion
 

@@ -149,7 +149,7 @@ namespace ILGPU.Runtime
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private List<WeakReference<AcceleratorObject>> childObjects =
-            new List<WeakReference<AcceleratorObject>>(MinNumberOfChildObjectsInGC);
+            new(MinNumberOfChildObjectsInGC);
 
         #endregion
 

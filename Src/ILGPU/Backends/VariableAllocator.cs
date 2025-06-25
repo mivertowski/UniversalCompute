@@ -83,48 +83,38 @@ namespace ILGPU.Backends
         /// <summary>
         /// A constant "variable".
         /// </summary>
-        public sealed class ConstantVariable : PrimitiveVariable
-        {
-            /// <summary>
-            /// Constructs a new constant register.
-            /// </summary>
-            /// <param name="id">The current variable id.</param>
-            /// <param name="value">The primitive value.</param>
-            public ConstantVariable(int id, PrimitiveValue value)
-                : base(
-                      id,
-                      value.BasicValueType.GetArithmeticBasicValueType(
+        /// <remarks>
+        /// Constructs a new constant register.
+        /// </remarks>
+        /// <param name="id">The current variable id.</param>
+        /// <param name="value">The primitive value.</param>
+        public sealed class ConstantVariable(int id, PrimitiveValue value) : PrimitiveVariable(
+                  id,
+                  value.BasicValueType.GetArithmeticBasicValueType(
                           isUnsigned: false))
-            {
-                Value = value;
-            }
+        {
 
             /// <summary>
             /// Returns the associated value.
             /// </summary>
-            public PrimitiveValue Value { get; }
+            public PrimitiveValue Value { get; } = value;
         }
 
         /// <summary>
         /// A typed variable.
         /// </summary>
-        public abstract class TypedVariable : Variable
+        /// <remarks>
+        /// Constructs a new typed variable.
+        /// </remarks>
+        /// <param name="id">The current variable id.</param>
+        /// <param name="type">The type.</param>
+        public abstract class TypedVariable(int id, TypeNode type) : Variable(id)
         {
-            /// <summary>
-            /// Constructs a new typed variable.
-            /// </summary>
-            /// <param name="id">The current variable id.</param>
-            /// <param name="type">The type.</param>
-            protected TypedVariable(int id, TypeNode type)
-                : base(id)
-            {
-                Type = type;
-            }
 
             /// <summary>
             /// Returns the underlying type.
             /// </summary>
-            public TypeNode Type { get; }
+            public TypeNode Type { get; } = type;
         }
 
         /// <summary>
@@ -194,7 +184,7 @@ namespace ILGPU.Backends
         #region Instance
 
         private readonly Dictionary<Value, Variable> variableLookup =
-            new Dictionary<Value, Variable>();
+            new();
         private int idCounter;
 
         /// <summary>
@@ -270,7 +260,7 @@ namespace ILGPU.Backends
         /// <param name="pointerType">The pointer type to allocate.</param>
         /// <returns>The allocated variable.</returns>
         public PointerVariable AllocatePointerType(PointerType pointerType) =>
-            new PointerVariable(idCounter++, pointerType);
+            new(idCounter++, pointerType);
 
         /// <summary>
         /// Allocates the given type.

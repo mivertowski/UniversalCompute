@@ -133,10 +133,7 @@ namespace ILGPU.Numerics
         /// Copies data to another tensor.
         /// </summary>
         /// <param name="destination">The destination tensor.</param>
-        public void CopyTo(ITensor<T> destination)
-        {
-            destination?.CopyFrom(this);
-        }
+        public void CopyTo(ITensor<T> destination) => destination?.CopyFrom(this);
 
         /// <summary>
         /// Creates a reshaped view of the tensor.
@@ -179,10 +176,7 @@ namespace ILGPU.Numerics
         /// <summary>
         /// Disposes the tensor.
         /// </summary>
-        public void Dispose()
-        {
-            _disposed = true;
-        }
+        public void Dispose() => _disposed = true;
 
         private static int[] CalculateStrides(TensorShape shape)
         {
@@ -215,11 +209,9 @@ namespace ILGPU.Numerics
             return index;
         }
 
-        private void CopySliceData(int[] start, int[] length, CpuTensor<T> destination)
-        {
+        private void CopySliceData(int[] start, int[] length, CpuTensor<T> destination) =>
             // Simplified slice copy - recursive implementation
             CopySliceRecursive(start, length, new int[Rank], 0, destination, new int[Rank]);
-        }
 
         private void CopySliceRecursive(int[] start, int[] length, int[] currentSourceIndex, 
             int dimension, CpuTensor<T> destination, int[] currentDestIndex)

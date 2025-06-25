@@ -19,27 +19,22 @@ namespace ILGPU.IR.Transformations
     /// Resolved required intrinsic IR implementations.
     /// </summary>
     /// <typeparam name="TDelegate">The backend-specific delegate type.</typeparam>
-    public sealed class IntrinsicResolver<TDelegate> :
+    /// <remarks>
+    /// Constructs a new intrinsic resolver.
+    /// </remarks>
+    /// <param name="implementationProvider">
+    /// The implementation provider to use.
+    /// </param>
+    public sealed class IntrinsicResolver<TDelegate>(
+        IntrinsicImplementationProvider<TDelegate> implementationProvider) :
         UnorderedTransformation<
             IntrinsicImplementationProvider<TDelegate>.IRSpecializationPhase>
         where TDelegate : Delegate
     {
         #region Instance
 
-        private readonly IntrinsicImplementationProvider<TDelegate> provider;
-
-        /// <summary>
-        /// Constructs a new intrinsic resolver.
-        /// </summary>
-        /// <param name="implementationProvider">
-        /// The implementation provider to use.
-        /// </param>
-        public IntrinsicResolver(
-            IntrinsicImplementationProvider<TDelegate> implementationProvider)
-        {
-            provider = implementationProvider
+        private readonly IntrinsicImplementationProvider<TDelegate> provider = implementationProvider
                 ?? throw new ArgumentNullException(nameof(implementationProvider));
-        }
 
         #endregion
 

@@ -62,27 +62,22 @@ namespace ILGPU.Runtime.CPU
         /// Represents an operation that allocates and managed broadcast memory.
         /// </summary>
         /// <typeparam name="T">The element type.</typeparam>
-        protected readonly struct GetBroadcastMemory<T> : ILockedOperation<ArrayView<T>>
+        /// <remarks>
+        /// Constructs a new allocation operation.
+        /// </remarks>
+        protected readonly struct GetBroadcastMemory<T>(CPURuntimeContext parent, int groupIndex) : ILockedOperation<ArrayView<T>>
             where T : unmanaged
         {
-            /// <summary>
-            /// Constructs a new allocation operation.
-            /// </summary>
-            public GetBroadcastMemory(CPURuntimeContext parent, int groupIndex)
-            {
-                Parent = parent;
-                GroupIndex = groupIndex;
-            }
 
             /// <summary>
             /// Returns the parent context.
             /// </summary>
-            public CPURuntimeContext Parent { get; }
+            public CPURuntimeContext Parent { get; } = parent;
 
             /// <summary>
             /// Returns the current group index to read from.
             /// </summary>
-            public int GroupIndex { get; }
+            public int GroupIndex { get; } = groupIndex;
 
             /// <summary>
             /// Returns a reference to the parent broadcast cache.

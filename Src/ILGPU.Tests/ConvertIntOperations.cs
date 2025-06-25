@@ -16,12 +16,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract partial class ConvertIntOperations : TestBase
+    public abstract partial class ConvertIntOperations(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected ConvertIntOperations(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void TruncateIntKernel(
             Index1D index,
             ArrayView1D<long, Stride1D.Dense> input,

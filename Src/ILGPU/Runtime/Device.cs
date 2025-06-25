@@ -275,7 +275,7 @@ namespace ILGPU.Runtime
         /// simplifying memory management and enabling automatic data migration
         /// between host and device memory.
         /// </remarks>
-        public virtual bool SupportsUnifiedMemory { get; protected set; } = false;
+        public virtual bool SupportsUnifiedMemory { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether this device supports memory pools.
@@ -285,7 +285,7 @@ namespace ILGPU.Runtime
         /// overhead through sophisticated caching and recycling strategies,
         /// significantly improving performance for frequent allocations.
         /// </remarks>
-        public virtual bool SupportsMemoryPools { get; protected set; } = false;
+        public virtual bool SupportsMemoryPools { get; protected set; }
 
         #endregion
 
@@ -406,8 +406,14 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Annotates classes derived from <see cref="Device"/>.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new device type attribute.
+    /// </remarks>
+    /// <param name="acceleratorType">
+    /// The accelerator type of the annotated device.
+    /// </param>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
-    public sealed class DeviceTypeAttribute : Attribute
+    public sealed class DeviceTypeAttribute(AcceleratorType acceleratorType) : Attribute
     {
         /// <summary>
         /// Gets the accelerator type of the given device class.
@@ -427,20 +433,9 @@ namespace ILGPU.Runtime
         }
 
         /// <summary>
-        /// Constructs a new device type attribute.
-        /// </summary>
-        /// <param name="acceleratorType">
-        /// The accelerator type of the annotated device.
-        /// </param>
-        public DeviceTypeAttribute(AcceleratorType acceleratorType)
-        {
-            AcceleratorType = acceleratorType;
-        }
-
-        /// <summary>
         /// Returns the associated accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType { get; }
+        public AcceleratorType AcceleratorType { get; } = acceleratorType;
     }
 
     /// <summary>
@@ -467,7 +462,7 @@ namespace ILGPU.Runtime
         /// The set of all registered devices.
         /// </summary>
         private readonly HashSet<Device> registered =
-            new HashSet<Device>();
+            new();
 
         /// <summary>
         /// Stores all registered accelerator device objects.

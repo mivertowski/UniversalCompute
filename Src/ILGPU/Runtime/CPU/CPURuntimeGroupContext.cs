@@ -21,7 +21,11 @@ namespace ILGPU.Runtime.CPU
     /// <summary>
     /// Represents a runtime context for thread groups.
     /// </summary>
-    sealed class CPURuntimeGroupContext : CPURuntimeContext, CPURuntimeContext.IParent
+    /// <remarks>
+    /// Constructs a new CPU-based runtime context for parallel processing.
+    /// </remarks>
+    /// <param name="multiprocessor">The target CPU multiprocessor.</param>
+    sealed class CPURuntimeGroupContext(CPUMultiprocessor multiprocessor) : CPURuntimeContext(multiprocessor), CPURuntimeContext.IParent
     {
         #region Thread Static
 
@@ -63,7 +67,7 @@ namespace ILGPU.Runtime.CPU
         /// <summary>
         /// Internal storage to track group-wide allocation indices
         /// </summary>
-        private readonly int[] groupAllocationIndices;
+        private readonly int[] groupAllocationIndices = new int[multiprocessor.MaxNumThreadsPerGroup];
 
         /// <summary>
         /// The current dynamic shared memory array size in bytes.
@@ -86,17 +90,7 @@ namespace ILGPU.Runtime.CPU
         /// Shared-memory allocation lock object for synchronizing accesses to the
         /// <see cref="sharedMemory" /> list.
         /// </summary>
-        private readonly object sharedMemoryLock = new object();
-
-        /// <summary>
-        /// Constructs a new CPU-based runtime context for parallel processing.
-        /// </summary>
-        /// <param name="multiprocessor">The target CPU multiprocessor.</param>
-        public CPURuntimeGroupContext(CPUMultiprocessor multiprocessor)
-            : base(multiprocessor)
-        {
-            groupAllocationIndices = new int[multiprocessor.MaxNumThreadsPerGroup];
-        }
+        private readonly object sharedMemoryLock = new();
 
         #endregion
 

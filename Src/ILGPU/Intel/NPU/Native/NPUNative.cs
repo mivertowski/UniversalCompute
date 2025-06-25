@@ -301,7 +301,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         internal static unsafe int ExecuteConvolution(
             nint input,
-            nint kernel, 
+            nint kernel,
             nint output,
             int batchSize,
             int inputChannels,
@@ -313,11 +313,9 @@ namespace ILGPU.Intel.NPU.Native
             int strideHeight,
             int strideWidth,
             int paddingHeight,
-            int paddingWidth)
-        {
+            int paddingWidth) =>
             // For now, return success - would implement actual NPU call
-            return 0;
-        }
+            0;
 
         /// <summary>
         /// Executes attention mechanism on NPU.
@@ -330,11 +328,9 @@ namespace ILGPU.Intel.NPU.Native
             int batchSize,
             int sequenceLength,
             int hiddenSize,
-            int numHeads)
-        {
+            int numHeads) =>
             // For now, return success - would implement actual NPU call
-            return 0;
-        }
+            0;
 
         #endregion
     }
@@ -393,13 +389,10 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void InferenceFloat(
             float* input, float* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
-            NPUNative.NPU_InferenceFloat32(
+            IntPtr context) => NPUNative.NPU_InferenceFloat32(
                 (IntPtr)input, (IntPtr)output,
                 (IntPtr)(&inputShape), (IntPtr)(&outputShape),
                 context);
-        }
 
         /// <summary>
         /// Executes inference with BFloat16 data.
@@ -407,13 +400,10 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void InferenceBF16(
             BFloat16* input, BFloat16* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
-            NPUNative.NPU_InferenceBF16(
+            IntPtr context) => NPUNative.NPU_InferenceBF16(
                 (IntPtr)input, (IntPtr)output,
                 (IntPtr)(&inputShape), (IntPtr)(&outputShape),
                 context);
-        }
 
         /// <summary>
         /// Executes inference with INT8 data.
@@ -421,13 +411,10 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void InferenceInt8(
             byte* input, byte* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
-            NPUNative.NPU_InferenceInt8(
+            IntPtr context) => NPUNative.NPU_InferenceInt8(
                 (IntPtr)input, (IntPtr)output,
                 (IntPtr)(&inputShape), (IntPtr)(&outputShape),
                 context);
-        }
 
         /// <summary>
         /// Executes convolution with float data.
@@ -435,13 +422,10 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void ConvolutionFloat(
             float* input, float* weights, float* output,
             TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape,
-            IntPtr config)
-        {
-            NPUNative.NPU_ConvolutionFloat32(
+            IntPtr config) => NPUNative.NPU_ConvolutionFloat32(
                 (IntPtr)input, (IntPtr)weights, (IntPtr)output,
                 (IntPtr)(&inputShape), (IntPtr)(&weightsShape), (IntPtr)(&outputShape),
                 config);
-        }
 
         /// <summary>
         /// Executes matrix multiplication with float data.
@@ -449,10 +433,7 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void MatMulFloat(
             float* a, float* b, float* c,
             int m, int k, int n,
-            IntPtr config)
-        {
-            NPUNative.NPU_MatMulFloat32((IntPtr)a, (IntPtr)b, (IntPtr)c, m, k, n, config);
-        }
+            IntPtr config) => NPUNative.NPU_MatMulFloat32((IntPtr)a, (IntPtr)b, (IntPtr)c, m, k, n, config);
 
         /// <summary>
         /// Executes matrix multiplication with BFloat16 data.
@@ -460,10 +441,7 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void MatMulBF16(
             BFloat16* a, BFloat16* b, BFloat16* c,
             int m, int k, int n,
-            IntPtr config)
-        {
-            NPUNative.NPU_MatMulBF16((IntPtr)a, (IntPtr)b, (IntPtr)c, m, k, n, config);
-        }
+            IntPtr config) => NPUNative.NPU_MatMulBF16((IntPtr)a, (IntPtr)b, (IntPtr)c, m, k, n, config);
 
         /// <summary>
         /// Executes attention with float data.
@@ -471,12 +449,9 @@ namespace ILGPU.Intel.NPU.Native
         internal static unsafe void AttentionFloat(
             float* query, float* key, float* value, float* output,
             TensorShape queryShape, TensorShape keyShape, TensorShape valueShape,
-            IntPtr config)
-        {
-            NPUNative.NPU_AttentionFloat32(
+            IntPtr config) => NPUNative.NPU_AttentionFloat32(
                 (IntPtr)query, (IntPtr)key, (IntPtr)value, (IntPtr)output,
                 (IntPtr)(&queryShape), (IntPtr)(&keyShape), (IntPtr)(&valueShape),
                 config);
-        }
     }
 }

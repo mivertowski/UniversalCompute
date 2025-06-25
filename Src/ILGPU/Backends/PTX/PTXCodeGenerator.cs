@@ -117,25 +117,19 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Represents a parameter that is mapped to PTX.
         /// </summary>
-        protected internal readonly struct MappedParameter
+        /// <remarks>
+        /// Constructs a new mapped parameter.
+        /// </remarks>
+        /// <param name="register">The PTX register.</param>
+        /// <param name="ptxName">The name of the parameter in PTX code.</param>
+        /// <param name="parameter">The source parameter.</param>
+        protected internal readonly struct MappedParameter(
+RegisterAllocator<PTXRegisterKind>.Register register,
+            string ptxName,
+            Parameter parameter)
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new mapped parameter.
-            /// </summary>
-            /// <param name="register">The PTX register.</param>
-            /// <param name="ptxName">The name of the parameter in PTX code.</param>
-            /// <param name="parameter">The source parameter.</param>
-            public MappedParameter(
-                Register register,
-                string ptxName,
-                Parameter parameter)
-            {
-                Register = register;
-                PTXName = ptxName;
-                Parameter = parameter;
-            }
+            #region Instance
 
             #endregion
 
@@ -144,17 +138,17 @@ namespace ILGPU.Backends.PTX
             /// <summary>
             /// Returns the associated PTX register.
             /// </summary>
-            public Register Register { get; }
+            public Register Register { get; } = register;
 
             /// <summary>
             /// Returns the name of the parameter in PTX code.
             /// </summary>
-            public string PTXName { get; }
+            public string PTXName { get; } = ptxName;
 
             /// <summary>
             /// Returns the source parameter.
             /// </summary>
-            public Parameter Parameter { get; }
+            public Parameter Parameter { get; } = parameter;
 
             #endregion
         }
@@ -710,28 +704,23 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits complex load parameter instructions.
         /// </summary>
-        private readonly struct LoadParamEmitter : IComplexCommandEmitterWithOffsets
+        private readonly struct LoadParamEmitter(string paramName, RegisterAllocator<PTXRegisterKind>.HardwareRegister tempRegister) : IComplexCommandEmitterWithOffsets
         {
             /// <summary>
             /// The underlying IO emitter.
             /// </summary>
-            private readonly struct IOEmitter : IIOEmitter<int>
+            private readonly struct IOEmitter(string paramName, RegisterAllocator<PTXRegisterKind>.HardwareRegister tempRegister) : IIOEmitter<int>
             {
-                public IOEmitter(string paramName, HardwareRegister tempRegister)
-                {
-                    ParamName = paramName;
-                    TempRegister = tempRegister;
-                }
 
                 /// <summary>
                 /// Returns the associated parameter name.
                 /// </summary>
-                public string ParamName { get; }
+                public string ParamName { get; } = paramName;
 
                 /// <summary>
                 /// Returns the associated temp register.
                 /// </summary>
-                public HardwareRegister TempRegister { get; }
+                public HardwareRegister TempRegister { get; } = tempRegister;
 
                 private static CommandEmitter BeginEmitLoad(
                     PTXCodeGenerator codeGenerator,
@@ -790,15 +779,10 @@ namespace ILGPU.Backends.PTX
                 }
             }
 
-            public LoadParamEmitter(string paramName, HardwareRegister tempRegister)
-            {
-                Emitter = new IOEmitter(paramName, tempRegister);
-            }
-
             /// <summary>
             /// The underlying IO emitter.
             /// </summary>
-            private IOEmitter Emitter { get; }
+            private IOEmitter Emitter { get; } = new IOEmitter(paramName, tempRegister);
 
             /// <summary>
             /// Emits a new parameter load operation that converts generic address-
@@ -859,28 +843,25 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Emits complex store parameter instructions.
         /// </summary>
-        private readonly struct StoreParamEmitter : IComplexCommandEmitterWithOffsets
+        private readonly struct StoreParamEmitter(
+            string paramName,
+RegisterAllocator<PTXRegisterKind>.HardwareRegister tempRegister) : IComplexCommandEmitterWithOffsets
         {
             /// <summary>
             /// The underlying IO emitter.
             /// </summary>
-            private readonly struct IOEmitter : IIOEmitter<int>
+            private readonly struct IOEmitter(string paramName, RegisterAllocator<PTXRegisterKind>.HardwareRegister tempRegister) : IIOEmitter<int>
             {
-                public IOEmitter(string paramName, HardwareRegister tempRegister)
-                {
-                    ParamName = paramName;
-                    TempRegister = tempRegister;
-                }
 
                 /// <summary>
                 /// Returns the associated parameter name.
                 /// </summary>
-                public string ParamName { get; }
+                public string ParamName { get; } = paramName;
 
                 /// <summary>
                 /// Returns the associated temp register.
                 /// </summary>
-                public HardwareRegister TempRegister { get; }
+                public HardwareRegister TempRegister { get; } = tempRegister;
 
                 /// <summary>
                 /// Emits a new parameter store operation that converts non-generic
@@ -918,17 +899,10 @@ namespace ILGPU.Backends.PTX
                 }
             }
 
-            public StoreParamEmitter(
-                string paramName,
-                HardwareRegister tempRegister)
-            {
-                Emitter = new IOEmitter(paramName, tempRegister);
-            }
-
             /// <summary>
             /// The underlying IO emitter.
             /// </summary>
-            private IOEmitter Emitter { get; }
+            private IOEmitter Emitter { get; } = new IOEmitter(paramName, tempRegister);
 
             /// <summary>
             /// Emits a new parameter store operation that converts non-generic

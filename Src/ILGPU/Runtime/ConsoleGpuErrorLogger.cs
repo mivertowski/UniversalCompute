@@ -41,7 +41,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets or sets whether to include stack trace for critical errors.
         /// </summary>
-        public bool IncludeStackTrace { get; set; } = false;
+        public bool IncludeStackTrace { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum severity level to log.

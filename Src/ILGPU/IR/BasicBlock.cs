@@ -82,29 +82,25 @@ namespace ILGPU.IR
             public static IsInCollectionPredicate<TCollection>
                 ToPredicate<TCollection>(TCollection collection)
                 where TCollection : ICollection<BasicBlock> =>
-                new IsInCollectionPredicate<TCollection>(collection);
+                new(collection);
         }
 
         /// <summary>
         /// An equality comparer for basic blocks.
         /// </summary>
-        public readonly struct IsInCollectionPredicate<TCollection> :
+        /// <remarks>
+        /// Constructs a new collection predicate.
+        /// </remarks>
+        /// <param name="collection">The source collection.</param>
+        public readonly struct IsInCollectionPredicate<TCollection>(TCollection collection) :
             InlineList.IPredicate<BasicBlock>
             where TCollection : ICollection<BasicBlock>
         {
-            /// <summary>
-            /// Constructs a new collection predicate.
-            /// </summary>
-            /// <param name="collection">The source collection.</param>
-            public IsInCollectionPredicate(TCollection collection)
-            {
-                Collection = collection;
-            }
 
             /// <summary>
             /// Returns the collection of all blocks.
             /// </summary>
-            public TCollection Collection { get; }
+            public TCollection Collection { get; } = collection;
 
             /// <summary>
             /// Returns true if both blocks represent the same block.
@@ -124,28 +120,23 @@ namespace ILGPU.IR
         /// <summary>
         /// Represents a value reference within a single basic block.
         /// </summary>
-        public readonly struct ValueEntry
+        /// <remarks>
+        /// Converts a new value entry.
+        /// </remarks>
+        /// <param name="index">The index within the block.</param>
+        /// <param name="valueReference">The actual value reference.</param>
+        public readonly struct ValueEntry(int index, ValueReference valueReference)
         {
-            /// <summary>
-            /// Converts a new value entry.
-            /// </summary>
-            /// <param name="index">The index within the block.</param>
-            /// <param name="valueReference">The actual value reference.</param>
-            public ValueEntry(int index, ValueReference valueReference)
-            {
-                Index = index;
-                ValueReference = valueReference;
-            }
 
             /// <summary>
             /// The current index of the associated value.
             /// </summary>
-            public int Index { get; }
+            public int Index { get; } = index;
 
             /// <summary>
             /// The actual value reference.
             /// </summary>
-            public ValueReference ValueReference { get; }
+            public ValueReference ValueReference { get; } = valueReference;
 
             /// <summary>
             /// The resolved value.
@@ -225,7 +216,7 @@ namespace ILGPU.IR
             /// <summary>
             /// Returns the current node.
             /// </summary>
-            public ValueEntry Current => new ValueEntry(index, values[index]);
+            public ValueEntry Current => new(index, values[index]);
 
             /// <summary cref="IEnumerator.Current"/>
             object IEnumerator.Current => Current;
@@ -287,7 +278,7 @@ namespace ILGPU.IR
         private InlineList<BasicBlock> successors;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<ValueReference> values = new List<ValueReference>();
+        private List<ValueReference> values = new();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Builder? builder = null;
@@ -570,7 +561,7 @@ namespace ILGPU.IR
         /// Returns a value enumerator.
         /// </summary>
         /// <returns>The resolved enumerator.</returns>
-        public Enumerator GetEnumerator() => new Enumerator(this);
+        public Enumerator GetEnumerator() => new(this);
 
         /// <summary cref="IEnumerable{T}.GetEnumerator"/>
         IEnumerator<ValueEntry> IEnumerable<ValueEntry>.GetEnumerator() =>

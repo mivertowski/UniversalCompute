@@ -50,34 +50,27 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// A specialized kernel setup logic for parameters.
         /// </summary>
-        private struct KernelParameterSetupLogic : IParametersSetupLogic
+        /// <remarks>
+        /// Constructs a new specialized kernel setup logic.
+        /// </remarks>
+        /// <param name="generator">The parent generator.</param>
+        private struct KernelParameterSetupLogic(CLKernelFunctionGenerator generator) : IParametersSetupLogic
         {
-            /// <summary>
-            /// Constructs a new specialized kernel setup logic.
-            /// </summary>
-            /// <param name="generator">The parent generator.</param>
-            public KernelParameterSetupLogic(CLKernelFunctionGenerator generator)
-            {
-                Parent = generator;
-
-                IndexVariable = null;
-                LengthVariable = null;
-            }
 
             /// <summary>
             /// Returns the main index variable.
             /// </summary>
-            public Variable? IndexVariable { get; private set; }
+            public Variable? IndexVariable { get; private set; } = null;
 
             /// <summary>
             /// Returns the length variable of implicitly grouped kernels.
             /// </summary>
-            public Variable? LengthVariable { get; private set; }
+            public Variable? LengthVariable { get; private set; } = null;
 
             /// <summary>
             /// Returns the parent type generator.
             /// </summary>
-            public CLKernelFunctionGenerator Parent { get; }
+            public CLKernelFunctionGenerator Parent { get; } = generator;
 
             /// <summary>
             /// Returns the associated kernel type.

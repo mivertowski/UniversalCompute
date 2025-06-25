@@ -16,17 +16,13 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract partial class SpecializedKernels : TestBase
+    public abstract partial class SpecializedKernels(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
-        protected SpecializedKernels(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
-
         public static TheoryData<object> SpecializedValueTestData =>
-            new TheoryData<object>
-        {
+            new()
+            {
             { default(sbyte) },
             { default(byte) },
             { default(short) },

@@ -43,7 +43,7 @@ namespace ILGPU
         /// <summary>
         /// Represents the empty instance id.
         /// </summary>
-        public static readonly InstanceId Empty = new InstanceId(-1);
+        public static readonly InstanceId Empty = new(-1);
 
         /// <summary>
         /// A shared static instance id counter.
@@ -56,7 +56,7 @@ namespace ILGPU
         /// <returns>The unique instance id.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static InstanceId CreateNew() =>
-            new InstanceId(Interlocked.Add(ref instanceIdCounter, 1L));
+            new(Interlocked.Add(ref instanceIdCounter, 1L));
 
         #endregion
 

@@ -34,7 +34,7 @@ namespace ILGPU.Util
         /// <summary>
         /// An empty inline list.
         /// </summary>
-        public static readonly InlineList<T> Empty = new InlineList<T>(0);
+        public static readonly InlineList<T> Empty = new(0);
 
         /// <summary>
         /// Creates a new inline list with the given capacity and storage capacity.
@@ -42,7 +42,7 @@ namespace ILGPU.Util
         /// <param name="capacity">The capacity.</param>
         /// <returns>The new inline list.</returns>
         public static InlineList<T> Create(int capacity) =>
-            new InlineList<T>(capacity);
+            new(capacity);
 
         /// <summary>
         /// Creates a new inline list with the given item.
@@ -425,7 +425,7 @@ namespace ILGPU.Util
         /// Converts this inline list into a span.
         /// </summary>
         /// <returns>The span.</returns>
-        public readonly Span<T> AsSpan() => new Span<T>(items, 0, Count);
+        public readonly Span<T> AsSpan() => new(items, 0, Count);
 
         /// <summary>
         /// Converts this inline list into a read-only span.
@@ -472,14 +472,14 @@ namespace ILGPU.Util
         /// </summary>
         /// <param name="list">The list to convert.</param>
         public static explicit operator Span<T>(InlineList<T> list) =>
-            new Span<T>(list.items, 0, list.Count);
+            new(list.items, 0, list.Count);
 
         /// <summary>
         /// Converts the given list into a read-only span.
         /// </summary>
         /// <param name="list">The list to convert.</param>
         public static implicit operator ReadOnlySpan<T>(InlineList<T> list) =>
-            new ReadOnlySpan<T>(list.items, 0, list.Count);
+            new(list.items, 0, list.Count);
 
         #endregion
     }

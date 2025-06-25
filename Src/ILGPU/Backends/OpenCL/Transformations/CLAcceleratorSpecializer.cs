@@ -23,7 +23,19 @@ namespace ILGPU.Backends.OpenCL.Transformations
     /// <summary>
     /// The OpenCL accelerator specializer.
     /// </summary>
-    public sealed class CLAcceleratorSpecializer : AcceleratorSpecializer
+    /// <remarks>
+    /// Constructs a new OpenCL accelerator specializer.
+    /// </remarks>
+    /// <param name="pointerType">The actual pointer type to use.</param>
+    /// <param name="enableIOOperations">True, if the IO is enabled.</param>
+    public sealed class CLAcceleratorSpecializer(
+        PrimitiveType pointerType,
+        bool enableIOOperations) : AcceleratorSpecializer(
+              AcceleratorType.OpenCL,
+              null,
+              pointerType,
+              enableAssertions: false,
+              enableIOOperations)
     {
         #region External Functions
 
@@ -48,24 +60,7 @@ namespace ILGPU.Backends.OpenCL.Transformations
             .ThrowIfNull();
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new OpenCL accelerator specializer.
-        /// </summary>
-        /// <param name="pointerType">The actual pointer type to use.</param>
-        /// <param name="enableIOOperations">True, if the IO is enabled.</param>
-        public CLAcceleratorSpecializer(
-            PrimitiveType pointerType,
-            bool enableIOOperations)
-            : base(
-                  AcceleratorType.OpenCL,
-                  null,
-                  pointerType,
-                  enableAssertions: false,
-                  enableIOOperations)
-        { }
 
         #endregion
 

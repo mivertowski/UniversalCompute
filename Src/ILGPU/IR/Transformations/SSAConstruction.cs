@@ -266,7 +266,11 @@ namespace ILGPU.IR.Transformations
     /// The base class for both the <see cref="SSAConstruction"/> and the
     /// <see cref="SSAStructureConstruction"/> classes.
     /// </summary>
-    public abstract class SSAConstructionBase : SSATransformationBase
+    /// <remarks>
+    /// Constructs a new SSA transformation pass.
+    /// </remarks>
+    /// <param name="addressSpace">The target memory address space.</param>
+    public abstract class SSAConstructionBase(MemoryAddressSpace addressSpace) : SSATransformationBase
     {
         #region Nested Types
 
@@ -274,28 +278,24 @@ namespace ILGPU.IR.Transformations
         /// A single field reference in the scope of the <see cref="ConstructionData"/>
         /// container structure.
         /// </summary>
-        protected readonly struct ConstructionFieldRef :
+        /// <remarks>
+        /// Constructs a new wrapper field reference.
+        /// </remarks>
+        /// <param name="fieldRef">The field reference to wrap.</param>
+        protected readonly struct ConstructionFieldRef(FieldRef fieldRef) :
             IConstructionDataType<ConstructionFieldRef>
         {
-            /// <summary>
-            /// Constructs a new wrapper field reference.
-            /// </summary>
-            /// <param name="fieldRef">The field reference to wrap.</param>
-            public ConstructionFieldRef(FieldRef fieldRef)
-            {
-                FieldRef = fieldRef;
-            }
 
             /// <summary>
             /// Returns the internal field reference.
             /// </summary>
-            public FieldRef FieldRef { get; }
+            public FieldRef FieldRef { get; } = fieldRef;
 
             /// <summary>
             /// Returns an updated instance using the given field reference.
             /// </summary>
             public readonly ConstructionFieldRef Access(FieldRef fieldRef) =>
-                new ConstructionFieldRef(fieldRef);
+                new(fieldRef);
 
             /// <summary>
             /// Returns the string representation of the underlying field reference.
@@ -307,27 +307,22 @@ namespace ILGPU.IR.Transformations
         /// A default implementation of the
         /// <see cref="SSATransformationBase.IConstructionData{TData}" /> interface.
         /// </summary>
-        protected readonly struct ConstructionData :
+        /// <remarks>
+        /// Initializes the data structure.
+        /// </remarks>
+        protected readonly struct ConstructionData(HashSet<Alloca> allocas) :
             IConstructionData<ConstructionFieldRef>
         {
-            /// <summary>
-            /// Initializes the data structure.
-            /// </summary>
-            public ConstructionData(HashSet<Alloca> allocas)
-            {
-                Allocas = allocas;
-                ConvertedValues = new Dictionary<Value, ConstructionFieldRef>();
-            }
 
             /// <summary>
             /// The set of all allocas to be converted into SSA value.
             /// </summary>
-            private HashSet<Alloca> Allocas { get; }
+            private HashSet<Alloca> Allocas { get; } = allocas;
 
             /// <summary>
             /// Maps converted values to their associated field references.
             /// </summary>
-            private Dictionary<Value, ConstructionFieldRef> ConvertedValues { get; }
+            private Dictionary<Value, ConstructionFieldRef> ConvertedValues { get; } = new Dictionary<Value, ConstructionFieldRef>();
 
             /// <summary>
             /// Returns true if the given alloca should be converted.
@@ -355,17 +350,7 @@ namespace ILGPU.IR.Transformations
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new SSA transformation pass.
-        /// </summary>
-        /// <param name="addressSpace">The target memory address space.</param>
-        protected SSAConstructionBase(MemoryAddressSpace addressSpace)
-        {
-            AddressSpace = addressSpace;
-        }
 
         #endregion
 
@@ -374,7 +359,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Returns the memory address space to handle.
         /// </summary>
-        public MemoryAddressSpace AddressSpace { get; }
+        public MemoryAddressSpace AddressSpace { get; } = addressSpace;
 
         #endregion
 
@@ -427,7 +412,11 @@ namespace ILGPU.IR.Transformations
     /// <summary>
     /// Performs an SSA construction transformation.
     /// </summary>
-    public sealed class SSAConstruction : SSAConstructionBase
+    /// <remarks>
+    /// Constructs a new SSA construction pass.
+    /// </remarks>
+    /// <param name="addressSpace">The target memory address space.</param>
+    public sealed class SSAConstruction(MemoryAddressSpace addressSpace) : SSAConstructionBase(addressSpace)
     {
         #region Rewriter Methods
 
@@ -498,7 +487,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly SSARewriter<Value, ConstructionData> Rewriter =
-            new SSARewriter<Value, ConstructionData>();
+            new();
 
         /// <summary>
         /// Registers all rewriting patterns.
@@ -520,14 +509,6 @@ namespace ILGPU.IR.Transformations
         /// Constructs a new SSA construction pass.
         /// </summary>
         public SSAConstruction() : this(MemoryAddressSpace.Local) { }
-
-        /// <summary>
-        /// Constructs a new SSA construction pass.
-        /// </summary>
-        /// <param name="addressSpace">The target memory address space.</param>
-        public SSAConstruction(MemoryAddressSpace addressSpace)
-            : base(addressSpace)
-        { }
 
         #endregion
 
@@ -557,7 +538,11 @@ namespace ILGPU.IR.Transformations
     /// <summary>
     /// Performs an SSA structure construction from array allocations transformation.
     /// </summary>
-    public sealed class SSAStructureConstruction : SSAConstructionBase
+    /// <remarks>
+    /// Constructs a new SSA structure construction pass.
+    /// </remarks>
+    /// <param name="addressSpace">The target memory address space.</param>
+    public sealed class SSAStructureConstruction(MemoryAddressSpace addressSpace) : SSAConstructionBase(addressSpace)
     {
         #region Utility Methods
 
@@ -659,7 +644,7 @@ namespace ILGPU.IR.Transformations
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public readonly ArrayData Access(FieldRef fieldRef) =>
-                new ArrayData(
+                new(
                     ArrayLength,
                     NumElementFields,
                     InternalFieldRef.Access(fieldRef));
@@ -669,18 +654,13 @@ namespace ILGPU.IR.Transformations
         /// An array construction helper that stores intermediate data during the SSA
         /// construction of data arrays.
         /// </summary>
-        private readonly struct ArrayConstructionData : IConstructionData<ArrayData>
+        private readonly struct ArrayConstructionData(in SSAConstructionBase.ConstructionData data) : IConstructionData<ArrayData>
         {
-            public ArrayConstructionData(in ConstructionData data)
-            {
-                ConstructionData = data;
-                ArrayData = new Dictionary<Value, (int, int)>();
-            }
 
             /// <summary>
             /// The internal construction data.
             /// </summary>
-            public ConstructionData ConstructionData { get; }
+            public ConstructionData ConstructionData { get; } = data;
 
             /// <summary>
             /// The additional array data per allocation entry.
@@ -688,7 +668,7 @@ namespace ILGPU.IR.Transformations
             private Dictionary<
                 Value,
                 (int ArrayLength, int NumElementFields)> ArrayData
-            { get; }
+            { get; } = new Dictionary<Value, (int, int)>();
 
             /// <summary>
             /// Returns true if the given alloca should be converted.
@@ -903,7 +883,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly SSARewriter<Value, ArrayConstructionData> Rewriter =
-            new SSARewriter<Value, ArrayConstructionData>();
+            new();
 
         /// <summary>
         /// Registers all rewriting patterns.
@@ -929,14 +909,6 @@ namespace ILGPU.IR.Transformations
         /// Constructs a new SSA structure construction pass.
         /// </summary>
         public SSAStructureConstruction() : this(MemoryAddressSpace.Local) { }
-
-        /// <summary>
-        /// Constructs a new SSA structure construction pass.
-        /// </summary>
-        /// <param name="addressSpace">The target memory address space.</param>
-        public SSAStructureConstruction(MemoryAddressSpace addressSpace)
-            : base(addressSpace)
-        { }
 
         #endregion
 

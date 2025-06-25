@@ -43,20 +43,16 @@ namespace ILGPU.IR.Analyses
         /// blocks of an associated loop.
         /// </summary>
         /// <typeparam name="TOtherDirection">The target direction.</typeparam>
-        public readonly struct MembersSuccessorProvider<TOtherDirection> :
+        /// <remarks>
+        /// Constructs a new successor provider.
+        /// </remarks>
+        /// <param name="node">The loop node.</param>
+        public readonly struct MembersSuccessorProvider<TOtherDirection>(Loops<TOrder, TDirection>.Node node) :
             ITraversalSuccessorsProvider<TOtherDirection>
             where TOtherDirection : struct, IControlFlowDirection
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new successor provider.
-            /// </summary>
-            /// <param name="node">The loop node.</param>
-            public MembersSuccessorProvider(Node node)
-            {
-                Node = node;
-            }
+            #region Instance
 
             #endregion
 
@@ -65,7 +61,7 @@ namespace ILGPU.IR.Analyses
             /// <summary>
             /// Returns the associated loop node.
             /// </summary>
-            public Node Node { get; }
+            public Node Node { get; } = node;
 
             #endregion
 
@@ -504,28 +500,24 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Provides new intermediate <see cref="NodeData"/> instances.
         /// </summary>
-        private readonly struct NodeDataProvider : IBasicBlockMapValueProvider<NodeData>
+        /// <remarks>
+        /// Constructs a new data provider.
+        /// </remarks>
+        /// <param name="cfg">The underlying CFG.</param>
+        private readonly struct NodeDataProvider(CFG<TOrder, TDirection> cfg) : IBasicBlockMapValueProvider<NodeData>
         {
-            /// <summary>
-            /// Constructs a new data provider.
-            /// </summary>
-            /// <param name="cfg">The underlying CFG.</param>
-            public NodeDataProvider(CFG<TOrder, TDirection> cfg)
-            {
-                CFG = cfg;
-            }
 
             /// <summary>
             /// Returns the underlying CFG.
             /// </summary>
-            public CFG<TOrder, TDirection> CFG { get; }
+            public CFG<TOrder, TDirection> CFG { get; } = cfg;
 
             /// <summary>
             /// Creates a new <see cref="NodeData"/> instance.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public NodeData GetValue(BasicBlock block, int traversalIndex) =>
-                new NodeData(CFG[block]);
+                new(CFG[block]);
         }
 
         #endregion
@@ -576,7 +568,7 @@ namespace ILGPU.IR.Analyses
         /// <param name="cfg">The underlying source CFG.</param>
         /// <returns>The created loop analysis.</returns>
         public static Loops<TOrder, TDirection> Create(CFG<TOrder, TDirection> cfg) =>
-            new Loops<TOrder, TDirection>(cfg);
+            new(cfg);
 
         #endregion
 

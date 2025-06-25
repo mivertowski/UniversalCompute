@@ -63,28 +63,23 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// A simple remapper that allows to map an old block to a new block.
         /// </summary>
-        public readonly struct BlockRemapper : IArgumentRemapper
+        /// <remarks>
+        /// Constructs a new block remapper.
+        /// </remarks>
+        /// <param name="oldBlock">The old block.</param>
+        /// <param name="newBlock">The new block.</param>
+        public readonly struct BlockRemapper(BasicBlock oldBlock, BasicBlock newBlock) : IArgumentRemapper
         {
-            /// <summary>
-            /// Constructs a new block remapper.
-            /// </summary>
-            /// <param name="oldBlock">The old block.</param>
-            /// <param name="newBlock">The new block.</param>
-            public BlockRemapper(BasicBlock oldBlock, BasicBlock newBlock)
-            {
-                OldBlock = oldBlock;
-                NewBlock = newBlock;
-            }
 
             /// <summary>
             /// Returns the old block.
             /// </summary>
-            public BasicBlock OldBlock { get; }
+            public BasicBlock OldBlock { get; } = oldBlock;
 
             /// <summary>
             /// Returns the new block.
             /// </summary>
-            public BasicBlock NewBlock { get; }
+            public BasicBlock NewBlock { get; } = newBlock;
 
             /// <summary>
             /// Returns true if the given blocks contain the old block.

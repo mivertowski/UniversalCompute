@@ -48,7 +48,7 @@ namespace ILGPU.IR
             /// <summary>
             /// A collection of values to remove
             /// </summary>
-            private readonly HashSet<Value> toRemove = new HashSet<Value>();
+            private readonly HashSet<Value> toRemove = new();
 
             /// <summary>
             /// The current insert position for new instructions.
@@ -562,7 +562,7 @@ namespace ILGPU.IR
             /// Returns a value enumerator.
             /// </summary>
             /// <returns>The resolved enumerator.</returns>
-            public Enumerator GetEnumerator() => new Enumerator(BasicBlock);
+            public Enumerator GetEnumerator() => new(BasicBlock);
 
             /// <summary cref="IEnumerable{T}.GetEnumerator"/>
             IEnumerator<ValueEntry> IEnumerable<ValueEntry>.GetEnumerator() =>

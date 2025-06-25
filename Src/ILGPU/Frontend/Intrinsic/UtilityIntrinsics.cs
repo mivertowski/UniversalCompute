@@ -26,19 +26,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks intrinsic utility methods.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class UtilityIntrinsicAttribute : IntrinsicAttribute
+    sealed class UtilityIntrinsicAttribute(UtilityIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public UtilityIntrinsicAttribute(UtilityIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Utility;
 
         /// <summary>
         /// Returns the associated intrinsic kind.
         /// </summary>
-        public UtilityIntrinsicKind IntrinsicKind { get; }
+        public UtilityIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

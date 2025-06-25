@@ -165,7 +165,7 @@ namespace ILGPU.IR
             /// All created basic block builders.
             /// </summary>
             private readonly List<BasicBlock.Builder> basicBlockBuilders =
-                new List<BasicBlock.Builder>();
+                new();
 
             /// <summary>
             /// Constructs a new method builder.
@@ -428,7 +428,7 @@ namespace ILGPU.IR
             /// <param name="name">The parameter name (for debugging purposes).</param>
             /// <returns>The created parameter.</returns>
             private Parameter CreateParam(TypeNode type, string? name) =>
-                new Parameter(
+                new(
                     new ValueInitializer(
                         BaseContext,
                         Method,

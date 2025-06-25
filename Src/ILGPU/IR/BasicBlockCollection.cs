@@ -176,7 +176,7 @@ namespace ILGPU.IR
             /// Returns a value enumerator.
             /// </summary>
             /// <returns>The resolved enumerator.</returns>
-            public readonly Enumerator GetEnumerator() => new Enumerator(blocks);
+            public readonly Enumerator GetEnumerator() => new(blocks);
 
             /// <summary cref="IEnumerable{T}.GetEnumerator"/>
             IEnumerator<BasicBlock.ValueEntry>
@@ -236,7 +236,7 @@ namespace ILGPU.IR
         /// <summary>
         /// Returns an abstract view on all values.
         /// </summary>
-        public ValueCollection Values => new ValueCollection(this);
+        public ValueCollection Values => new(this);
 
         #endregion
 
@@ -359,7 +359,7 @@ namespace ILGPU.IR
                 struct,
                 ITraversalOrder,
                 ICompatibleTraversalOrder<TOrder> =>
-            new BasicBlockCollection<TOtherOrder, TDirection>(EntryBlock, blocks);
+            new(EntryBlock, blocks);
 
         /// <summary>
         /// Changes the direction of this collection.
@@ -507,7 +507,7 @@ namespace ILGPU.IR
         /// Returns an enumerator to enumerate all attached blocks.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public readonly Enumerator GetEnumerator() => new Enumerator(blocks);
+        public readonly Enumerator GetEnumerator() => new(blocks);
 
         /// <summary>
         /// Returns an enumerator to enumerator all actual (not replaced) parameters.

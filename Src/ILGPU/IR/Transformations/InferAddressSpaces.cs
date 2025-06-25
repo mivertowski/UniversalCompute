@@ -148,7 +148,7 @@ namespace ILGPU.IR.Transformations
         public static ProcessingData<TProvider> CreateProcessingData<TProvider>(
             TProvider provider)
             where TProvider : struct, IAddressSpaceProvider =>
-            new ProcessingData<TProvider>(provider);
+            new(provider);
 
         /// <summary>
         /// Returns true if the given cast is redundant.
@@ -353,7 +353,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<ProcessingData<DataProvider>> Rewriter =
-            new Rewriter<ProcessingData<DataProvider>>();
+            new();
 
         /// <summary>
         /// Registers all conversion patterns.
@@ -456,7 +456,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<ProcessingData<LocalDataProvider>> Rewriter =
-            new Rewriter<ProcessingData<LocalDataProvider>>();
+            new();
 
         /// <summary>
         /// Registers all conversion patterns.
@@ -507,7 +507,13 @@ namespace ILGPU.IR.Transformations
     /// program in the end. The additionally introduced casts are intended to be removed
     /// using <see cref="InferLocalAddressSpaces"/> afterwards.
     /// </remarks>
-    public sealed class InferKernelAddressSpaces :
+    /// <remarks>
+    /// Constructs a new address-space specialization pass.
+    /// </remarks>
+    /// <param name="kernelAddressSpace">
+    /// The root address space of all kernel functions.
+    /// </param>
+    public sealed class InferKernelAddressSpaces(MemoryAddressSpace kernelAddressSpace) :
         OrderedTransformation<InferKernelAddressSpaces.MethodDataProvider>
     {
         #region Nested Types
@@ -515,7 +521,11 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents an intermediate value for processing.
         /// </summary>
-        public sealed class MethodDataProvider
+        /// <remarks>
+        /// Constructs a new intermediate value.
+        /// </remarks>
+        /// <param name="result">The analysis result.</param>
+        public sealed class MethodDataProvider(in AnalysisResult result)
         {
             #region Static
 
@@ -549,17 +559,7 @@ namespace ILGPU.IR.Transformations
 
             #region Instance
 
-            private readonly Dictionary<Parameter, Parameter> oldParameters;
-
-            /// <summary>
-            /// Constructs a new intermediate value.
-            /// </summary>
-            /// <param name="result">The analysis result.</param>
-            public MethodDataProvider(in AnalysisResult result)
-            {
-                oldParameters = new Dictionary<Parameter, Parameter>();
-                Result = result;
-            }
+            private readonly Dictionary<Parameter, Parameter> oldParameters = new Dictionary<Parameter, Parameter>();
 
             #endregion
 
@@ -568,7 +568,7 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the associated program analysis result.
             /// </summary>
-            private AnalysisResult Result { get; }
+            private AnalysisResult Result { get; } = result;
 
             /// <summary>
             /// Returns the return type and the original parameters of the given method.
@@ -825,7 +825,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<MethodDataProvider> Rewriter =
-            new Rewriter<MethodDataProvider>();
+            new();
 
         /// <summary>
         /// Registers all conversion patterns.
@@ -837,19 +837,7 @@ namespace ILGPU.IR.Transformations
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new address-space specialization pass.
-        /// </summary>
-        /// <param name="kernelAddressSpace">
-        /// The root address space of all kernel functions.
-        /// </param>
-        public InferKernelAddressSpaces(MemoryAddressSpace kernelAddressSpace)
-        {
-            KernelAddressSpace = kernelAddressSpace;
-        }
 
         #endregion
 
@@ -858,7 +846,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Returns the kernel address space.
         /// </summary>
-        public MemoryAddressSpace KernelAddressSpace { get; }
+        public MemoryAddressSpace KernelAddressSpace { get; } = kernelAddressSpace;
 
         #endregion
 

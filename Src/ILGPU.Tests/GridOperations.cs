@@ -19,12 +19,8 @@ using Xunit.Abstractions;
 namespace ILGPU.Tests
 {
     [Collection("DimensionOperations")]
-    public abstract class GridOperations : TestBase
+    public abstract class GridOperations(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected GridOperations(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void GridDimensionKernel(
             ArrayView1D<int, Stride1D.Dense> data)
         {

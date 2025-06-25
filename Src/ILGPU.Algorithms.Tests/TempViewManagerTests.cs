@@ -17,17 +17,14 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class TempViewManagerTests : TestBase
+    public abstract partial class TempViewManagerTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected TempViewManagerTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         #region MemberData
 
         public static TheoryData<object> PrimitiveTypes =>
-            new TheoryData<object>
-        {
+            new()
+            {
             { default(sbyte) },
             { default(byte) },
             { default(short) },

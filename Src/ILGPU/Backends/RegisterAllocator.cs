@@ -24,7 +24,11 @@ namespace ILGPU.Backends
     /// </summary>
     /// <typeparam name="TKind">The register kind.</typeparam>
     /// <remarks>The members of this class are not thread safe.</remarks>
-    public abstract class RegisterAllocator<TKind>
+    /// <remarks>
+    /// Constructs a new register allocator.
+    /// </remarks>
+    /// <param name="backend">The underlying backend.</param>
+    public abstract class RegisterAllocator<TKind>(Backend backend)
         where TKind : struct
     {
         #region Nested Types
@@ -43,7 +47,7 @@ namespace ILGPU.Backends
             public static RegisterDescription Create(
                 PrimitiveType primitiveType,
                 TKind kind) =>
-                new RegisterDescription(
+                new(
                     primitiveType,
                     primitiveType.BasicValueType,
                     kind);
@@ -61,7 +65,7 @@ namespace ILGPU.Backends
                 TypeNode typeNode,
                 BasicValueType basicValueType,
                 TKind kind) =>
-                new RegisterDescription(
+                new(
                     typeNode,
                     basicValueType,
                     kind);
@@ -109,26 +113,21 @@ namespace ILGPU.Backends
         /// <summary>
         /// Represents an abstract register
         /// </summary>
-        public abstract class Register : ILocation
+        /// <remarks>
+        /// Constructs a new abstract register.
+        /// </remarks>
+        public abstract class Register(TypeNode type, BasicValueType basicValueType) : ILocation
         {
-            /// <summary>
-            /// Constructs a new abstract register.
-            /// </summary>
-            protected Register(TypeNode type, BasicValueType basicValueType)
-            {
-                Type = type;
-                BasicValueType = basicValueType;
-            }
 
             /// <summary>
             /// Returns the associated register type.
             /// </summary>
-            public TypeNode Type { get; }
+            public TypeNode Type { get; } = type;
 
             /// <summary>
             /// Returns the associated basic value type.
             /// </summary>
-            public BasicValueType BasicValueType { get; }
+            public BasicValueType BasicValueType { get; } = basicValueType;
 
             /// <summary>
             /// Returns true if this register is a primitive register.
@@ -150,17 +149,12 @@ namespace ILGPU.Backends
         /// Represents a primitive register that might consume up to one hardware
         /// register.
         /// </summary>
-        public abstract class PrimitiveRegister : Register
+        /// <remarks>
+        /// Constructs a new constant register.
+        /// </remarks>
+        /// <param name="description">The current register description.</param>
+        public abstract class PrimitiveRegister(in RegisterAllocator<TKind>.RegisterDescription description) : Register(description.Type, description.BasicValueType)
         {
-            /// <summary>
-            /// Constructs a new constant register.
-            /// </summary>
-            /// <param name="description">The current register description.</param>
-            protected PrimitiveRegister(in RegisterDescription description)
-                : base(description.Type, description.BasicValueType)
-            {
-                Kind = description.Kind;
-            }
 
             /// <inheritdoc/>
             public override bool IsPrimitive => true;
@@ -168,7 +162,7 @@ namespace ILGPU.Backends
             /// <summary>
             /// Returns the actual register kind.
             /// </summary>
-            public TKind Kind { get; }
+            public TKind Kind { get; } = description.Kind;
 
             /// <summary>
             /// Returns the associated register description.
@@ -180,25 +174,20 @@ namespace ILGPU.Backends
         /// <summary>
         /// A primitive register with a constant value.
         /// </summary>
-        public sealed class ConstantRegister : PrimitiveRegister
+        /// <remarks>
+        /// Constructs a new constant register.
+        /// </remarks>
+        /// <param name="description">The current register description.</param>
+        /// <param name="value">The primitive value.</param>
+        public sealed class ConstantRegister(
+            in RegisterAllocator<TKind>.RegisterDescription description,
+            PrimitiveValue value) : PrimitiveRegister(description)
         {
-            /// <summary>
-            /// Constructs a new constant register.
-            /// </summary>
-            /// <param name="description">The current register description.</param>
-            /// <param name="value">The primitive value.</param>
-            public ConstantRegister(
-                in RegisterDescription description,
-                PrimitiveValue value)
-                : base(description)
-            {
-                Value = value;
-            }
 
             /// <summary>
             /// Returns the associated value.
             /// </summary>
-            public PrimitiveValue Value { get; }
+            public PrimitiveValue Value { get; } = value;
 
             /// <summary>
             /// Returns the string representation of the current register.
@@ -305,28 +294,23 @@ namespace ILGPU.Backends
         /// <summary>
         /// Represents a register mapping entry.
         /// </summary>
-        private readonly struct RegisterEntry
+        /// <remarks>
+        /// Constructs a new mapping entry.
+        /// </remarks>
+        /// <param name="register">The register.</param>
+        /// <param name="node">The node.</param>
+        private readonly struct RegisterEntry(RegisterAllocator<TKind>.Register register, Value node)
         {
-            /// <summary>
-            /// Constructs a new mapping entry.
-            /// </summary>
-            /// <param name="register">The register.</param>
-            /// <param name="node">The node.</param>
-            public RegisterEntry(Register register, Value node)
-            {
-                Register = register;
-                Node = node;
-            }
 
             /// <summary>
             /// Returns the associated register.
             /// </summary>
-            public Register Register { get; }
+            public Register Register { get; } = register;
 
             /// <summary>
             /// Returns the associated value.
             /// </summary>
-            public Value Node { get; }
+            public Value Node { get; } = node;
         }
 
         #endregion
@@ -334,19 +318,9 @@ namespace ILGPU.Backends
         #region Instance
 
         private readonly Dictionary<Value, RegisterEntry> registerLookup =
-            new Dictionary<Value, RegisterEntry>();
+            new();
         private readonly Dictionary<Value, Value> aliases =
-            new Dictionary<Value, Value>();
-
-        /// <summary>
-        /// Constructs a new register allocator.
-        /// </summary>
-        /// <param name="backend">The underlying backend.</param>
-        protected RegisterAllocator(Backend backend)
-        {
-            Backend = backend;
-            TypeContext = backend.Context.TypeContext;
-        }
+            new();
 
         #endregion
 
@@ -355,12 +329,12 @@ namespace ILGPU.Backends
         /// <summary>
         /// Returns the underlying ABI.
         /// </summary>
-        public Backend Backend { get; }
+        public Backend Backend { get; } = backend;
 
         /// <summary>
         /// Returns the parent type context.
         /// </summary>
-        public IRTypeContext TypeContext { get; }
+        public IRTypeContext TypeContext { get; } = backend.Context.TypeContext;
 
         #endregion
 

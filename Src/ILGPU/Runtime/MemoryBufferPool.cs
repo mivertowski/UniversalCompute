@@ -62,7 +62,7 @@ namespace ILGPU.Runtime
         private readonly Accelerator accelerator;
         private readonly ConcurrentQueue<PooledBuffer>[] buckets;
         private readonly Timer trimTimer;
-        private readonly object trimLock = new object();
+        private readonly object trimLock = new();
 
         // Performance tracking
         private long totalAllocations;
@@ -339,16 +339,10 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Represents a buffer stored in the pool.
         /// </summary>
-        private readonly struct PooledBuffer
+        private readonly struct PooledBuffer(MemoryBuffer1D<T, Stride1D.Dense> buffer, long lastUsed)
         {
-            public PooledBuffer(MemoryBuffer1D<T, Stride1D.Dense> buffer, long lastUsed)
-            {
-                Buffer = buffer;
-                LastUsed = lastUsed;
-            }
-
-            public MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; }
-            public long LastUsed { get; }
+            public MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; } = buffer;
+            public long LastUsed { get; } = lastUsed;
 
             public void Reset()
             {
@@ -409,38 +403,25 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Statistics about memory pool usage.
     /// </summary>
-    public readonly struct MemoryPoolStatistics
+    public readonly struct MemoryPoolStatistics(
+        long totalAllocations,
+        long totalHits,
+        long totalMisses,
+        double hitRatio,
+        long totalBytesAllocated,
+        long totalBytesReused,
+        long totalPooledBytes,
+        int[] bucketCounts,
+        long[] bucketSizes)
     {
-        public MemoryPoolStatistics(
-            long totalAllocations,
-            long totalHits,
-            long totalMisses,
-            double hitRatio,
-            long totalBytesAllocated,
-            long totalBytesReused,
-            long totalPooledBytes,
-            int[] bucketCounts,
-            long[] bucketSizes)
-        {
-            TotalAllocations = totalAllocations;
-            TotalHits = totalHits;
-            TotalMisses = totalMisses;
-            HitRatio = hitRatio;
-            TotalBytesAllocated = totalBytesAllocated;
-            TotalBytesReused = totalBytesReused;
-            TotalPooledBytes = totalPooledBytes;
-            BucketCounts = bucketCounts;
-            BucketSizes = bucketSizes;
-        }
-
-        public long TotalAllocations { get; }
-        public long TotalHits { get; }
-        public long TotalMisses { get; }
-        public double HitRatio { get; }
-        public long TotalBytesAllocated { get; }
-        public long TotalBytesReused { get; }
-        public long TotalPooledBytes { get; }
-        public int[] BucketCounts { get; }
-        public long[] BucketSizes { get; }
+        public long TotalAllocations { get; } = totalAllocations;
+        public long TotalHits { get; } = totalHits;
+        public long TotalMisses { get; } = totalMisses;
+        public double HitRatio { get; } = hitRatio;
+        public long TotalBytesAllocated { get; } = totalBytesAllocated;
+        public long TotalBytesReused { get; } = totalBytesReused;
+        public long TotalPooledBytes { get; } = totalPooledBytes;
+        public int[] BucketCounts { get; } = bucketCounts;
+        public long[] BucketSizes { get; } = bucketSizes;
     }
 }

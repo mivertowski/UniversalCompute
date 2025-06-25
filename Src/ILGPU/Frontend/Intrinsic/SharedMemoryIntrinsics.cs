@@ -28,19 +28,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks shared-memory methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class SharedMemoryIntrinsicAttribute : IntrinsicAttribute
+    sealed class SharedMemoryIntrinsicAttribute(SharedMemoryIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public SharedMemoryIntrinsicAttribute(SharedMemoryIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.SharedMemory;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public SharedMemoryIntrinsicKind IntrinsicKind { get; }
+        public SharedMemoryIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

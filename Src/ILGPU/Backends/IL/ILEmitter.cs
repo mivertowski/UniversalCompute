@@ -676,13 +676,13 @@ namespace ILGPU.Backends.IL
         #region Methods
 
         /// <summary cref="IILEmitter.DeclareLocal(Type)"/>
-        public ILLocal DeclareLocal(Type type) => new ILLocal(0, type);
+        public ILLocal DeclareLocal(Type type) => new(0, type);
 
         /// <summary cref="IILEmitter.DeclarePinnedLocal(Type)"/>
-        public ILLocal DeclarePinnedLocal(Type type) => new ILLocal(0, type);
+        public ILLocal DeclarePinnedLocal(Type type) => new(0, type);
 
         /// <summary cref="IILEmitter.DeclareLabel"/>
-        public ILLabel DeclareLabel() => new ILLabel(-1);
+        public ILLabel DeclareLabel() => new(-1);
 
         /// <summary cref="IILEmitter.MarkLabel(ILLabel)"/>
         public void MarkLabel(ILLabel label) { }

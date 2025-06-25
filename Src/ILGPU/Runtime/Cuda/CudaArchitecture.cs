@@ -17,22 +17,17 @@ namespace ILGPU.Runtime.Cuda
     /// <summary>
     /// Represents a Cuda architecture.
     /// </summary>
-    public readonly partial struct CudaArchitecture :
+    /// <remarks>
+    /// Creates the architecture from major/minor values.
+    /// </remarks>
+    /// <param name="major">The major version.</param>
+    /// <param name="minor">The minor version.</param>
+    public readonly partial struct CudaArchitecture(int major, int minor) :
         IEquatable<CudaArchitecture>,
         IComparable<CudaArchitecture>
     {
-        #region Instance
 
-        /// <summary>
-        /// Creates the architecture from major/minor values.
-        /// </summary>
-        /// <param name="major">The major version.</param>
-        /// <param name="minor">The minor version.</param>
-        public CudaArchitecture(int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
-        }
+        #region Instance
 
         #endregion
 
@@ -73,12 +68,12 @@ namespace ILGPU.Runtime.Cuda
         /// <summary>
         /// The major version.
         /// </summary>
-        public int Major { get; }
+        public int Major { get; } = major;
 
         /// <summary>
         /// The minor version.
         /// </summary>
-        public int Minor { get; }
+        public int Minor { get; } = minor;
 
         #endregion
 

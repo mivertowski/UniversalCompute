@@ -18,12 +18,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class SharedMemory : TestBase
+    public abstract class SharedMemory(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected SharedMemory(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void SharedMemoryVariableKernel(
             ArrayView1D<int, Stride1D.Dense> data)
         {

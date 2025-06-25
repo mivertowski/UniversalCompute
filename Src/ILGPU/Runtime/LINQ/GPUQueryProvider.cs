@@ -26,20 +26,15 @@ namespace ILGPU.Runtime.LINQ
     /// <summary>
     /// Provides query execution services for GPU-based LINQ operations.
     /// </summary>
-    internal sealed class GPUQueryProvider : IQueryProvider
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="GPUQueryProvider"/> class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator.</param>
+    internal sealed class GPUQueryProvider(Accelerator accelerator) : IQueryProvider
     {
         #region Instance
 
-        private readonly Accelerator accelerator;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GPUQueryProvider"/> class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator.</param>
-        public GPUQueryProvider(Accelerator accelerator)
-        {
-            this.accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        }
+        private readonly Accelerator accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         #endregion
 

@@ -176,7 +176,7 @@ namespace ILGPU.Backends.PTX.Analyses
             in BasicBlockCollection<TOrder, TDirection> blocks)
             where TOrder : struct, ITraversalOrder
             where TDirection : struct, IControlFlowDirection =>
-            new OptimizedPTXBlockSchedule<TOrder, TDirection>(blocks);
+            new(blocks);
 
         #endregion
     }

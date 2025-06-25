@@ -300,21 +300,15 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Simple source code emitter implementation.
     /// </summary>
-    public readonly struct SourceEmitter : ISourceEmitter
+    /// <remarks>
+    /// Constructs a new source emitter.
+    /// </remarks>
+    /// <param name="sourceBuilder">The source builder.</param>
+    /// <param name="indentLevel">The indentation level.</param>
+    public readonly struct SourceEmitter(StringBuilder sourceBuilder, int indentLevel = 3) : ISourceEmitter
     {
-        private readonly StringBuilder sourceBuilder;
-        private readonly int indentLevel;
-
-        /// <summary>
-        /// Constructs a new source emitter.
-        /// </summary>
-        /// <param name="sourceBuilder">The source builder.</param>
-        /// <param name="indentLevel">The indentation level.</param>
-        public SourceEmitter(StringBuilder sourceBuilder, int indentLevel = 3)
-        {
-            this.sourceBuilder = sourceBuilder;
-            this.indentLevel = indentLevel;
-        }
+        private readonly StringBuilder sourceBuilder = sourceBuilder;
+        private readonly int indentLevel = indentLevel;
 
         /// <summary>
         /// Returns the underlying source builder.

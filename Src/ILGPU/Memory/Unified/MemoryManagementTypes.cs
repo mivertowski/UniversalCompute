@@ -27,20 +27,15 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Manages memory allocation and deallocation for accelerators.
     /// </summary>
-    public class AcceleratorMemoryManager : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the AcceleratorMemoryManager class.
+    /// </remarks>
+    public class AcceleratorMemoryManager(Accelerator accelerator) : IDisposable
     {
-        private readonly Accelerator _accelerator;
+        private readonly Accelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
         private readonly Dictionary<IntPtr, MemoryAllocation> _allocations = new();
         private long _totalAllocatedBytes;
         private readonly object _syncLock = new();
-
-        /// <summary>
-        /// Initializes a new instance of the AcceleratorMemoryManager class.
-        /// </summary>
-        public AcceleratorMemoryManager(Accelerator accelerator)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        }
 
         /// <summary>
         /// Gets the associated accelerator.
@@ -328,21 +323,15 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Optimizes memory placement across accelerators.
     /// </summary>
-    public class MemoryPlacementOptimizer : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the MemoryPlacementOptimizer class.
+    /// </remarks>
+    public class MemoryPlacementOptimizer(
+        IEnumerable<Accelerator> accelerators,
+        MemoryUsageTracker usageTracker) : IDisposable
     {
-        private readonly List<Accelerator> _accelerators;
-        private readonly MemoryUsageTracker _usageTracker;
-
-        /// <summary>
-        /// Initializes a new instance of the MemoryPlacementOptimizer class.
-        /// </summary>
-        public MemoryPlacementOptimizer(
-            IEnumerable<Accelerator> accelerators,
-            MemoryUsageTracker usageTracker)
-        {
-            _accelerators = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
-            _usageTracker = usageTracker ?? throw new ArgumentNullException(nameof(usageTracker));
-        }
+        private readonly List<Accelerator> _accelerators = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
+        private readonly MemoryUsageTracker _usageTracker = usageTracker ?? throw new ArgumentNullException(nameof(usageTracker));
 
         /// <summary>
         /// Determines optimal placement for a memory allocation.
@@ -445,18 +434,12 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets optimization recommendations for memory usage.
         /// </summary>
-        public async Task<List<MemoryTransferSuggestion>> GetRecommendations()
-        {
-            return await SuggestTransfersAsync();
-        }
+        public async Task<List<MemoryTransferSuggestion>> GetRecommendations() => await SuggestTransfersAsync();
 
         /// <summary>
         /// Disposes the memory placement optimizer.
         /// </summary>
-        public void Dispose()
-        {
-            _accelerators?.Clear();
-        }
+        public void Dispose() => _accelerators?.Clear();
     }
 
     /// <summary>
@@ -607,15 +590,9 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Memory usage information for placement decisions.
     /// </summary>
-    public readonly struct MemoryUsageInfo
+    public readonly struct MemoryUsageInfo(long totalMemory, long availableMemory)
     {
-        public long TotalMemory { get; }
-        public long AvailableMemory { get; }
-
-        public MemoryUsageInfo(long totalMemory, long availableMemory)
-        {
-            TotalMemory = totalMemory;
-            AvailableMemory = availableMemory;
-        }
+        public long TotalMemory { get; } = totalMemory;
+        public long AvailableMemory { get; } = availableMemory;
     }
 }

@@ -365,7 +365,7 @@ namespace ILGPU.Backends
             /// Returns an enumerator to enumerate all entries.
             /// </summary>
             /// <returns>An enumerator to enumerate all entries.</returns>
-            public Enumerator GetEnumerator() => new Enumerator(this);
+            public Enumerator GetEnumerator() => new(this);
 
             #endregion
         }
@@ -753,7 +753,7 @@ namespace ILGPU.Backends
             in EntryPointDescription entry,
             in BackendContext backendContext,
             in KernelSpecialization specialization) =>
-            new EntryPoint(
+            new(
                 entry,
                 backendContext.SharedMemorySpecification,
                 specialization);
@@ -795,29 +795,22 @@ namespace ILGPU.Backends
     /// <typeparam name="TDelegate">
     /// The intrinsic delegate type for backend implementations.
     /// </typeparam>
-    public abstract class Backend<TDelegate> : Backend
+    /// <remarks>
+    /// Constructs a new generic backend.
+    /// </remarks>
+    /// <param name="context">The context to use.</param>
+    /// <param name="capabilities">The supported capabilities.</param>
+    /// <param name="backendType">The backend type.</param>
+    /// <param name="argumentMapper">The argument mapper to use.</param>
+    public abstract class Backend<TDelegate>(
+        Context context,
+        CapabilityContext capabilities,
+        BackendType backendType,
+        ArgumentMapper argumentMapper) : Backend(context, capabilities, backendType, argumentMapper)
         where TDelegate : Delegate
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new generic backend.
-        /// </summary>
-        /// <param name="context">The context to use.</param>
-        /// <param name="capabilities">The supported capabilities.</param>
-        /// <param name="backendType">The backend type.</param>
-        /// <param name="argumentMapper">The argument mapper to use.</param>
-        protected Backend(
-            Context context,
-            CapabilityContext capabilities,
-            BackendType backendType,
-            ArgumentMapper argumentMapper)
-            : base(context, capabilities, backendType, argumentMapper)
-        {
-            // NB: Initialized later by derived classes.
-            IntrinsicProvider =
-                Utilities.InitNotNullable<IntrinsicImplementationProvider<TDelegate>>();
-        }
+        #region Instance
 
         #endregion
 
@@ -830,7 +823,8 @@ namespace ILGPU.Backends
         {
             get;
             private set;
-        }
+        } =
+                Utilities.InitNotNullable<IntrinsicImplementationProvider<TDelegate>>();
 
         #endregion
 

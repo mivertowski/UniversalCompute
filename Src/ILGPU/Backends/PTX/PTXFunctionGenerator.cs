@@ -19,22 +19,19 @@ namespace ILGPU.Backends.PTX
     /// <summary>
     /// Represents a function generator for helper device functions.
     /// </summary>
-    sealed class PTXFunctionGenerator : PTXCodeGenerator
+    /// <remarks>
+    /// Creates a new PTX function generator.
+    /// </remarks>
+    /// <param name="args">The generation arguments.</param>
+    /// <param name="method">The current method.</param>
+    /// <param name="allocas">All local allocas.</param>
+    sealed class PTXFunctionGenerator(
+        in PTXCodeGenerator.GeneratorArgs args,
+        Method method,
+        Allocas allocas) : PTXCodeGenerator(args, method, allocas)
     {
-        #region Instance
 
-        /// <summary>
-        /// Creates a new PTX function generator.
-        /// </summary>
-        /// <param name="args">The generation arguments.</param>
-        /// <param name="method">The current method.</param>
-        /// <param name="allocas">All local allocas.</param>
-        public PTXFunctionGenerator(
-            in GeneratorArgs args,
-            Method method,
-            Allocas allocas)
-            : base(args, method, allocas)
-        { }
+        #region Instance
 
         #endregion
 

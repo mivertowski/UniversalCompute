@@ -15,12 +15,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class BasicSwitches : TestBase
+    public abstract class BasicSwitches(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected BasicSwitches(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void BasicSwitchKernel(
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data,

@@ -19,13 +19,10 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class KernelEntryPoints : TestBase
+    public abstract class KernelEntryPoints(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
-        protected KernelEntryPoints(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
 
         /// <summary cref="IDisposable.Dispose"/>
         protected override void Dispose(bool disposing)
@@ -661,8 +658,8 @@ namespace ILGPU.Tests
         }
 
         public static TheoryData<object> TestDataUnsupportedEntryPointParameter =>
-            new TheoryData<object>
-        {
+            new()
+            {
             { new UnsupportedKernelParam() { Data = new int[32] } },
             { true },
             { new ValueTuple<int, bool>(42, false) },
@@ -756,7 +753,7 @@ namespace ILGPU.Tests
         [KernelMethod(nameof(AlignedStructParamAlignmentKernel))]
         public void AlignedStructParamAlignment(int length)
         {
-            MyAlignedStruct c = new MyAlignedStruct { Y = 42 };
+            MyAlignedStruct c = new() { Y = 42 };
             using var buffer = Accelerator.Allocate1D<Int128>(length);
             Execute(buffer.Length, buffer.View, c);
 

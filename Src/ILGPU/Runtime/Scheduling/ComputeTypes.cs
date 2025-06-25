@@ -84,12 +84,15 @@ namespace ILGPU.Runtime.Scheduling
     /// <summary>
     /// Represents a compute node in the execution graph.
     /// </summary>
-    public class ComputeNode
+    /// <remarks>
+    /// Initializes a new instance of the ComputeNode class.
+    /// </remarks>
+    public class ComputeNode(IComputeOperation operation)
     {
         /// <summary>
         /// Gets or sets the operation to be executed.
         /// </summary>
-        public IComputeOperation Operation { get; set; }
+        public IComputeOperation Operation { get; set; } = operation ?? throw new ArgumentNullException(nameof(operation));
 
         /// <summary>
         /// Gets or sets the preferred device for execution.
@@ -105,14 +108,6 @@ namespace ILGPU.Runtime.Scheduling
         /// Gets or sets the node identifier.
         /// </summary>
         public string Id { get; set; } = Guid.NewGuid().ToString();
-
-        /// <summary>
-        /// Initializes a new instance of the ComputeNode class.
-        /// </summary>
-        public ComputeNode(IComputeOperation operation)
-        {
-            Operation = operation ?? throw new ArgumentNullException(nameof(operation));
-        }
     }
 
     /// <summary>
@@ -139,22 +134,25 @@ namespace ILGPU.Runtime.Scheduling
     /// <summary>
     /// Represents a matrix multiplication operation.
     /// </summary>
-    public class MatMulOp : IComputeOperation
+    /// <remarks>
+    /// Initializes a new instance of the MatMulOp class.
+    /// </remarks>
+    public class MatMulOp(int m, int n, int k) : IComputeOperation
     {
         /// <summary>
         /// Gets the M dimension (rows of A and C).
         /// </summary>
-        public int M { get; }
+        public int M { get; } = m;
 
         /// <summary>
         /// Gets the N dimension (columns of B and C).
         /// </summary>
-        public int N { get; }
+        public int N { get; } = n;
 
         /// <summary>
         /// Gets the K dimension (columns of A and rows of B).
         /// </summary>
-        public int K { get; }
+        public int K { get; } = k;
 
         /// <summary>
         /// Gets the total size of the operation.
@@ -169,37 +167,30 @@ namespace ILGPU.Runtime.Scheduling
 
         /// <inheritdoc/>
         public string OperationType => "MatMul";
-
-        /// <summary>
-        /// Initializes a new instance of the MatMulOp class.
-        /// </summary>
-        public MatMulOp(int m, int n, int k)
-        {
-            M = m;
-            N = n;
-            K = k;
-        }
     }
 
     /// <summary>
     /// Represents a convolution operation.
     /// </summary>
-    public class ConvolutionOp : IComputeOperation
+    /// <remarks>
+    /// Initializes a new instance of the ConvolutionOp class.
+    /// </remarks>
+    public class ConvolutionOp(long outputSize, int kernelSize, int inputChannels) : IComputeOperation
     {
         /// <summary>
         /// Gets the output size.
         /// </summary>
-        public long OutputSize { get; }
+        public long OutputSize { get; } = outputSize;
 
         /// <summary>
         /// Gets the kernel size.
         /// </summary>
-        public int KernelSize { get; }
+        public int KernelSize { get; } = kernelSize;
 
         /// <summary>
         /// Gets the number of input channels.
         /// </summary>
-        public int InputChannels { get; }
+        public int InputChannels { get; } = inputChannels;
 
         /// <inheritdoc/>
         public double EstimatedFlops => OutputSize * KernelSize * KernelSize * InputChannels * 2.0;
@@ -209,32 +200,25 @@ namespace ILGPU.Runtime.Scheduling
 
         /// <inheritdoc/>
         public string OperationType => "Convolution";
-
-        /// <summary>
-        /// Initializes a new instance of the ConvolutionOp class.
-        /// </summary>
-        public ConvolutionOp(long outputSize, int kernelSize, int inputChannels)
-        {
-            OutputSize = outputSize;
-            KernelSize = kernelSize;
-            InputChannels = inputChannels;
-        }
     }
 
     /// <summary>
     /// Represents a vector operation.
     /// </summary>
-    public class VectorOp : IComputeOperation
+    /// <remarks>
+    /// Initializes a new instance of the VectorOp class.
+    /// </remarks>
+    public class VectorOp(long size, int elementSize = 4) : IComputeOperation
     {
         /// <summary>
         /// Gets the size of the vector operation.
         /// </summary>
-        public long Size { get; }
+        public long Size { get; } = size;
 
         /// <summary>
         /// Gets the element size in bytes.
         /// </summary>
-        public int ElementSize { get; }
+        public int ElementSize { get; } = elementSize;
 
         /// <inheritdoc/>
         public double EstimatedFlops => Size;
@@ -244,26 +228,20 @@ namespace ILGPU.Runtime.Scheduling
 
         /// <inheritdoc/>
         public string OperationType => "Vector";
-
-        /// <summary>
-        /// Initializes a new instance of the VectorOp class.
-        /// </summary>
-        public VectorOp(long size, int elementSize = 4)
-        {
-            Size = size;
-            ElementSize = elementSize;
-        }
     }
 
     /// <summary>
     /// Represents a memory operation.
     /// </summary>
-    public class MemoryOp : IComputeOperation
+    /// <remarks>
+    /// Initializes a new instance of the MemoryOp class.
+    /// </remarks>
+    public class MemoryOp(long sizeBytes) : IComputeOperation
     {
         /// <summary>
         /// Gets the size of the memory operation in bytes.
         /// </summary>
-        public long SizeBytes { get; }
+        public long SizeBytes { get; } = sizeBytes;
 
         /// <inheritdoc/>
         public double EstimatedFlops => 0; // Pure memory operation
@@ -273,14 +251,6 @@ namespace ILGPU.Runtime.Scheduling
 
         /// <inheritdoc/>
         public string OperationType => "Memory";
-
-        /// <summary>
-        /// Initializes a new instance of the MemoryOp class.
-        /// </summary>
-        public MemoryOp(long sizeBytes)
-        {
-            SizeBytes = sizeBytes;
-        }
     }
 
     /// <summary>

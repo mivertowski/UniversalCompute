@@ -15,17 +15,13 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class UnaryFloatOperations : TestBase
+    public abstract class UnaryFloatOperations(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
-        protected UnaryFloatOperations(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
-
         public static TheoryData<Half, bool, bool, bool, bool> HalfData =>
-            new TheoryData<Half, bool, bool, bool, bool>
-        {
+            new()
+            {
             { Half.PositiveInfinity, false, false, true, false },
             { Half.NegativeInfinity, false, false, false, true },
             { Half.Zero, true, false, false, false },

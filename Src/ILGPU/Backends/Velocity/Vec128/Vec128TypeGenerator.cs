@@ -21,7 +21,14 @@ namespace ILGPU.Backends.Velocity.Vec128
     /// <summary>
     /// A vector type generator of 128bit vectors to be used with the Velocity backend.
     /// </summary>
-    sealed class Vec128TypeGenerator : VelocityTypeGenerator
+    /// <remarks>
+    /// Constructs a new IL vector type generator.
+    /// </remarks>
+    /// <param name="capabilityContext">The parent capability context.</param>
+    /// <param name="runtimeSystem">The parent runtime system.</param>
+    sealed class Vec128TypeGenerator(
+        VelocityCapabilityContext capabilityContext,
+        RuntimeSystem runtimeSystem) : VelocityTypeGenerator(capabilityContext, runtimeSystem, Vector<int>.Count)
     {
         #region Static
 
@@ -44,19 +51,7 @@ namespace ILGPU.Backends.Velocity.Vec128
         };
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new IL vector type generator.
-        /// </summary>
-        /// <param name="capabilityContext">The parent capability context.</param>
-        /// <param name="runtimeSystem">The parent runtime system.</param>
-        public Vec128TypeGenerator(
-            VelocityCapabilityContext capabilityContext,
-            RuntimeSystem runtimeSystem)
-            : base(capabilityContext, runtimeSystem, Vector<int>.Count)
-        { }
 
         #endregion
 

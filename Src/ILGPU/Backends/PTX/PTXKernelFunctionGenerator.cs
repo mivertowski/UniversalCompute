@@ -23,42 +23,43 @@ namespace ILGPU.Backends.PTX
     /// <summary>
     /// Represents a function generator for main kernel functions.
     /// </summary>
-    sealed class PTXKernelFunctionGenerator : PTXCodeGenerator
+    /// <remarks>
+    /// Creates a new PTX kernel generator.
+    /// </remarks>
+    /// <param name="args">The generation arguments.</param>
+    /// <param name="method">The current method.</param>
+    /// <param name="allocas">All local allocas.</param>
+    sealed class PTXKernelFunctionGenerator(
+        in PTXCodeGenerator.GeneratorArgs args,
+        Method method,
+        Allocas allocas) : PTXCodeGenerator(args, method, allocas)
     {
         #region Nested Types
 
-        private struct KernelParameterSetupLogic : IParameterSetupLogic
+        private struct KernelParameterSetupLogic(
+            EntryPoint entryPoint,
+            PTXKernelFunctionGenerator parent) : IParameterSetupLogic
         {
-            public KernelParameterSetupLogic(
-                EntryPoint entryPoint,
-                PTXKernelFunctionGenerator parent)
-            {
-                EntryPoint = entryPoint;
-                Parent = parent;
-
-                IndexRegister = null;
-                LengthRegister = null;
-            }
 
             /// <summary>
             /// Returns the associated entry point.
             /// </summary>
-            public EntryPoint EntryPoint { get; }
+            public EntryPoint EntryPoint { get; } = entryPoint;
 
             /// <summary>
             /// Returns the main index register.
             /// </summary>
-            public Register? IndexRegister { get; private set; }
+            public Register? IndexRegister { get; private set; } = null;
 
             /// <summary>
             /// Returns the length register of implicitly grouped kernels.
             /// </summary>
-            public Register? LengthRegister { get; private set; }
+            public Register? LengthRegister { get; private set; } = null;
 
             /// <summary>
             /// Returns the associated register allocator.
             /// </summary>
-            public PTXKernelFunctionGenerator Parent { get; }
+            public PTXKernelFunctionGenerator Parent { get; } = parent;
 
             /// <summary>
             /// Updates index and length registers.
@@ -81,23 +82,7 @@ namespace ILGPU.Backends.PTX
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Creates a new PTX kernel generator.
-        /// </summary>
-        /// <param name="args">The generation arguments.</param>
-        /// <param name="method">The current method.</param>
-        /// <param name="allocas">All local allocas.</param>
-        public PTXKernelFunctionGenerator(
-            in GeneratorArgs args,
-            Method method,
-            Allocas allocas)
-            : base(args, method, allocas)
-        {
-            EntryPoint = args.EntryPoint;
-        }
 
         #endregion
 
@@ -106,7 +91,7 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Returns the associated entry point.
         /// </summary>
-        public EntryPoint EntryPoint { get; }
+        public EntryPoint EntryPoint { get; } = args.EntryPoint;
 
         #endregion
 

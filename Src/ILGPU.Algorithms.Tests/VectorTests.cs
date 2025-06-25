@@ -21,16 +21,13 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class VectorTests : TestBase
+    public abstract partial class VectorTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected VectorTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         #region MemberData
 
         public static TheoryData<int, object> Vector2dTestData =>
-            new TheoryData<int, object>
+            new()
             {
                 { 1, default(Vector2Zero) },
                 { 32, default(Vector2One) },
@@ -39,7 +36,7 @@ namespace ILGPU.Algorithms.Tests
             };
 
         public static TheoryData<int, object> Vector3dTestData =>
-            new TheoryData<int, object>
+            new()
             {
                 { 1, default(Vector3Zero) },
                 { 32, default(Vector3One) },
@@ -49,7 +46,7 @@ namespace ILGPU.Algorithms.Tests
             };
 
         public static TheoryData<int, object> Vector4dTestData =>
-            new TheoryData<int, object>
+            new()
             {
                 { 1, default(Vector4Zero) },
                 { 32, default(Vector4One) },
@@ -63,7 +60,7 @@ namespace ILGPU.Algorithms.Tests
         
         public static TheoryData<object, object, object, object>
             VectorStaticAbstractData =>
-            new TheoryData<object, object, object, object>
+            new()
             {
                 { Int32x2.Zero, Int32x2.One, default(int),
                     XorShift64Star.Create(new System.Random(1337)) },
@@ -209,8 +206,8 @@ namespace ILGPU.Algorithms.Tests
         [InlineData(2, 1)]
         public void Index2Vector2Conv(float x, float y)
         {
-            Vector2 initVector = new Vector2(x, y);
-            Index2D initIndex = new Index2D((int)x, (int)y);
+            Vector2 initVector = new(x, y);
+            Index2D initIndex = new((int)x, (int)y);
 
             Index2D index = initVector.ToIndex();
             Vector2 vector = index.ToVector();
@@ -225,8 +222,8 @@ namespace ILGPU.Algorithms.Tests
         [InlineData(3, 2, 1)]
         public void Index3Vector3Conv(float x, float y, float z)
         {
-            Vector3 initVector = new Vector3(x, y, z);
-            Index3D initIndex = new Index3D((int)x, (int)y, (int)z);
+            Vector3 initVector = new(x, y, z);
+            Index3D initIndex = new((int)x, (int)y, (int)z);
 
             Index3D index = initVector.ToIndex();
             Vector3 vector = index.ToVector();

@@ -410,7 +410,7 @@ namespace ILGPU.Backends.IL
             Type Type,
             string VariableName)
         {
-            public bool IsPinned { get; init; } = false;
+            public bool IsPinned { get; init; }
         }
 
         /// <summary>

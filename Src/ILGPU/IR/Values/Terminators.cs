@@ -23,7 +23,11 @@ namespace ILGPU.IR.Values
     /// <summary>
     /// Represents a single terminator value.
     /// </summary>
-    public abstract class TerminatorValue : Value
+    /// <remarks>
+    /// Constructs a new terminator value that is marked.
+    /// </remarks>
+    /// <param name="initializer">The value initializer.</param>
+    public abstract class TerminatorValue(in ValueInitializer initializer) : Value(initializer)
     {
         #region Nested Types
 
@@ -82,17 +86,7 @@ namespace ILGPU.IR.Values
 
         #region Instance
 
-        private BlockList branchTargets;
-
-        /// <summary>
-        /// Constructs a new terminator value that is marked.
-        /// </summary>
-        /// <param name="initializer">The value initializer.</param>
-        protected TerminatorValue(in ValueInitializer initializer)
-            : base(initializer)
-        {
-            branchTargets = BlockList.Empty;
-        }
+        private BlockList branchTargets = BlockList.Empty;
 
         #endregion
 
@@ -366,17 +360,14 @@ namespace ILGPU.IR.Values
     /// <summary>
     /// Represents a conditional branch terminator.
     /// </summary>
-    public abstract class ConditionalBranch : Branch
+    /// <remarks>
+    /// Constructs a new conditional branch terminator.
+    /// </remarks>
+    /// <param name="initializer">The value initializer.</param>
+    public abstract class ConditionalBranch(in ValueInitializer initializer) : Branch(initializer)
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new conditional branch terminator.
-        /// </summary>
-        /// <param name="initializer">The value initializer.</param>
-        protected ConditionalBranch(in ValueInitializer initializer)
-            : base(initializer)
-        { }
+        #region Instance
 
         #endregion
 

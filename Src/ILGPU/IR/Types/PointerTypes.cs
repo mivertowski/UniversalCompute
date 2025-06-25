@@ -67,10 +67,10 @@ namespace ILGPU.IR.Types
         /// </summary>
         private static readonly AddressSpaceConverter[] TypeConverters =
         {
-            new AddressSpaceConverter(MemoryAddressSpace.Generic),
-            new AddressSpaceConverter(MemoryAddressSpace.Global),
-            new AddressSpaceConverter(MemoryAddressSpace.Shared),
-            new AddressSpaceConverter(MemoryAddressSpace.Local),
+            new(MemoryAddressSpace.Generic),
+            new(MemoryAddressSpace.Global),
+            new(MemoryAddressSpace.Shared),
+            new(MemoryAddressSpace.Local),
         };
 
         /// <summary>

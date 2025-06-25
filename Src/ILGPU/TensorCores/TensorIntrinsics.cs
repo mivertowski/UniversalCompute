@@ -42,15 +42,10 @@ namespace ILGPU.TensorCores
     /// Attribute to mark methods as tensor core intrinsics that generate PTX instructions.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TensorCoreIntrinsicAttribute : Attribute
+    public sealed class TensorCoreIntrinsicAttribute(TensorCoreOperation operation) : Attribute
     {
-        public TensorCoreOperation Operation { get; }
+        public TensorCoreOperation Operation { get; } = operation;
         public string? PTXInstruction { get; set; }
-        
-        public TensorCoreIntrinsicAttribute(TensorCoreOperation operation)
-        {
-            Operation = operation;
-        }
     }
 
     /// <summary>
@@ -64,12 +59,10 @@ namespace ILGPU.TensorCores
         /// </summary>
         /// <returns>True if tensor cores are available.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsTensorCoreSupported()
-        {
+        public static bool IsTensorCoreSupported() =>
             // This method will be replaced with actual capability check during kernel compilation
             // For now, we return a conservative estimate
-            return true; // Will be optimized during PTX generation
-        }
+            true; // Will be optimized during PTX generation
 
         /// <summary>
         /// Loads matrix A fragment from global memory using WMMA.
@@ -217,10 +210,7 @@ namespace ILGPU.TensorCores
         /// Synchronizes all threads in a warp after tensor operations.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SyncTensor()
-        {
-            Warp.Barrier();
-        }
+        public static void SyncTensor() => Warp.Barrier();
     }
 
     /// <summary>

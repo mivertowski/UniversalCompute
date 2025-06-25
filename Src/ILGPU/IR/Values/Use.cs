@@ -62,7 +62,7 @@ namespace ILGPU.IR.Values
         /// Refreshes the use with up-to-date replacement information.
         /// </summary>
         /// <returns>The refreshed use.</returns>
-        public Use Refresh() => new Use(Resolve(), Index);
+        public Use Refresh() => new(Resolve(), Index);
 
         /// <summary>
         /// Resolves the actual node with respect to replacement information.
@@ -323,6 +323,6 @@ namespace ILGPU.IR.Values
         /// of the parent scope.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public readonly Enumerator GetEnumerator() => new Enumerator(Node, Uses);
+        public readonly Enumerator GetEnumerator() => new(Node, Uses);
     }
 }

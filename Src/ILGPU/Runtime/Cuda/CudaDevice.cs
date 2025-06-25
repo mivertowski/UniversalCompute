@@ -518,7 +518,7 @@ namespace ILGPU.Runtime.Cuda
         public CudaAccelerator CreateCudaAccelerator(
             Context context,
             CudaAcceleratorFlags acceleratorFlags) =>
-            new CudaAccelerator(context, this, acceleratorFlags);
+            new(context, this, acceleratorFlags);
 
         /// <inheritdoc/>
         protected override void PrintHeader(TextWriter writer)

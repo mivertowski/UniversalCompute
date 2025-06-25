@@ -92,10 +92,7 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Gets the recommended maximum working set size.
         /// </summary>
-        internal static ulong GetRecommendedMaxWorkingSetSize(IntPtr device)
-        {
-            return MTLDeviceRecommendedMaxWorkingSetSize(device);
-        }
+        internal static ulong GetRecommendedMaxWorkingSetSize(IntPtr device) => MTLDeviceRecommendedMaxWorkingSetSize(device);
 
         /// <summary>
         /// Checks ray tracing support.
@@ -266,18 +263,12 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Gets the number of Metal devices.
         /// </summary>
-        internal static int GetDeviceCount()
-        {
-            return MTLCopyAllDevices();
-        }
+        internal static int GetDeviceCount() => MTLCopyAllDevices();
 
         /// <summary>
         /// Gets a Metal device.
         /// </summary>
-        internal static IntPtr GetDevice(int index)
-        {
-            return MTLCopyAllDevicesGetDevice(index);
-        }
+        internal static IntPtr GetDevice(int index) => MTLCopyAllDevicesGetDevice(index);
 
         /// <summary>
         /// Gets device name as string.
@@ -291,18 +282,12 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Checks if device is discrete GPU.
         /// </summary>
-        internal static bool IsDiscreteGPU(IntPtr device)
-        {
-            return !MTLDeviceIsLowPower(device);
-        }
+        internal static bool IsDiscreteGPU(IntPtr device) => !MTLDeviceIsLowPower(device);
 
         /// <summary>
         /// Checks ray tracing support.
         /// </summary>
-        internal static bool SupportsRayTracing(IntPtr device)
-        {
-            return MTLDeviceSupportsRaytracing(device);
-        }
+        internal static bool SupportsRayTracing(IntPtr device) => MTLDeviceSupportsRaytracing(device);
 
         /// <summary>
         /// Gets GPU family.
@@ -323,10 +308,7 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates command queue.
         /// </summary>
-        internal static IntPtr CreateCommandQueue(IntPtr device)
-        {
-            return MTLDeviceNewCommandQueue(device);
-        }
+        internal static IntPtr CreateCommandQueue(IntPtr device) => MTLDeviceNewCommandQueue(device);
 
         /// <summary>
         /// Creates library from data.
@@ -389,17 +371,10 @@ namespace ILGPU.Backends.Metal.Native
     /// Metal 3D size structure.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    internal struct MTLSize
+    internal struct MTLSize(nuint width, nuint height, nuint depth)
     {
-        public nuint Width;
-        public nuint Height;
-        public nuint Depth;
-
-        public MTLSize(nuint width, nuint height, nuint depth)
-        {
-            Width = width;
-            Height = height;
-            Depth = depth;
-        }
+        public nuint Width = width;
+        public nuint Height = height;
+        public nuint Depth = depth;
     }
 }

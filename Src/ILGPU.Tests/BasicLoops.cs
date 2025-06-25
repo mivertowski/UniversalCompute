@@ -20,13 +20,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class BasicLoops : TestBase
+    public abstract class BasicLoops(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
         private const int Length = 128;
-
-        protected BasicLoops(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         internal static void WhileFalseKernel(
             Index1D index,
@@ -866,14 +862,9 @@ namespace ILGPU.Tests
         /// Wrapper view required by <see cref="DoLoopWithoutEntryBlockKernel(Index1D,
         /// ArrayView{int}, ArrayView{int})"/>.
         /// </summary>
-        private readonly struct WrapperView
+        private readonly struct WrapperView(ArrayView<int> source)
         {
-            public WrapperView(ArrayView<int> source)
-            {
-                Source = source;
-            }
-
-            public ArrayView<int> Source { get; }
+            public ArrayView<int> Source { get; } = source;
 
             public readonly void GetNonZero(int offset, ref int result)
             {

@@ -58,7 +58,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <returns>A scoped binding object.</returns>
         public ScopedAcceleratorBinding BindScoped() =>
-            new ScopedAcceleratorBinding(this);
+            new(this);
 
         /// <summary>
         /// Will be invoked when this accelerator will the current one.

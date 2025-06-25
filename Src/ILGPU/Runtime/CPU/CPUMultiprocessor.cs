@@ -53,7 +53,7 @@ namespace ILGPU.Runtime.CPU
         // Execution threads
 
         private readonly Thread[] threads;
-        private readonly Barrier processorBarrier = new Barrier(0);
+        private readonly Barrier processorBarrier = new(0);
         private readonly CPURuntimeGroupContext groupContext;
         private readonly CPURuntimeWarpContext[] warpContexts;
 
@@ -395,26 +395,22 @@ namespace ILGPU.Runtime.CPU
         /// <summary>
         /// A sequential multiprocessor.
         /// </summary>
-        private sealed class SequentialProcessor : CPUMultiprocessor
+        /// <remarks>
+        /// Creates a new sequential processor.
+        /// </remarks>
+        private sealed class SequentialProcessor(CPUAccelerator accelerator, int processorIndex) : CPUMultiprocessor(accelerator, processorIndex)
         {
             #region Instance
 
             /// <summary>
             /// The internal activity set.
             /// </summary>
-            private volatile BitArray activitySet = new BitArray(1024);
+            private volatile BitArray activitySet = new(1024);
 
             /// <summary>
             /// The internal index of the currently active thread.
             /// </summary>
             private volatile int activeThreadIndex;
-
-            /// <summary>
-            /// Creates a new sequential processor.
-            /// </summary>
-            public SequentialProcessor(CPUAccelerator accelerator, int processorIndex)
-                : base(accelerator, processorIndex)
-            { }
 
             #endregion
 
@@ -626,7 +622,7 @@ namespace ILGPU.Runtime.CPU
             /// <summary>
             /// The general barrier.
             /// </summary>
-            private readonly Barrier barrier = new Barrier(0);
+            private readonly Barrier barrier = new(0);
 
             /// <summary>
             /// Warp barriers for each warp.

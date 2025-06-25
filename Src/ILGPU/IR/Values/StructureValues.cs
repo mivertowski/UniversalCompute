@@ -122,7 +122,7 @@ namespace ILGPU.IR.Values
         /// </summary>
         /// <param name="fieldIndex">The field index to convert.</param>
         public static implicit operator FieldAccess(int fieldIndex) =>
-            new FieldAccess(fieldIndex);
+            new(fieldIndex);
 
         /// <summary>
         /// Converts a field index access into its underlying field index.
@@ -159,7 +159,12 @@ namespace ILGPU.IR.Values
     /// <summary>
     /// An index into to a scalar structure field that can span multiple fields.
     /// </summary>
-    public readonly struct FieldSpan : IEquatable<FieldSpan>
+    /// <remarks>
+    /// Constructs a new field reference.
+    /// </remarks>
+    /// <param name="fieldIndex">The field access.</param>
+    /// <param name="span">The number of fields to span.</param>
+    public readonly struct FieldSpan(FieldAccess fieldIndex, int span) : IEquatable<FieldSpan>
     {
         #region Instance
 
@@ -171,17 +176,6 @@ namespace ILGPU.IR.Values
             : this(fieldIndex, 1)
         { }
 
-        /// <summary>
-        /// Constructs a new field reference.
-        /// </summary>
-        /// <param name="fieldIndex">The field access.</param>
-        /// <param name="span">The number of fields to span.</param>
-        public FieldSpan(FieldAccess fieldIndex, int span)
-        {
-            Access = fieldIndex;
-            Span = Math.Max(span, 1);
-        }
-
         #endregion
 
         #region Properties
@@ -189,7 +183,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns the field index.
         /// </summary>
-        public FieldAccess Access { get; }
+        public FieldAccess Access { get; } = fieldIndex;
 
         /// <summary>
         /// Returns the field index.
@@ -199,7 +193,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// The number of fields to span.
         /// </summary>
-        public int Span { get; }
+        public int Span { get; } = Math.Max(span, 1);
 
         /// <summary>
         /// Returns true if this instance spans over multiple fields.
@@ -258,7 +252,7 @@ namespace ILGPU.IR.Values
         /// <param name="fieldSpan">The nested span.</param>
         /// <returns>A new nested span that has an adjusted field index.</returns>
         public FieldSpan Narrow(FieldSpan fieldSpan) =>
-            new FieldSpan(
+            new(
                 Index + fieldSpan.Index,
                 fieldSpan.Span);
 
@@ -317,7 +311,7 @@ namespace ILGPU.IR.Values
         /// </summary>
         /// <param name="access">The access to convert.</param>
         public static implicit operator FieldSpan(FieldAccess access) =>
-            new FieldSpan(access);
+            new(access);
 
         /// <summary>
         /// Returns true if the first and second field access are the same.
@@ -356,7 +350,7 @@ namespace ILGPU.IR.Values
         /// An empty access chain.
         /// </summary>
         public static readonly FieldAccessChain Empty =
-            new FieldAccessChain(ImmutableArray<FieldAccess>.Empty);
+            new(ImmutableArray<FieldAccess>.Empty);
 
         #endregion
 
@@ -450,7 +444,7 @@ namespace ILGPU.IR.Values
         /// <param name="accessChain">The next access chain.</param>
         /// <returns>The extended field reference.</returns>
         public FieldAccessChain Append(FieldAccessChain accessChain) =>
-            new FieldAccessChain(AccessChain.AddRange(accessChain.AccessChain));
+            new(AccessChain.AddRange(accessChain.AccessChain));
 
         /// <summary>
         /// Realizes an additional access operation to the given field index.
@@ -458,7 +452,7 @@ namespace ILGPU.IR.Values
         /// <param name="fieldAccess">The next field access.</param>
         /// <returns>The extended field reference.</returns>
         public FieldAccessChain Append(FieldAccess fieldAccess) =>
-            new FieldAccessChain(AccessChain.Add(fieldAccess));
+            new(AccessChain.Add(fieldAccess));
 
         #endregion
 

@@ -124,7 +124,7 @@ namespace ILGPU.IR.Construction
             Location location,
             Value value,
             int capacity) =>
-            new SwitchBranch.Builder(this, location, value, capacity);
+            new(this, location, value, capacity);
 
         /// <summary>
         /// Creates a switch terminator.
@@ -172,7 +172,7 @@ namespace ILGPU.IR.Construction
         /// <param name="capacity">The expected number of branch targets.</param>
         /// <returns>The created terminator builder.</returns>
         public BuilderTerminator.Builder CreateBuilderTerminator(int capacity) =>
-            new BuilderTerminator.Builder(this, capacity);
+            new(this, capacity);
 
         /// <summary>
         /// Creates a temporary builder terminator.

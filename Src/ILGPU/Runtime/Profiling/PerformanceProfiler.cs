@@ -32,7 +32,12 @@ namespace ILGPU.Runtime.Profiling
     /// <summary>
     /// Default implementation of the performance profiler.
     /// </summary>
-    public sealed class PerformanceProfiler : IPerformanceProfiler
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="PerformanceProfiler"/> class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator to profile.</param>
+    /// <param name="enabledByDefault">Whether profiling is enabled by default.</param>
+    public sealed class PerformanceProfiler(Accelerator accelerator, bool enabledByDefault = false) : IPerformanceProfiler
     {
         #region Static Fields
 
@@ -57,26 +62,15 @@ namespace ILGPU.Runtime.Profiling
         private readonly List<KernelExecutionRecord> currentKernelExecutions = new();
         private readonly List<MemoryOperationRecord> currentMemoryOperations = new();
         private readonly List<CustomEventRecord> currentCustomEvents = new();
-        private readonly Accelerator accelerator;
+        private readonly Accelerator accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
         
-        private volatile bool isProfilingEnabled;
+        private volatile bool isProfilingEnabled = enabledByDefault;
         private volatile bool disposed;
         private string currentSessionId = "";
         private string currentSessionName = "";
         private DateTime currentSessionStart;
         private long totalExecutions;
         private long totalMemoryOperations;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PerformanceProfiler"/> class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator to profile.</param>
-        /// <param name="enabledByDefault">Whether profiling is enabled by default.</param>
-        public PerformanceProfiler(Accelerator accelerator, bool enabledByDefault = false)
-        {
-            this.accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            isProfilingEnabled = enabledByDefault;
-        }
 
         /// <inheritdoc/>
         public bool IsProfilingEnabled => isProfilingEnabled;
@@ -534,7 +528,7 @@ namespace ILGPU.Runtime.Profiling
             };
         }
 
-        private static SystemInformation GetSystemInformation() => new SystemInformation
+        private static SystemInformation GetSystemInformation() => new()
         {
             OperatingSystem = Environment.OSVersion.ToString(),
             RuntimeVersion = Environment.Version.ToString(),
@@ -545,7 +539,7 @@ namespace ILGPU.Runtime.Profiling
             Is64BitProcess = Environment.Is64BitProcess
         };
 
-        private AcceleratorInformation GetAcceleratorInformation() => new AcceleratorInformation
+        private AcceleratorInformation GetAcceleratorInformation() => new()
         {
             AcceleratorType = accelerator.AcceleratorType,
             Name = accelerator.Name,

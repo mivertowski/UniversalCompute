@@ -80,7 +80,7 @@ namespace ILGPU.Frontend.Intrinsic
         /// Stores function handlers.
         /// </summary>
         private static readonly Dictionary<Type, DeviceFunctionHandler> FunctionHandlers =
-            new Dictionary<Type, DeviceFunctionHandler>()
+            new()
             {
                 { typeof(Activator), HandleActivator },
                 { typeof(Debug), HandleDebugAndTrace },

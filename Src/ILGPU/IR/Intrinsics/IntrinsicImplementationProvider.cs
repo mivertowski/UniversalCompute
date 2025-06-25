@@ -112,40 +112,34 @@ namespace ILGPU.IR.Intrinsics
         /// <summary>
         /// Represents a mapping entry.
         /// </summary>
-        private readonly struct MappingEntry
+        /// <remarks>
+        /// Constructs a new mapping entry.
+        /// </remarks>
+        /// <param name="mapping">The parent mapping.</param>
+        /// <param name="mappingKey">The current mapping key.</param>
+        /// <param name="codeGenerationResult">
+        /// The intermediate code-generation result.
+        /// </param>
+        private readonly struct MappingEntry(
+            IntrinsicMapping<TDelegate> mapping,
+            IntrinsicMapping.MappingKey mappingKey,
+            CodeGenerationResult codeGenerationResult)
         {
-            /// <summary>
-            /// Constructs a new mapping entry.
-            /// </summary>
-            /// <param name="mapping">The parent mapping.</param>
-            /// <param name="mappingKey">The current mapping key.</param>
-            /// <param name="codeGenerationResult">
-            /// The intermediate code-generation result.
-            /// </param>
-            public MappingEntry(
-                IntrinsicMapping<TDelegate> mapping,
-                IntrinsicMapping.MappingKey mappingKey,
-                CodeGenerationResult codeGenerationResult)
-            {
-                Mapping = mapping;
-                MappingKey = mappingKey;
-                CodeGenerationResult = codeGenerationResult;
-            }
 
             /// <summary>
             /// The associated mapping.
             /// </summary>
-            public IntrinsicMapping<TDelegate> Mapping { get; }
+            public IntrinsicMapping<TDelegate> Mapping { get; } = mapping;
 
             /// <summary>
             /// The associated method mapping key.
             /// </summary>
-            public IntrinsicMapping.MappingKey MappingKey { get; }
+            public IntrinsicMapping.MappingKey MappingKey { get; } = mappingKey;
 
             /// <summary>
             /// The code-generation result from the IL frontend.
             /// </summary>
-            public CodeGenerationResult CodeGenerationResult { get; }
+            public CodeGenerationResult CodeGenerationResult { get; } = codeGenerationResult;
 
             /// <summary>
             /// Applies the code-generation result to the underlying mapping.
@@ -395,7 +389,7 @@ namespace ILGPU.IR.Intrinsics
         /// </summary>
         /// <returns>The specialization context.</returns>
         public IRSpecializationPhase BeginIRSpecialization() =>
-            new IRSpecializationPhase(
+            new(
                 this,
                 Context.BeginCodeGeneration(intrinsicContext));
 

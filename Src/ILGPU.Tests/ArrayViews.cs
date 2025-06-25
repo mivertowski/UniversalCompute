@@ -20,12 +20,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class ArrayViews : TestBase
+    public abstract class ArrayViews(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected ArrayViews(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void ArrayViewValidKernel(
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data)
@@ -781,7 +777,7 @@ namespace ILGPU.Tests
         }
 
         public static TheoryData<object, object> VectorizedIOData =>
-            new TheoryData<object, object>
+            new()
             {
                 { default(int), default(PairStruct<int, int>) },
                 { default(long), default(PairStruct<long, long>) },
@@ -864,7 +860,7 @@ namespace ILGPU.Tests
         }
 
         public static TheoryData<int, object> AlignToData =>
-            new TheoryData<int, object>
+            new()
             {
                 { 8, int.MaxValue },
                 { 16, int.MaxValue },

@@ -59,20 +59,16 @@ namespace ILGPU.IR.Analyses.TraversalOrders
     /// A generic collection visitor.
     /// </summary>
     /// <typeparam name="TCollection">The collection type.</typeparam>
-    public readonly struct TraversalCollectionVisitor<TCollection> :
+    /// <remarks>
+    /// Constructs a new collection visitor.
+    /// </remarks>
+    /// <param name="collection">The target collection.</param>
+    public readonly struct TraversalCollectionVisitor<TCollection>(TCollection collection) :
         ITraversalVisitor
         where TCollection : ICollection<BasicBlock>
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new collection visitor.
-        /// </summary>
-        /// <param name="collection">The target collection.</param>
-        public TraversalCollectionVisitor(TCollection collection)
-        {
-            Collection = collection;
-        }
+        #region Instance
 
         #endregion
 
@@ -81,7 +77,7 @@ namespace ILGPU.IR.Analyses.TraversalOrders
         /// <summary>
         /// Returns the target collection to add the elements to.
         /// </summary>
-        public TCollection Collection { get; }
+        public TCollection Collection { get; } = collection;
 
         #endregion
 
@@ -162,7 +158,7 @@ namespace ILGPU.IR.Analyses.TraversalOrders
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TraversalEnumerationState ForwardsInit() =>
-            new TraversalEnumerationState()
+            new()
             {
                 Index = -1,
             };
@@ -188,7 +184,7 @@ namespace ILGPU.IR.Analyses.TraversalOrders
         public static TraversalEnumerationState BackwardsInit<TCollection>(
             TCollection blocks)
             where TCollection : IReadOnlyList<BasicBlock> =>
-            new TraversalEnumerationState()
+            new()
             {
                 Index = blocks.Count
             };

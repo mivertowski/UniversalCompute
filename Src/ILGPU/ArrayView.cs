@@ -279,7 +279,7 @@ namespace ILGPU
         public readonly LongIndex1D Extent
         {
             [ViewIntrinsic(ViewIntrinsicKind.GetViewLongExtent)]
-            get => new LongIndex1D(Length);
+            get => new(Length);
         }
 
         /// <summary>
@@ -288,7 +288,7 @@ namespace ILGPU
         public readonly Stride1D.Dense Stride
         {
             [ViewIntrinsic(ViewIntrinsicKind.GetStride)]
-            get => new Stride1D.Dense();
+            get => new();
         }
 
         /// <summary>
@@ -404,7 +404,7 @@ namespace ILGPU
         /// <remarks>This method is not supported on accelerators.</remarks>
         [NotInsideKernel]
         readonly ArrayView<byte> IContiguousArrayView.AsRawArrayView() =>
-            new ArrayView<byte>(Buffer, GetIndexInBytes(), LengthInBytes);
+            new(Buffer, GetIndexInBytes(), LengthInBytes);
 
         /// <summary>
         /// Computes the number of unaligned elements in this view while taking the given
@@ -475,7 +475,7 @@ namespace ILGPU
         /// <returns>The effective address.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal readonly unsafe IntPtr LoadEffectiveAddressAsPtr(long index) =>
-            new IntPtr(Unsafe.AsPointer(ref LoadEffectiveAddress(index)));
+            new(Unsafe.AsPointer(ref LoadEffectiveAddress(index)));
 
         /// <summary>
         /// Loads the effective address of the current view.
@@ -577,7 +577,7 @@ namespace ILGPU
         /// <returns>The corresponding generic view.</returns>
         public static implicit operator ArrayView1D<T, Stride1D.Dense>(
             ArrayView<T> view) =>
-            new ArrayView1D<T, Stride1D.Dense>(view, view.Extent, default);
+            new(view, view.Extent, default);
 
         /// <summary>
         /// Converts the given specialized array view into a corresponding generic view.

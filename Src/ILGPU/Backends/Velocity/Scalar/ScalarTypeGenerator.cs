@@ -18,7 +18,14 @@ namespace ILGPU.Backends.Velocity.Scalar
     /// <summary>
     /// A scalar type generator to be used with the Velocity backend.
     /// </summary>
-    sealed class ScalarTypeGenerator : VelocityTypeGenerator
+    /// <remarks>
+    /// Constructs a new IL scalar code generator.
+    /// </remarks>
+    /// <param name="capabilityContext">The parent capability context.</param>
+    /// <param name="runtimeSystem">The parent runtime system.</param>
+    sealed class ScalarTypeGenerator(
+        VelocityCapabilityContext capabilityContext,
+        RuntimeSystem runtimeSystem) : VelocityTypeGenerator(capabilityContext, runtimeSystem, ScalarOperations2.WarpSize)
     {
         #region Static
 
@@ -41,19 +48,7 @@ namespace ILGPU.Backends.Velocity.Scalar
         };
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new IL scalar code generator.
-        /// </summary>
-        /// <param name="capabilityContext">The parent capability context.</param>
-        /// <param name="runtimeSystem">The parent runtime system.</param>
-        public ScalarTypeGenerator(
-            VelocityCapabilityContext capabilityContext,
-            RuntimeSystem runtimeSystem)
-            : base(capabilityContext, runtimeSystem, ScalarOperations2.WarpSize)
-        { }
 
         #endregion
 

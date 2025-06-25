@@ -33,19 +33,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks inline language methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class LanguageIntrinsicAttribute : IntrinsicAttribute
+    sealed class LanguageIntrinsicAttribute(LanguageIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public LanguageIntrinsicAttribute(LanguageIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Language;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public LanguageIntrinsicKind IntrinsicKind { get; }
+        public LanguageIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics
@@ -55,7 +50,7 @@ namespace ILGPU.Frontend.Intrinsic
         /// </summary>
         private static readonly Regex PTXExpressionRegex =
             // Escape sequence, %n arguments, singular % detection.
-            new Regex("(%%|%\\d+|%)");
+            new("(%%|%\\d+|%)");
 
         /// <summary>
         /// Handles language operations.

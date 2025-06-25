@@ -28,11 +28,8 @@ namespace ILGPU.Backends.PointerViews
         /// <summary>
         /// Converts view types into pointer-based structure types.
         /// </summary>
-        private sealed class PointerViewLowering : ViewTypeLowering
+        private sealed class PointerViewLowering(Method.Builder builder) : ViewTypeLowering(builder)
         {
-            public PointerViewLowering(Method.Builder builder)
-                : base(builder)
-            { }
 
             /// <summary>
             /// Returns the number of fields per view type.
@@ -361,7 +358,7 @@ namespace ILGPU.Backends.PointerViews
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<TypeLowering<ViewType>> Rewriter =
-            new Rewriter<TypeLowering<ViewType>>();
+            new();
 
         /// <summary>
         /// Initializes all rewriter patterns.

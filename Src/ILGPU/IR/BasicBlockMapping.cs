@@ -54,7 +54,7 @@ namespace ILGPU.IR
             in BasicBlockCollection<TOrder, TDirection> blocks)
             where TOrder : struct, ITraversalOrder
             where TDirection : struct, IControlFlowDirection =>
-            new BasicBlockSet(blocks.EntryBlock, blocks.Count);
+            new(blocks.EntryBlock, blocks.Count);
 
         /// <summary>
         /// Creates a new block set.
@@ -62,7 +62,7 @@ namespace ILGPU.IR
         /// <param name="entryBlock">The entry block.</param>
         /// <returns>The created block set.</returns>
         public static BasicBlockSet Create(BasicBlock entryBlock) =>
-            new BasicBlockSet(entryBlock, NumDefaultElements);
+            new(entryBlock, NumDefaultElements);
 
         /// <summary>
         /// Computes the bucket index and the bit mask.
@@ -258,7 +258,7 @@ namespace ILGPU.IR
             in BasicBlockCollection<TOrder, TDirection> blocks)
             where TOrder : struct, ITraversalOrder
             where TDirection : struct, IControlFlowDirection =>
-            new BasicBlockSetList(
+            new(
                 BasicBlockSet.Create(blocks),
                 blocks.Count);
 
@@ -460,7 +460,7 @@ namespace ILGPU.IR
             in BasicBlockCollection<TOrder, TDirection> blocks)
             where TOrder : struct, ITraversalOrder
             where TDirection : struct, IControlFlowDirection =>
-            new BasicBlockMap<T>(blocks.EntryBlock, blocks.Count);
+            new(blocks.EntryBlock, blocks.Count);
 
         /// <summary>
         /// Constructs a new block map.
@@ -468,7 +468,7 @@ namespace ILGPU.IR
         /// <param name="entryBlock">The entry block.</param>
         /// <returns>The created block map.</returns>
         public static BasicBlockMap<T> Create(BasicBlock entryBlock) =>
-            new BasicBlockMap<T>(entryBlock, BasicBlockSet.NumDefaultElements);
+            new(entryBlock, BasicBlockSet.NumDefaultElements);
 
         #endregion
 
@@ -712,7 +712,7 @@ namespace ILGPU.IR
         /// Returns an enumerator to enumerate all attached blocks.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public readonly Enumerator GetEnumerator() => new Enumerator(this);
+        public readonly Enumerator GetEnumerator() => new(this);
 
         /// <summary>
         /// Returns an enumerator to enumerator all actual (not replaced) parameters.

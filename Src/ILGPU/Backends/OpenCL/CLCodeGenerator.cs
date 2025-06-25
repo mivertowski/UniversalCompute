@@ -90,25 +90,19 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// Represents a parameter that is mapped to OpenCL.
         /// </summary>
-        protected internal readonly struct MappedParameter
+        /// <remarks>
+        /// Constructs a new mapped parameter.
+        /// </remarks>
+        /// <param name="variable">The OpenCL variable.</param>
+        /// <param name="clName">The name of the parameter in OpenCL code.</param>
+        /// <param name="parameter">The source parameter.</param>
+        protected internal readonly struct MappedParameter(
+VariableAllocator.Variable variable,
+            string clName,
+            Parameter parameter)
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new mapped parameter.
-            /// </summary>
-            /// <param name="variable">The OpenCL variable.</param>
-            /// <param name="clName">The name of the parameter in OpenCL code.</param>
-            /// <param name="parameter">The source parameter.</param>
-            public MappedParameter(
-                Variable variable,
-                string clName,
-                Parameter parameter)
-            {
-                Variable = variable;
-                CLName = clName;
-                Parameter = parameter;
-            }
+            #region Instance
 
             #endregion
 
@@ -117,17 +111,17 @@ namespace ILGPU.Backends.OpenCL
             /// <summary>
             /// Returns the associated OpenCL variable.
             /// </summary>
-            public Variable Variable { get; }
+            public Variable Variable { get; } = variable;
 
             /// <summary>
             /// Returns the name of the parameter in OpenCL code.
             /// </summary>
-            public string CLName { get; }
+            public string CLName { get; } = clName;
 
             /// <summary>
             /// Returns the source parameter.
             /// </summary>
-            public Parameter Parameter { get; }
+            public Parameter Parameter { get; } = parameter;
 
             #endregion
         }
@@ -199,11 +193,11 @@ namespace ILGPU.Backends.OpenCL
 
         private int labelCounter;
         private readonly Dictionary<BasicBlock, string> blockLookup =
-            new Dictionary<BasicBlock, string>(new BasicBlock.Comparer());
+            new(new BasicBlock.Comparer());
         private readonly string labelPrefix;
 
-        private StringBuilder prefixBuilder = new StringBuilder();
-        private StringBuilder suffixBuilder = new StringBuilder();
+        private StringBuilder prefixBuilder = new();
+        private StringBuilder suffixBuilder = new();
 
         /// <summary>
         /// Constructs a new code generator.

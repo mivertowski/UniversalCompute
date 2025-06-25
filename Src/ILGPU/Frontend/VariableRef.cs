@@ -51,7 +51,7 @@ namespace ILGPU.Frontend
         /// Represents a reference to a memory monad.
         /// </summary>
         public static readonly VariableRef Memory =
-            new VariableRef(0, VariableRefType.Memory);
+            new(0, VariableRefType.Memory);
 
         #endregion
 

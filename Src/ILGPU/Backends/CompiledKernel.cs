@@ -23,7 +23,16 @@ namespace ILGPU.Backends
     /// <summary>
     /// Represents a compiled kernel that encapsulates emitted binary code.
     /// </summary>
-    public abstract class CompiledKernel
+    /// <remarks>
+    /// Constructs a new compiled kernel.
+    /// </remarks>
+    /// <param name="context">The associated context.</param>
+    /// <param name="entryPoint">The entry point.</param>
+    /// <param name="info">Detailed kernel information.</param>
+    public abstract class CompiledKernel(
+        Context context,
+        EntryPoint entryPoint,
+CompiledKernel.KernelInfo? info)
     {
         #region Nested Types
 
@@ -75,24 +84,19 @@ namespace ILGPU.Backends
         /// <summary>
         /// Provides detailed information about compiled kernels.
         /// </summary>
-        public class KernelInfo : IDumpable
+        /// <remarks>
+        /// Constructs a new kernel information object.
+        /// </remarks>
+        /// <param name="sharedAllocations">All shared allocations.</param>
+        /// <param name="functions">
+        /// An array containing detailed function information.
+        /// </param>
+        public class KernelInfo(
+            in AllocaKindInformation sharedAllocations,
+            ImmutableArray<CompiledKernel.FunctionInfo> functions) : IDumpable
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new kernel information object.
-            /// </summary>
-            /// <param name="sharedAllocations">All shared allocations.</param>
-            /// <param name="functions">
-            /// An array containing detailed function information.
-            /// </param>
-            public KernelInfo(
-                in AllocaKindInformation sharedAllocations,
-                ImmutableArray<FunctionInfo> functions)
-            {
-                SharedAllocations = sharedAllocations;
-                Functions = functions;
-            }
+            #region Instance
 
             #endregion
 
@@ -105,7 +109,7 @@ namespace ILGPU.Backends
             /// This information will be populated if the property
             /// <see cref="ContextProperties.EnableKernelInformation"/> is enabled.
             /// </remarks>
-            public AllocaKindInformation SharedAllocations { get; }
+            public AllocaKindInformation SharedAllocations { get; } = sharedAllocations;
 
             /// <summary>
             /// Returns information about all functions in the compiled kernel.
@@ -114,7 +118,7 @@ namespace ILGPU.Backends
             /// This array will be populated if the property
             /// <see cref="ContextProperties.EnableKernelInformation"/> is enabled.
             /// </remarks>
-            public ImmutableArray<FunctionInfo> Functions { get; }
+            public ImmutableArray<FunctionInfo> Functions { get; } = functions;
 
             #endregion
 
@@ -171,24 +175,7 @@ namespace ILGPU.Backends
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new compiled kernel.
-        /// </summary>
-        /// <param name="context">The associated context.</param>
-        /// <param name="entryPoint">The entry point.</param>
-        /// <param name="info">Detailed kernel information.</param>
-        protected CompiledKernel(
-            Context context,
-            EntryPoint entryPoint,
-            KernelInfo? info)
-        {
-            Context = context;
-            EntryPoint = entryPoint;
-            Info = info;
-        }
 
         #endregion
 
@@ -197,7 +184,7 @@ namespace ILGPU.Backends
         /// <summary>
         /// Returns the associated context.
         /// </summary>
-        public Context Context { get; }
+        public Context Context { get; } = context;
 
         /// <summary>
         /// Represents the source method.
@@ -227,7 +214,7 @@ namespace ILGPU.Backends
         /// <summary>
         /// Returns the internally used entry point.
         /// </summary>
-        internal EntryPoint EntryPoint { get; }
+        internal EntryPoint EntryPoint { get; } = entryPoint;
 
         /// <summary>
         /// Returns information about all functions in the compiled kernel.
@@ -236,7 +223,7 @@ namespace ILGPU.Backends
         /// This instance will be available when the property
         /// <see cref="ContextProperties.EnableKernelInformation"/> is enabled.
         /// </remarks>
-        public KernelInfo? Info { get; }
+        public KernelInfo? Info { get; } = info;
 
         #endregion
 

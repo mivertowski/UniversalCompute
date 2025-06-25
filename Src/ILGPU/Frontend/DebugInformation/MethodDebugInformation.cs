@@ -98,7 +98,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// The internal synchronization object.
         /// </summary>
-        private readonly object syncLock = new object();
+        private readonly object syncLock = new();
 
         /// <summary>
         /// Constructs method debug information.
@@ -187,7 +187,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// </summary>
         /// <returns>The created sequence-point enumerator.</returns>
         public SequencePointEnumerator CreateSequencePointEnumerator() =>
-            new SequencePointEnumerator(SequencePoints);
+            new(SequencePoints);
 
         #endregion
     }

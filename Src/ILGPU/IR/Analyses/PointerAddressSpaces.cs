@@ -73,7 +73,11 @@ namespace ILGPU.IR.Analyses
         /// An internal address-space information object used to manage
         /// <see cref="AddressSpaceFlags"/> flags.
         /// </summary>
-        public readonly struct AddressSpaceInfo : IEquatable<AddressSpaceInfo>
+        /// <remarks>
+        /// Constructs a new address-space information object.
+        /// </remarks>
+        /// <param name="flags">The associated flags.</param>
+        public readonly struct AddressSpaceInfo(PointerAddressSpaces.AddressSpaceFlags flags) : IEquatable<AddressSpaceInfo>
         {
             #region Nested Types
 
@@ -205,20 +209,10 @@ namespace ILGPU.IR.Analyses
             public static AddressSpaceInfo Merge(
                 AddressSpaceInfo first,
                 AddressSpaceInfo second) =>
-                new AddressSpaceInfo(first.Flags | second.Flags);
+                new(first.Flags | second.Flags);
 
             #endregion
-
             #region Instance
-
-            /// <summary>
-            /// Constructs a new address-space information object.
-            /// </summary>
-            /// <param name="flags">The associated flags.</param>
-            public AddressSpaceInfo(AddressSpaceFlags flags)
-            {
-                Flags = flags;
-            }
 
             #endregion
 
@@ -227,7 +221,7 @@ namespace ILGPU.IR.Analyses
             /// <summary>
             /// Returns the underlying address-space flags.
             /// </summary>
-            public AddressSpaceFlags Flags { get; }
+            public AddressSpaceFlags Flags { get; } = flags;
 
             /// <summary>
             /// Returns the most generic address space that is compatible with all
@@ -289,7 +283,7 @@ namespace ILGPU.IR.Analyses
             /// Returns an enumerator to iterate over all address spaces.
             /// </summary>
             /// <returns>The enumerator instance.</returns>
-            public readonly Enumerator GetEnumerator() => new Enumerator(this);
+            public readonly Enumerator GetEnumerator() => new(this);
 
             #endregion
 
@@ -369,24 +363,20 @@ namespace ILGPU.IR.Analyses
         /// provides initial <see cref="AddressSpaceInfo"/> information for each
         /// parameter.
         /// </summary>
-        public readonly struct ConstParameterValueContext :
+        /// <remarks>
+        /// Constructs a new parameter value context.
+        /// </remarks>
+        /// <param name="addressSpace">
+        /// The target address space to use for each parameter.
+        /// </param>
+        public readonly struct ConstParameterValueContext(MemoryAddressSpace addressSpace) :
             IAnalysisValueSourceContext<AddressSpaceInfo>
         {
-            /// <summary>
-            /// Constructs a new parameter value context.
-            /// </summary>
-            /// <param name="addressSpace">
-            /// The target address space to use for each parameter.
-            /// </param>
-            public ConstParameterValueContext(MemoryAddressSpace addressSpace)
-            {
-                AddressSpace = addressSpace;
-            }
 
             /// <summary>
             /// Returns the target address space to use for each parameter.
             /// </summary>
-            public MemoryAddressSpace AddressSpace { get; }
+            public MemoryAddressSpace AddressSpace { get; } = addressSpace;
 
             /// <summary>
             /// Returns the initial <see cref="AddressSpaceInfo"/> for the given value.
@@ -440,7 +430,7 @@ namespace ILGPU.IR.Analyses
         /// <param name="flags">The analysis flags.</param>
         /// <returns>The created analysis instance.</returns>
         public static PointerAddressSpaces Create(AnalysisFlags flags) =>
-            new PointerAddressSpaces(flags);
+            new(flags);
 
         #endregion
 

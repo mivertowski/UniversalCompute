@@ -66,22 +66,18 @@ namespace ILGPU
     /// <summary>
     /// An internal attribute to specify the index type of a custom structure.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new attribute instance.
+    /// </remarks>
+    /// <param name="indexType">The index type.</param>
     [AttributeUsage(AttributeTargets.Struct, AllowMultiple = false)]
-    sealed class IndexTypeAttribute : Attribute
+    sealed class IndexTypeAttribute(IndexType indexType) : Attribute
     {
-        /// <summary>
-        /// Constructs a new attribute instance.
-        /// </summary>
-        /// <param name="indexType">The index type.</param>
-        public IndexTypeAttribute(IndexType indexType)
-        {
-            IndexType = indexType;
-        }
 
         /// <summary>
         /// Returns the associated index type.
         /// </summary>
-        public IndexType IndexType { get; }
+        public IndexType IndexType { get; } = indexType;
     }
 
     /// <summary>

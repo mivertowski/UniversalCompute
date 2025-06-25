@@ -351,20 +351,13 @@ namespace ILGPU.Runtime.MemoryPooling
             }
         }
 
-        private sealed class PooledBuffer : IPooledMemoryBuffer<T>
+        private sealed class PooledBuffer(AdaptiveMemoryPool<T> pool, MemoryBuffer1D<T, Stride1D.Dense> buffer, long actualLength) : IPooledMemoryBuffer<T>
         {
             private volatile bool isReturned;
 
-            public PooledBuffer(AdaptiveMemoryPool<T> pool, MemoryBuffer1D<T, Stride1D.Dense> buffer, long actualLength)
-            {
-                Pool = pool;
-                Buffer = buffer;
-                ActualLength = actualLength;
-            }
-
-            public IMemoryPool<T> Pool { get; }
-            public MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; }
-            public long ActualLength { get; }
+            public IMemoryPool<T> Pool { get; } = pool;
+            public MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; } = buffer;
+            public long ActualLength { get; } = actualLength;
             public bool IsReturned => isReturned;
 
             // IMemoryBuffer implementation

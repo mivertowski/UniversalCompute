@@ -132,7 +132,7 @@ namespace ILGPU.IR.Intrinsics
         /// <returns>The resolved intrinsic implementation.</returns>
         public IntrinsicMapping<TDelegate> ResolveMapping<TDelegate>()
             where TDelegate : Delegate =>
-            new IntrinsicMapping<TDelegate>(this);
+            new(this);
 
         #endregion
     }

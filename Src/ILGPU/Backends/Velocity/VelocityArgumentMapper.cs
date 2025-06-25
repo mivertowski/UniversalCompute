@@ -17,17 +17,14 @@ namespace ILGPU.Backends.Velocity
     /// Constructs mappings Velocity kernels.
     /// </summary>
     /// <remarks>The current velocity backend uses the PTX argument mapper.</remarks>
-    sealed class VelocityArgumentMapper : PTXArgumentMapper
+    /// <remarks>
+    /// Constructs a new IL argument mapper.
+    /// </remarks>
+    /// <param name="context">The current context.</param>
+    sealed class VelocityArgumentMapper(Context context) : PTXArgumentMapper(context)
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new IL argument mapper.
-        /// </summary>
-        /// <param name="context">The current context.</param>
-        public VelocityArgumentMapper(Context context)
-            : base(context)
-        { }
+        #region Instance
 
         #endregion
     }

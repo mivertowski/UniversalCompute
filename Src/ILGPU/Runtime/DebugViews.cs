@@ -56,19 +56,15 @@ namespace ILGPU.Runtime
     /// Represents a debugger view for generic array views.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
-    sealed class DebugArrayView<T> : BaseDebugArrayView<T>
+    /// <remarks>
+    /// Constructs a new debug view.
+    /// </remarks>
+    /// <param name="source">The source array view.</param>
+    sealed class DebugArrayView<T>(ArrayView<T> source) : BaseDebugArrayView<T>
         where T : unmanaged
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new debug view.
-        /// </summary>
-        /// <param name="source">The source array view.</param>
-        public DebugArrayView(ArrayView<T> source)
-        {
-            Data = GetDebuggerData(source);
-        }
+        #region Instance
 
         #endregion
 
@@ -78,7 +74,7 @@ namespace ILGPU.Runtime
         /// The buffer data.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public T[] Data { get; }
+        public T[] Data { get; } = GetDebuggerData(source);
 
         #endregion
     }
@@ -88,18 +84,12 @@ namespace ILGPU.Runtime
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
     /// <typeparam name="TStride">The stride type.</typeparam>
-    sealed class DebugArrayView1D<T, TStride> : BaseDebugArrayView<T>
+    sealed class DebugArrayView1D<T, TStride>(ArrayView1D<T, TStride> source) : BaseDebugArrayView<T>
         where T : unmanaged
         where TStride : struct, IStride1D
     {
-        #region Instance
 
-        public DebugArrayView1D(ArrayView1D<T, TStride> source)
-        {
-            Extent = source.Extent;
-            Stride = source.Stride;
-            Data = GetDebuggerData(source.BaseView);
-        }
+        #region Instance
 
         #endregion
 
@@ -108,18 +98,18 @@ namespace ILGPU.Runtime
         /// <summary>
         /// The extent of the view.
         /// </summary>
-        public LongIndex1D Extent { get; }
+        public LongIndex1D Extent { get; } = source.Extent;
 
         /// <summary>
         /// The stride information.
         /// </summary>
-        public TStride Stride { get; }
+        public TStride Stride { get; } = source.Stride;
 
         /// <summary>
         /// The buffer data.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-        public T[] Data { get; }
+        public T[] Data { get; } = GetDebuggerData(source.BaseView);
 
         #endregion
     }

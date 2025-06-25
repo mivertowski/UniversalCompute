@@ -55,27 +55,22 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// An internal context implementation for block-based analyses.
         /// </summary>
-        protected abstract class BaseAnalysisContext
+        /// <remarks>
+        /// Constructs an abstract analysis context.
+        /// </remarks>
+        /// <param name="onStack">The block set.</param>
+        protected abstract class BaseAnalysisContext(BasicBlockSet onStack)
         {
-            /// <summary>
-            /// Constructs an abstract analysis context.
-            /// </summary>
-            /// <param name="onStack">The block set.</param>
-            protected BaseAnalysisContext(BasicBlockSet onStack)
-            {
-                OnStack = onStack;
-                Stack = new Stack<BasicBlock>();
-            }
 
             /// <summary>
             /// Returns the current stack set.
             /// </summary>
-            public BasicBlockSet OnStack { get; }
+            public BasicBlockSet OnStack { get; } = onStack;
 
             /// <summary>
             /// Returns the current stack.
             /// </summary>
-            public Stack<BasicBlock> Stack { get; }
+            public Stack<BasicBlock> Stack { get; } = new Stack<BasicBlock>();
 
             /// <summary>
             /// Tries to pop one block from the stack.
@@ -153,24 +148,18 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// An internal context implementation for block-based analyses.
         /// </summary>
-        protected sealed class BlockAnalysisContext :
-            BaseAnalysisContext,
+        /// <remarks>
+        /// Constructs a new block analysis context.
+        /// </remarks>
+        /// <param name="dataMapping">The block mapping.</param>
+        /// <param name="onStack">The internal block set.</param>
+        protected sealed class BlockAnalysisContext(
+            BasicBlockMap<TData> dataMapping,
+            BasicBlockSet onStack) :
+            BaseAnalysisContext(onStack),
             IFixPointAnalysisContext<TData, BasicBlock>
         {
-            private BasicBlockMap<TData> mapping;
-
-            /// <summary>
-            /// Constructs a new block analysis context.
-            /// </summary>
-            /// <param name="dataMapping">The block mapping.</param>
-            /// <param name="onStack">The internal block set.</param>
-            public BlockAnalysisContext(
-                BasicBlockMap<TData> dataMapping,
-                BasicBlockSet onStack)
-                : base(onStack)
-            {
-                mapping = dataMapping;
-            }
+            private BasicBlockMap<TData> mapping = dataMapping;
 
             /// <summary>
             /// Returns the data of the given block.
@@ -242,7 +231,13 @@ namespace ILGPU.IR.Analyses
     /// </summary>
     /// <typeparam name="T">The underlying data type of the analysis.</typeparam>
     /// <typeparam name="TDirection">The control-flow direction.</typeparam>
-    public abstract class ValueFixPointAnalysis<T, TDirection> :
+    /// <remarks>
+    /// Constructs a new fix point analysis.
+    /// </remarks>
+    /// <param name="defaultValue">
+    /// The default analysis value for generic IR nodes.
+    /// </param>
+    public abstract class ValueFixPointAnalysis<T, TDirection>(T defaultValue) :
         FixPointAnalysis<AnalysisValue<T>, Value, TDirection>
         where T : struct, IEquatable<T>
         where TDirection : struct, IControlFlowDirection
@@ -252,38 +247,30 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// An internal context implementation.
         /// </summary>
-        protected sealed class ValueAnalysisContext :
-            BaseAnalysisContext,
+        /// <remarks>
+        /// Constructs a new analysis context.
+        /// </remarks>
+        /// <param name="parent">The parent analysis.</param>
+        /// <param name="valueMapping">The parent value mapping.</param>
+        /// <param name="returnValueMapping">The parent return value mapping.</param>
+        /// <param name="onStack">The internal block set.</param>
+        protected sealed class ValueAnalysisContext(
+            ValueFixPointAnalysis<T, TDirection> parent,
+            AnalysisValueMapping<T> valueMapping,
+            AnalysisReturnValueMapping<T> returnValueMapping,
+            BasicBlockSet onStack) :
+            BaseAnalysisContext(onStack),
             IFixPointAnalysisContext<AnalysisValue<T>, Value>,
             IAnalysisValueContext<T>
         {
-            private readonly AnalysisReturnValueMapping<T> returnMapping;
+            private readonly AnalysisReturnValueMapping<T> returnMapping = returnValueMapping;
 
             /// <summary>
             /// Returns the current value mapping.
             /// </summary>
-            private readonly AnalysisValueMapping<T> mapping;
+            private readonly AnalysisValueMapping<T> mapping = valueMapping;
 
-            /// <summary>
-            /// Constructs a new analysis context.
-            /// </summary>
-            /// <param name="parent">The parent analysis.</param>
-            /// <param name="valueMapping">The parent value mapping.</param>
-            /// <param name="returnValueMapping">The parent return value mapping.</param>
-            /// <param name="onStack">The internal block set.</param>
-            public ValueAnalysisContext(
-                ValueFixPointAnalysis<T, TDirection> parent,
-                AnalysisValueMapping<T> valueMapping,
-                AnalysisReturnValueMapping<T> returnValueMapping,
-                BasicBlockSet onStack)
-                : base(onStack)
-            {
-                Parent = parent;
-                returnMapping = returnValueMapping;
-                mapping = valueMapping;
-            }
-
-            private ValueFixPointAnalysis<T, TDirection> Parent { get; }
+            private ValueFixPointAnalysis<T, TDirection> Parent { get; } = parent;
 
             /// <summary>
             /// Returns the data of the given node.
@@ -316,19 +303,7 @@ namespace ILGPU.IR.Analyses
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new fix point analysis.
-        /// </summary>
-        /// <param name="defaultValue">
-        /// The default analysis value for generic IR nodes.
-        /// </param>
-        protected ValueFixPointAnalysis(T defaultValue)
-        {
-            DefaultValue = defaultValue;
-        }
 
         #endregion
 
@@ -337,7 +312,7 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Returns the default analysis value for generic IR nodes.
         /// </summary>
-        public T DefaultValue { get; }
+        public T DefaultValue { get; } = defaultValue;
 
         #endregion
 
@@ -886,8 +861,14 @@ namespace ILGPU.IR.Analyses
     /// The underlying value data type of the analysis.
     /// </typeparam>
     /// <typeparam name="TDirection">The control-flow direction.</typeparam>
-    public abstract class GlobalFixPointAnalysis<TMethodData, T, TDirection> :
-        ValueFixPointAnalysis<T, TDirection>
+    /// <remarks>
+    /// Constructs a new global fix point analysis.
+    /// </remarks>
+    /// <param name="defaultValue">
+    /// The default analysis value for generic IR nodes.
+    /// </param>
+    public abstract class GlobalFixPointAnalysis<TMethodData, T, TDirection>(T defaultValue) :
+        ValueFixPointAnalysis<T, TDirection>(defaultValue)
         where T : struct, IEquatable<T>
         where TDirection : struct, IControlFlowDirection
     {
@@ -897,34 +878,29 @@ namespace ILGPU.IR.Analyses
         /// Represents an internal analysis entry.
         /// </summary>
         /// <typeparam name="TValue">The value type to track.</typeparam>
-        protected readonly struct GlobalAnalysisEntry<TValue> :
+        /// <remarks>
+        /// Constructs an internal analysis entry.
+        /// </remarks>
+        /// <param name="method">The associated method.</param>
+        /// <param name="arguments">The argument bindings.</param>
+        protected readonly struct GlobalAnalysisEntry<TValue>(
+            Method method,
+            ImmutableArray<AnalysisValue<TValue>> arguments) :
             IEquatable<GlobalAnalysisEntry<TValue>>
             where TValue : IEquatable<TValue>
         {
-            /// <summary>
-            /// Constructs an internal analysis entry.
-            /// </summary>
-            /// <param name="method">The associated method.</param>
-            /// <param name="arguments">The argument bindings.</param>
-            public GlobalAnalysisEntry(
-                Method method,
-                ImmutableArray<AnalysisValue<TValue>> arguments)
-            {
-                Method = method;
-                Arguments = arguments;
-            }
 
             #region Properties
 
             /// <summary>
             /// Returns the current method.
             /// </summary>
-            public Method Method { get; }
+            public Method Method { get; } = method;
 
             /// <summary>
             /// Returns all call argument data.
             /// </summary>
-            public ImmutableArray<AnalysisValue<TValue>> Arguments { get; }
+            public ImmutableArray<AnalysisValue<TValue>> Arguments { get; } = arguments;
 
             #endregion
 
@@ -1009,40 +985,33 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Implements a global analysis context.
         /// </summary>
-        protected sealed class GlobalAnalysisContext :
+        /// <remarks>
+        /// Constructs a new global analysis context.
+        /// </remarks>
+        /// <param name="mapping">The basic data mapping.</param>
+        protected sealed class GlobalAnalysisContext(Dictionary<Method, TMethodData> mapping) :
             IGlobalFixPointAnalysisContext<TMethodData, T>
         {
-            /// <summary>
-            /// Constructs a new global analysis context.
-            /// </summary>
-            /// <param name="mapping">The basic data mapping.</param>
-            public GlobalAnalysisContext(Dictionary<Method, TMethodData> mapping)
-            {
-                Mapping = mapping;
-                ValueMapping = new Dictionary<Value, AnalysisValue<T>>();
-                Visited = new HashSet<GlobalAnalysisEntry<T>>();
-                Stack = new Stack<GlobalAnalysisEntry<T>>();
-            }
 
             /// <summary>
             /// Returns the current method mapping.
             /// </summary>
-            public Dictionary<Method, TMethodData> Mapping { get; }
+            public Dictionary<Method, TMethodData> Mapping { get; } = mapping;
 
             /// <summary>
             /// Returns the current value mapping.
             /// </summary>
-            public Dictionary<Value, AnalysisValue<T>> ValueMapping { get; }
+            public Dictionary<Value, AnalysisValue<T>> ValueMapping { get; } = new Dictionary<Value, AnalysisValue<T>>();
 
             /// <summary>
             /// Returns the set of visited configurations.
             /// </summary>
-            public HashSet<GlobalAnalysisEntry<T>> Visited { get; }
+            public HashSet<GlobalAnalysisEntry<T>> Visited { get; } = new HashSet<GlobalAnalysisEntry<T>>();
 
             /// <summary>
             /// Returns the current stack.
             /// </summary>
-            public Stack<GlobalAnalysisEntry<T>> Stack { get; }
+            public Stack<GlobalAnalysisEntry<T>> Stack { get; } = new Stack<GlobalAnalysisEntry<T>>();
 
             /// <summary>
             /// Returns the method data of the given method.
@@ -1102,18 +1071,7 @@ namespace ILGPU.IR.Analyses
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new global fix point analysis.
-        /// </summary>
-        /// <param name="defaultValue">
-        /// The default analysis value for generic IR nodes.
-        /// </param>
-        protected GlobalFixPointAnalysis(T defaultValue)
-            : base(defaultValue)
-        { }
 
         #endregion
 
@@ -1223,7 +1181,12 @@ namespace ILGPU.IR.Analyses
     /// Represents the result of a global value analysis.
     /// </summary>
     /// <typeparam name="T">The value analysis type.</typeparam>
-    public readonly struct GlobalAnalysisValueResult<T>
+    /// <remarks>
+    /// Constructs a new wrapped analysis result.
+    /// </remarks>
+    /// <param name="result"></param>
+    public readonly struct GlobalAnalysisValueResult<T>(
+        GlobalAnalysisResult<T, AnalysisValueMapping<T>> result)
         where T : struct, IEquatable<T>
     {
         #region Static
@@ -1232,22 +1195,11 @@ namespace ILGPU.IR.Analyses
         /// An empty value result.
         /// </summary>
         public static readonly GlobalAnalysisValueResult<T> Empty =
-            new GlobalAnalysisValueResult<T>(
+            new(
                 GlobalAnalysisResult<T, AnalysisValueMapping<T>>.Empty);
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new wrapped analysis result.
-        /// </summary>
-        /// <param name="result"></param>
-        public GlobalAnalysisValueResult(
-            GlobalAnalysisResult<T, AnalysisValueMapping<T>> result)
-        {
-            Result = result;
-        }
 
         #endregion
 
@@ -1256,7 +1208,7 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Return the underlying analysis result.
         /// </summary>
-        private GlobalAnalysisResult<T, AnalysisValueMapping<T>> Result { get; }
+        private GlobalAnalysisResult<T, AnalysisValueMapping<T>> Result { get; } = result;
 
         /// <summary>
         /// Returns true if this result information object is empty.
@@ -1316,25 +1268,22 @@ namespace ILGPU.IR.Analyses
     /// The underlying value data type of the analysis.
     /// </typeparam>
     /// <typeparam name="TDirection">The control-flow direction.</typeparam>
-    public abstract class GlobalFixPointAnalysis<T, TDirection> :
+    /// <remarks>
+    /// Constructs a new global fix point analysis.
+    /// </remarks>
+    /// <param name="defaultValue">
+    /// The default analysis value for generic IR nodes.
+    /// </param>
+    public abstract class GlobalFixPointAnalysis<T, TDirection>(T defaultValue) :
         GlobalFixPointAnalysis<
             AnalysisValueMapping<T>,
             T,
-            TDirection>
+            TDirection>(defaultValue)
         where T : struct, IEquatable<T>
         where TDirection : struct, IControlFlowDirection
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new global fix point analysis.
-        /// </summary>
-        /// <param name="defaultValue">
-        /// The default analysis value for generic IR nodes.
-        /// </param>
-        protected GlobalFixPointAnalysis(T defaultValue)
-            : base(defaultValue)
-        { }
+        #region Instance
 
         #endregion
 

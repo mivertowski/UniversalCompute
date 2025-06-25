@@ -19,7 +19,16 @@ namespace ILGPU.Backends.OpenCL
     /// <summary>
     /// Represents a function generator for helper device functions.
     /// </summary>
-    sealed class CLFunctionGenerator : CLCodeGenerator
+    /// <remarks>
+    /// Creates a new OpenCL function generator.
+    /// </remarks>
+    /// <param name="args">The generation arguments.</param>
+    /// <param name="method">The current method.</param>
+    /// <param name="allocas">All local allocas.</param>
+    sealed class CLFunctionGenerator(
+        in CLCodeGenerator.GeneratorArgs args,
+        Method method,
+        Allocas allocas) : CLCodeGenerator(args, method, allocas)
     {
         #region Constants
 
@@ -37,21 +46,17 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// A specialized function setup logic for parameters.
         /// </summary>
-        private readonly struct FunctionParameterSetupLogic : IParametersSetupLogic
+        /// <remarks>
+        /// Constructs a new specialized function setup logic.
+        /// </remarks>
+        /// <param name="typeGenerator">The parent type generator.</param>
+        private readonly struct FunctionParameterSetupLogic(CLTypeGenerator typeGenerator) : IParametersSetupLogic
         {
-            /// <summary>
-            /// Constructs a new specialized function setup logic.
-            /// </summary>
-            /// <param name="typeGenerator">The parent type generator.</param>
-            public FunctionParameterSetupLogic(CLTypeGenerator typeGenerator)
-            {
-                TypeGenerator = typeGenerator;
-            }
 
             /// <summary>
             /// Returns the parent type generator.
             /// </summary>
-            public CLTypeGenerator TypeGenerator { get; }
+            public CLTypeGenerator TypeGenerator { get; } = typeGenerator;
 
             /// <summary>
             /// Returns the internal type for the given parameter.
@@ -69,21 +74,7 @@ namespace ILGPU.Backends.OpenCL
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Creates a new OpenCL function generator.
-        /// </summary>
-        /// <param name="args">The generation arguments.</param>
-        /// <param name="method">The current method.</param>
-        /// <param name="allocas">All local allocas.</param>
-        public CLFunctionGenerator(
-            in GeneratorArgs args,
-            Method method,
-            Allocas allocas)
-            : base(args, method, allocas)
-        { }
 
         #endregion
 

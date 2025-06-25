@@ -23,7 +23,16 @@ namespace ILGPU.Backends.IL
     /// <summary>
     /// A type generator for managed IL types.
     /// </summary>
-    abstract class VelocityTypeGenerator : DisposeBase
+    /// <remarks>
+    /// Constructs a new IL type generator.
+    /// </remarks>
+    /// <param name="capabilityContext">The parent context.</param>
+    /// <param name="runtimeSystem">The parent runtime system.</param>
+    /// <param name="warpSize">The current warp size.</param>
+    abstract class VelocityTypeGenerator(
+        VelocityCapabilityContext capabilityContext,
+        RuntimeSystem runtimeSystem,
+        int warpSize) : DisposeBase
     {
         #region Static
 
@@ -76,20 +85,14 @@ namespace ILGPU.Backends.IL
         /// <summary>
         /// Provides linearized scalar versions of given scalar managed types.
         /// </summary>
-        private readonly struct LinearScalarTypeProvider : IExtendedTypeProvider
+        /// <remarks>
+        /// Creates a new instance of the scalar type provider.
+        /// </remarks>
+        /// <param name="typeGenerator">The parent IL type generator.</param>
+        private readonly struct LinearScalarTypeProvider(VelocityTypeGenerator typeGenerator) : IExtendedTypeProvider
         {
-            private readonly VelocityTypeGenerator parent;
-            private readonly TypeNode.ScalarManagedTypeProvider scalarProvider;
-
-            /// <summary>
-            /// Creates a new instance of the scalar type provider.
-            /// </summary>
-            /// <param name="typeGenerator">The parent IL type generator.</param>
-            public LinearScalarTypeProvider(VelocityTypeGenerator typeGenerator)
-            {
-                parent = typeGenerator;
-                scalarProvider = new TypeNode.ScalarManagedTypeProvider();
-            }
+            private readonly VelocityTypeGenerator parent = typeGenerator;
+            private readonly TypeNode.ScalarManagedTypeProvider scalarProvider = new TypeNode.ScalarManagedTypeProvider();
 
             /// <summary>
             /// Returns the default managed type for the given primitive one.
@@ -144,18 +147,13 @@ namespace ILGPU.Backends.IL
         /// <summary>
         /// Provides vectorized versions of given scalar managed types.
         /// </summary>
-        private readonly struct VectorizedTypeProvider : IExtendedTypeProvider
+        /// <remarks>
+        /// Creates a new instance of the vectorized type provider.
+        /// </remarks>
+        /// <param name="typeGenerator">The parent IL type generator.</param>
+        private readonly struct VectorizedTypeProvider(VelocityTypeGenerator typeGenerator) : IExtendedTypeProvider
         {
-            private readonly VelocityTypeGenerator parent;
-
-            /// <summary>
-            /// Creates a new instance of the vectorized type provider.
-            /// </summary>
-            /// <param name="typeGenerator">The parent IL type generator.</param>
-            public VectorizedTypeProvider(VelocityTypeGenerator typeGenerator)
-            {
-                parent = typeGenerator;
-            }
+            private readonly VelocityTypeGenerator parent = typeGenerator;
 
             /// <summary>
             /// Returns the default managed type for the given primitive one.
@@ -242,25 +240,9 @@ namespace ILGPU.Backends.IL
         #region Instance
 
         private readonly ReaderWriterLockSlim readerWriterLock =
-            new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+            new(LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<TypeNode, (Type Linear, Type Vectorized)>
-            typeMapping = new Dictionary<TypeNode, (Type, Type)>();
-
-        /// <summary>
-        /// Constructs a new IL type generator.
-        /// </summary>
-        /// <param name="capabilityContext">The parent context.</param>
-        /// <param name="runtimeSystem">The parent runtime system.</param>
-        /// <param name="warpSize">The current warp size.</param>
-        public VelocityTypeGenerator(
-            VelocityCapabilityContext capabilityContext,
-            RuntimeSystem runtimeSystem,
-            int warpSize)
-        {
-            CapabilityContext = capabilityContext;
-            RuntimeSystem = runtimeSystem;
-            WarpSize = warpSize;
-        }
+            typeMapping = new();
 
         #endregion
 
@@ -269,17 +251,17 @@ namespace ILGPU.Backends.IL
         /// <summary>
         /// Returns the parent capability context.
         /// </summary>
-        public VelocityCapabilityContext CapabilityContext { get; }
+        public VelocityCapabilityContext CapabilityContext { get; } = capabilityContext;
 
         /// <summary>
         /// Returns the parent runtime system.
         /// </summary>
-        public RuntimeSystem RuntimeSystem { get; }
+        public RuntimeSystem RuntimeSystem { get; } = runtimeSystem;
 
         /// <summary>
         /// Returns the current warp size.
         /// </summary>
-        public int WarpSize { get; }
+        public int WarpSize { get; } = warpSize;
 
         #endregion
 

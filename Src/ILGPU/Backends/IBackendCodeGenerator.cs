@@ -361,22 +361,18 @@ namespace ILGPU.Backends
     /// </summary>
     public static class BackendCodeGenerator
     {
-        private readonly struct BackendValueVisitor<TCodeGenerator> : IValueVisitor
+        /// <summary>
+        /// Creates a new code-generation visitor wrapper.
+        /// </summary>
+        /// <param name="codeGenerator">The parent code generator.</param>
+        private readonly struct BackendValueVisitor<TCodeGenerator>(TCodeGenerator codeGenerator) : IValueVisitor
             where TCodeGenerator : IBackendCodeGenerator
         {
-            /// <summary>
-            /// Creates a new code-generation visitor wrapper.
-            /// </summary>
-            /// <param name="codeGenerator">The parent code generator.</param>
-            public BackendValueVisitor(TCodeGenerator codeGenerator)
-            {
-                CodeGenerator = codeGenerator;
-            }
 
             /// <summary>
             /// Returns the parent code generator.
             /// </summary>
-            public TCodeGenerator CodeGenerator { get; }
+            public TCodeGenerator CodeGenerator { get; } = codeGenerator;
 
             /// <summary cref="IValueVisitor.Visit(MethodCall)"/>
             public void Visit(MethodCall methodCall) =>

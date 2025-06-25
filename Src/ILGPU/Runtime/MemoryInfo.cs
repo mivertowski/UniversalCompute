@@ -34,7 +34,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Represents unknown or unavailable memory information.
         /// </summary>
-        public static readonly MemoryInfo Unknown = new MemoryInfo();
+        public static readonly MemoryInfo Unknown = new();
 
         /// <summary>
         /// Initializes a new instance of MemoryInfo with unknown values.
@@ -240,7 +240,7 @@ namespace ILGPU.Runtime
         /// <param name="newAvailableMemory">The new available memory value.</param>
         /// <param name="newUsedMemory">The new used memory value.</param>
         /// <returns>A new MemoryInfo instance with updated values.</returns>
-        public MemoryInfo WithUpdatedUsage(long newAvailableMemory, long newUsedMemory) => new MemoryInfo(
+        public MemoryInfo WithUpdatedUsage(long newAvailableMemory, long newUsedMemory) => new(
                 TotalMemory,
                 newAvailableMemory,
                 newUsedMemory,

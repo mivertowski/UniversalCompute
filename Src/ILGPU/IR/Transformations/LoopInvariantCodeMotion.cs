@@ -36,17 +36,11 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Manages knowledge loop invariance.
         /// </summary>
-        private readonly struct LoopInvariance
+        private readonly struct LoopInvariance(Loops<ReversePostOrder, Forwards>.Loop loop)
         {
             #region Instance
 
-            private readonly Dictionary<Value, bool> mapping;
-
-            public LoopInvariance(Loop loop)
-            {
-                mapping = new Dictionary<Value, bool>(loop.Count << 1);
-                Loop = loop;
-            }
+            private readonly Dictionary<Value, bool> mapping = new Dictionary<Value, bool>(loop.Count << 1);
 
             #endregion
 
@@ -55,7 +49,7 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the parent loop.
             /// </summary>
-            public Loop Loop { get; }
+            public Loop Loop { get; } = loop;
 
             #endregion
 
@@ -115,20 +109,14 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// A helper structure to move values around
         /// </summary>
-        private struct Mover
+        /// <remarks>
+        /// Initializes a new mover.
+        /// </remarks>
+        /// <param name="numBlocks">The number of blocks of the parent loop.</param>
+        private struct Mover(int numBlocks)
         {
-            private readonly HashSet<Value> visited;
-            private InlineList<Value> toMove;
-
-            /// <summary>
-            /// Initializes a new mover.
-            /// </summary>
-            /// <param name="numBlocks">The number of blocks of the parent loop.</param>
-            public Mover(int numBlocks)
-            {
-                visited = new HashSet<Value>();
-                toMove = InlineList<Value>.Create(numBlocks << 1);
-            }
+            private readonly HashSet<Value> visited = new HashSet<Value>();
+            private InlineList<Value> toMove = InlineList<Value>.Create(numBlocks << 1);
 
             /// <summary>
             /// Registers the given value to be moved later.

@@ -224,7 +224,7 @@ namespace ILGPU.Backends.EntryPoints
             /// <returns>
             /// An enumerator to enumerate all parameters in this collection.
             /// </returns>
-            public Enumerator GetEnumerator() => new Enumerator(this);
+            public Enumerator GetEnumerator() => new(this);
 
             /// <summary cref="IEnumerable{T}.GetEnumerator"/>
             IEnumerator<ViewParameter> IEnumerable<ViewParameter>.GetEnumerator() =>
@@ -244,7 +244,7 @@ namespace ILGPU.Backends.EntryPoints
         /// Maps parameter indices to view-parameter intervals.
         /// </summary>
         private readonly Dictionary<int, (int, int)> viewParameterMapping =
-            new Dictionary<int, (int, int)>();
+            new();
 
         /// <summary>
         /// Constructs a new entry point targeting the given method.

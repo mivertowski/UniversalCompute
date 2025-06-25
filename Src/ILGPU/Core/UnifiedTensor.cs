@@ -27,23 +27,16 @@ namespace ILGPU.Core
     /// across ILGPU's ML, Numerics, and Hybrid tensor systems.
     /// </summary>
     /// <typeparam name="T">The element type, must be unmanaged.</typeparam>
-    public sealed class UnifiedTensor<T> : ITensorCore<T> where T : unmanaged
+    /// <remarks>
+    /// Initializes a new tensor with the specified shape on the given accelerator.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator to create the tensor on.</param>
+    /// <param name="shape">The tensor shape.</param>
+    public sealed class UnifiedTensor<T>(Accelerator accelerator, TensorShape shape) : ITensorCore<T> where T : unmanaged
     {
-        private readonly MemoryBuffer1D<T, Stride1D.Dense> buffer;
-        private readonly TensorShape shape;
+        private readonly MemoryBuffer1D<T, Stride1D.Dense> buffer = accelerator.Allocate1D<T>(shape.ElementCount);
+        private readonly TensorShape shape = shape;
         private bool disposed;
-
-        /// <summary>
-        /// Initializes a new tensor with the specified shape on the given accelerator.
-        /// </summary>
-        /// <param name="accelerator">The accelerator to create the tensor on.</param>
-        /// <param name="shape">The tensor shape.</param>
-        public UnifiedTensor(Accelerator accelerator, TensorShape shape)
-        {
-            this.shape = shape;
-            this.buffer = accelerator.Allocate1D<T>(shape.ElementCount);
-            Accelerator = accelerator;
-        }
 
         /// <summary>
         /// Initializes a new tensor with the specified shape and initial data.
@@ -80,7 +73,7 @@ namespace ILGPU.Core
         public long ElementCount => shape.ElementCount;
 
         /// <inheritdoc/>
-        public Accelerator Accelerator { get; }
+        public Accelerator Accelerator { get; } = accelerator;
 
         /// <inheritdoc/>
         public bool IsOnCPU => Accelerator is ILGPU.Runtime.CPU.CPUAccelerator;

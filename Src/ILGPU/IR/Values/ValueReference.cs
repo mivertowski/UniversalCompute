@@ -133,7 +133,7 @@ namespace ILGPU.IR.Values
         /// Refreshes the current reference and returns the new one.
         /// </summary>
         /// <returns>The refreshed reference.</returns>
-        public ValueReference Refresh() => new ValueReference(Resolve());
+        public ValueReference Refresh() => new(Resolve());
 
         /// <summary>
         /// Returns an enumerator to enumerate all child nodes.
@@ -239,7 +239,7 @@ namespace ILGPU.IR.Values
         /// </summary>
         /// <param name="node">The node to convert.</param>
         public static implicit operator ValueReference(Value node) =>
-            new ValueReference(node);
+            new(node);
 
         /// <summary>
         /// Converts the given reference to the latest node information.

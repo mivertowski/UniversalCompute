@@ -33,7 +33,7 @@ namespace ILGPU.Backends.EntryPoints
         /// <returns>The created entry point description.</returns>
         public static EntryPointDescription FromExplicitlyGroupedKernel(
             MethodInfo methodSource) =>
-            new EntryPointDescription(methodSource, null, IndexType.KernelConfig);
+            new(methodSource, null, IndexType.KernelConfig);
 
         /// <summary>
         /// Creates a new entry point description from the given method source that is

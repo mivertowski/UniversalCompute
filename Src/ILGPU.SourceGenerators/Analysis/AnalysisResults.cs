@@ -118,20 +118,12 @@ namespace ILGPU.SourceGenerators.Analysis
     /// <summary>
     /// Represents an analyzed kernel parameter.
     /// </summary>
-    internal sealed class AnalyzedParameter
+    internal sealed class AnalyzedParameter(IParameterSymbol symbol, ParameterKind kind, ITypeSymbol type, ITypeSymbol? elementType = null)
     {
-        public IParameterSymbol Symbol { get; }
-        public ParameterKind Kind { get; }
-        public ITypeSymbol Type { get; }
-        public ITypeSymbol? ElementType { get; }
-
-        public AnalyzedParameter(IParameterSymbol symbol, ParameterKind kind, ITypeSymbol type, ITypeSymbol? elementType = null)
-        {
-            Symbol = symbol;
-            Kind = kind;
-            Type = type;
-            ElementType = elementType;
-        }
+        public IParameterSymbol Symbol { get; } = symbol;
+        public ParameterKind Kind { get; } = kind;
+        public ITypeSymbol Type { get; } = type;
+        public ITypeSymbol? ElementType { get; } = elementType;
     }
 
     /// <summary>

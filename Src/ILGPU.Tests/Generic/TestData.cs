@@ -143,25 +143,19 @@ namespace ILGPU.Tests
     public static class PairStruct
     {
         public static PairStruct<float, float> MaxFloats =>
-            new PairStruct<float, float>(float.MaxValue, float.MaxValue);
+            new(float.MaxValue, float.MaxValue);
 
         public static PairStruct<double, double> MaxDoubles =>
-            new PairStruct<double, double>(double.MaxValue, double.MaxValue);
+            new(double.MaxValue, double.MaxValue);
     }
 
     [Serializable]
-    public struct PairStruct<T1, T2> : IXunitSerializable
+    public struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
         where T1 : struct
         where T2 : struct
     {
-        public PairStruct(T1 val0, T2 val1)
-        {
-            Val0 = val0;
-            Val1 = val1;
-        }
-
-        public T1 Val0;
-        public T2 Val1;
+        public T1 Val0 = val0;
+        public T2 Val1 = val1;
 
         public void Deserialize(IXunitSerializationInfo info)
         {

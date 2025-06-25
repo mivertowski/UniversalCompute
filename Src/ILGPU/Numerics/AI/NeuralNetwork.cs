@@ -23,23 +23,18 @@ namespace ILGPU.Numerics.AI
     /// <summary>
     /// Represents a neural network that can be executed on various accelerators.
     /// </summary>
-    public sealed class NeuralNetwork : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the NeuralNetwork class.
+    /// </remarks>
+    /// <param name="modelPath">The path to the model file.</param>
+    public sealed class NeuralNetwork(string modelPath) : IDisposable
     {
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the NeuralNetwork class.
-        /// </summary>
-        /// <param name="modelPath">The path to the model file.</param>
-        public NeuralNetwork(string modelPath)
-        {
-            ModelPath = modelPath ?? throw new ArgumentNullException(nameof(modelPath));
-        }
-
-        /// <summary>
         /// Gets the path to the model file.
         /// </summary>
-        public string ModelPath { get; }
+        public string ModelPath { get; } = modelPath ?? throw new ArgumentNullException(nameof(modelPath));
 
         /// <summary>
         /// Gets the input shape expected by the network.
@@ -61,21 +56,17 @@ namespace ILGPU.Numerics.AI
         /// </summary>
         /// <param name="inputShape">The input tensor shape.</param>
         /// <returns>The expected output shape.</returns>
-        public TensorShape GetOutputShape(TensorShape inputShape)
-        {
+        public TensorShape GetOutputShape(TensorShape inputShape) =>
             // For now, return a default output shape
             // In a real implementation, this would compute the actual output shape
-            return OutputShape;
-        }
+            OutputShape;
 
         /// <summary>
         /// Loads the neural network model.
         /// </summary>
-        public void Load()
-        {
+        public void Load() =>
             // Stub implementation - would load the actual model
             IsLoaded = true;
-        }
 
         /// <summary>
         /// Disposes the neural network.

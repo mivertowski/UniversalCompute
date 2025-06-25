@@ -183,7 +183,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// The internal rewriter.
         /// </summary>
-        private static readonly Rewriter Rewriter = new Rewriter();
+        private static readonly Rewriter Rewriter = new();
 
         /// <summary>
         /// Registers all rewriting patterns.

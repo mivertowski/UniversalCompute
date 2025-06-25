@@ -65,28 +65,23 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// Represents a file loader for PDB files.
         /// </summary>
-        readonly struct FileLoader : ILoader
+        /// <remarks>
+        /// Constructs a new file loader.
+        /// </remarks>
+        /// <param name="parent">The parent manager.</param>
+        /// <param name="pdbFileName">The file name to load.</param>
+        readonly struct FileLoader(DebugInformationManager parent, string pdbFileName) : ILoader
         {
-            /// <summary>
-            /// Constructs a new file loader.
-            /// </summary>
-            /// <param name="parent">The parent manager.</param>
-            /// <param name="pdbFileName">The file name to load.</param>
-            public FileLoader(DebugInformationManager parent, string pdbFileName)
-            {
-                Parent = parent;
-                PDBFileName = pdbFileName;
-            }
 
             /// <summary>
             /// Returns the parent debug-information manager.
             /// </summary>
-            public DebugInformationManager Parent { get; }
+            public DebugInformationManager Parent { get; } = parent;
 
             /// <summary>
             /// Returns the file name to load.
             /// </summary>
-            public string PDBFileName { get; }
+            public string PDBFileName { get; } = pdbFileName;
 
 
             /// <summary cref="ILoader.Load(Assembly, out AssemblyDebugInformation)"/>
@@ -137,21 +132,17 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// Represents a automatic file loader for PDB files.
         /// </summary>
-        readonly struct AutoFileLoader : ILoader
+        /// <remarks>
+        /// Constructs a new automatic file loader.
+        /// </remarks>
+        /// <param name="parent">The parent manager.</param>
+        readonly struct AutoFileLoader(DebugInformationManager parent) : ILoader
         {
-            /// <summary>
-            /// Constructs a new automatic file loader.
-            /// </summary>
-            /// <param name="parent">The parent manager.</param>
-            public AutoFileLoader(DebugInformationManager parent)
-            {
-                Parent = parent;
-            }
 
             /// <summary>
             /// Returns the parent debug-information manager.
             /// </summary>
-            public DebugInformationManager Parent { get; }
+            public DebugInformationManager Parent { get; } = parent;
 
             /// <summary cref="ILoader.Load(Assembly, out AssemblyDebugInformation?)"/>
             public bool Load(
@@ -176,30 +167,25 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// Represents a stream loader for PDB files.
         /// </summary>
-        readonly struct StreamLoader : ILoader
+        /// <remarks>
+        /// Constructs a new stream loader.
+        /// </remarks>
+        /// <param name="parent">The parent manager.</param>
+        /// <param name="pdbStream">
+        /// The stream to load from (must be left open).
+        /// </param>
+        readonly struct StreamLoader(DebugInformationManager parent, Stream pdbStream) : ILoader
         {
-            /// <summary>
-            /// Constructs a new stream loader.
-            /// </summary>
-            /// <param name="parent">The parent manager.</param>
-            /// <param name="pdbStream">
-            /// The stream to load from (must be left open).
-            /// </param>
-            public StreamLoader(DebugInformationManager parent, Stream pdbStream)
-            {
-                Parent = parent;
-                PDBStream = pdbStream;
-            }
 
             /// <summary>
             /// Returns the parent debug-information manager.
             /// </summary>
-            public DebugInformationManager Parent { get; }
+            public DebugInformationManager Parent { get; } = parent;
 
             /// <summary>
             /// Returns the stream to load from.
             /// </summary>
-            public Stream PDBStream { get; }
+            public Stream PDBStream { get; } = pdbStream;
 
             /// <summary cref="ILoader.Load(Assembly, out AssemblyDebugInformation?)"/>
             [SuppressMessage(
@@ -239,12 +225,12 @@ namespace ILGPU.Frontend.DebugInformation
         #region Instance
 
         private readonly ReaderWriterLockSlim cacheLock =
-            new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+            new(LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<string, string> pdbFiles =
-            new Dictionary<string, string>();
-        private readonly HashSet<string> lookupDirectories = new HashSet<string>();
+            new();
+        private readonly HashSet<string> lookupDirectories = new();
         private readonly Dictionary<Assembly, AssemblyDebugInformation> assemblies =
-            new Dictionary<Assembly, AssemblyDebugInformation>();
+            new();
 
         /// <summary>
         /// Constructs a new debug-information manager.

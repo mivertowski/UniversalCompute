@@ -26,15 +26,24 @@ namespace ILGPU.Backends.PTX
         /// <summary>
         /// Represents a general PTX command emitter.
         /// </summary>
-        public struct CommandEmitter : IDisposable
+        /// <remarks>
+        /// Constructs a new command emitter using the given target.
+        /// </remarks>
+        /// <param name="target">The target builder.</param>
+        /// <param name="argSeparator">The string used to separate arguments.</param>
+        /// <param name="terminator">The string used to end the command.</param>
+        public struct CommandEmitter(
+            StringBuilder target,
+            string argSeparator,
+            string terminator) : IDisposable
         {
             #region Instance
 
-            private readonly StringBuilder stringBuilder;
-            private bool argMode;
-            private int argumentCount;
-            private readonly string argumentSeparator;
-            private readonly string commandTerminator;
+            private readonly StringBuilder stringBuilder = target;
+            private bool argMode = false;
+            private int argumentCount = 0;
+            private readonly string argumentSeparator = argSeparator;
+            private readonly string commandTerminator = terminator;
 
             /// <summary>
             /// Constructs a new command emitter using the given target.
@@ -43,24 +52,6 @@ namespace ILGPU.Backends.PTX
             public CommandEmitter(StringBuilder target)
                 : this(target, argSeparator: ", ", terminator: ";")
             { }
-
-            /// <summary>
-            /// Constructs a new command emitter using the given target.
-            /// </summary>
-            /// <param name="target">The target builder.</param>
-            /// <param name="argSeparator">The string used to separate arguments.</param>
-            /// <param name="terminator">The string used to end the command.</param>
-            public CommandEmitter(
-                StringBuilder target,
-                string argSeparator,
-                string terminator)
-            {
-                stringBuilder = target;
-                argumentCount = 0;
-                argMode = false;
-                argumentSeparator = argSeparator;
-                commandTerminator = terminator;
-            }
 
             #endregion
 
@@ -496,7 +487,7 @@ namespace ILGPU.Backends.PTX
             /// Resolves a new predicate configuration.
             /// </summary>
             public PredicateConfiguration GetConfiguration(bool isTrue) =>
-                new PredicateConfiguration(PredicateRegister, isTrue);
+                new(PredicateRegister, isTrue);
 
             /// <summary>
             /// Converts the underlying predicate register to a

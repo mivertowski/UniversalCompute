@@ -17,13 +17,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class BasicPhis : TestBase
+    public abstract class BasicPhis(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
         private const int Length = 32;
-
-        protected BasicPhis(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int GetValueLoop(int c)

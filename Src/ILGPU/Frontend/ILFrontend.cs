@@ -32,32 +32,26 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Represents a single processing entry.
         /// </summary>
-        private readonly struct ProcessingEntry
+        private readonly struct ProcessingEntry(
+            MethodBase method,
+            CompilationStackLocation compilationStackLocation,
+            CodeGenerationResult? result)
         {
-            public ProcessingEntry(
-                MethodBase method,
-                CompilationStackLocation compilationStackLocation,
-                CodeGenerationResult? result)
-            {
-                Method = method;
-                CompilationStackLocation = compilationStackLocation;
-                Result = result;
-            }
 
             /// <summary>
             /// Returns the method.
             /// </summary>
-            public MethodBase Method { get; }
+            public MethodBase Method { get; } = method;
 
             /// <summary>
             /// Returns the source location.
             /// </summary>
-            public CompilationStackLocation CompilationStackLocation { get; }
+            public CompilationStackLocation CompilationStackLocation { get; } = compilationStackLocation;
 
             /// <summary>
             /// Returns the processing future.
             /// </summary>
-            public CodeGenerationResult? Result { get; }
+            public CodeGenerationResult? Result { get; } = result;
 
             /// <summary>
             /// Returns true if this is an external processing request.
@@ -84,9 +78,9 @@ namespace ILGPU.Frontend
         private readonly Thread[] threads;
         private readonly ManualResetEventSlim driverNotifier;
         private volatile int activeThreads;
-        private readonly object processingSyncObject = new object();
+        private readonly object processingSyncObject = new();
         private readonly Stack<ProcessingEntry> processing =
-            new Stack<ProcessingEntry>(1 << 6);
+            new(1 << 6);
 
         private volatile CodeGenerationPhase? codeGenerationPhase;
 

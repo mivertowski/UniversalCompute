@@ -180,7 +180,13 @@ namespace ILGPU.IR.Analyses
     /// Implements an alloca analysis to resolve information
     /// about alloca nodes.
     /// </summary>
-    public sealed class Allocas
+    /// <remarks>
+    /// Constructs a new analysis.
+    /// </remarks>
+    public sealed class Allocas(
+        in AllocaKindInformation localAllocations,
+        in AllocaKindInformation sharedAllocations,
+        in AllocaKindInformation dynamicSharedAllocations)
     {
         #region Shared
 
@@ -244,21 +250,7 @@ namespace ILGPU.IR.Analyses
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new analysis.
-        /// </summary>
-        public Allocas(
-            in AllocaKindInformation localAllocations,
-            in AllocaKindInformation sharedAllocations,
-            in AllocaKindInformation dynamicSharedAllocations)
-        {
-            LocalAllocations = localAllocations;
-            SharedAllocations = sharedAllocations;
-            DynamicSharedAllocations = dynamicSharedAllocations;
-        }
 
         /// <summary>
         /// Creates and adds a new allocation to the given list.
@@ -295,17 +287,17 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Returns all location allocations.
         /// </summary>
-        public AllocaKindInformation LocalAllocations { get; }
+        public AllocaKindInformation LocalAllocations { get; } = localAllocations;
 
         /// <summary>
         /// Returns all shared allocations.
         /// </summary>
-        public AllocaKindInformation SharedAllocations { get; }
+        public AllocaKindInformation SharedAllocations { get; } = sharedAllocations;
 
         /// <summary>
         /// Returns all dynamic shared allocations.
         /// </summary>
-        public AllocaKindInformation DynamicSharedAllocations { get; }
+        public AllocaKindInformation DynamicSharedAllocations { get; } = dynamicSharedAllocations;
 
         /// <summary>
         /// Returns the total local memory size in bytes.
@@ -387,7 +379,7 @@ namespace ILGPU.IR.Analyses
         /// </summary>
         /// <param name="capacity">The initial stack processing capacity.</param>
         public static AllocaAlignments Create(int capacity) =>
-            new AllocaAlignments(capacity);
+            new(capacity);
 
         #endregion
 

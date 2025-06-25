@@ -29,19 +29,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks group methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class GroupIntrinsicAttribute : IntrinsicAttribute
+    sealed class GroupIntrinsicAttribute(GroupIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public GroupIntrinsicAttribute(GroupIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Group;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public GroupIntrinsicKind IntrinsicKind { get; }
+        public GroupIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

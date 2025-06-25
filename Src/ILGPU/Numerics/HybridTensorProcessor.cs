@@ -260,7 +260,7 @@ namespace ILGPU.Numerics.Hybrid
         private readonly Context context;
         private readonly Accelerator[] accelerators;
         private HybridProcessorStats stats;
-        private readonly object statsLock = new object();
+        private readonly object statsLock = new();
         private bool disposed;
 
         /// <summary>
@@ -384,24 +384,21 @@ namespace ILGPU.Numerics.Hybrid
         private async Task<ITensor<T>> ExecuteCpuSimdAsync<T>(
             ITensor<T> input,
             TensorOperation operation,
-            CancellationToken ct) where T : unmanaged, IFloatingPoint<T>
-        {
-            return await Task.Run(() =>
-            {
-                var startTime = DateTime.UtcNow;
-                
-                // Execute operation using CPU SIMD
-                var result = ExecuteCpuOperation(input, operation);
-                
-                lock (statsLock)
-                {
-                    stats.CpuOperationsExecuted++;
-                    stats.CpuExecutionTime += DateTime.UtcNow - startTime;
-                }
-                
-                return result;
-            }, ct);
-        }
+            CancellationToken ct) where T : unmanaged, IFloatingPoint<T> => await Task.Run(() =>
+                                                                                     {
+                                                                                         var startTime = DateTime.UtcNow;
+
+                                                                                         // Execute operation using CPU SIMD
+                                                                                         var result = ExecuteCpuOperation(input, operation);
+
+                                                                                         lock (statsLock)
+                                                                                         {
+                                                                                             stats.CpuOperationsExecuted++;
+                                                                                             stats.CpuExecutionTime += DateTime.UtcNow - startTime;
+                                                                                         }
+
+                                                                                         return result;
+                                                                                     }, ct);
 
         private async Task<ITensor<T>> ExecuteGpuTensorCoreAsync<T>(
             ITensor<T> input,
@@ -465,10 +462,9 @@ namespace ILGPU.Numerics.Hybrid
         }
 
         private ITensor<T> ExecuteCpuOperation<T>(ITensor<T> input, TensorOperation operation)
-            where T : unmanaged, IFloatingPoint<T>
-        {
+            where T : unmanaged, IFloatingPoint<T> =>
             // Execute operation using CPU SIMD operations
-            return operation.Type switch
+            operation.Type switch
             {
                 TensorOperationType.ElementWiseAdd => CreateRandomResult(input),
                 TensorOperationType.MatrixMultiply => CreateRandomResult(input),
@@ -479,13 +475,11 @@ namespace ILGPU.Numerics.Hybrid
                 TensorOperationType.Convolution2D => CreateRandomResult(input),
                 _ => throw new NotSupportedException($"Operation type {operation.Type} not supported on CPU")
             };
-        }
 
         private ITensor<T> ExecuteGpuTensorCoreOperation<T>(ITensor<T> input, TensorOperation operation, Accelerator accelerator)
-            where T : unmanaged, IFloatingPoint<T>
-        {
+            where T : unmanaged, IFloatingPoint<T> =>
             // Execute operation using GPU tensor core operations
-            return operation.Type switch
+            operation.Type switch
             {
                 TensorOperationType.MatrixMultiply => CreateRandomResult(input),
                 TensorOperationType.ElementWiseAdd => CreateRandomResult(input),
@@ -493,13 +487,11 @@ namespace ILGPU.Numerics.Hybrid
                 TensorOperationType.Convolution2D => CreateRandomResult(input),
                 _ => throw new NotSupportedException($"Operation type {operation.Type} not optimized for tensor cores")
             };
-        }
 
         private ITensor<T> ExecuteGpuGeneralOperation<T>(ITensor<T> input, TensorOperation operation, Accelerator accelerator)
-            where T : unmanaged, IFloatingPoint<T>
-        {
+            where T : unmanaged, IFloatingPoint<T> =>
             // Execute operation using GPU general compute operations
-            return operation.Type switch
+            operation.Type switch
             {
                 TensorOperationType.ElementWiseAdd => CreateRandomResult(input),
                 TensorOperationType.MatrixMultiply => CreateRandomResult(input),
@@ -510,7 +502,6 @@ namespace ILGPU.Numerics.Hybrid
                 TensorOperationType.Convolution2D => CreateRandomResult(input),
                 _ => throw new NotSupportedException($"Operation type {operation.Type} not supported on GPU")
             };
-        }
 
         private void ThrowIfDisposed()
         {
@@ -518,12 +509,10 @@ namespace ILGPU.Numerics.Hybrid
                 throw new ObjectDisposedException(nameof(HybridTensorProcessor));
         }
 
-        private ITensor<T> CreateRandomResult<T>(ITensor<T> input) where T : unmanaged, IFloatingPoint<T>
-        {
+        private ITensor<T> CreateRandomResult<T>(ITensor<T> input) where T : unmanaged, IFloatingPoint<T> =>
             // Create a result tensor with random data for benchmarking purposes
             // Return a result tensor for benchmarking purposes
-            return input;
-        }
+            input;
 
         #endregion
 
@@ -551,10 +540,7 @@ namespace ILGPU.Numerics.Hybrid
         /// </summary>
         /// <param name="context">The ILGPU context.</param>
         /// <returns>A configured hybrid tensor processor.</returns>
-        public static IHybridTensorProcessor Create(Context context)
-        {
-            return new HybridTensorProcessor(context);
-        }
+        public static IHybridTensorProcessor Create(Context context) => new HybridTensorProcessor(context);
 
         /// <summary>
         /// Creates a hybrid tensor processor with the best available devices.

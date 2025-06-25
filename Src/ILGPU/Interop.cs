@@ -199,7 +199,7 @@ namespace ILGPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [InteropIntrinsic(InteropIntrinsicKind.IntAsFloat)]
         public static Half IntAsFloat(ushort value) =>
-            new Half(value);
+            new(value);
 
         /// <summary>
         /// Casts the given int to a float via a reinterpret cast.

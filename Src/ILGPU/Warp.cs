@@ -101,7 +101,7 @@ namespace ILGPU
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static ShuffleConfig GetShuffleConfig(int sourceLane) =>
-            new ShuffleConfig(
+            new(
                 LaneIdx,
                 sourceLane,
                 0,

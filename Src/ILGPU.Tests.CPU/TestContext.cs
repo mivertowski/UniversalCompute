@@ -23,7 +23,27 @@ namespace ILGPU.Tests.CPU
     /// string representation of one of the enumeration members of
     /// <see cref="CPUDeviceKind"/>
     /// </remarks>
-    public abstract class CPUTestContext : TestContext
+    /// <remarks>
+    /// Creates a new test context instance.
+    /// </remarks>
+    /// <param name="optimizationLevel">The optimization level to use.</param>
+    /// <param name="enableAssertions">
+    /// Enables use of assertions.
+    /// </param>
+    /// <param name="forceDebugConfig">
+    /// Forces use of debug configuration in O1 and O2 builds.
+    /// </param>
+    /// <param name="prepareContext">The context preparation handler.</param>
+    public abstract class CPUTestContext(
+        OptimizationLevel optimizationLevel,
+        bool enableAssertions,
+        bool forceDebugConfig,
+        Action<Context.Builder> prepareContext) : TestContext(
+              optimizationLevel,
+              enableAssertions,
+              forceDebugConfig,
+              builder => prepareContext(builder.CPU(GetCPUDeviceKind())),
+              context => context.CreateCPUAccelerator(0))
     {
         /// <summary>
         /// The name of the environment variable to control the kind of all CPU tests.
@@ -47,29 +67,5 @@ namespace ILGPU.Tests.CPU
                 ? kind
                 : CPUDeviceKind.Default;
         }
-
-        /// <summary>
-        /// Creates a new test context instance.
-        /// </summary>
-        /// <param name="optimizationLevel">The optimization level to use.</param>
-        /// <param name="enableAssertions">
-        /// Enables use of assertions.
-        /// </param>
-        /// <param name="forceDebugConfig">
-        /// Forces use of debug configuration in O1 and O2 builds.
-        /// </param>
-        /// <param name="prepareContext">The context preparation handler.</param>
-        protected CPUTestContext(
-            OptimizationLevel optimizationLevel,
-            bool enableAssertions,
-            bool forceDebugConfig,
-            Action<Context.Builder> prepareContext)
-            : base(
-                  optimizationLevel,
-                  enableAssertions,
-                  forceDebugConfig,
-                  builder => prepareContext(builder.CPU(GetCPUDeviceKind())),
-                  context => context.CreateCPUAccelerator(0))
-        { }
     }
 }

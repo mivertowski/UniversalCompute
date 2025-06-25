@@ -112,7 +112,7 @@ namespace ILGPU.IR.Analyses
             /// Seals the current builder and creates a <see cref="Phis"/> instance.
             /// </summary>
             /// <returns>The created <see cref="Phis"/> instance.</returns>
-            public Phis Seal() => new Phis(Method, phiValues.AsReadOnlySpan());
+            public Phis Seal() => new(Method, phiValues.AsReadOnlySpan());
 
             #endregion
         }
@@ -126,7 +126,7 @@ namespace ILGPU.IR.Analyses
         /// </summary>
         /// <param name="method">The parent method to use.</param>
         /// <returns>The created analysis builder.</returns>
-        public static Builder CreateBuilder(Method method) => new Builder(method);
+        public static Builder CreateBuilder(Method method) => new(method);
 
         /// <summary>
         /// Resolves all phi values in the given block collection.

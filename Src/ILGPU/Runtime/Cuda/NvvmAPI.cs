@@ -110,7 +110,7 @@ namespace ILGPU.Runtime.Cuda
         /// <param name="libDevicePath">Path to LibDevice bitcode.</param>
         /// <returns>The NVVM API instance.</returns>
         public static NvvmAPI Create(string libNvvmPath, string libDevicePath) =>
-            new NvvmAPI(libNvvmPath, libDevicePath);
+            new(libNvvmPath, libDevicePath);
 
         #endregion
 

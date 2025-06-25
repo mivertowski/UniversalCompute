@@ -89,17 +89,13 @@ namespace ILGPU.Runtime.Velocity
 
     }
 
-    sealed class VelocityMemoryBufferPool : VelocityMemoryBuffer
+    sealed class VelocityMemoryBufferPool(
+        VelocityAccelerator accelerator,
+        int size) : VelocityMemoryBuffer(accelerator, size, 1)
     {
         #region Instance
 
         private int sharedMemoryOffset;
-
-        public VelocityMemoryBufferPool(
-            VelocityAccelerator accelerator,
-            int size)
-            : base(accelerator, size, 1)
-        { }
 
         #endregion
 

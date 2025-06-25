@@ -27,27 +27,21 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks grid methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class GridIntrinsicAttribute : IntrinsicAttribute
+    sealed class GridIntrinsicAttribute(
+        GridIntrinsicKind intrinsicKind,
+        DeviceConstantDimension3D dimension) : IntrinsicAttribute
     {
-        public GridIntrinsicAttribute(
-            GridIntrinsicKind intrinsicKind,
-            DeviceConstantDimension3D dimension)
-        {
-            IntrinsicKind = intrinsicKind;
-            Dimension = dimension;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Grid;
 
         /// <summary>
         /// The associated constant dimension.
         /// </summary>
-        public DeviceConstantDimension3D Dimension { get; }
+        public DeviceConstantDimension3D Dimension { get; } = dimension;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public GridIntrinsicKind IntrinsicKind { get; }
+        public GridIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

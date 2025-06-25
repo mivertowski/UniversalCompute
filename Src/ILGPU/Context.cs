@@ -159,7 +159,7 @@ namespace ILGPU
             /// Returns an enumerator to enumerate all uses devices.
             /// </summary>
             /// <returns>The enumerator.</returns>
-            public readonly Enumerator GetEnumerator() => new Enumerator(devices);
+            public readonly Enumerator GetEnumerator() => new(devices);
         }
 
         #endregion
@@ -227,7 +227,7 @@ namespace ILGPU
         /// <summary>
         /// The synchronization semaphore for frontend workers.
         /// </summary>
-        private readonly SemaphoreSlim codeGenerationSemaphore = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim codeGenerationSemaphore = new(1);
 
         /// <summary>
         /// An internal mapping of accelerator types to individual devices.

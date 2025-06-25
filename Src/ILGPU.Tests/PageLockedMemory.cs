@@ -17,15 +17,11 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class PageLockedMemory : TestBase
+    public abstract class PageLockedMemory(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected PageLockedMemory(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         private const int Length = 1024;
 
-        public static TheoryData<long> Numbers => new TheoryData<long>
+        public static TheoryData<long> Numbers => new()
         {
             { 10 },
             { -10 },

@@ -20,25 +20,20 @@ namespace ILGPU.IR.Serialization
     /// Wrapper class around <see cref="BinaryWriter"/>
     /// for serializing IR types and values. 
     /// </summary>
-    public sealed partial class BinaryIRWriter : DisposeBase, IIRWriter
+    /// <remarks>
+    /// Wraps an instance of <see cref="BinaryIRWriter"/>
+    /// around a given <see cref="Stream"/>.
+    /// </remarks>
+    /// <param name="stream">
+    /// The <see cref="Stream"/> instance to wrap.
+    /// </param>
+    /// <param name="encoding">
+    /// The <see cref="Encoding"/> to use for
+    /// serializing <see cref="string"/> values.
+    /// </param>
+    public sealed partial class BinaryIRWriter(Stream stream, Encoding encoding) : DisposeBase, IIRWriter
     {
-        private readonly BinaryWriter writer;
-
-        /// <summary>
-        /// Wraps an instance of <see cref="BinaryIRWriter"/>
-        /// around a given <see cref="Stream"/>.
-        /// </summary>
-        /// <param name="stream">
-        /// The <see cref="Stream"/> instance to wrap.
-        /// </param>
-        /// <param name="encoding">
-        /// The <see cref="Encoding"/> to use for
-        /// serializing <see cref="string"/> values.
-        /// </param>
-        public BinaryIRWriter(Stream stream, Encoding encoding)
-        {
-            writer = new BinaryWriter(stream, encoding);
-        }
+        private readonly BinaryWriter writer = new BinaryWriter(stream, encoding);
 
         /// <inheritdoc/>
         public void Write(string tag, int value) =>

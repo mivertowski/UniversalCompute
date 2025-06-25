@@ -31,27 +31,21 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks intrinsic atomic methods.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class AtomicIntrinsicAttribute : IntrinsicAttribute
+    sealed class AtomicIntrinsicAttribute(
+        AtomicIntrinsicKind intrinsicKind,
+        AtomicFlags intrinsicFlags) : IntrinsicAttribute
     {
-        public AtomicIntrinsicAttribute(
-            AtomicIntrinsicKind intrinsicKind,
-            AtomicFlags intrinsicFlags)
-        {
-            IntrinsicKind = intrinsicKind;
-            IntrinsicFlags = intrinsicFlags;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Atomic;
 
         /// <summary>
         /// Returns the associated intrinsic kind.
         /// </summary>
-        public AtomicIntrinsicKind IntrinsicKind { get; }
+        public AtomicIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
 
         /// <summary>
         /// Returns the associated intrinsic flags.
         /// </summary>
-        public AtomicFlags IntrinsicFlags { get; }
+        public AtomicFlags IntrinsicFlags { get; } = intrinsicFlags;
     }
 
     partial class Intrinsics

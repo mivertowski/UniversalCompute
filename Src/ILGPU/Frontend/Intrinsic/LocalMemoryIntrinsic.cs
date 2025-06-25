@@ -25,19 +25,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks local-memory methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class LocalMemoryIntrinsicAttribute : IntrinsicAttribute
+    sealed class LocalMemoryIntrinsicAttribute(LocalMemoryIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public LocalMemoryIntrinsicAttribute(LocalMemoryIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.LocalMemory;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public LocalMemoryIntrinsicKind IntrinsicKind { get; }
+        public LocalMemoryIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

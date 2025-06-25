@@ -15,14 +15,10 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class InteropTests : TestBase
+    public abstract class InteropTests(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
-        protected InteropTests(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void PrintFKernel(
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data,

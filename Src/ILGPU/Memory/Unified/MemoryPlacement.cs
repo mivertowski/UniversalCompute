@@ -95,63 +95,52 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Describes the characteristics and capabilities of a memory placement.
     /// </summary>
-    public readonly struct MemoryPlacementInfo
+    /// <remarks>
+    /// Initializes a new instance of the MemoryPlacementInfo struct.
+    /// </remarks>
+    public readonly struct MemoryPlacementInfo(
+        MemoryPlacement placement,
+        bool supportsZeroCopy,
+        bool supportsAutoMigration,
+        float relativeBandwidth,
+        float relativeLatency,
+        bool isAvailable,
+        string description)
     {
         /// <summary>
         /// Gets the memory placement type.
         /// </summary>
-        public MemoryPlacement Placement { get; }
+        public MemoryPlacement Placement { get; } = placement;
 
         /// <summary>
         /// Gets whether this placement supports zero-copy access.
         /// </summary>
-        public bool SupportsZeroCopy { get; }
+        public bool SupportsZeroCopy { get; } = supportsZeroCopy;
 
         /// <summary>
         /// Gets whether this placement supports automatic migration.
         /// </summary>
-        public bool SupportsAutoMigration { get; }
+        public bool SupportsAutoMigration { get; } = supportsAutoMigration;
 
         /// <summary>
         /// Gets the relative bandwidth of this memory placement (1.0 = baseline).
         /// </summary>
-        public float RelativeBandwidth { get; }
+        public float RelativeBandwidth { get; } = relativeBandwidth;
 
         /// <summary>
         /// Gets the relative latency of this memory placement (1.0 = baseline).
         /// </summary>
-        public float RelativeLatency { get; }
+        public float RelativeLatency { get; } = relativeLatency;
 
         /// <summary>
         /// Gets whether this placement is available on the current platform.
         /// </summary>
-        public bool IsAvailable { get; }
+        public bool IsAvailable { get; } = isAvailable;
 
         /// <summary>
         /// Gets a description of this memory placement.
         /// </summary>
-        public string Description { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the MemoryPlacementInfo struct.
-        /// </summary>
-        public MemoryPlacementInfo(
-            MemoryPlacement placement,
-            bool supportsZeroCopy,
-            bool supportsAutoMigration,
-            float relativeBandwidth,
-            float relativeLatency,
-            bool isAvailable,
-            string description)
-        {
-            Placement = placement;
-            SupportsZeroCopy = supportsZeroCopy;
-            SupportsAutoMigration = supportsAutoMigration;
-            RelativeBandwidth = relativeBandwidth;
-            RelativeLatency = relativeLatency;
-            IsAvailable = isAvailable;
-            Description = description;
-        }
+        public string Description { get; } = description;
     }
 
     /// <summary>

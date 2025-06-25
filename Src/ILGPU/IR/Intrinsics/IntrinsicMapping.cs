@@ -91,20 +91,15 @@ namespace ILGPU.IR.Intrinsics
         /// <summary>
         /// Represents a cached mapping key.
         /// </summary>
-        public readonly struct MappingKey : IEquatable<MappingKey>
+        /// <remarks>
+        /// Constructs a new mapping key.
+        /// </remarks>
+        /// <param name="arguments">The type arguments.</param>
+        public readonly struct MappingKey(Type[] arguments) : IEquatable<MappingKey>
         {
             #region Instance
 
-            private readonly Type[] genericArguments;
-
-            /// <summary>
-            /// Constructs a new mapping key.
-            /// </summary>
-            /// <param name="arguments">The type arguments.</param>
-            public MappingKey(Type[] arguments)
-            {
-                genericArguments = arguments;
-            }
+            private readonly Type[] genericArguments = arguments;
 
             #endregion
 

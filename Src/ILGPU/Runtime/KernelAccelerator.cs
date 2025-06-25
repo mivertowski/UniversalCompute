@@ -23,20 +23,17 @@ namespace ILGPU.Runtime
     /// </summary>
     /// <typeparam name="TCompiledKernel">The type of a compiled kernel.</typeparam>
     /// <typeparam name="TKernel">The type of a loaded runtime kernel</typeparam>
-    public abstract class KernelAccelerator<TCompiledKernel, TKernel> : Accelerator
+    /// <remarks>
+    /// Constructs a new kernel accelerator.
+    /// </remarks>
+    /// <param name="context">The target context.</param>
+    /// <param name="device">The device.</param>
+    public abstract class KernelAccelerator<TCompiledKernel, TKernel>(Context context, Device device) : Accelerator(context, device)
         where TCompiledKernel : CompiledKernel
         where TKernel : Kernel
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new kernel accelerator.
-        /// </summary>
-        /// <param name="context">The target context.</param>
-        /// <param name="device">The device.</param>
-        protected KernelAccelerator(Context context, Device device)
-            : base(context, device)
-        { }
+        #region Instance
 
         #endregion
 

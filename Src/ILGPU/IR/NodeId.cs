@@ -26,7 +26,7 @@ namespace ILGPU.IR
         /// </summary>
         /// <returns>A new unique node id.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static NodeId CreateNew() => new NodeId(InstanceId.CreateNew());
+        public static NodeId CreateNew() => new(InstanceId.CreateNew());
 
         #endregion
 

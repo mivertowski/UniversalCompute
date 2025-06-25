@@ -74,21 +74,17 @@ namespace ILGPU.IR.Construction
         /// <summary>
         /// Provides marker values.
         /// </summary>
-        internal ref struct MarkerProvider
+        /// <remarks>
+        /// Constructs a new marker provider.
+        /// </remarks>
+        /// <param name="markerValue">The current marker value.</param>
+        internal ref struct MarkerProvider(int markerValue)
         {
-            /// <summary>
-            /// Constructs a new marker provider.
-            /// </summary>
-            /// <param name="markerValue">The current marker value.</param>
-            public MarkerProvider(int markerValue)
-            {
-                MarkerValue = markerValue;
-            }
 
             /// <summary>
             /// Returns the current marker value.
             /// </summary>
-            public int MarkerValue { get; private set; }
+            public int MarkerValue { get; private set; } = markerValue;
 
             /// <summary>
             /// Creates a new marker value.
@@ -117,30 +113,25 @@ namespace ILGPU.IR.Construction
             /// Represents an incomplete phi parameter that has to be
             /// completed by adding its required operands later on.
             /// </summary>
-            private readonly struct IncompletePhi
+            /// <remarks>
+            /// Constructs an incomplete phi.
+            /// </remarks>
+            /// <param name="variableRef">The referenced variable.</param>
+            /// <param name="phiBuilder">The phi builder.</param>
+            private readonly struct IncompletePhi(
+                TVariable variableRef,
+                PhiValue.Builder phiBuilder)
             {
-                /// <summary>
-                /// Constructs an incomplete phi.
-                /// </summary>
-                /// <param name="variableRef">The referenced variable.</param>
-                /// <param name="phiBuilder">The phi builder.</param>
-                public IncompletePhi(
-                    TVariable variableRef,
-                    PhiValue.Builder phiBuilder)
-                {
-                    VariableRef = variableRef;
-                    PhiBuilder = phiBuilder;
-                }
 
                 /// <summary>
                 /// Returns the associated variable ref.
                 /// </summary>
-                public TVariable VariableRef { get; }
+                public TVariable VariableRef { get; } = variableRef;
 
                 /// <summary>
                 /// Returns the associated phi builder.
                 /// </summary>
-                public PhiValue.Builder PhiBuilder { get; }
+                public PhiValue.Builder PhiBuilder { get; } = phiBuilder;
 
                 /// <summary>
                 /// Returns the type of the underlying phi node.
@@ -171,14 +162,14 @@ namespace ILGPU.IR.Construction
             /// Value cache for SSA GetValue and SetValue functionality.
             /// </summary>
             private readonly Dictionary<TVariable, Value> values =
-                new Dictionary<TVariable, Value>();
+                new();
 
             /// <summary>
             /// Container for incomplete "phis" that have to be wired during block
             /// sealing.
             /// </summary>
             private readonly Dictionary<TVariable, IncompletePhi> incompletePhis =
-                new Dictionary<TVariable, IncompletePhi>();
+                new();
 
             /// <summary>
             /// Constructs a new SSA block.
@@ -446,22 +437,18 @@ namespace ILGPU.IR.Construction
         /// <summary>
         /// Provides <see cref="ValueContainer"/> instances.
         /// </summary>
-        private readonly struct ValueContainerProvider :
+        /// <remarks>
+        /// Constructs a new container provider.
+        /// </remarks>
+        /// <param name="parent">The parent SSA builder.</param>
+        private readonly struct ValueContainerProvider(SSABuilder<TVariable> parent) :
             IBasicBlockMapValueProvider<ValueContainer>
         {
-            /// <summary>
-            /// Constructs a new container provider.
-            /// </summary>
-            /// <param name="parent">The parent SSA builder.</param>
-            public ValueContainerProvider(SSABuilder<TVariable> parent)
-            {
-                Parent = parent;
-            }
 
             /// <summary>
             /// Returns the parent SSA builder.
             /// </summary>
-            public SSABuilder<TVariable> Parent { get; }
+            public SSABuilder<TVariable> Parent { get; } = parent;
 
             /// <summary>
             /// Creates a new <see cref="ValueContainer"/> instance.
@@ -470,7 +457,7 @@ namespace ILGPU.IR.Construction
             public readonly ValueContainer GetValue(
                 BasicBlock block,
                 int traversalIndex) =>
-                new ValueContainer(Parent, block);
+                new(Parent, block);
         }
 
         #endregion
@@ -495,7 +482,7 @@ namespace ILGPU.IR.Construction
         public static SSABuilder<TVariable> Create(
             Method.Builder methodBuilder,
             in BlockCollection blockCollection) =>
-            new SSABuilder<TVariable>(
+            new(
                 methodBuilder ?? throw new ArgumentNullException(nameof(methodBuilder)),
                 blockCollection);
 

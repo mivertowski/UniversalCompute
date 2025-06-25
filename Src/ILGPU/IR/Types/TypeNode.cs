@@ -114,7 +114,11 @@ namespace ILGPU.IR.Types
     /// <summary>
     /// Represents a type in the scope of the ILGPU IR.
     /// </summary>
-    public abstract class TypeNode : Node, ITypeNode
+    /// <remarks>
+    /// Constructs a new type.
+    /// </remarks>
+    /// <param name="typeContext">The parent type context.</param>
+    public abstract class TypeNode(IRTypeContext typeContext) : Node(Location.Unknown), ITypeNode
     {
         #region Static
 
@@ -192,19 +196,6 @@ namespace ILGPU.IR.Types
         /// </summary>
         private Type? managedType;
 
-        /// <summary>
-        /// Constructs a new type.
-        /// </summary>
-        /// <param name="typeContext">The parent type context.</param>
-        protected TypeNode(IRTypeContext typeContext)
-            : base(Location.Unknown)
-        {
-            TypeContext = typeContext;
-
-            Size = 1;
-            Alignment = 1;
-        }
-
         #endregion
 
         #region Properties
@@ -212,7 +203,7 @@ namespace ILGPU.IR.Types
         /// <summary>
         /// Returns the parent type context.
         /// </summary>
-        public IRTypeContext TypeContext { get; }
+        public IRTypeContext TypeContext { get; } = typeContext;
 
         /// <summary>
         /// Returns the current runtime system.
@@ -222,12 +213,12 @@ namespace ILGPU.IR.Types
         /// <summary>
         /// The size of the type in bytes (if the type is in its lowered representation).
         /// </summary>
-        public int Size { get; protected set; }
+        public int Size { get; protected set; } = 1;
 
         /// <summary>
         /// The type alignment in bytes (if the type is in its lowered representation).
         /// </summary>
-        public int Alignment { get; protected set; }
+        public int Alignment { get; protected set; } = 1;
 
         /// <summary>
         /// Returns true if the current type is a <see cref="VoidType"/>.

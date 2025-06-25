@@ -18,13 +18,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class BasicIfs : TestBase
+    public abstract class BasicIfs(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
         private const int Length = 32;
-
-        protected BasicIfs(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         internal static void IfTrueKernel(
             Index1D index,

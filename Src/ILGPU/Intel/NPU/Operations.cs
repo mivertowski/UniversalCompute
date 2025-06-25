@@ -123,25 +123,15 @@ namespace ILGPU.Intel.NPU
     /// Attention operation for NPU execution.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
-    public sealed class AttentionOperation<T> : NPUOperation<T> where T : unmanaged
+    /// <remarks>
+    /// Initializes a new instance of the AttentionOperation class.
+    /// </remarks>
+    /// <param name="query">The query tensor.</param>
+    /// <param name="key">The key tensor.</param>
+    /// <param name="value">The value tensor.</param>
+    /// <param name="parameters">The attention parameters.</param>
+    public sealed class AttentionOperation<T>(ITensor<T> query, ITensor<T> key, ITensor<T> value, AttentionParameters parameters) : NPUOperation<T> where T : unmanaged
     {
-        /// <summary>
-        /// Initializes a new instance of the AttentionOperation class.
-        /// </summary>
-        /// <param name="query">The query tensor.</param>
-        /// <param name="key">The key tensor.</param>
-        /// <param name="value">The value tensor.</param>
-        /// <param name="parameters">The attention parameters.</param>
-        public AttentionOperation(ITensor<T> query, ITensor<T> key, ITensor<T> value, AttentionParameters parameters)
-        {
-            Query = query ?? throw new ArgumentNullException(nameof(query));
-            Key = key ?? throw new ArgumentNullException(nameof(key));
-            Value = value ?? throw new ArgumentNullException(nameof(value));
-            Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-            
-            // Output shape is same as query
-            OutputShape = query.Shape;
-        }
 
         /// <summary>
         /// Gets the operation name.
@@ -156,27 +146,27 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the query tensor.
         /// </summary>
-        public ITensor<T> Query { get; }
+        public ITensor<T> Query { get; } = query ?? throw new ArgumentNullException(nameof(query));
 
         /// <summary>
         /// Gets the key tensor.
         /// </summary>
-        public ITensor<T> Key { get; }
+        public ITensor<T> Key { get; } = key ?? throw new ArgumentNullException(nameof(key));
 
         /// <summary>
         /// Gets the value tensor.
         /// </summary>
-        public ITensor<T> Value { get; }
+        public ITensor<T> Value { get; } = value ?? throw new ArgumentNullException(nameof(value));
 
         /// <summary>
         /// Gets the attention parameters.
         /// </summary>
-        public AttentionParameters Parameters { get; }
+        public AttentionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
         /// <summary>
         /// Gets the expected output shape.
         /// </summary>
-        public override TensorShape OutputShape { get; }
+        public override TensorShape OutputShape { get; } = query.Shape;
 
         /// <summary>
         /// Executes the attention operation on the NPU.

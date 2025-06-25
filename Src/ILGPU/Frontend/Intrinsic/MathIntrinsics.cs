@@ -20,31 +20,25 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks math methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class MathIntrinsicAttribute : IntrinsicAttribute
+    sealed class MathIntrinsicAttribute(
+        MathIntrinsicKind intrinsicKind,
+        ArithmeticFlags intrinsicFlags) : IntrinsicAttribute
     {
         public MathIntrinsicAttribute(MathIntrinsicKind intrinsicKind)
             : this(intrinsicKind, ArithmeticFlags.None)
         { }
-
-        public MathIntrinsicAttribute(
-            MathIntrinsicKind intrinsicKind,
-            ArithmeticFlags intrinsicFlags)
-        {
-            IntrinsicKind = intrinsicKind;
-            IntrinsicFlags = intrinsicFlags;
-        }
 
         public override IntrinsicType Type => IntrinsicType.Math;
 
         /// <summary>
         /// Returns the associated intrinsic kind.
         /// </summary>
-        public MathIntrinsicKind IntrinsicKind { get; }
+        public MathIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
 
         /// <summary>
         /// Returns the associated intrinsic flags.
         /// </summary>
-        public ArithmeticFlags IntrinsicFlags { get; }
+        public ArithmeticFlags IntrinsicFlags { get; } = intrinsicFlags;
     }
 
     partial class Intrinsics

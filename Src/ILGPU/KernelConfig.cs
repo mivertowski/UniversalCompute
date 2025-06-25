@@ -261,7 +261,7 @@ namespace ILGPU
         /// <param name="dimensions">The kernel dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig((Index1D, Index1D) dimensions) =>
-            new KernelConfig(
+            new(
                 new Index3D(dimensions.Item1, 1, 1),
                 new Index3D(dimensions.Item2, 1, 1));
 
@@ -271,7 +271,7 @@ namespace ILGPU
         /// <param name="dimensions">The kernel dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig((Index3D, Index1D) dimensions) =>
-            new KernelConfig(dimensions.Item1, new Index3D(dimensions.Item2, 1, 1));
+            new(dimensions.Item1, new Index3D(dimensions.Item2, 1, 1));
 
         /// <summary>
         /// Converts the given dimension tuple into an equivalent kernel configuration.
@@ -279,7 +279,7 @@ namespace ILGPU
         /// <param name="dimensions">The kernel dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig((Index3D, Index2D) dimensions) =>
-            new KernelConfig(dimensions.Item1, new Index3D(dimensions.Item2, 1));
+            new(dimensions.Item1, new Index3D(dimensions.Item2, 1));
 
         /// <summary>
         /// Converts the given dimension tuple into an equivalent kernel configuration.
@@ -287,7 +287,7 @@ namespace ILGPU
         /// <param name="dimensions">The kernel dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig((Index2D, Index2D) dimensions) =>
-            new KernelConfig(dimensions.Item1, dimensions.Item2);
+            new(dimensions.Item1, dimensions.Item2);
 
         /// <summary>
         /// Converts the given dimension tuple into an equivalent kernel configuration.
@@ -295,7 +295,7 @@ namespace ILGPU
         /// <param name="dimensions">The kernel dimensions.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig((Index3D, Index3D) dimensions) =>
-            new KernelConfig(dimensions.Item1, dimensions.Item2);
+            new(dimensions.Item1, dimensions.Item2);
 
         /// <summary>
         /// Converts the given dimension tuple into an equivalent kernel configuration.
@@ -304,7 +304,7 @@ namespace ILGPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig(
             (Index1D, Index1D, SharedMemoryConfig) dimensions) =>
-            new KernelConfig(
+            new(
                 new Index3D(dimensions.Item1, 1, 1),
                 new Index3D(dimensions.Item2, 1, 1),
                 dimensions.Item3);
@@ -316,7 +316,7 @@ namespace ILGPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator KernelConfig(
             (Index3D, Index3D, SharedMemoryConfig) dimensions) =>
-            new KernelConfig(dimensions.Item1, dimensions.Item2, dimensions.Item3);
+            new(dimensions.Item1, dimensions.Item2, dimensions.Item3);
 
         /// <summary>
         /// Converts the given kernel configuration into an equivalent dimension tuple.
@@ -488,9 +488,17 @@ namespace ILGPU
     /// Represents a runtime kernel configuration that is used internally to specify
     /// launch dimensions and shared memory settings.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new runtime kernel configuration.
+    /// </remarks>
+    /// <param name="kernelConfig">The kernel configuration to use.</param>
+    /// <param name="specification">The shared memory specification to use.</param>
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public readonly struct RuntimeKernelConfig
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public readonly struct RuntimeKernelConfig(
+        KernelConfig kernelConfig,
+        SharedMemorySpecification specification)
     {
         #region Static
 
@@ -506,25 +514,7 @@ namespace ILGPU
             .ThrowIfNull();
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new runtime kernel configuration.
-        /// </summary>
-        /// <param name="kernelConfig">The kernel configuration to use.</param>
-        /// <param name="specification">The shared memory specification to use.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RuntimeKernelConfig(
-            KernelConfig kernelConfig,
-            SharedMemorySpecification specification)
-        {
-            GridDim = kernelConfig.GridDim;
-            GroupDim = kernelConfig.GroupDim;
-            SharedMemoryConfig = new RuntimeSharedMemoryConfig(
-                specification,
-                kernelConfig.SharedMemoryConfig);
-        }
 
         #endregion
 
@@ -533,17 +523,19 @@ namespace ILGPU
         /// <summary>
         /// Returns the global grid dimension.
         /// </summary>
-        public Index3D GridDim { get; }
+        public Index3D GridDim { get; } = kernelConfig.GridDim;
 
         /// <summary>
         /// Returns the global group dimension of each group.
         /// </summary>
-        public Index3D GroupDim { get; }
+        public Index3D GroupDim { get; } = kernelConfig.GroupDim;
 
         /// <summary>
         /// Returns the current shared memory configuration.
         /// </summary>
-        public RuntimeSharedMemoryConfig SharedMemoryConfig { get; }
+        public RuntimeSharedMemoryConfig SharedMemoryConfig { get; } = new RuntimeSharedMemoryConfig(
+                specification,
+                kernelConfig.SharedMemoryConfig);
 
         /// <summary>
         /// Returns true if this configuration is a valid launch configuration.

@@ -207,36 +207,30 @@ namespace ILGPU.Backends
         /// <summary>
         /// Stores <see cref="PhiValue"/> information per block.
         /// </summary>
-        internal readonly struct BlockInfo
+        /// <remarks>
+        /// Constructs a new information object.
+        /// </remarks>
+        /// <param name="capacity">
+        /// The initial capacity of the internal data structures.
+        /// </param>
+        internal readonly struct BlockInfo(int capacity)
         {
-            /// <summary>
-            /// Constructs a new information object.
-            /// </summary>
-            /// <param name="capacity">
-            /// The initial capacity of the internal data structures.
-            /// </param>
-            public BlockInfo(int capacity)
-            {
-                LHSPhis = new HashSet<PhiValue>(capacity);
-                IntermediatePhis = new HashSet<PhiValue>(capacity);
-                Bindings = new List<(PhiValue, Value)>(capacity);
-            }
 
             /// <summary>
             /// The set of all phi values in this block on the left-hand side.
             /// </summary>
-            public HashSet<PhiValue> LHSPhis { get; }
+            public HashSet<PhiValue> LHSPhis { get; } = new HashSet<PhiValue>(capacity);
 
             /// <summary>
             /// The set of all phi values in this block that need to be stored into a
             /// temporary location in order to recover their original value.
             /// </summary>
-            public HashSet<PhiValue> IntermediatePhis { get; }
+            public HashSet<PhiValue> IntermediatePhis { get; } = new HashSet<PhiValue>(capacity);
 
             /// <summary>
             /// The list of value phi bindings.
             /// </summary>
-            public List<(PhiValue Phi, Value Value)> Bindings { get; }
+            public List<(PhiValue Phi, Value Value)> Bindings { get; } = new List<(PhiValue, Value)>(capacity);
 
             /// <summary>
             /// Registers a new phi binding.

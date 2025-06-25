@@ -98,28 +98,23 @@ namespace ILGPU
         /// <summary>
         /// Represents a method builder in the .Net world.
         /// </summary>
-        public readonly struct MethodEmitter
+        /// <remarks>
+        /// Constructs a new method emitter.
+        /// </remarks>
+        /// <param name="method">The desired internal method.</param>
+        public readonly struct MethodEmitter(
+            DynamicMethod method)
         {
-            /// <summary>
-            /// Constructs a new method emitter.
-            /// </summary>
-            /// <param name="method">The desired internal method.</param>
-            public MethodEmitter(
-                DynamicMethod method)
-            {
-                Method = method;
-                ILGenerator = method.GetILGenerator();
-            }
 
             /// <summary>
             /// Returns the associated method builder.
             /// </summary>
-            internal DynamicMethod Method { get; }
+            internal DynamicMethod Method { get; } = method;
 
             /// <summary>
             /// Returns the internal IL generator.
             /// </summary>
-            public ILGenerator ILGenerator { get; }
+            public ILGenerator ILGenerator { get; } = method.GetILGenerator();
 
             /// <summary>
             /// Finishes the building process.
@@ -147,7 +142,7 @@ namespace ILGPU
 
         #region Instance
 
-        private readonly ReaderWriterLockSlim assemblyLock = new ReaderWriterLockSlim(
+        private readonly ReaderWriterLockSlim assemblyLock = new(
             LockRecursionPolicy.SupportsRecursion);
 
         private AssemblyBuilder assemblyBuilder;

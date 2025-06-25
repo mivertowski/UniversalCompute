@@ -24,32 +24,21 @@ namespace ILGPU.Runtime.Profiling
     /// <summary>
     /// Implementation of kernel profiling context.
     /// </summary>
-    internal sealed class KernelProfilingContext : IKernelProfilingContext
+    internal sealed class KernelProfilingContext(PerformanceProfiler profiler, string executionId, string kernelName, Index3D gridSize, Index3D groupSize) : IKernelProfilingContext
     {
-        private readonly PerformanceProfiler profiler;
-        private readonly string executionId;
-        private readonly Stopwatch stopwatch;
+        private readonly PerformanceProfiler profiler = profiler;
+        private readonly string executionId = executionId;
+        private readonly Stopwatch stopwatch = Stopwatch.StartNew();
         private readonly Dictionary<string, object> metadata = new();
         private TimeSpan compilationTime;
         private int sharedMemorySize;
         private int registerCount;
         private bool disposed;
 
-        public KernelProfilingContext(PerformanceProfiler profiler, string executionId, string kernelName, Index3D gridSize, Index3D groupSize)
-        {
-            this.profiler = profiler;
-            this.executionId = executionId;
-            KernelName = kernelName;
-            GridSize = gridSize;
-            GroupSize = groupSize;
-            StartTime = DateTime.UtcNow;
-            stopwatch = Stopwatch.StartNew();
-        }
-
-        public string KernelName { get; }
-        public Index3D GridSize { get; }
-        public Index3D GroupSize { get; }
-        public DateTime StartTime { get; }
+        public string KernelName { get; } = kernelName;
+        public Index3D GridSize { get; } = gridSize;
+        public Index3D GroupSize { get; } = groupSize;
+        public DateTime StartTime { get; } = DateTime.UtcNow;
 
         public void RecordCompilation(TimeSpan compilationTime) => this.compilationTime = compilationTime;
 
@@ -107,36 +96,24 @@ namespace ILGPU.Runtime.Profiling
     /// <summary>
     /// Implementation of memory operation profiling context.
     /// </summary>
-    internal sealed class MemoryProfilingContext : IMemoryProfilingContext
+    internal sealed class MemoryProfilingContext(
+        PerformanceProfiler profiler,
+        string operationId,
+        MemoryOperationType operationType,
+        long sizeInBytes,
+        string source,
+        string destination) : IMemoryProfilingContext
     {
-        private readonly PerformanceProfiler profiler;
-        private readonly string operationId;
-        private readonly string source;
-        private readonly string destination;
-        private readonly Stopwatch stopwatch;
+        private readonly PerformanceProfiler profiler = profiler;
+        private readonly string operationId = operationId;
+        private readonly string source = source;
+        private readonly string destination = destination;
+        private readonly Stopwatch stopwatch = Stopwatch.StartNew();
         private bool disposed;
 
-        public MemoryProfilingContext(
-            PerformanceProfiler profiler, 
-            string operationId, 
-            MemoryOperationType operationType, 
-            long sizeInBytes,
-            string source,
-            string destination)
-        {
-            this.profiler = profiler;
-            this.operationId = operationId;
-            this.source = source;
-            this.destination = destination;
-            OperationType = operationType;
-            SizeInBytes = sizeInBytes;
-            StartTime = DateTime.UtcNow;
-            stopwatch = Stopwatch.StartNew();
-        }
-
-        public MemoryOperationType OperationType { get; }
-        public long SizeInBytes { get; }
-        public DateTime StartTime { get; }
+        public MemoryOperationType OperationType { get; } = operationType;
+        public long SizeInBytes { get; } = sizeInBytes;
+        public DateTime StartTime { get; } = DateTime.UtcNow;
 
         public void RecordCompletion(TimeSpan actualDuration, double? bandwidth = null)
         {

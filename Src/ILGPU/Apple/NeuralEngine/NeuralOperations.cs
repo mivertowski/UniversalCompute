@@ -93,22 +93,16 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// Neural network representation for compilation.
     /// </summary>
-    public sealed class NeuralNetwork : IDisposable
+    /// <remarks>
+    /// Initializes a new instance of the NeuralNetwork class.
+    /// </remarks>
+    /// <param name="name">The network name.</param>
+    /// <param name="operations">The network operations.</param>
+    public sealed class NeuralNetwork(string name, params NeuralOperation[] operations) : IDisposable
     {
-        private readonly string _name;
-        private readonly NeuralOperation[] _operations;
+        private readonly string _name = name ?? throw new ArgumentNullException(nameof(name));
+        private readonly NeuralOperation[] _operations = operations ?? throw new ArgumentNullException(nameof(operations));
         private bool _disposed;
-
-        /// <summary>
-        /// Initializes a new instance of the NeuralNetwork class.
-        /// </summary>
-        /// <param name="name">The network name.</param>
-        /// <param name="operations">The network operations.</param>
-        public NeuralNetwork(string name, params NeuralOperation[] operations)
-        {
-            _name = name ?? throw new ArgumentNullException(nameof(name));
-            _operations = operations ?? throw new ArgumentNullException(nameof(operations));
-        }
 
         /// <summary>
         /// Gets the network name.
@@ -160,17 +154,15 @@ namespace ILGPU.Apple.NeuralEngine
             }
         }
 
-        private long EstimateOperationComplexity(NeuralOperation operation)
-        {
+        private long EstimateOperationComplexity(NeuralOperation operation) =>
             // Estimate FLOPs based on operation type and tensor shapes
-            return operation.Type switch
+            operation.Type switch
             {
                 NeuralOperationType.Convolution => EstimateConvolutionComplexity(operation),
                 NeuralOperationType.MatMul => EstimateMatMulComplexity(operation),
                 NeuralOperationType.Attention => EstimateAttentionComplexity(operation),
                 _ => 1000 // Default complexity estimate
             };
-        }
 
         private long EstimateConvolutionComplexity(NeuralOperation operation)
         {
@@ -272,17 +264,14 @@ namespace ILGPU.Apple.NeuralEngine
         /// <param name="shape">The tensor shape.</param>
         /// <param name="location">The compute location.</param>
         /// <returns>A new tensor.</returns>
-        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged
+        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged => location switch
         {
-            return location switch
-            {
-                ComputeLocation.Cpu => new CpuTensor<T>(shape),
-                ComputeLocation.Gpu => throw new NotImplementedException("GPU tensor creation not implemented"),
-                ComputeLocation.Npu => new NPUTensor<T>(shape),
-                ComputeLocation.Unified => throw new NotImplementedException("Unified tensor creation requires accelerator"),
-                _ => throw new ArgumentException($"Unsupported compute location: {location}")
-            };
-        }
+            ComputeLocation.Cpu => new CpuTensor<T>(shape),
+            ComputeLocation.Gpu => throw new NotImplementedException("GPU tensor creation not implemented"),
+            ComputeLocation.Npu => new NPUTensor<T>(shape),
+            ComputeLocation.Unified => throw new NotImplementedException("Unified tensor creation requires accelerator"),
+            _ => throw new ArgumentException($"Unsupported compute location: {location}")
+        };
     }
 
     /// <summary>
@@ -397,10 +386,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <param name="start">The starting indices for the slice.</param>
         /// <param name="length">The length of the slice in each dimension.</param>
         /// <returns>A new tensor slice.</returns>
-        public ITensor<T> Slice(int[] start, int[] length)
-        {
-            throw new NotSupportedException("NPU tensor slicing not yet implemented");
-        }
+        public ITensor<T> Slice(int[] start, int[] length) => throw new NotSupportedException("NPU tensor slicing not yet implemented");
 
         /// <summary>
         /// Disposes the NPU tensor.

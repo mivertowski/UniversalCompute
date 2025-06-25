@@ -45,52 +45,52 @@ namespace ILGPU
         /// <summary>
         /// Represents positive zero.
         /// </summary>
-        public static readonly BFloat16 Zero = new BFloat16(0x0000);
+        public static readonly BFloat16 Zero = new(0x0000);
 
         /// <summary>
         /// Represents negative zero.
         /// </summary>
-        public static readonly BFloat16 NegativeZero = new BFloat16(0x8000);
+        public static readonly BFloat16 NegativeZero = new(0x8000);
 
         /// <summary>
         /// Represents positive infinity.
         /// </summary>
-        public static readonly BFloat16 PositiveInfinity = new BFloat16(0x7F80);
+        public static readonly BFloat16 PositiveInfinity = new(0x7F80);
 
         /// <summary>
         /// Represents negative infinity.
         /// </summary>
-        public static readonly BFloat16 NegativeInfinity = new BFloat16(0xFF80);
+        public static readonly BFloat16 NegativeInfinity = new(0xFF80);
 
         /// <summary>
         /// Represents not-a-number (NaN).
         /// </summary>
-        public static readonly BFloat16 NaN = new BFloat16(0x7FC0);
+        public static readonly BFloat16 NaN = new(0x7FC0);
 
         /// <summary>
         /// Represents the smallest positive normalized value.
         /// </summary>
-        public static readonly BFloat16 MinValue = new BFloat16(0xFF7F);
+        public static readonly BFloat16 MinValue = new(0xFF7F);
 
         /// <summary>
         /// Represents the largest positive value.
         /// </summary>
-        public static readonly BFloat16 MaxValue = new BFloat16(0x7F7F);
+        public static readonly BFloat16 MaxValue = new(0x7F7F);
 
         /// <summary>
         /// Represents the smallest positive subnormal value.
         /// </summary>
-        public static readonly BFloat16 Epsilon = new BFloat16(0x0001);
+        public static readonly BFloat16 Epsilon = new(0x0001);
 
         /// <summary>
         /// Represents one.
         /// </summary>
-        public static readonly BFloat16 One = new BFloat16(0x3F80);
+        public static readonly BFloat16 One = new(0x3F80);
 
         /// <summary>
         /// Represents negative one.
         /// </summary>
-        public static readonly BFloat16 NegativeOne = new BFloat16(0xBF80);
+        public static readonly BFloat16 NegativeOne = new(0xBF80);
 
         #endregion
 
@@ -263,7 +263,7 @@ namespace ILGPU
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BFloat16 operator -(BFloat16 value) =>
-            new BFloat16((ushort)(value.value ^ 0x8000));
+            new((ushort)(value.value ^ 0x8000));
 
         /// <summary>
         /// Returns the value unchanged.
@@ -422,7 +422,7 @@ namespace ILGPU
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BFloat16 Abs(BFloat16 value) =>
-            new BFloat16((ushort)(value.value & 0x7FFF));
+            new((ushort)(value.value & 0x7FFF));
 
         /// <summary>
         /// Returns the maximum of two values.

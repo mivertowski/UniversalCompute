@@ -34,7 +34,7 @@ namespace ILGPU.IR.Analyses
         /// <returns>The created dominator analysis.</returns>
         public static Dominators<TDirection> Create(
             CFG<DominanceOrder, TDirection> cfg) =>
-            new Dominators<TDirection>(cfg);
+            new(cfg);
 
         #endregion
 

@@ -41,7 +41,7 @@ namespace ILGPU.Backends.OpenCL
         private static CLIntrinsic CreateIntrinsic(
             string name,
             IntrinsicImplementationMode mode) =>
-            new CLIntrinsic(
+            new(
                 CLIntrinsicsType,
                 name,
                 mode);

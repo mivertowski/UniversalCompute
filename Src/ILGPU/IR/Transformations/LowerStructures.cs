@@ -43,7 +43,11 @@ namespace ILGPU.IR.Transformations
     /// This transformation does not change function parameters and calls to other
     /// functions.
     /// </remarks>
-    public sealed class LowerStructures : UnorderedTransformation
+    /// <remarks>
+    /// Constructs a new structure conversion pass.
+    /// </remarks>
+    /// <param name="flags">The transformation flags.</param>
+    public sealed class LowerStructures(LowerStructureFlags flags) : UnorderedTransformation
     {
         #region Utility Methods
 
@@ -116,32 +120,26 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// A lowered phi that has to be sealed after all blocks have been processed.
         /// </summary>
-        private readonly struct LoweredPhi
+        private readonly struct LoweredPhi(
+            PhiValue sourcePhi,
+            FieldAccess fieldAccess,
+            PhiValue.Builder phiBuilder)
         {
-            public LoweredPhi(
-                PhiValue sourcePhi,
-                FieldAccess fieldAccess,
-                PhiValue.Builder phiBuilder)
-            {
-                SourcePhi = sourcePhi;
-                FieldAccess = fieldAccess;
-                PhiBuilder = phiBuilder;
-            }
 
             /// <summary>
             /// Returns the source phi.
             /// </summary>
-            public PhiValue SourcePhi { get; }
+            public PhiValue SourcePhi { get; } = sourcePhi;
 
             /// <summary>
             /// Returns the source access chain.
             /// </summary>
-            public FieldAccess FieldAccess { get; }
+            public FieldAccess FieldAccess { get; } = fieldAccess;
 
             /// <summary>
             /// Returns the new phi builder.
             /// </summary>
-            public PhiValue.Builder PhiBuilder { get; }
+            public PhiValue.Builder PhiBuilder { get; } = phiBuilder;
 
             /// <summary>
             /// Seals this lowered phi.
@@ -168,17 +166,13 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Internal temporary data structure.
         /// </summary>
-        private readonly struct LoweringData
+        private readonly struct LoweringData(List<LowerStructures.LoweredPhi> loweredPhis)
         {
-            public LoweringData(List<LoweredPhi> loweredPhis)
-            {
-                LoweredPhis = loweredPhis;
-            }
 
             /// <summary>
             /// The list of lowered phis.
             /// </summary>
-            private List<LoweredPhi> LoweredPhis { get; }
+            private List<LoweredPhi> LoweredPhis { get; } = loweredPhis;
 
             /// <summary>
             /// Adds the given phi to the list of lowered phis.
@@ -590,13 +584,13 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter that keeps load/store values.
         /// </summary>
         private static readonly SSARewriter<FieldRef, LoweringData> Rewriter =
-            new SSARewriter<FieldRef, LoweringData>();
+            new();
 
         /// <summary>
         /// The internal rewriter that lowers load/store values.
         /// </summary>
         private static readonly SSARewriter<FieldRef, LoweringData> LoadStoreRewriter =
-            new SSARewriter<FieldRef, LoweringData>();
+            new();
 
         /// <summary>
         /// Adds the common rewriters to the given rewriter instance.
@@ -651,15 +645,6 @@ namespace ILGPU.IR.Transformations
         /// </summary>
         public LowerStructures() : this(LowerStructureFlags.None) { }
 
-        /// <summary>
-        /// Constructs a new structure conversion pass.
-        /// </summary>
-        /// <param name="flags">The transformation flags.</param>
-        public LowerStructures(LowerStructureFlags flags)
-        {
-            Flags = flags;
-        }
-
         #endregion
 
         #region Properties
@@ -667,7 +652,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Returns the current flags.
         /// </summary>
-        public LowerStructureFlags Flags { get; }
+        public LowerStructureFlags Flags { get; } = flags;
 
         /// <summary>
         /// Returns true if load/store operations should be lowered.

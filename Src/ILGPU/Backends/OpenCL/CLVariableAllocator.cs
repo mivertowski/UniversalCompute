@@ -19,7 +19,11 @@ namespace ILGPU.Backends.OpenCL
     /// <summary>
     /// Represents a specialized OpenCL variable allocator.
     /// </summary>
-    public class CLVariableAllocator : VariableAllocator
+    /// <remarks>
+    /// Constructs a new register allocator.
+    /// </remarks>
+    /// <param name="typeGenerator">The associated type generator.</param>
+    public class CLVariableAllocator(CLTypeGenerator typeGenerator) : VariableAllocator
     {
         #region Nested Types
 
@@ -29,22 +33,17 @@ namespace ILGPU.Backends.OpenCL
         /// <remarks>
         /// Instances of this class will not return valid variable ids.
         /// </remarks>
-        private sealed class GloballySharedMemoryVariable : TypedVariable
+        /// <remarks>
+        /// Constructs a new variable instance.
+        /// </remarks>
+        /// <param name="allocaInfo">The source allocation info.</param>
+        private sealed class GloballySharedMemoryVariable(in AllocaInformation allocaInfo) : TypedVariable(-1, allocaInfo.Alloca.Type)
         {
-            /// <summary>
-            /// Constructs a new variable instance.
-            /// </summary>
-            /// <param name="allocaInfo">The source allocation info.</param>
-            public GloballySharedMemoryVariable(in AllocaInformation allocaInfo)
-                : base(-1, allocaInfo.Alloca.Type)
-            {
-                Name = GetSharedMemoryAllocationName(allocaInfo);
-            }
 
             /// <summary>
             /// Returns the allocation name.
             /// </summary>
-            public string Name { get; }
+            public string Name { get; } = GetSharedMemoryAllocationName(allocaInfo);
 
             /// <summary>
             /// Returns the allocation name.
@@ -59,22 +58,17 @@ namespace ILGPU.Backends.OpenCL
         /// <remarks>
         /// Instances of this class will not return valid variable ids.
         /// </remarks>
-        private sealed class GloballySharedMemoryLengthVariable : TypedVariable
+        /// <remarks>
+        /// Constructs a new variable instance.
+        /// </remarks>
+        /// <param name="allocaInfo">The source allocation info.</param>
+        private sealed class GloballySharedMemoryLengthVariable(in AllocaInformation allocaInfo) : TypedVariable(-1, allocaInfo.Alloca.Type)
         {
-            /// <summary>
-            /// Constructs a new variable instance.
-            /// </summary>
-            /// <param name="allocaInfo">The source allocation info.</param>
-            public GloballySharedMemoryLengthVariable(in AllocaInformation allocaInfo)
-                : base(-1, allocaInfo.Alloca.Type)
-            {
-                Name = GetSharedMemoryAllocationLengthName(allocaInfo);
-            }
 
             /// <summary>
             /// Returns the allocation name.
             /// </summary>
-            public string Name { get; }
+            public string Name { get; } = GetSharedMemoryAllocationLengthName(allocaInfo);
 
             /// <summary>
             /// Returns the allocation name.
@@ -137,17 +131,7 @@ namespace ILGPU.Backends.OpenCL
             "shared_var_len_" + alloca.Id;
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new register allocator.
-        /// </summary>
-        /// <param name="typeGenerator">The associated type generator.</param>
-        public CLVariableAllocator(CLTypeGenerator typeGenerator)
-        {
-            TypeGenerator = typeGenerator;
-        }
 
         #endregion
 
@@ -156,7 +140,7 @@ namespace ILGPU.Backends.OpenCL
         /// <summary>
         /// Returns the associated type generator.
         /// </summary>
-        public CLTypeGenerator TypeGenerator { get; }
+        public CLTypeGenerator TypeGenerator { get; } = typeGenerator;
 
         #endregion
 

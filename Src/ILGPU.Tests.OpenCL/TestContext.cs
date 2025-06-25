@@ -17,30 +17,27 @@ namespace ILGPU.Tests.OpenCL
     /// <summary>
     /// An abstract test context for OpenCL accelerators.
     /// </summary>
-    public abstract class CLTestContext : TestContext
+    /// <remarks>
+    /// Creates a new test context instance.
+    /// </remarks>
+    /// <param name="optimizationLevel">The optimization level to use.</param>
+    /// <param name="enableAssertions">
+    /// Enables use of assertions.
+    /// </param>
+    /// <param name="forceDebugConfig">
+    /// Forces use of debug configuration in O1 and O2 builds.
+    /// </param>
+    /// <param name="prepareContext">The context preparation handler.</param>
+    public abstract class CLTestContext(
+        OptimizationLevel optimizationLevel,
+        bool enableAssertions,
+        bool forceDebugConfig,
+        Action<Context.Builder> prepareContext) : TestContext(
+              optimizationLevel,
+              enableAssertions,
+              forceDebugConfig,
+              builder => prepareContext(builder.OpenCL()),
+              context => context.CreateCLAccelerator(0))
     {
-        /// <summary>
-        /// Creates a new test context instance.
-        /// </summary>
-        /// <param name="optimizationLevel">The optimization level to use.</param>
-        /// <param name="enableAssertions">
-        /// Enables use of assertions.
-        /// </param>
-        /// <param name="forceDebugConfig">
-        /// Forces use of debug configuration in O1 and O2 builds.
-        /// </param>
-        /// <param name="prepareContext">The context preparation handler.</param>
-        protected CLTestContext(
-            OptimizationLevel optimizationLevel,
-            bool enableAssertions,
-            bool forceDebugConfig,
-            Action<Context.Builder> prepareContext)
-            : base(
-                  optimizationLevel,
-                  enableAssertions,
-                  forceDebugConfig,
-                  builder => prepareContext(builder.OpenCL()),
-                  context => context.CreateCLAccelerator(0))
-        { }
     }
 }

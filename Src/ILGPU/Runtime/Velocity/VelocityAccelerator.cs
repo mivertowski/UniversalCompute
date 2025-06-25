@@ -55,21 +55,17 @@ namespace ILGPU.Runtime.Velocity
 
         #region Nested Types
 
-        private sealed class ParallelExecutionEngine :
+        private sealed class ParallelExecutionEngine(VelocityAccelerator accelerator) :
             ParallelProcessingCache<
                 VelocityGroupExecutionContext,
                 ParallelExecutionEngine>,
             IParallelProcessingBody<VelocityGroupExecutionContext>
         {
-            public ParallelExecutionEngine(VelocityAccelerator accelerator)
-            {
-                Accelerator = accelerator;
-            }
 
             /// <summary>
             /// Returns the parent Velocity accelerator.
             /// </summary>
-            public VelocityAccelerator Accelerator { get; }
+            public VelocityAccelerator Accelerator { get; } = accelerator;
 
             /// <summary>
             /// Returns the current instance.

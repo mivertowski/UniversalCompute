@@ -41,19 +41,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks view methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class ViewIntrinsicAttribute : IntrinsicAttribute
+    sealed class ViewIntrinsicAttribute(ViewIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public ViewIntrinsicAttribute(ViewIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.View;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public ViewIntrinsicKind IntrinsicKind { get; }
+        public ViewIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

@@ -77,6 +77,15 @@
     <!-- Turn off package validation for now to avoid checks against non-supported frameworks -->
     <EnablePackageValidation>false</EnablePackageValidation>
     <PackageValidationBaselineVersion>$(LibraryPackageValidationBaselineVersion)</PackageValidationBaselineVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
+    <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
 
   <ItemGroup>

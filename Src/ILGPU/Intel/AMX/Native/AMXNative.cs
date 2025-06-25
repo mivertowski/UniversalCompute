@@ -167,11 +167,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile.</param>
         /// <param name="base_addr">Base address.</param>
         /// <param name="stride">Stride in bytes.</param>
-        internal static unsafe void tile_loadd(byte dst, void* base_addr, int stride)
-        {
+        internal static unsafe void tile_loadd(byte dst, void* base_addr, int stride) =>
             // This would use the actual intrinsic in real implementation
             LoadTile(dst, base_addr, stride);
-        }
 
         /// <summary>
         /// Wrapper for _tile_stored intrinsic.
@@ -179,21 +177,17 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile.</param>
         /// <param name="base_addr">Base address.</param>
         /// <param name="stride">Stride in bytes.</param>
-        internal static unsafe void tile_stored(byte dst, void* base_addr, int stride)
-        {
+        internal static unsafe void tile_stored(byte dst, void* base_addr, int stride) =>
             // This would use the actual intrinsic in real implementation
             StoreTile(dst, base_addr, stride);
-        }
 
         /// <summary>
         /// Wrapper for _tile_zero intrinsic.
         /// </summary>
         /// <param name="dst">Destination tile.</param>
-        internal static void tile_zero(byte dst)
-        {
+        internal static void tile_zero(byte dst) =>
             // This would use the actual intrinsic in real implementation
             ZeroTile(dst);
-        }
 
         /// <summary>
         /// Wrapper for _tile_dpbf16ps intrinsic.
@@ -201,11 +195,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile.</param>
         /// <param name="src1">Source tile 1.</param>
         /// <param name="src2">Source tile 2.</param>
-        internal static void tile_dpbf16ps(byte dst, byte src1, byte src2)
-        {
+        internal static void tile_dpbf16ps(byte dst, byte src1, byte src2) =>
             // This would use the actual intrinsic in real implementation
             TileMatMulBF16(dst, src1, src2);
-        }
 
         /// <summary>
         /// Wrapper for _tile_dpbssd intrinsic.
@@ -213,11 +205,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile.</param>
         /// <param name="src1">Source tile 1.</param>
         /// <param name="src2">Source tile 2.</param>
-        internal static void tile_dpbssd(byte dst, byte src1, byte src2)
-        {
+        internal static void tile_dpbssd(byte dst, byte src1, byte src2) =>
             // This would use the actual intrinsic in real implementation
             TileMatMulINT8(dst, src1, src2);
-        }
 
         #endregion
 
@@ -246,10 +236,7 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="rows">Number of rows.</param>
         /// <param name="cols">Number of columns (in bytes).</param>
         /// <returns>Tile size in bytes.</returns>
-        internal static int GetTileSize(int rows, int cols)
-        {
-            return rows * cols;
-        }
+        internal static int GetTileSize(int rows, int cols) => rows * cols;
 
         /// <summary>
         /// Calculates the optimal tile configuration for matrix dimensions.
@@ -280,16 +267,13 @@ namespace ILGPU.Intel.AMX.Native
             );
         }
 
-        private static int GetElementSize(AMXDataType dataType)
+        private static int GetElementSize(AMXDataType dataType) => dataType switch
         {
-            return dataType switch
-            {
-                AMXDataType.BFloat16 => 2,
-                AMXDataType.Int8 => 1,
-                AMXDataType.Float32 => 4,
-                _ => 4
-            };
-        }
+            AMXDataType.BFloat16 => 2,
+            AMXDataType.Int8 => 1,
+            AMXDataType.Float32 => 4,
+            _ => 4
+        };
 
         [DllImport("kernel32", SetLastError = true)]
         private static extern bool CheckCPUID_AMX();

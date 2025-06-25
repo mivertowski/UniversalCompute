@@ -69,29 +69,24 @@ namespace ILGPU.IR
         public static ValueBuilder<TBuilder> ToValueBuilder<TBuilder>(
             this TBuilder valueBuilder)
             where TBuilder : IValueBuilder =>
-            new ValueBuilder<TBuilder>(valueBuilder);
+            new(valueBuilder);
     }
 
     /// <summary>
     /// A wrapped <see cref="IValueBuilder"/> that wraps value-based builder structures.
     /// </summary>
     /// <typeparam name="TBuilder">The structure-based builder type.</typeparam>
-    public class ValueBuilder<TBuilder> : IValueBuilder
+    /// <remarks>
+    /// Constructs a new value builder.
+    /// </remarks>
+    /// <param name="builder">The underlying builder structure.</param>
+    public class ValueBuilder<TBuilder>(TBuilder builder) : IValueBuilder
         where TBuilder : IValueBuilder
     {
         /// <summary>
         /// The nested builder.
         /// </summary>
-        private TBuilder nestedBuilder;
-
-        /// <summary>
-        /// Constructs a new value builder.
-        /// </summary>
-        /// <param name="builder">The underlying builder structure.</param>
-        public ValueBuilder(TBuilder builder)
-        {
-            nestedBuilder = builder;
-        }
+        private TBuilder nestedBuilder = builder;
 
         /// <summary>
         /// Returns the parent IR builder.

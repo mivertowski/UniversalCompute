@@ -63,7 +63,7 @@ namespace ILGPU.Runtime.Cuda
         /// Wraps the value as an input parameter.
         /// </summary>
         public static implicit operator Input<T>(T v) =>
-            new Input<T>() { Value = v };
+            new() { Value = v };
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ namespace ILGPU.Runtime.Cuda
         /// Wraps the value as a reference parameter.
         /// </summary>
         public static implicit operator Ref<T>(T v) =>
-            new Ref<T>() { Value = v };
+            new() { Value = v };
     }
 }
 

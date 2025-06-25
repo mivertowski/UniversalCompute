@@ -45,23 +45,18 @@ namespace ILGPU.Runtime
         /// <summary>
         /// A cached kernel key.
         /// </summary>
-        private readonly struct CachedCompiledKernelKey :
+        /// <remarks>
+        /// Constructs a new kernel key.
+        /// </remarks>
+        /// <param name="entry">The entry point description.</param>
+        /// <param name="specialization">The kernel specialization.</param>
+        private readonly struct CachedCompiledKernelKey(
+            EntryPointDescription entry,
+            KernelSpecialization specialization) :
             IEquatable<CachedCompiledKernelKey>
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new kernel key.
-            /// </summary>
-            /// <param name="entry">The entry point description.</param>
-            /// <param name="specialization">The kernel specialization.</param>
-            public CachedCompiledKernelKey(
-                EntryPointDescription entry,
-                KernelSpecialization specialization)
-            {
-                Entry = entry;
-                Specialization = specialization;
-            }
+            #region Instance
 
             #endregion
 
@@ -70,12 +65,12 @@ namespace ILGPU.Runtime
             /// <summary>
             /// Returns the associated entry point description.
             /// </summary>
-            public EntryPointDescription Entry { get; }
+            public EntryPointDescription Entry { get; } = entry;
 
             /// <summary>
             /// Returns the associated kernel specialization.
             /// </summary>
-            public KernelSpecialization Specialization { get; }
+            public KernelSpecialization Specialization { get; } = specialization;
 
             #endregion
 
@@ -126,26 +121,21 @@ namespace ILGPU.Runtime
         /// <summary>
         /// A cached kernel key.
         /// </summary>
-        private readonly struct CachedKernelKey : IEquatable<CachedKernelKey>
+        /// <remarks>
+        /// Constructs a new kernel key.
+        /// </remarks>
+        /// <param name="compiledKernelKey">
+        /// The compiled kernel key for lookup purposes.
+        /// </param>
+        /// <param name="implicitGroupSize">
+        /// The implicit group size (if any).
+        /// </param>
+        private readonly struct CachedKernelKey(
+Accelerator.CachedCompiledKernelKey compiledKernelKey,
+            int implicitGroupSize) : IEquatable<CachedKernelKey>
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new kernel key.
-            /// </summary>
-            /// <param name="compiledKernelKey">
-            /// The compiled kernel key for lookup purposes.
-            /// </param>
-            /// <param name="implicitGroupSize">
-            /// The implicit group size (if any).
-            /// </param>
-            public CachedKernelKey(
-                CachedCompiledKernelKey compiledKernelKey,
-                int implicitGroupSize)
-            {
-                CompiledKernelKey = compiledKernelKey;
-                ImplicitGroupSize = implicitGroupSize;
-            }
+            #region Instance
 
             #endregion
 
@@ -154,12 +144,12 @@ namespace ILGPU.Runtime
             /// <summary>
             /// The associated compiled kernel key for lookup purposes.
             /// </summary>
-            public CachedCompiledKernelKey CompiledKernelKey { get; }
+            public CachedCompiledKernelKey CompiledKernelKey { get; } = compiledKernelKey;
 
             /// <summary>
             /// Returns the associated implicit group size.
             /// </summary>
-            public int ImplicitGroupSize { get; }
+            public int ImplicitGroupSize { get; } = implicitGroupSize;
 
             #endregion
 
@@ -208,24 +198,18 @@ namespace ILGPU.Runtime
         /// <summary>
         /// A cached kernel.
         /// </summary>
-        private struct CachedKernel
+        /// <remarks>
+        /// Constructs a new cached kernel.
+        /// </remarks>
+        /// <param name="kernel">The kernel to cache.</param>
+        /// <param name="kernelInfo">Detailed kernel information.</param>
+        private struct CachedKernel(
+            WeakReference<object> kernel,
+            KernelInfo? kernelInfo)
         {
             #region Instance
 
-            private WeakReference<object> kernelReference;
-
-            /// <summary>
-            /// Constructs a new cached kernel.
-            /// </summary>
-            /// <param name="kernel">The kernel to cache.</param>
-            /// <param name="kernelInfo">Detailed kernel information.</param>
-            public CachedKernel(
-                WeakReference<object> kernel,
-                KernelInfo? kernelInfo)
-            {
-                kernelReference = kernel;
-                KernelInfo = kernelInfo;
-            }
+            private WeakReference<object> kernelReference = kernel;
 
             #endregion
 
@@ -234,7 +218,7 @@ namespace ILGPU.Runtime
             /// <summary>
             /// Returns the stored kernel information.
             /// </summary>
-            public KernelInfo? KernelInfo { get; }
+            public KernelInfo? KernelInfo { get; } = kernelInfo;
 
             #endregion
 

@@ -30,7 +30,7 @@ namespace ILGPU.IR.Rewriting
         /// Note that this context does not support any of the conversion utilities.
         /// </remarks>
         public static RewriterContext FromBuilder(BasicBlock.Builder builder) =>
-            new RewriterContext(builder, null);
+            new(builder, null);
 
         #endregion
 
@@ -81,7 +81,7 @@ namespace ILGPU.IR.Rewriting
         /// <returns>The specialized rewriter context.</returns>
         public readonly RewriterContext SpecializeBuilder(
             BasicBlock.Builder newBuilder) =>
-            new RewriterContext(newBuilder, Converted);
+            new(newBuilder, Converted);
 
         /// <summary>
         /// Returns true if the given value has been converted.
@@ -177,6 +177,6 @@ namespace ILGPU.IR.Rewriting
             BasicBlock.Builder builder,
             HashSet<Value> converted,
             T data) =>
-            new RewriterContext(builder, converted);
+            new(builder, converted);
     }
 }

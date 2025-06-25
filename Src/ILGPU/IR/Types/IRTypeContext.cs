@@ -61,12 +61,12 @@ namespace ILGPU.IR.Types
 
         #region Instance
 
-        private readonly ReaderWriterLockSlim typeLock = new ReaderWriterLockSlim(
+        private readonly ReaderWriterLockSlim typeLock = new(
             LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<TypeNode, TypeNode> unifiedTypes =
-            new Dictionary<TypeNode, TypeNode>();
+            new();
         private readonly Dictionary<(Type, MemoryAddressSpace), TypeNode> typeMapping =
-            new Dictionary<(Type, MemoryAddressSpace), TypeNode>();
+            new();
         private readonly PrimitiveType[] basicValueTypes;
 
         /// <summary>
@@ -258,7 +258,7 @@ namespace ILGPU.IR.Types
         /// <param name="capacity">The initial capacity.</param>
         /// <returns>The created structure builder.</returns>
         public StructureType.Builder CreateStructureType(int capacity) =>
-            new StructureType.Builder(this, capacity, 0);
+            new(this, capacity, 0);
 
         /// <summary>
         /// Creates a new structure type.

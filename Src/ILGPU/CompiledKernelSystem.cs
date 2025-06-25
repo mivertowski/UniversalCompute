@@ -211,7 +211,7 @@ namespace ILGPU
 
         #region Instance
 
-        private readonly ReaderWriterLockSlim systemLock = new ReaderWriterLockSlim(
+        private readonly ReaderWriterLockSlim systemLock = new(
             LockRecursionPolicy.SupportsRecursion);
 
         private readonly ConcurrentDictionary<string, CompiledKernelEntry> compiledKernels = new();
@@ -390,34 +390,28 @@ namespace ILGPU
     /// <summary>
     /// Represents a compiled kernel entry.
     /// </summary>
-    public sealed class CompiledKernelEntry
+    /// <remarks>
+    /// Constructs a new compiled kernel entry.
+    /// </remarks>
+    /// <param name="kernelName">The kernel name.</param>
+    /// <param name="method">The compiled method.</param>
+    /// <param name="sourceCode">The generated source code.</param>
+    public sealed class CompiledKernelEntry(string kernelName, MethodInfo method, string sourceCode)
     {
-        /// <summary>
-        /// Constructs a new compiled kernel entry.
-        /// </summary>
-        /// <param name="kernelName">The kernel name.</param>
-        /// <param name="method">The compiled method.</param>
-        /// <param name="sourceCode">The generated source code.</param>
-        public CompiledKernelEntry(string kernelName, MethodInfo method, string sourceCode)
-        {
-            KernelName = kernelName;
-            Method = method;
-            SourceCode = sourceCode;
-        }
 
         /// <summary>
         /// Returns the kernel name.
         /// </summary>
-        public string KernelName { get; }
+        public string KernelName { get; } = kernelName;
 
         /// <summary>
         /// Returns the compiled method.
         /// </summary>
-        public MethodInfo Method { get; }
+        public MethodInfo Method { get; } = method;
 
         /// <summary>
         /// Returns the generated source code.
         /// </summary>
-        public string SourceCode { get; }
+        public string SourceCode { get; } = sourceCode;
     }
 }

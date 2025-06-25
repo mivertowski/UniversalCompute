@@ -36,23 +36,19 @@ namespace ILGPU.IR.Analyses
     /// that always returns a specific constant value.
     /// </summary>
     /// <typeparam name="T">The value type.</typeparam>
-    public readonly struct ConstAnalysisValueSourceContext<T> :
+    /// <remarks>
+    /// Constructs a new source context.
+    /// </remarks>
+    /// <param name="value">The constant value to use for all nodes.</param>
+    public readonly struct ConstAnalysisValueSourceContext<T>(T value) :
         IAnalysisValueSourceContext<T>
         where T : IEquatable<T>
     {
-        /// <summary>
-        /// Constructs a new source context.
-        /// </summary>
-        /// <param name="value">The constant value to use for all nodes.</param>
-        public ConstAnalysisValueSourceContext(T value)
-        {
-            Value = value;
-        }
 
         /// <summary>
         /// Returns the constant value to use for all nodes.
         /// </summary>
-        public T Value { get; }
+        public T Value { get; } = value;
 
         /// <summary>
         /// Returns the value of <see cref="Value"/> for all input nodes.
@@ -86,13 +82,18 @@ namespace ILGPU.IR.Analyses
     /// additional fine-grained information about each child element in the case of
     /// structure values. This improves the overall program analysis precision.
     /// </remarks>
-    public readonly struct AnalysisValue<T> :
+    /// <remarks>
+    /// Constructs a new analysis value with different data values for each child.
+    /// </remarks>
+    /// <param name="data">The accumulated data value.</param>
+    /// <param name="childArray">All child data values.</param>
+    public readonly struct AnalysisValue<T>(T data, T[] childArray) :
         IEquatable<AnalysisValue<T>>
         where T : IEquatable<T>
     {
         #region Instance
 
-        private readonly T[] childData;
+        private readonly T[] childData = childArray ?? Array.Empty<T>();
 
         /// <summary>
         /// Constructs a new analysis value with the given data value.
@@ -102,17 +103,6 @@ namespace ILGPU.IR.Analyses
             : this(data, Array.Empty<T>())
         { }
 
-        /// <summary>
-        /// Constructs a new analysis value with different data values for each child.
-        /// </summary>
-        /// <param name="data">The accumulated data value.</param>
-        /// <param name="childArray">All child data values.</param>
-        public AnalysisValue(T data, T[] childArray)
-        {
-            Data = data;
-            childData = childArray ?? Array.Empty<T>();
-        }
-
         #endregion
 
         #region Properties
@@ -120,7 +110,7 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Returns the underlying data value.
         /// </summary>
-        public T Data { get; }
+        public T Data { get; } = data;
 
         /// <summary>
         /// Returns the number of child elements.
@@ -258,21 +248,16 @@ namespace ILGPU.IR.Analyses
     /// specialized using the user-defined type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The target mapping type.</typeparam>
-    public readonly struct AnalysisValueMapping<T>
+    /// <remarks>
+    /// Constructs a new value mapping using the given dictionary.
+    /// </remarks>
+    /// <param name="data">The underlying dictionary to use.</param>
+    public readonly struct AnalysisValueMapping<T>(Dictionary<Value, AnalysisValue<T>> data)
         where T : IEquatable<T>
     {
         #region Instance
 
-        private readonly Dictionary<Value, AnalysisValue<T>> mapping;
-
-        /// <summary>
-        /// Constructs a new value mapping using the given dictionary.
-        /// </summary>
-        /// <param name="data">The underlying dictionary to use.</param>
-        public AnalysisValueMapping(Dictionary<Value, AnalysisValue<T>> data)
-        {
-            mapping = data ?? throw new ArgumentNullException(nameof(data));
-        }
+        private readonly Dictionary<Value, AnalysisValue<T>> mapping = data ?? throw new ArgumentNullException(nameof(data));
 
         #endregion
 
@@ -334,21 +319,16 @@ namespace ILGPU.IR.Analyses
     /// specialized using the user-defined type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The target mapping type.</typeparam>
-    public readonly struct AnalysisReturnValueMapping<T>
+    /// <remarks>
+    /// Constructs a new value mapping using the given dictionary.
+    /// </remarks>
+    /// <param name="data">The underlying dictionary to use.</param>
+    public readonly struct AnalysisReturnValueMapping<T>(Dictionary<Method, AnalysisValue<T>> data)
         where T : IEquatable<T>
     {
         #region Instance
 
-        private readonly Dictionary<Method, AnalysisValue<T>> mapping;
-
-        /// <summary>
-        /// Constructs a new value mapping using the given dictionary.
-        /// </summary>
-        /// <param name="data">The underlying dictionary to use.</param>
-        public AnalysisReturnValueMapping(Dictionary<Method, AnalysisValue<T>> data)
-        {
-            mapping = data ?? throw new ArgumentNullException(nameof(data));
-        }
+        private readonly Dictionary<Method, AnalysisValue<T>> mapping = data ?? throw new ArgumentNullException(nameof(data));
 
         #endregion
 
@@ -393,7 +373,7 @@ namespace ILGPU.IR.Analyses
         /// <returns>The initialized analysis mapping instance.</returns>
         public static AnalysisValueMapping<T> Create<T>()
             where T : struct, IEquatable<T> =>
-            new AnalysisValueMapping<T>(
+            new(
                 new Dictionary<Value, AnalysisValue<T>>());
     }
 
@@ -409,7 +389,7 @@ namespace ILGPU.IR.Analyses
         /// <returns>The initialized analysis mapping instance.</returns>
         public static AnalysisReturnValueMapping<T> Create<T>()
             where T : struct, IEquatable<T> =>
-            new AnalysisReturnValueMapping<T>(
+            new(
                 new Dictionary<Method, AnalysisValue<T>>());
     }
 }

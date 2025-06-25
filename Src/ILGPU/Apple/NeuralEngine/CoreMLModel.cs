@@ -133,21 +133,16 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         /// <param name="inputShape">The input tensor shape.</param>
         /// <returns>The output tensor shape.</returns>
-        public TensorShape GetOutputShape(TensorShape inputShape)
-        {
+        public TensorShape GetOutputShape(TensorShape inputShape) =>
             // For most models, we'd need to query the Core ML model metadata
             // For now, return a placeholder shape
-            return inputShape; // Placeholder - would be determined by model architecture
-        }
+            inputShape; // Placeholder - would be determined by model architecture
 
         /// <summary>
         /// Gets the optimal batch size for this model.
         /// </summary>
         /// <returns>The recommended batch size.</returns>
-        public int GetOptimalBatchSize()
-        {
-            return _capabilities.GetOptimalBatchSize(EstimatedComplexity);
-        }
+        public int GetOptimalBatchSize() => _capabilities.GetOptimalBatchSize(EstimatedComplexity);
 
         /// <summary>
         /// Checks if the model is compatible with the Neural Engine.
@@ -353,18 +348,13 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// ANE model compiler for converting neural networks to ANE format.
     /// </summary>
-    public sealed class ANEModelCompiler
+    /// <remarks>
+    /// Initializes a new instance of the ANEModelCompiler class.
+    /// </remarks>
+    /// <param name="capabilities">The Neural Engine capabilities.</param>
+    public sealed class ANEModelCompiler(ANECapabilities capabilities)
     {
-        private readonly ANECapabilities _capabilities;
-
-        /// <summary>
-        /// Initializes a new instance of the ANEModelCompiler class.
-        /// </summary>
-        /// <param name="capabilities">The Neural Engine capabilities.</param>
-        public ANEModelCompiler(ANECapabilities capabilities)
-        {
-            _capabilities = capabilities;
-        }
+        private readonly ANECapabilities _capabilities = capabilities;
 
         /// <summary>
         /// Compiles a neural network for Neural Engine execution.
@@ -396,13 +386,11 @@ namespace ILGPU.Apple.NeuralEngine
             return model;
         }
 
-        private string ConvertToCoreML(NeuralNetwork network, ANECompilationOptions options)
-        {
+        private string ConvertToCoreML(NeuralNetwork network, ANECompilationOptions options) =>
             // This would implement the conversion from ILGPU neural network representation
             // to Core ML format, including ANE-specific optimizations
-            
+
             // For now, return a placeholder path
             throw new NotImplementedException("Neural network to Core ML conversion not implemented");
-        }
     }
 }

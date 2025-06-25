@@ -20,12 +20,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class BasicJumps : TestBase
+    public abstract class BasicJumps(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected BasicJumps(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         [SuppressMessage(
             "Style",
             "IDE0059:Unnecessary assignment of a value",

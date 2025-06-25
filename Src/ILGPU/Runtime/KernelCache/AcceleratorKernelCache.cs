@@ -374,61 +374,52 @@ namespace ILGPU.Runtime.KernelCache
     /// <summary>
     /// Information about a cached kernel.
     /// </summary>
-    public sealed class CachedKernelInfo
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="CachedKernelInfo"/> class.
+    /// </remarks>
+    /// <param name="cacheKey">The cache key.</param>
+    /// <param name="version">The version string.</param>
+    /// <param name="isInCache">Whether the kernel is cached.</param>
+    /// <param name="isLoaded">Whether the kernel is loaded in memory.</param>
+    /// <param name="methodName">The kernel method name.</param>
+    /// <param name="acceleratorType">The accelerator type.</param>
+    public sealed class CachedKernelInfo(
+        string cacheKey,
+        string version,
+        bool isInCache,
+        bool isLoaded,
+        string methodName,
+        string acceleratorType)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CachedKernelInfo"/> class.
-        /// </summary>
-        /// <param name="cacheKey">The cache key.</param>
-        /// <param name="version">The version string.</param>
-        /// <param name="isInCache">Whether the kernel is cached.</param>
-        /// <param name="isLoaded">Whether the kernel is loaded in memory.</param>
-        /// <param name="methodName">The kernel method name.</param>
-        /// <param name="acceleratorType">The accelerator type.</param>
-        public CachedKernelInfo(
-            string cacheKey,
-            string version,
-            bool isInCache,
-            bool isLoaded,
-            string methodName,
-            string acceleratorType)
-        {
-            CacheKey = cacheKey;
-            Version = version;
-            IsInCache = isInCache;
-            IsLoaded = isLoaded;
-            MethodName = methodName;
-            AcceleratorType = acceleratorType;
-        }
 
         /// <summary>
         /// Gets the cache key.
         /// </summary>
-        public string CacheKey { get; }
+        public string CacheKey { get; } = cacheKey;
 
         /// <summary>
         /// Gets the version string.
         /// </summary>
-        public string Version { get; }
+        public string Version { get; } = version;
 
         /// <summary>
         /// Gets a value indicating whether the kernel is in cache.
         /// </summary>
-        public bool IsInCache { get; }
+        public bool IsInCache { get; } = isInCache;
 
         /// <summary>
         /// Gets a value indicating whether the kernel is loaded in memory.
         /// </summary>
-        public bool IsLoaded { get; }
+        public bool IsLoaded { get; } = isLoaded;
 
         /// <summary>
         /// Gets the kernel method name.
         /// </summary>
-        public string MethodName { get; }
+        public string MethodName { get; } = methodName;
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public string AcceleratorType { get; }
+        public string AcceleratorType { get; } = acceleratorType;
     }
 }

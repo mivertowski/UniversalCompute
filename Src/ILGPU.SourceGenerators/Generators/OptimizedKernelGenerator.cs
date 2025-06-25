@@ -348,7 +348,7 @@ namespace ILGPU.SourceGenerators.Generators
 
         private static void GenerateUnrolledVariant(StringBuilder sb, OptimizableKernelInfo kernel, string baseName)
         {
-            if (!kernel.Analysis.LoopUnrollCandidates.Any())
+            if (kernel.Analysis.LoopUnrollCandidates.Count == 0)
                 return;
 
             sb.AppendLine($"        /// <summary>");
@@ -371,7 +371,7 @@ namespace ILGPU.SourceGenerators.Generators
 
         private static void GenerateVectorizedVariant(StringBuilder sb, OptimizableKernelInfo kernel, string baseName)
         {
-            if (!kernel.Analysis.VectorizationCandidates.Any())
+            if (kernel.Analysis.VectorizationCandidates.Count == 0)
                 return;
 
             sb.AppendLine($"        /// <summary>");
@@ -397,7 +397,7 @@ namespace ILGPU.SourceGenerators.Generators
 
         private static void GenerateSpecializedParameterVariants(StringBuilder sb, OptimizableKernelInfo kernel, string baseName)
         {
-            if (!kernel.Analysis.SpecializableParameters.Any())
+            if (kernel.Analysis.SpecializableParameters.Count == 0)
                 return;
 
             // Generate variants for common parameter values
@@ -442,21 +442,14 @@ namespace ILGPU.SourceGenerators.Generators
     }
 
     // Supporting types for kernel optimization analysis
-    internal class OptimizableKernelInfo
+    internal class OptimizableKernelInfo(
+        MethodDeclarationSyntax method,
+        IMethodSymbol methodSymbol,
+        KernelOptimizationAnalysis analysis)
     {
-        public MethodDeclarationSyntax Method { get; }
-        public IMethodSymbol MethodSymbol { get; }
-        public KernelOptimizationAnalysis Analysis { get; }
-
-        public OptimizableKernelInfo(
-            MethodDeclarationSyntax method,
-            IMethodSymbol methodSymbol,
-            KernelOptimizationAnalysis analysis)
-        {
-            Method = method;
-            MethodSymbol = methodSymbol;
-            Analysis = analysis;
-        }
+        public MethodDeclarationSyntax Method { get; } = method;
+        public IMethodSymbol MethodSymbol { get; } = methodSymbol;
+        public KernelOptimizationAnalysis Analysis { get; } = analysis;
     }
 
     internal class KernelOptimizationAnalysis

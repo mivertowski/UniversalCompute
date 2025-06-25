@@ -31,11 +31,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class OptimizationTests : TestBase
+    public abstract partial class OptimizationTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected OptimizationTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
 #if NET7_0_OR_GREATER
 
@@ -369,17 +366,8 @@ namespace ILGPU.Algorithms.Tests
             object,
             object,
             object> TestData =>
-            new TheoryData<
-                object,
-                object,
-                object,
-                object,
-                object,
-                object,
-                object,
-                object,
-                object>
-        {
+            new()
+            {
             {
                 new OptimizerConfig<float>(
                     32,

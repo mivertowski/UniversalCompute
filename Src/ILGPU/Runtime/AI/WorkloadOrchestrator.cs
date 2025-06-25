@@ -230,7 +230,7 @@ namespace ILGPU.Runtime.AI
                 .Where(p => p.CanExecute(workload))
                 .ToList();
             
-            if (!suitableProfiles.Any())
+            if (suitableProfiles.Count == 0)
                 return _acceleratorProfiles.First(); // Fallback to first available
             
             // Select based on workload type and current load
@@ -329,28 +329,23 @@ namespace ILGPU.Runtime.AI
     /// <summary>
     /// Accelerator profile containing performance characteristics.
     /// </summary>
-    public sealed class AcceleratorProfile
+    /// <remarks>
+    /// Initializes a new instance of the AcceleratorProfile class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator.</param>
+    /// <param name="primitives">The performance primitives.</param>
+    public sealed class AcceleratorProfile(Accelerator accelerator, IPerformancePrimitives primitives)
     {
-        /// <summary>
-        /// Initializes a new instance of the AcceleratorProfile class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator.</param>
-        /// <param name="primitives">The performance primitives.</param>
-        public AcceleratorProfile(Accelerator accelerator, IPerformancePrimitives primitives)
-        {
-            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            Primitives = primitives ?? throw new ArgumentNullException(nameof(primitives));
-        }
 
         /// <summary>
         /// Gets the accelerator.
         /// </summary>
-        public Accelerator Accelerator { get; }
+        public Accelerator Accelerator { get; } = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Gets the performance primitives.
         /// </summary>
-        public IPerformancePrimitives Primitives { get; }
+        public IPerformancePrimitives Primitives { get; } = primitives ?? throw new ArgumentNullException(nameof(primitives));
 
         /// <summary>
         /// Gets or sets the performance score.
@@ -384,28 +379,23 @@ namespace ILGPU.Runtime.AI
     /// <summary>
     /// Workload execution context.
     /// </summary>
-    public sealed class WorkloadExecutionContext
+    /// <remarks>
+    /// Initializes a new instance of the WorkloadExecutionContext class.
+    /// </remarks>
+    /// <param name="strategy">The execution strategy.</param>
+    /// <param name="performanceTracker">The performance tracker.</param>
+    public sealed class WorkloadExecutionContext(ExecutionStrategy strategy, PerformanceTracker performanceTracker)
     {
-        /// <summary>
-        /// Initializes a new instance of the WorkloadExecutionContext class.
-        /// </summary>
-        /// <param name="strategy">The execution strategy.</param>
-        /// <param name="performanceTracker">The performance tracker.</param>
-        public WorkloadExecutionContext(ExecutionStrategy strategy, PerformanceTracker performanceTracker)
-        {
-            Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
-            PerformanceTracker = performanceTracker ?? throw new ArgumentNullException(nameof(performanceTracker));
-        }
 
         /// <summary>
         /// Gets the execution strategy.
         /// </summary>
-        public ExecutionStrategy Strategy { get; }
+        public ExecutionStrategy Strategy { get; } = strategy ?? throw new ArgumentNullException(nameof(strategy));
 
         /// <summary>
         /// Gets the performance tracker.
         /// </summary>
-        public PerformanceTracker PerformanceTracker { get; }
+        public PerformanceTracker PerformanceTracker { get; } = performanceTracker ?? throw new ArgumentNullException(nameof(performanceTracker));
     }
 
     /// <summary>
@@ -427,21 +417,17 @@ namespace ILGPU.Runtime.AI
     /// <summary>
     /// Single accelerator execution strategy.
     /// </summary>
-    public sealed class SingleAcceleratorStrategy : ExecutionStrategy
+    /// <remarks>
+    /// Initializes a new instance of the SingleAcceleratorStrategy class.
+    /// </remarks>
+    /// <param name="accelerator">The target accelerator.</param>
+    public sealed class SingleAcceleratorStrategy(Accelerator accelerator) : ExecutionStrategy
     {
-        /// <summary>
-        /// Initializes a new instance of the SingleAcceleratorStrategy class.
-        /// </summary>
-        /// <param name="accelerator">The target accelerator.</param>
-        public SingleAcceleratorStrategy(Accelerator accelerator)
-        {
-            TargetAccelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        }
 
         /// <summary>
         /// Gets the target accelerator.
         /// </summary>
-        public Accelerator TargetAccelerator { get; }
+        public Accelerator TargetAccelerator { get; } = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Gets the strategy type.
@@ -457,21 +443,17 @@ namespace ILGPU.Runtime.AI
     /// <summary>
     /// Multi-accelerator execution strategy.
     /// </summary>
-    public sealed class MultiAcceleratorStrategy : ExecutionStrategy
+    /// <remarks>
+    /// Initializes a new instance of the MultiAcceleratorStrategy class.
+    /// </remarks>
+    /// <param name="accelerators">The target accelerators.</param>
+    public sealed class MultiAcceleratorStrategy(IEnumerable<Accelerator> accelerators) : ExecutionStrategy
     {
-        /// <summary>
-        /// Initializes a new instance of the MultiAcceleratorStrategy class.
-        /// </summary>
-        /// <param name="accelerators">The target accelerators.</param>
-        public MultiAcceleratorStrategy(IEnumerable<Accelerator> accelerators)
-        {
-            Accelerators = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
-        }
 
         /// <summary>
         /// Gets the accelerators.
         /// </summary>
-        public List<Accelerator> Accelerators { get; }
+        public List<Accelerator> Accelerators { get; } = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
 
         /// <summary>
         /// Gets the strategy type.

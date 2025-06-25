@@ -25,7 +25,21 @@ namespace ILGPU.Backends.PTX.Transformations
     /// <summary>
     /// The PTX accelerator specializer.
     /// </summary>
-    public sealed class PTXAcceleratorSpecializer : AcceleratorSpecializer
+    /// <remarks>
+    /// Constructs a new PTX accelerator specializer.
+    /// </remarks>
+    /// <param name="pointerType">The actual pointer type to use.</param>
+    /// <param name="enableAssertions">True, if the assertions are enabled.</param>
+    /// <param name="enableIOOperations">True, if the IO is enabled.</param>
+    public sealed class PTXAcceleratorSpecializer(
+        PrimitiveType pointerType,
+        bool enableAssertions,
+        bool enableIOOperations) : AcceleratorSpecializer(
+              AcceleratorType.Cuda,
+              PTXBackend.WarpSize,
+              pointerType,
+              enableAssertions,
+              enableIOOperations)
     {
         #region External Functions
 
@@ -75,26 +89,7 @@ namespace ILGPU.Backends.PTX.Transformations
             .ThrowIfNull();
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new PTX accelerator specializer.
-        /// </summary>
-        /// <param name="pointerType">The actual pointer type to use.</param>
-        /// <param name="enableAssertions">True, if the assertions are enabled.</param>
-        /// <param name="enableIOOperations">True, if the IO is enabled.</param>
-        public PTXAcceleratorSpecializer(
-            PrimitiveType pointerType,
-            bool enableAssertions,
-            bool enableIOOperations)
-            : base(
-                  AcceleratorType.Cuda,
-                  PTXBackend.WarpSize,
-                  pointerType,
-                  enableAssertions,
-                  enableIOOperations)
-        { }
 
         #endregion
 

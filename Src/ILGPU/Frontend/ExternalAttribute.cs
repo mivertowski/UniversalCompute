@@ -17,22 +17,18 @@ namespace ILGPU.Frontend
     /// <summary>
     /// Marks external methods that are opaque in the scope of the ILGPU IR.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new external attribute.
+    /// </remarks>
+    /// <param name="name">The external name.</param>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public sealed class ExternalAttribute : Attribute
+    public sealed class ExternalAttribute(string name) : Attribute
     {
-        /// <summary>
-        /// Constructs a new external attribute.
-        /// </summary>
-        /// <param name="name">The external name.</param>
-        public ExternalAttribute(string name)
-        {
-            Name = name;
-        }
 
         /// <summary>
         /// Returns the associated internal function name.
         /// </summary>
-        public string Name { get; }
+        public string Name { get; } = name;
 
         /// <summary>
         /// Resolves the actual IR name.

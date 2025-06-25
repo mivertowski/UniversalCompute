@@ -26,16 +26,10 @@ namespace ILGPU.SourceGenerators.Analysis
     /// <summary>
     /// Analyzes kernel methods for AOT compatibility and code generation requirements.
     /// </summary>
-    internal sealed class KernelMethodAnalyzer
+    internal sealed class KernelMethodAnalyzer(Compilation compilation, SemanticModel semanticModel)
     {
-        private readonly Compilation compilation;
-        private readonly SemanticModel semanticModel;
-
-        public KernelMethodAnalyzer(Compilation compilation, SemanticModel semanticModel)
-        {
-            this.compilation = compilation;
-            this.semanticModel = semanticModel;
-        }
+        private readonly Compilation compilation = compilation;
+        private readonly SemanticModel semanticModel = semanticModel;
 
         /// <summary>
         /// Analyzes a method to determine if it's a valid kernel method for AOT compilation.
@@ -122,7 +116,7 @@ namespace ILGPU.SourceGenerators.Analysis
                 .OfType<ObjectCreationExpressionSyntax>()
                 .ToList();
 
-            if (dynamicAllocations.Any())
+            if (dynamicAllocations.Count != 0)
             {
                 bodyAnalysis.AddWarning("Dynamic object allocation found - may not be AOT compatible");
             }
@@ -133,7 +127,7 @@ namespace ILGPU.SourceGenerators.Analysis
                 .Where(ma => IsReflectionAPI(ma))
                 .ToList();
 
-            if (memberAccess.Any())
+            if (memberAccess.Count != 0)
             {
                 return MethodBodyAnalysisResult.Failed("Reflection API usage not allowed in AOT kernels");
             }
@@ -143,7 +137,7 @@ namespace ILGPU.SourceGenerators.Analysis
                 .OfType<AnonymousFunctionExpressionSyntax>()
                 .ToList();
 
-            if (delegateCreations.Any())
+            if (delegateCreations.Count != 0)
             {
                 return MethodBodyAnalysisResult.Failed("Anonymous functions not supported in AOT kernels");
             }

@@ -17,13 +17,9 @@ using static ILGPU.Tests.EnumValues;
 
 namespace ILGPU.Tests
 {
-    public abstract class SizeOfValues : TestBase
+    public abstract class SizeOfValues(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected SizeOfValues(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
-        public static TheoryData<object> SizeOfTestData => new TheoryData<object>
+        public static TheoryData<object> SizeOfTestData => new()
         {
             { default(sbyte) },
             { default(byte) },
@@ -84,7 +80,7 @@ namespace ILGPU.Tests
             Verify(buffer.View, expected);
         }
 
-        public static TheoryData<object> OffsetOfData => new TheoryData<object>
+        public static TheoryData<object> OffsetOfData => new()
         {
             { default(TestStruct<TestStruct<byte>>) },
             { default(

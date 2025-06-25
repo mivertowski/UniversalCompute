@@ -254,19 +254,15 @@ namespace ILGPU.ML.Integration
             return compiledModel;
         }
 
-        private async Task<ONNXModel> LoadONNXModelAsync(string modelPath)
-        {
+        private async Task<ONNXModel> LoadONNXModelAsync(string modelPath) =>
             // Implementation would load and parse ONNX model file
             // This is a simplified placeholder
-            return await Task.FromResult(new ONNXModel(modelPath));
-        }
+            await Task.FromResult(new ONNXModel(modelPath));
 
-        private async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel)
-        {
+        private async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel) =>
             // Implementation would convert ONNX operators to ILGPU compute operations
             // This involves mapping ONNX ops to universal kernels
-            return await Task.FromResult(new ComputeGraph());
-        }
+            await Task.FromResult(new ComputeGraph());
 
         private async Task<Dictionary<string, ITensor<float>>> ConvertInputsToTensorsAsync(
             IReadOnlyCollection<NamedOnnxValue> inputs)
@@ -282,11 +278,9 @@ namespace ILGPU.ML.Integration
             return tensorInputs;
         }
 
-        private async Task<ITensor<float>> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue)
-        {
+        private async Task<ITensor<float>> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue) =>
             // Implementation would convert ONNX tensor format to ILGPU tensor format
-            return await Task.FromResult<ITensor<float>>(null);
-        }
+            await Task.FromResult<ITensor<float>>(null);
 
         private async Task<NamedOnnxValue[]> ConvertTensorsToOutputsAsync(
             Dictionary<string, ITensor<float>> tensors,
@@ -306,11 +300,9 @@ namespace ILGPU.ML.Integration
             return outputs.ToArray();
         }
 
-        private async Task<NamedOnnxValue> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor)
-        {
+        private async Task<NamedOnnxValue> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>
             // Implementation would convert ILGPU tensor back to ONNX format
-            return await Task.FromResult<NamedOnnxValue>(null);
-        }
+            await Task.FromResult<NamedOnnxValue>(null);
 
         private async Task<Dictionary<ComputeNode, CompiledKernel>> CompileKernelsAsync(ExecutionPlan plan)
         {
@@ -325,11 +317,9 @@ namespace ILGPU.ML.Integration
             return compiledKernels;
         }
 
-        private async Task<CompiledKernel> CompileNodeKernelAsync(ComputeNode node, ComputeDevice device)
-        {
+        private async Task<CompiledKernel> CompileNodeKernelAsync(ComputeNode node, ComputeDevice device) =>
             // Implementation would compile the node's operation to device-specific code
-            return await Task.FromResult(new CompiledKernel(node, device));
-        }
+            await Task.FromResult(new CompiledKernel(node, device));
 
         private async Task<DeviceProfilingResult> ProfileOnDeviceAsync(
             string modelPath,
@@ -360,11 +350,11 @@ namespace ILGPU.ML.Integration
             var frequencies = samples.Select(s => s.Frequency).ToList();
 
             return new WorkloadAnalysis(
-                TimeSpan.FromMilliseconds(batchSizes.Any() ? batchSizes.Average() * 10 : 10),
-                modelSizes.Any() ? (long)modelSizes.Average() * 1024 : 1024,
+                TimeSpan.FromMilliseconds(batchSizes.Count != 0 ? batchSizes.Average() * 10 : 10),
+                modelSizes.Count != 0 ? (long)modelSizes.Average() * 1024 : 1024,
                 WorkloadType.Compute,
                 1, // Priority
-                modelSizes.Any() ? modelSizes.Average() : 0,
+                modelSizes.Count != 0 ? modelSizes.Average() : 0,
                 "ONNX workload analysis");
         }
 
@@ -460,42 +450,34 @@ namespace ILGPU.ML.Integration
     /// <summary>
     /// Provides configuration recommendations for optimal performance.
     /// </summary>
-    public class ConfigurationRecommendations
+    /// <remarks>
+    /// Initializes a new instance of the ConfigurationRecommendations class.
+    /// </remarks>
+    public class ConfigurationRecommendations(
+        IReadOnlyDictionary<string, ComputeDevice> deviceRecommendations,
+        int recommendedBatchSize,
+        MemoryLayout optimalMemoryLayout,
+        string[] suggestedOptimizations)
     {
         /// <summary>
         /// Gets the recommended device assignments.
         /// </summary>
-        public IReadOnlyDictionary<string, ComputeDevice> DeviceRecommendations { get; }
+        public IReadOnlyDictionary<string, ComputeDevice> DeviceRecommendations { get; } = deviceRecommendations;
 
         /// <summary>
         /// Gets the recommended batch size.
         /// </summary>
-        public int RecommendedBatchSize { get; }
+        public int RecommendedBatchSize { get; } = recommendedBatchSize;
 
         /// <summary>
         /// Gets the optimal memory layout strategy.
         /// </summary>
-        public MemoryLayout OptimalMemoryLayout { get; }
+        public MemoryLayout OptimalMemoryLayout { get; } = optimalMemoryLayout;
 
         /// <summary>
         /// Gets suggested optimizations.
         /// </summary>
-        public string[] SuggestedOptimizations { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the ConfigurationRecommendations class.
-        /// </summary>
-        public ConfigurationRecommendations(
-            IReadOnlyDictionary<string, ComputeDevice> deviceRecommendations,
-            int recommendedBatchSize,
-            MemoryLayout optimalMemoryLayout,
-            string[] suggestedOptimizations)
-        {
-            DeviceRecommendations = deviceRecommendations;
-            RecommendedBatchSize = recommendedBatchSize;
-            OptimalMemoryLayout = optimalMemoryLayout;
-            SuggestedOptimizations = suggestedOptimizations;
-        }
+        public string[] SuggestedOptimizations { get; } = suggestedOptimizations;
     }
 
     /// <summary>

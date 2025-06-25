@@ -415,40 +415,33 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Event arguments for GPU error events.
     /// </summary>
-    public sealed class GpuErrorEventArgs : EventArgs
+    /// <remarks>
+    /// Initializes a new instance of the GpuErrorEventArgs class.
+    /// </remarks>
+    /// <param name="exception">The exception that occurred.</param>
+    /// <param name="operationName">The name of the operation.</param>
+    /// <param name="attempt">The current attempt number.</param>
+    public sealed class GpuErrorEventArgs(GpuException exception, string operationName, int attempt) : EventArgs
     {
-        /// <summary>
-        /// Initializes a new instance of the GpuErrorEventArgs class.
-        /// </summary>
-        /// <param name="exception">The exception that occurred.</param>
-        /// <param name="operationName">The name of the operation.</param>
-        /// <param name="attempt">The current attempt number.</param>
-        public GpuErrorEventArgs(GpuException exception, string operationName, int attempt)
-        {
-            Exception = exception ?? throw new ArgumentNullException(nameof(exception));
-            OperationName = operationName ?? "Unknown";
-            Attempt = attempt;
-            Timestamp = DateTime.UtcNow;
-        }
 
         /// <summary>
         /// Gets the exception that occurred.
         /// </summary>
-        public GpuException Exception { get; }
+        public GpuException Exception { get; } = exception ?? throw new ArgumentNullException(nameof(exception));
 
         /// <summary>
         /// Gets the name of the operation.
         /// </summary>
-        public string OperationName { get; }
+        public string OperationName { get; } = operationName ?? "Unknown";
 
         /// <summary>
         /// Gets the current attempt number.
         /// </summary>
-        public int Attempt { get; }
+        public int Attempt { get; } = attempt;
 
         /// <summary>
         /// Gets the timestamp when the error occurred.
         /// </summary>
-        public DateTime Timestamp { get; }
+        public DateTime Timestamp { get; } = DateTime.UtcNow;
     }
 }

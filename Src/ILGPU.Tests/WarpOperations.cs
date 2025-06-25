@@ -17,12 +17,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class WarpOperations : TestBase
+    public abstract class WarpOperations(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected WarpOperations(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void WarpDimensionKernel(
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> length,

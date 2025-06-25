@@ -17,23 +17,18 @@ namespace ILGPU.Runtime.Cuda
     /// <summary>
     /// Represents a Cuda (PTX) ISA (Instruction Set Architecture).
     /// </summary>
+    /// <remarks>
+    /// Creates the instruction set from major/minor values.
+    /// </remarks>
+    /// <param name="major">The major version.</param>
+    /// <param name="minor">The minor version.</param>
     [DebuggerDisplay("ISA {Major}.{Minor}")]
-    public readonly partial struct CudaInstructionSet :
+    public readonly partial struct CudaInstructionSet(int major, int minor) :
         IEquatable<CudaInstructionSet>,
         IComparable<CudaInstructionSet>
     {
-        #region Instance
 
-        /// <summary>
-        /// Creates the instruction set from major/minor values.
-        /// </summary>
-        /// <param name="major">The major version.</param>
-        /// <param name="minor">The minor version.</param>
-        public CudaInstructionSet(int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
-        }
+        #region Instance
 
         #endregion
 
@@ -74,12 +69,12 @@ namespace ILGPU.Runtime.Cuda
         /// <summary>
         /// The major version
         /// </summary>
-        public int Major { get; }
+        public int Major { get; } = major;
 
         /// <summary>
         /// The minor version
         /// </summary>
-        public int Minor { get; }
+        public int Minor { get; } = minor;
 
         #endregion
 

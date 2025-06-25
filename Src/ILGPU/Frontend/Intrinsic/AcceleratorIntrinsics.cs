@@ -24,19 +24,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks accelerator methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class AcceleratorIntrinsicAttribute : IntrinsicAttribute
+    sealed class AcceleratorIntrinsicAttribute(AcceleratorIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public AcceleratorIntrinsicAttribute(AcceleratorIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Accelerator;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public AcceleratorIntrinsicKind IntrinsicKind { get; }
+        public AcceleratorIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

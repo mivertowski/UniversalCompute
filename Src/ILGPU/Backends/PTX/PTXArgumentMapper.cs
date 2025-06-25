@@ -22,28 +22,28 @@ namespace ILGPU.Backends.PTX
     /// Constructs mappings for PTX kernels.
     /// </summary>
     /// <remarks>Members of this class are not thread safe.</remarks>
-    public class PTXArgumentMapper : ViewArgumentMapper
+    /// <remarks>
+    /// Constructs a new PTX argument mapper.
+    /// </remarks>
+    /// <param name="context">The current context.</param>
+    public class PTXArgumentMapper(Context context) : ViewArgumentMapper(context)
     {
         #region Nested Types
 
         /// <summary>
         /// Implements the actual argument mapping.
         /// </summary>
-        private readonly struct MappingHandler : IStructMappingHandler<(ILLocal, int)>
+        /// <remarks>
+        /// Constructs a new mapping handler.
+        /// </remarks>
+        /// <param name="entryPoint">The parent entry point.</param>
+        private readonly struct MappingHandler(EntryPoint entryPoint) : IStructMappingHandler<(ILLocal, int)>
         {
-            /// <summary>
-            /// Constructs a new mapping handler.
-            /// </summary>
-            /// <param name="entryPoint">The parent entry point.</param>
-            public MappingHandler(EntryPoint entryPoint)
-            {
-                EntryPoint = entryPoint;
-            }
 
             /// <summary>
             /// Returns the associated current entry point.
             /// </summary>
-            public EntryPoint EntryPoint { get; }
+            public EntryPoint EntryPoint { get; } = entryPoint;
 
             public bool CanMapKernelLength(out Type indexType)
             {
@@ -76,16 +76,7 @@ namespace ILGPU.Backends.PTX
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new PTX argument mapper.
-        /// </summary>
-        /// <param name="context">The current context.</param>
-        public PTXArgumentMapper(Context context)
-            : base(context)
-        { }
 
         #endregion
 

@@ -21,15 +21,11 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class StructureValues : TestBase
+    public abstract class StructureValues(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
-        protected StructureValues(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
-
-        public static TheoryData<object> StructureInteropData => new TheoryData<object>
+        public static TheoryData<object> StructureInteropData => new()
         {
             { default(EmptyStruct) },
             { default(TestStruct) },
@@ -121,8 +117,8 @@ namespace ILGPU.Tests
         }
 
         public static TheoryData<object> StructureViewInteropData =>
-            new TheoryData<object>
-        {
+            new()
+            {
             { default(EmptyStruct) },
             { default(TestStruct) },
             { new TestStruct<byte>()
@@ -278,7 +274,7 @@ namespace ILGPU.Tests
             Verify(buffer.View, new Parent[] { value });
         }
 
-        public static TheoryData<object> StructureEmptyTypeData => new TheoryData<object>
+        public static TheoryData<object> StructureEmptyTypeData => new()
         {
             { default(sbyte) },
             { default(byte) },
@@ -405,18 +401,12 @@ namespace ILGPU.Tests
             Verify(output.View, expected);
         }
 
-        internal struct Vector2
+        internal struct Vector2(int x, int y)
         {
-            public int X { get; set; }
-            public int Y { get; set; }
+            public int X { get; set; } = x;
+            public int Y { get; set; } = y;
 
-            public static readonly Vector2 Zero = new Vector2(0, 0);
-
-            public Vector2(int x, int y)
-            {
-                X = x;
-                Y = y;
-            }
+            public static readonly Vector2 Zero = new(0, 0);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

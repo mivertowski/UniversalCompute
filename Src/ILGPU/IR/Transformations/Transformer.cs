@@ -17,21 +17,30 @@ namespace ILGPU.IR.Transformations
     /// <summary>
     /// Represents a transformer configuration.
     /// </summary>
-    public readonly struct TransformerConfiguration
+    /// <remarks>
+    /// Constructs a new transformer configuration.
+    /// </remarks>
+    /// <param name="requiredFlags">
+    /// The transformation flags that should not be set.
+    /// </param>
+    /// <param name="flags">The transformation flags that will be set.</param>
+    public readonly struct TransformerConfiguration(
+        MethodTransformationFlags requiredFlags,
+        MethodTransformationFlags flags)
     {
         /// <summary>
         /// Represents an empty configuration that works on all functions without
         /// adding additional flags to them.
         /// </summary>
         public static readonly TransformerConfiguration Empty =
-            new TransformerConfiguration(MethodTransformationFlags.None);
+            new(MethodTransformationFlags.None);
 
         /// <summary>
         /// Represents a default configuration that works on all non-transformed
         /// functions and marks them as transformed.
         /// </summary>
         public static readonly TransformerConfiguration Transformed =
-            new TransformerConfiguration(MethodTransformationFlags.Transformed);
+            new(MethodTransformationFlags.Transformed);
 
         /// <summary>
         /// Constructs a new transformer configuration.
@@ -42,31 +51,16 @@ namespace ILGPU.IR.Transformations
         { }
 
         /// <summary>
-        /// Constructs a new transformer configuration.
-        /// </summary>
-        /// <param name="requiredFlags">
-        /// The transformation flags that should not be set.
-        /// </param>
-        /// <param name="flags">The transformation flags that will be set.</param>
-        public TransformerConfiguration(
-            MethodTransformationFlags requiredFlags,
-            MethodTransformationFlags flags)
-        {
-            RequiredFlags = requiredFlags;
-            TransformationFlags = flags;
-        }
-
-        /// <summary>
         /// Returns the transformation flags that will be checked
         /// on the functions to transform.
         /// </summary>
-        public MethodTransformationFlags RequiredFlags { get; }
+        public MethodTransformationFlags RequiredFlags { get; } = requiredFlags;
 
         /// <summary>
         /// Returns the transformation flags that will be stored on
         /// on the transformed functions.
         /// </summary>
-        public MethodTransformationFlags TransformationFlags { get; }
+        public MethodTransformationFlags TransformationFlags { get; } = flags;
 
         /// <summary>
         /// Returns true if the current configuration manipulates transformation flags.
@@ -78,7 +72,7 @@ namespace ILGPU.IR.Transformations
         /// Returns a compatible collection predicate.
         /// </summary>
         public readonly MethodCollections.ToTransform Predicate =>
-            new MethodCollections.ToTransform(RequiredFlags);
+            new(RequiredFlags);
     }
 
     /// <summary>
@@ -154,7 +148,7 @@ namespace ILGPU.IR.Transformations
         /// <param name="configuration">The transformer configuration.</param>
         /// <returns>A new builder.</returns>
         public static Builder CreateBuilder(TransformerConfiguration configuration) =>
-            new Builder(
+            new(
                 configuration,
                 ImmutableArray.CreateBuilder<Transformation>());
 
@@ -197,7 +191,7 @@ namespace ILGPU.IR.Transformations
         public static Transformer Create(
             TransformerConfiguration configuration,
             ImmutableArray<Transformation> transforms) =>
-            new Transformer(configuration, transforms);
+            new(configuration, transforms);
 
         #endregion
 

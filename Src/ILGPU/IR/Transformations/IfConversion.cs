@@ -37,28 +37,23 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Remaps if branch targets to new blocks in order to linearize all jump targets.
         /// </summary>
-        private readonly struct IfBranchRemapper : TerminatorValue.ITargetRemapper
+        /// <remarks>
+        /// Constructs a new if branch remapper.
+        /// </remarks>
+        /// <param name="postDominator">The common post dominator.</param>
+        /// <param name="newTarget">The new target block.</param>
+        private readonly struct IfBranchRemapper(BasicBlock postDominator, BasicBlock newTarget) : TerminatorValue.ITargetRemapper
         {
-            /// <summary>
-            /// Constructs a new if branch remapper.
-            /// </summary>
-            /// <param name="postDominator">The common post dominator.</param>
-            /// <param name="newTarget">The new target block.</param>
-            public IfBranchRemapper(BasicBlock postDominator, BasicBlock newTarget)
-            {
-                PostDominator = postDominator;
-                NewTarget = newTarget;
-            }
 
             /// <summary>
             /// Returns the common post dominator.
             /// </summary>
-            public BasicBlock PostDominator { get; }
+            public BasicBlock PostDominator { get; } = postDominator;
 
             /// <summary>
             /// Returns the new target block.
             /// </summary>
-            public BasicBlock NewTarget { get; }
+            public BasicBlock NewTarget { get; } = newTarget;
 
             /// <summary>
             /// Returns true if one of the block is equal to the
@@ -86,23 +81,16 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// A wrapper structure to encapsulate several basic block regions.
         /// </summary>
-        private readonly struct Regions
+        /// <remarks>
+        /// Constructs a new regions wrapper.
+        /// </remarks>
+        /// <param name="root">The root node.</param>
+        /// <param name="numRegions">The number of attached regions.</param>
+        private readonly struct Regions(BasicBlock root, int numRegions)
         {
             #region Instance
 
-            private readonly HashSet<BasicBlock>[] regions;
-
-            /// <summary>
-            /// Constructs a new regions wrapper.
-            /// </summary>
-            /// <param name="root">The root node.</param>
-            /// <param name="numRegions">The number of attached regions.</param>
-            public Regions(BasicBlock root, int numRegions)
-            {
-                regions = new HashSet<BasicBlock>[numRegions];
-
-                Root = root;
-            }
+            private readonly HashSet<BasicBlock>[] regions = new HashSet<BasicBlock>[numRegions];
 
             #endregion
 
@@ -111,7 +99,7 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the associated root block.
             /// </summary>
-            public BasicBlock Root { get; }
+            public BasicBlock Root { get; } = root;
 
             /// <summary>
             /// Returns the number of regions.
@@ -171,7 +159,18 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// An analyzer to detect compatible if/switch branch constructions.
         /// </summary>
-        private struct ConditionalAnalyzer
+        /// <remarks>
+        /// Constructs a new conditional analyzer.
+        /// </remarks>
+        /// <param name="maxBlockSize">The maximum block size.</param>
+        /// <param name="maxBlockDifference">
+        /// The maximum block size difference.
+        /// </param>
+        /// <param name="blocks">The current blocks.</param>
+        private struct ConditionalAnalyzer(
+            int maxBlockSize,
+            int maxBlockDifference,
+            in BlockCollection blocks)
         {
             #region Static
 
@@ -229,27 +228,7 @@ namespace ILGPU.IR.Transformations
             }
 
             #endregion
-
             #region Instance
-
-            /// <summary>
-            /// Constructs a new conditional analyzer.
-            /// </summary>
-            /// <param name="maxBlockSize">The maximum block size.</param>
-            /// <param name="maxBlockDifference">
-            /// The maximum block size difference.
-            /// </param>
-            /// <param name="blocks">The current blocks.</param>
-            public ConditionalAnalyzer(
-                int maxBlockSize,
-                int maxBlockDifference,
-                in BlockCollection blocks)
-            {
-                PostDominators = blocks.CreatePostDominators();
-                MaxBlockSize = maxBlockSize;
-                MaxBlockDifference = maxBlockDifference;
-                Gathered = null;
-            }
 
             #endregion
 
@@ -258,22 +237,22 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the maximum block size.
             /// </summary>
-            public int MaxBlockSize { get; }
+            public int MaxBlockSize { get; } = maxBlockSize;
 
             /// <summary>
             /// Returns the maximum block difference.
             /// </summary>
-            public int MaxBlockDifference { get; }
+            public int MaxBlockDifference { get; } = maxBlockDifference;
 
             /// <summary>
             /// Returns the parent post dominators.
             /// </summary>
-            public Dominators<Backwards> PostDominators { get; }
+            public Dominators<Backwards> PostDominators { get; } = blocks.CreatePostDominators();
 
             /// <summary>
             /// Gets or sets the current set of gathered blocks.
             /// </summary>
-            private HashSet<BasicBlock>? Gathered { get; set; }
+            private HashSet<BasicBlock>? Gathered { get; set; } = null;
 
             #endregion
 
@@ -435,28 +414,21 @@ namespace ILGPU.IR.Transformations
         /// A conditional converter to perform the actual if/switch conversion into
         /// conditional value predicates.
         /// </summary>
-        private readonly struct ConditionalConverter
+        /// <remarks>
+        /// Constructs a new conditional converter.
+        /// </remarks>
+        /// <param name="branch">The conditional branch node.</param>
+        /// <param name="postDominator">The common post dominator.</param>
+        /// <param name="phiValues">All phi values to convert.</param>
+        /// <param name="regions"></param>
+        private readonly struct ConditionalConverter(
+            ConditionalBranch branch,
+            BasicBlock postDominator,
+            HashSet<PhiValue> phiValues,
+IfConversion.Regions regions)
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new conditional converter.
-            /// </summary>
-            /// <param name="branch">The conditional branch node.</param>
-            /// <param name="postDominator">The common post dominator.</param>
-            /// <param name="phiValues">All phi values to convert.</param>
-            /// <param name="regions"></param>
-            public ConditionalConverter(
-                ConditionalBranch branch,
-                BasicBlock postDominator,
-                HashSet<PhiValue> phiValues,
-                Regions regions)
-            {
-                Branch = branch;
-                PostDominator = postDominator;
-                PhiValues = phiValues;
-                Regions = regions;
-            }
+            #region Instance
 
             #endregion
 
@@ -465,22 +437,22 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the source branch.
             /// </summary>
-            private ConditionalBranch Branch { get; }
+            private ConditionalBranch Branch { get; } = branch;
 
             /// <summary>
             /// The post dominator block.
             /// </summary>
-            private BasicBlock PostDominator { get; }
+            private BasicBlock PostDominator { get; } = postDominator;
 
             /// <summary>
             /// Returns the set of all phi values that will be converted.
             /// </summary>
-            private HashSet<PhiValue> PhiValues { get; }
+            private HashSet<PhiValue> PhiValues { get; } = phiValues;
 
             /// <summary>
             /// Returns all regions.
             /// </summary>
-            private Regions Regions { get; }
+            private Regions Regions { get; } = regions;
 
             #endregion
 
@@ -844,28 +816,22 @@ namespace ILGPU.IR.Transformations
         /// A custom successors provider that stops processing as soon as it hits an
         /// block with kind <see cref="BlockKind.Exit"/>.
         /// </summary>
-        private readonly struct SuccessorsProvider :
+        /// <remarks>
+        /// Constructs a new successors provider.
+        /// </remarks>
+        /// <param name="dominators">The dominators.</param>
+        /// <param name="entryPoint">The current entry point.</param>
+        /// <param name="maxNumInstructions">
+        /// The maximum number of instructions in an inner block.
+        /// </param>
+        private readonly struct SuccessorsProvider(
+            Dominators dominators,
+            BasicBlock entryPoint,
+            int maxNumInstructions) :
             ITraversalSuccessorsProvider<Forwards>
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new successors provider.
-            /// </summary>
-            /// <param name="dominators">The dominators.</param>
-            /// <param name="entryPoint">The current entry point.</param>
-            /// <param name="maxNumInstructions">
-            /// The maximum number of instructions in an inner block.
-            /// </param>
-            public SuccessorsProvider(
-                Dominators dominators,
-                BasicBlock entryPoint,
-                int maxNumInstructions)
-            {
-                Dominators = dominators;
-                EntryPoint = entryPoint;
-                MaxNumInstructions = maxNumInstructions;
-            }
+            #region Instance
 
             #endregion
 
@@ -874,17 +840,17 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns all dominators.
             /// </summary>
-            public Dominators Dominators { get; }
+            public Dominators Dominators { get; } = dominators;
 
             /// <summary>
             /// Returns the current entry point.
             /// </summary>
-            public BasicBlock EntryPoint { get; }
+            public BasicBlock EntryPoint { get; } = entryPoint;
 
             /// <summary>
             /// Returns the maximum number of instructions in an inner block.
             /// </summary>
-            public int MaxNumInstructions { get; }
+            public int MaxNumInstructions { get; } = maxNumInstructions;
 
             #endregion
 
@@ -947,30 +913,25 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Represents a kind predicate that filters blocks based on their kind.
         /// </summary>
-        private readonly struct BlockKindPredicate : InlineList.IPredicate<BasicBlock>
+        /// <remarks>
+        /// Constructs a new kind predicate.
+        /// </remarks>
+        /// <param name="kinds">All block kinds.</param>
+        /// <param name="kindToInclude">The kind of blocks to include.</param>
+        private readonly struct BlockKindPredicate(
+            in BasicBlockMap<IfConditionConversion.BlockKind> kinds,
+IfConditionConversion.BlockKind kindToInclude) : InlineList.IPredicate<BasicBlock>
         {
-            /// <summary>
-            /// Constructs a new kind predicate.
-            /// </summary>
-            /// <param name="kinds">All block kinds.</param>
-            /// <param name="kindToInclude">The kind of blocks to include.</param>
-            public BlockKindPredicate(
-                in BasicBlockMap<BlockKind> kinds,
-                BlockKind kindToInclude)
-            {
-                Kinds = kinds;
-                KindToInclude = kindToInclude;
-            }
 
             /// <summary>
             /// Returns the kind of blocks to include.
             /// </summary>
-            public BlockKind KindToInclude { get; }
+            public BlockKind KindToInclude { get; } = kindToInclude;
 
             /// <summary>
             /// Returns the map of all block kinds.
             /// </summary>
-            private BasicBlockMap<BlockKind> Kinds { get; }
+            private BasicBlockMap<BlockKind> Kinds { get; } = kinds;
 
             /// <summary>
             /// Returns true if the kind of the given block is equal to
@@ -983,24 +944,19 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Skips duplicate entries pointing to the entry block.
         /// </summary>
-        private struct PhiRemapper : PhiValue.IArgumentRemapper
+        private struct PhiRemapper(BasicBlock entryBlock) : PhiValue.IArgumentRemapper
         {
-            public PhiRemapper(BasicBlock entryBlock)
-            {
-                EntryBlock = entryBlock;
-                Added = false;
-            }
 
             /// <summary>
             /// Returns the entry block to remap to.
             /// </summary>
-            public BasicBlock EntryBlock { get; }
+            public BasicBlock EntryBlock { get; } = entryBlock;
 
             /// <summary>
             /// Returns true if the <see cref="EntryBlock"/> has been already wired
             /// with the current block.
             /// </summary>
-            public bool Added { get; private set; }
+            public bool Added { get; private set; } = false;
 
             /// <summary>
             /// Returns true and sets the value of <see cref="Added"/> to false.
@@ -1042,26 +998,16 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// An analyzer to detect compatible (nested) if-branch conditions.
         /// </summary>
-        private ref struct ConditionalAnalyzer
+        /// <remarks>
+        /// Constructs a new conditional analyzer.
+        /// </remarks>
+        /// <param name="blocks">The current block collection.</param>
+        /// <param name="maxBlockSize">The maximum block size.</param>
+        private ref struct ConditionalAnalyzer(BlockCollection blocks, int maxBlockSize)
         {
             #region Instance
 
-            private BasicBlockMap<BlockKind> kinds;
-
-            /// <summary>
-            /// Constructs a new conditional analyzer.
-            /// </summary>
-            /// <param name="blocks">The current block collection.</param>
-            /// <param name="maxBlockSize">The maximum block size.</param>
-            public ConditionalAnalyzer(BlockCollection blocks, int maxBlockSize)
-            {
-                kinds = blocks.CreateMap<BlockKind>();
-
-                MaxNumBlocks = blocks.Count;
-                MaxBlockSize = maxBlockSize;
-
-                Dominators = blocks.CreateDominators();
-            }
+            private BasicBlockMap<BlockKind> kinds = blocks.CreateMap<BlockKind>();
 
             #endregion
 
@@ -1070,17 +1016,17 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the maximum number of all blocks.
             /// </summary>
-            public int MaxNumBlocks { get; }
+            public int MaxNumBlocks { get; } = blocks.Count;
 
             /// <summary>
             /// Returns the maximum block size
             /// </summary>
-            public int MaxBlockSize { get; }
+            public int MaxBlockSize { get; } = maxBlockSize;
 
             /// <summary>
             /// Returns the dominator analysis.
             /// </summary>
-            public Dominators Dominators { get; }
+            public Dominators Dominators { get; } = blocks.CreateDominators();
 
             #endregion
 

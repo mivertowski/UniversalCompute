@@ -68,20 +68,17 @@ namespace ILGPU.IR.Values
     /// <summary>
     /// An abstract base class for converting pointers to integers and vice versa.
     /// </summary>
-    public abstract class PointerIntCast : CastValue
+    /// <remarks>
+    /// Constructs a new cast value.
+    /// </remarks>
+    /// <param name="initializer">The value initializer.</param>
+    /// <param name="source">The value to cast.</param>
+    public abstract class PointerIntCast(
+        in ValueInitializer initializer,
+        ValueReference source) : CastValue(initializer, source)
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new cast value.
-        /// </summary>
-        /// <param name="initializer">The value initializer.</param>
-        /// <param name="source">The value to cast.</param>
-        protected PointerIntCast(
-            in ValueInitializer initializer,
-            ValueReference source)
-            : base(initializer, source)
-        { }
+        #region Instance
 
         #endregion
     }

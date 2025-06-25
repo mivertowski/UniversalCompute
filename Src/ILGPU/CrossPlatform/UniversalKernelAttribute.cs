@@ -45,7 +45,7 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether this kernel supports mixed precision execution.
         /// </summary>
-        public bool SupportsMixedPrecision { get; set; } = false;
+        public bool SupportsMixedPrecision { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the UniversalKernelAttribute class.

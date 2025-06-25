@@ -15,12 +15,8 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class EnumValues : TestBase
+    public abstract class EnumValues(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected EnumValues(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal enum BasicEnum1 : byte
         {
             Val0 = 0,
@@ -49,7 +45,7 @@ namespace ILGPU.Tests
             Val2 = int.MaxValue,
         }
 
-        public static TheoryData<object> EnumInteropData => new TheoryData<object>
+        public static TheoryData<object> EnumInteropData => new()
         {
             { BasicEnum1.Val1 },
             { BasicEnum2.Val2 },

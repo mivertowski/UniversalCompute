@@ -243,21 +243,17 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Represents a grouped kernel loader for implicitly-grouped kernels.
         /// </summary>
-        private struct GroupedKernelLoader : IKernelLoader
+        /// <remarks>
+        /// Constructs a new grouped kernel loader.
+        /// </remarks>
+        /// <param name="groupSize">The custom group size.</param>
+        private struct GroupedKernelLoader(int groupSize) : IKernelLoader
         {
-            /// <summary>
-            /// Constructs a new grouped kernel loader.
-            /// </summary>
-            /// <param name="groupSize">The custom group size.</param>
-            public GroupedKernelLoader(int groupSize)
-            {
-                GroupSize = groupSize;
-            }
 
             /// <summary>
             /// Returns the assigned group size.
             /// </summary>
-            public int GroupSize { get; }
+            public int GroupSize { get; } = groupSize;
 
             /// <summary>
             /// Loads an implicitly grouped kernel.

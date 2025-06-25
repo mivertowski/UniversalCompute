@@ -29,31 +29,26 @@ namespace ILGPU.Frontend
             /// <summary>
             /// Registers instruction offset mappings.
             /// </summary>
-            private readonly struct RegisterOffsetMapping :
+            /// <remarks>
+            /// Constructs a new offset registration mapping.
+            /// </remarks>
+            /// <param name="builder">The parent builder instance.</param>
+            /// <param name="instructionIndex">
+            /// The current instruction index to map to.
+            /// </param>
+            private readonly struct RegisterOffsetMapping(Block.CFGBuilder builder, int instructionIndex) :
                 IILInstructionOffsetOperation
             {
-                /// <summary>
-                /// Constructs a new offset registration mapping.
-                /// </summary>
-                /// <param name="builder">The parent builder instance.</param>
-                /// <param name="instructionIndex">
-                /// The current instruction index to map to.
-                /// </param>
-                public RegisterOffsetMapping(CFGBuilder builder, int instructionIndex)
-                {
-                    Builder = builder;
-                    InstructionIndex = instructionIndex;
-                }
 
                 /// <summary>
                 /// Returns the parent builder.
                 /// </summary>
-                public readonly CFGBuilder Builder { get; }
+                public readonly CFGBuilder Builder { get; } = builder;
 
                 /// <summary>
                 /// Returns the parent instruction index.
                 /// </summary>
-                public readonly int InstructionIndex { get; }
+                public readonly int InstructionIndex { get; } = instructionIndex;
 
                 /// <summary>
                 /// Registers the given instruction offset.
@@ -67,13 +62,13 @@ namespace ILGPU.Frontend
             #region Instance
 
             private readonly Dictionary<int, int> offsetMapping =
-                new Dictionary<int, int>();
+                new();
             private readonly Dictionary<int, Block> blockMapping =
-                new Dictionary<int, Block>();
+                new();
             private readonly Dictionary<BasicBlock, Block> basicBlockMapping =
-                new Dictionary<BasicBlock, Block>(new BasicBlock.Comparer());
+                new(new BasicBlock.Comparer());
             private readonly Dictionary<Block, List<Block>> successorMapping =
-                new Dictionary<Block, List<Block>>();
+                new();
 
             /// <summary>
             /// Constructs a new CFG builder.

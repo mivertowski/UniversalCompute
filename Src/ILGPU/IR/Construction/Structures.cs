@@ -305,7 +305,7 @@ namespace ILGPU.IR.Construction
         public StructureValue.Builder CreateStructure(
             Location location,
             StructureType structureType) =>
-            new StructureValue.Builder(this, location, structureType);
+            new(this, location, structureType);
 
         /// <summary>
         /// Creates a new dynamic structure instance builder.
@@ -325,7 +325,7 @@ namespace ILGPU.IR.Construction
         public StructureValue.DynamicBuilder CreateDynamicStructure(
             Location location,
             int capacity) =>
-            new StructureValue.DynamicBuilder(this, location, capacity);
+            new(this, location, capacity);
 
         /// <summary>
         /// Creates a new dynamic structure instance.

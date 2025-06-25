@@ -22,13 +22,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class DisassemblerTests : TestBase
+    public abstract class DisassemblerTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
         private const int Length = 32;
-
-        protected DisassemblerTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         internal interface IPrefixOffsetFunc
         {
@@ -48,7 +44,7 @@ namespace ILGPU.Tests
             public void Deserialize(IXunitSerializationInfo info) { }
         }
 
-        public static TheoryData<object> PrefixOffsetsData => new TheoryData<object>
+        public static TheoryData<object> PrefixOffsetsData => new()
         {
             { default(IdentityImpl) }
         };

@@ -34,12 +34,12 @@ namespace ILGPU
         /// <summary>
         /// Returns the XY components.
         /// </summary>
-        public readonly Index2D XY => new Index2D(X, Y);
+        public readonly Index2D XY => new(X, Y);
 
         /// <summary>
         /// Returns the YZ components.
         /// </summary>
-        public readonly Index2D YZ => new Index2D(Y, Z);
+        public readonly Index2D YZ => new(Y, Z);
     }
 
     partial struct LongIndex3D
@@ -65,11 +65,11 @@ namespace ILGPU
         /// <summary>
         /// Returns the XY components.
         /// </summary>
-        public readonly LongIndex2D XY => new LongIndex2D(X, Y);
+        public readonly LongIndex2D XY => new(X, Y);
 
         /// <summary>
         /// Returns the YZ components.
         /// </summary>
-        public readonly LongIndex2D YZ => new LongIndex2D(Y, Z);
+        public readonly LongIndex2D YZ => new(Y, Z);
     }
 }

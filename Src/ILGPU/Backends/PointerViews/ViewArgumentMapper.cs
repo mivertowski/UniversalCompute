@@ -19,7 +19,11 @@ namespace ILGPU.Backends.PointerViews
     /// Maps array views to pointer implementations.
     /// </summary>
     /// <remarks>Members of this class are not thread safe.</remarks>
-    public abstract class ViewArgumentMapper : ArgumentMapper
+    /// <remarks>
+    /// Constructs a new view argument mapper.
+    /// </remarks>
+    /// <param name="context">The current context.</param>
+    public abstract class ViewArgumentMapper(Context context) : ArgumentMapper(context)
     {
         #region Nested Types
 
@@ -27,21 +31,16 @@ namespace ILGPU.Backends.PointerViews
         /// Wraps a value source and created a new view instance from value references.
         /// </summary>
         /// <typeparam name="TSource">The source type.</typeparam>
-        private readonly struct ViewImplementationSource<TSource> : IRawValueSource
+        private readonly struct ViewImplementationSource<TSource>(TSource source, Type targetType) : IRawValueSource
             where TSource : struct, ISource
         {
-            public ViewImplementationSource(TSource source, Type targetType)
-            {
-                Source = source;
-                TargetType = targetType;
-            }
 
             /// <summary>
             /// Returns the parent source.
             /// </summary>
-            public TSource Source { get; }
+            public TSource Source { get; } = source;
 
-            public Type TargetType { get; }
+            public Type TargetType { get; } = targetType;
 
             /// <summary>
             /// Emits a new view-value construction.
@@ -58,16 +57,7 @@ namespace ILGPU.Backends.PointerViews
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new view argument mapper.
-        /// </summary>
-        /// <param name="context">The current context.</param>
-        protected ViewArgumentMapper(Context context)
-            : base(context)
-        { }
 
         #endregion
 

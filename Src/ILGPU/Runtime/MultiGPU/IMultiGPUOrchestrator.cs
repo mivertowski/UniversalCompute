@@ -123,37 +123,29 @@ namespace ILGPU.Runtime.MultiGPU
     /// <summary>
     /// Represents information about a GPU in the multi-GPU setup.
     /// </summary>
-    public sealed class GPUInfo
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="GPUInfo"/> class.
+    /// </remarks>
+    /// <param name="accelerator">The accelerator.</param>
+    /// <param name="index">The GPU index.</param>
+    /// <param name="performanceScore">The performance score.</param>
+    public sealed class GPUInfo(Accelerator accelerator, int index, double performanceScore)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GPUInfo"/> class.
-        /// </summary>
-        /// <param name="accelerator">The accelerator.</param>
-        /// <param name="index">The GPU index.</param>
-        /// <param name="performanceScore">The performance score.</param>
-        public GPUInfo(Accelerator accelerator, int index, double performanceScore)
-        {
-            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            Index = index;
-            PerformanceScore = performanceScore;
-            CurrentLoad = 0.0;
-            IsActive = true;
-        }
 
         /// <summary>
         /// Gets the accelerator for this GPU.
         /// </summary>
-        public Accelerator Accelerator { get; }
+        public Accelerator Accelerator { get; } = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Gets the GPU index.
         /// </summary>
-        public int Index { get; }
+        public int Index { get; } = index;
 
         /// <summary>
         /// Gets the performance score (higher is better).
         /// </summary>
-        public double PerformanceScore { get; }
+        public double PerformanceScore { get; } = performanceScore;
 
         /// <summary>
         /// Gets or sets the current load percentage (0.0 to 1.0).
@@ -163,7 +155,7 @@ namespace ILGPU.Runtime.MultiGPU
         /// <summary>
         /// Gets or sets whether this GPU is currently active.
         /// </summary>
-        public bool IsActive { get; set; }
+        public bool IsActive { get; set; } = true;
 
         /// <summary>
         /// Gets the device name.
@@ -179,34 +171,28 @@ namespace ILGPU.Runtime.MultiGPU
     /// <summary>
     /// Represents a work item to be distributed across GPUs.
     /// </summary>
-    public abstract class MultiGPUWorkItem
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MultiGPUWorkItem"/> class.
+    /// </remarks>
+    /// <param name="id">The work item ID.</param>
+    /// <param name="priority">The priority.</param>
+    public abstract class MultiGPUWorkItem(string id, int priority = 0)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MultiGPUWorkItem"/> class.
-        /// </summary>
-        /// <param name="id">The work item ID.</param>
-        /// <param name="priority">The priority.</param>
-        protected MultiGPUWorkItem(string id, int priority = 0)
-        {
-            Id = id ?? throw new ArgumentNullException(nameof(id));
-            Priority = priority;
-            CreatedAt = DateTime.UtcNow;
-        }
 
         /// <summary>
         /// Gets the work item ID.
         /// </summary>
-        public string Id { get; }
+        public string Id { get; } = id ?? throw new ArgumentNullException(nameof(id));
 
         /// <summary>
         /// Gets the priority (higher values = higher priority).
         /// </summary>
-        public int Priority { get; }
+        public int Priority { get; } = priority;
 
         /// <summary>
         /// Gets the creation timestamp.
         /// </summary>
-        public DateTime CreatedAt { get; }
+        public DateTime CreatedAt { get; } = DateTime.UtcNow;
 
         /// <summary>
         /// Gets or sets the estimated execution time in milliseconds.
@@ -237,46 +223,39 @@ namespace ILGPU.Runtime.MultiGPU
     /// <summary>
     /// Represents the result of a multi-GPU operation.
     /// </summary>
-    public sealed class MultiGPUResult
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MultiGPUResult"/> class.
+    /// </remarks>
+    /// <param name="isSuccess">Whether the operation was successful.</param>
+    /// <param name="totalExecutionTime">The total execution time.</param>
+    /// <param name="gpuResults">Results from individual GPUs.</param>
+    /// <param name="error">Error information if failed.</param>
+    public sealed class MultiGPUResult(
+        bool isSuccess,
+        TimeSpan totalExecutionTime,
+        Dictionary<int, object> gpuResults,
+        Exception? error = null)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MultiGPUResult"/> class.
-        /// </summary>
-        /// <param name="isSuccess">Whether the operation was successful.</param>
-        /// <param name="totalExecutionTime">The total execution time.</param>
-        /// <param name="gpuResults">Results from individual GPUs.</param>
-        /// <param name="error">Error information if failed.</param>
-        public MultiGPUResult(
-            bool isSuccess,
-            TimeSpan totalExecutionTime,
-            Dictionary<int, object> gpuResults,
-            Exception? error = null)
-        {
-            IsSuccess = isSuccess;
-            TotalExecutionTime = totalExecutionTime;
-            GPUResults = gpuResults ?? new Dictionary<int, object>();
-            Error = error;
-        }
 
         /// <summary>
         /// Gets a value indicating whether the operation was successful.
         /// </summary>
-        public bool IsSuccess { get; }
+        public bool IsSuccess { get; } = isSuccess;
 
         /// <summary>
         /// Gets the total execution time.
         /// </summary>
-        public TimeSpan TotalExecutionTime { get; }
+        public TimeSpan TotalExecutionTime { get; } = totalExecutionTime;
 
         /// <summary>
         /// Gets the results from individual GPUs.
         /// </summary>
-        public Dictionary<int, object> GPUResults { get; }
+        public Dictionary<int, object> GPUResults { get; } = gpuResults ?? new Dictionary<int, object>();
 
         /// <summary>
         /// Gets the error information if the operation failed.
         /// </summary>
-        public Exception? Error { get; }
+        public Exception? Error { get; } = error;
 
         /// <summary>
         /// Gets the number of GPUs that participated in the operation.
@@ -375,53 +354,45 @@ namespace ILGPU.Runtime.MultiGPU
     /// <summary>
     /// Performance metrics for multi-GPU operations.
     /// </summary>
-    public sealed class MultiGPUPerformanceMetrics
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MultiGPUPerformanceMetrics"/> class.
+    /// </remarks>
+    /// <param name="totalOperations">Total operations executed.</param>
+    /// <param name="averageExecutionTime">Average execution time.</param>
+    /// <param name="totalThroughput">Total throughput (operations/second).</param>
+    /// <param name="gpuUtilization">GPU utilization percentages.</param>
+    /// <param name="memoryUtilization">Memory utilization percentages.</param>
+    public sealed class MultiGPUPerformanceMetrics(
+        long totalOperations,
+        TimeSpan averageExecutionTime,
+        double totalThroughput,
+        Dictionary<int, double> gpuUtilization,
+        Dictionary<int, double> memoryUtilization)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MultiGPUPerformanceMetrics"/> class.
-        /// </summary>
-        /// <param name="totalOperations">Total operations executed.</param>
-        /// <param name="averageExecutionTime">Average execution time.</param>
-        /// <param name="totalThroughput">Total throughput (operations/second).</param>
-        /// <param name="gpuUtilization">GPU utilization percentages.</param>
-        /// <param name="memoryUtilization">Memory utilization percentages.</param>
-        public MultiGPUPerformanceMetrics(
-            long totalOperations,
-            TimeSpan averageExecutionTime,
-            double totalThroughput,
-            Dictionary<int, double> gpuUtilization,
-            Dictionary<int, double> memoryUtilization)
-        {
-            TotalOperations = totalOperations;
-            AverageExecutionTime = averageExecutionTime;
-            TotalThroughput = totalThroughput;
-            GPUUtilization = gpuUtilization ?? new Dictionary<int, double>();
-            MemoryUtilization = memoryUtilization ?? new Dictionary<int, double>();
-        }
 
         /// <summary>
         /// Gets the total number of operations executed.
         /// </summary>
-        public long TotalOperations { get; }
+        public long TotalOperations { get; } = totalOperations;
 
         /// <summary>
         /// Gets the average execution time per operation.
         /// </summary>
-        public TimeSpan AverageExecutionTime { get; }
+        public TimeSpan AverageExecutionTime { get; } = averageExecutionTime;
 
         /// <summary>
         /// Gets the total throughput in operations per second.
         /// </summary>
-        public double TotalThroughput { get; }
+        public double TotalThroughput { get; } = totalThroughput;
 
         /// <summary>
         /// Gets the GPU utilization percentages.
         /// </summary>
-        public Dictionary<int, double> GPUUtilization { get; }
+        public Dictionary<int, double> GPUUtilization { get; } = gpuUtilization ?? new Dictionary<int, double>();
 
         /// <summary>
         /// Gets the memory utilization percentages.
         /// </summary>
-        public Dictionary<int, double> MemoryUtilization { get; }
+        public Dictionary<int, double> MemoryUtilization { get; } = memoryUtilization ?? new Dictionary<int, double>();
     }
 }

@@ -222,7 +222,7 @@ namespace ILGPU.IR
         /// <param name="other">The other one to merge with.</param>
         /// <returns>The merged location.</returns>
         protected internal virtual FileLocation Merge(FileLocation other) =>
-            new FileLocation(
+            new(
                 FileName,
                 Math.Min(StartColumn, other.StartColumn),
                 Math.Max(EndColumn, other.EndColumn),
@@ -335,7 +335,7 @@ namespace ILGPU.IR
         /// <param name="other">The other one to merge with.</param>
         /// <returns>The merged location.</returns>
         public CompilationStackLocation Append(Location other) =>
-            new CompilationStackLocation(Stack.Push(other));
+            new(Stack.Push(other));
 
         /// <summary>
         /// Returns the most recent location of the given type from the compilation

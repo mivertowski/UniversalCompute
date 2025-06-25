@@ -122,7 +122,7 @@ namespace ILGPU.IR.Values
             /// of the parent scope.
             /// </summary>
             /// <returns>The enumerator.</returns>
-            public readonly Enumerator GetEnumerator() => new Enumerator(WriteToOutput);
+            public readonly Enumerator GetEnumerator() => new(WriteToOutput);
         }
 
         #endregion
@@ -250,7 +250,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns all direct argument references for further processing.
         /// </summary>
-        public ArgumentCollection Arguments => new ArgumentCollection(this);
+        public ArgumentCollection Arguments => new(this);
 
         #endregion
 

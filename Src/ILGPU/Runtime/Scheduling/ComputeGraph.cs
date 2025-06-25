@@ -226,12 +226,9 @@ namespace ILGPU.Runtime.Scheduling
             return true;
         }
 
-        private IEnumerable<ComputeNode> GetNodeDependencies(ComputeNode node)
-        {
-            return _dependencies
+        private IEnumerable<ComputeNode> GetNodeDependencies(ComputeNode node) => _dependencies
                 .Where(dep => dep.Consumer == node)
                 .Select(dep => dep.Producer);
-        }
 
         private void MergeCompatibleNodes()
         {
@@ -251,16 +248,13 @@ namespace ILGPU.Runtime.Scheduling
             // This would reorder operations to improve memory locality
         }
 
-        private double EstimateNodeExecutionTime(ComputeNode node, DevicePerformance performance)
+        private double EstimateNodeExecutionTime(ComputeNode node, DevicePerformance performance) => node.Operation switch
         {
-            return node.Operation switch
-            {
-                MatMulOp matmul => EstimateMatMulTime(matmul, performance),
-                ConvolutionOp conv => EstimateConvolutionTime(conv, performance),
-                VectorOp vector => EstimateVectorTime(vector, performance),
-                _ => node.EstimatedTimeMs
-            };
-        }
+            MatMulOp matmul => EstimateMatMulTime(matmul, performance),
+            ConvolutionOp conv => EstimateConvolutionTime(conv, performance),
+            VectorOp vector => EstimateVectorTime(vector, performance),
+            _ => node.EstimatedTimeMs
+        };
 
         private double EstimateMatMulTime(MatMulOp operation, DevicePerformance performance)
         {
@@ -289,52 +283,42 @@ namespace ILGPU.Runtime.Scheduling
     /// <summary>
     /// Represents a data dependency between two compute nodes.
     /// </summary>
-    public class DataDependency
+    /// <remarks>
+    /// Initializes a new instance of the DataDependency class.
+    /// </remarks>
+    public class DataDependency(
+        ComputeNode producer,
+        ComputeNode consumer,
+        long dataSize,
+        DataAccessPattern accessPattern)
     {
-        /// <summary>
-        /// Initializes a new instance of the DataDependency class.
-        /// </summary>
-        public DataDependency(
-            ComputeNode producer, 
-            ComputeNode consumer, 
-            long dataSize, 
-            DataAccessPattern accessPattern)
-        {
-            Producer = producer;
-            Consumer = consumer;
-            DataSize = dataSize;
-            AccessPattern = accessPattern;
-        }
 
         /// <summary>
         /// Gets the node that produces the data.
         /// </summary>
-        public ComputeNode Producer { get; }
+        public ComputeNode Producer { get; } = producer;
 
         /// <summary>
         /// Gets the node that consumes the data.
         /// </summary>
-        public ComputeNode Consumer { get; }
+        public ComputeNode Consumer { get; } = consumer;
 
         /// <summary>
         /// Gets the size of the data dependency in bytes.
         /// </summary>
-        public long DataSize { get; }
+        public long DataSize { get; } = dataSize;
 
         /// <summary>
         /// Gets the expected data access pattern.
         /// </summary>
-        public DataAccessPattern AccessPattern { get; }
+        public DataAccessPattern AccessPattern { get; } = accessPattern;
 
         /// <summary>
         /// Gets the estimated transfer time in milliseconds.
         /// </summary>
         /// <param name="bandwidth">Available bandwidth in GB/s.</param>
         /// <returns>Transfer time in milliseconds.</returns>
-        public double GetEstimatedTransferTime(double bandwidth)
-        {
-            return DataSize / (bandwidth * 1e9) * 1000.0;
-        }
+        public double GetEstimatedTransferTime(double bandwidth) => DataSize / (bandwidth * 1e9) * 1000.0;
     }
 
     /// <summary>

@@ -90,25 +90,19 @@ namespace ILGPU.IR
     /// <summary>
     /// Represents an IR context.
     /// </summary>
-    public sealed class IRContext : IRBaseContext, ICache, IDumpable
+    /// <remarks>
+    /// Constructs a new IR context.
+    /// </remarks>
+    /// <param name="context">The associated main context.</param>
+    public sealed class IRContext(Context context) : IRBaseContext(context), ICache, IDumpable
     {
         #region Instance
 
-        private readonly ReaderWriterLockSlim irLock = new ReaderWriterLockSlim(
+        private readonly ReaderWriterLockSlim irLock = new(
             LockRecursionPolicy.SupportsRecursion);
-        private readonly Action<Method> gcDelegate;
+        private readonly Action<Method> gcDelegate = (Method method) => method.GC();
 
-        private readonly MethodMapping<Method> methods = new MethodMapping<Method>();
-
-        /// <summary>
-        /// Constructs a new IR context.
-        /// </summary>
-        /// <param name="context">The associated main context.</param>
-        public IRContext(Context context)
-            : base(context)
-        {
-            gcDelegate = (Method method) => method.GC();
-        }
+        private readonly MethodMapping<Method> methods = new();
 
         #endregion
 

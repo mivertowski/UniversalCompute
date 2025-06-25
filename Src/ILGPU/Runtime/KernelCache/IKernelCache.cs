@@ -25,48 +25,39 @@ namespace ILGPU.Runtime.KernelCache
     /// <summary>
     /// Represents a kernel cache entry with version information.
     /// </summary>
-    public sealed class KernelCacheEntry
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="KernelCacheEntry"/> class.
+    /// </remarks>
+    /// <param name="kernel">The cached kernel.</param>
+    /// <param name="version">The kernel version.</param>
+    /// <param name="timestamp">The cache timestamp.</param>
+    /// <param name="metadata">Optional metadata.</param>
+    public sealed class KernelCacheEntry(
+        object kernel,
+        string version,
+        DateTime timestamp,
+        Dictionary<string, object>? metadata = null)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KernelCacheEntry"/> class.
-        /// </summary>
-        /// <param name="kernel">The cached kernel.</param>
-        /// <param name="version">The kernel version.</param>
-        /// <param name="timestamp">The cache timestamp.</param>
-        /// <param name="metadata">Optional metadata.</param>
-        public KernelCacheEntry(
-            object kernel,
-            string version,
-            DateTime timestamp,
-            Dictionary<string, object>? metadata = null)
-        {
-            Kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
-            Version = version ?? throw new ArgumentNullException(nameof(version));
-            Timestamp = timestamp;
-            Metadata = metadata ?? new Dictionary<string, object>();
-            AccessCount = 0;
-            LastAccess = timestamp;
-        }
 
         /// <summary>
         /// Gets the cached kernel.
         /// </summary>
-        public object Kernel { get; }
+        public object Kernel { get; } = kernel ?? throw new ArgumentNullException(nameof(kernel));
 
         /// <summary>
         /// Gets the kernel version.
         /// </summary>
-        public string Version { get; }
+        public string Version { get; } = version ?? throw new ArgumentNullException(nameof(version));
 
         /// <summary>
         /// Gets the cache timestamp.
         /// </summary>
-        public DateTime Timestamp { get; }
+        public DateTime Timestamp { get; } = timestamp;
 
         /// <summary>
         /// Gets the last access time.
         /// </summary>
-        public DateTime LastAccess { get; private set; }
+        public DateTime LastAccess { get; private set; } = timestamp;
 
         /// <summary>
         /// Gets the access count.
@@ -76,7 +67,7 @@ namespace ILGPU.Runtime.KernelCache
         /// <summary>
         /// Gets the metadata dictionary.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; }
+        public Dictionary<string, object> Metadata { get; } = metadata ?? new Dictionary<string, object>();
 
         /// <summary>
         /// Records an access to this cache entry.
@@ -98,69 +89,59 @@ namespace ILGPU.Runtime.KernelCache
     /// <summary>
     /// Represents cache statistics for monitoring and optimization.
     /// </summary>
-    public sealed class KernelCacheStatistics
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="KernelCacheStatistics"/> class.
+    /// </remarks>
+    /// <param name="totalHits">Total cache hits.</param>
+    /// <param name="totalMisses">Total cache misses.</param>
+    /// <param name="totalEvictions">Total cache evictions.</param>
+    /// <param name="currentSize">Current cache size.</param>
+    /// <param name="maxSize">Maximum cache size.</param>
+    /// <param name="averageAccessTime">Average access time in milliseconds.</param>
+    public sealed class KernelCacheStatistics(
+        long totalHits,
+        long totalMisses,
+        long totalEvictions,
+        int currentSize,
+        int maxSize,
+        double averageAccessTime)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KernelCacheStatistics"/> class.
-        /// </summary>
-        /// <param name="totalHits">Total cache hits.</param>
-        /// <param name="totalMisses">Total cache misses.</param>
-        /// <param name="totalEvictions">Total cache evictions.</param>
-        /// <param name="currentSize">Current cache size.</param>
-        /// <param name="maxSize">Maximum cache size.</param>
-        /// <param name="averageAccessTime">Average access time in milliseconds.</param>
-        public KernelCacheStatistics(
-            long totalHits,
-            long totalMisses,
-            long totalEvictions,
-            int currentSize,
-            int maxSize,
-            double averageAccessTime)
-        {
-            TotalHits = totalHits;
-            TotalMisses = totalMisses;
-            TotalEvictions = totalEvictions;
-            CurrentSize = currentSize;
-            MaxSize = maxSize;
-            AverageAccessTime = averageAccessTime;
-            HitRatio = totalHits + totalMisses > 0 ? 
-                (double)totalHits / (totalHits + totalMisses) : 0.0;
-        }
 
         /// <summary>
         /// Gets the total number of cache hits.
         /// </summary>
-        public long TotalHits { get; }
+        public long TotalHits { get; } = totalHits;
 
         /// <summary>
         /// Gets the total number of cache misses.
         /// </summary>
-        public long TotalMisses { get; }
+        public long TotalMisses { get; } = totalMisses;
 
         /// <summary>
         /// Gets the total number of cache evictions.
         /// </summary>
-        public long TotalEvictions { get; }
+        public long TotalEvictions { get; } = totalEvictions;
 
         /// <summary>
         /// Gets the current cache size.
         /// </summary>
-        public int CurrentSize { get; }
+        public int CurrentSize { get; } = currentSize;
 
         /// <summary>
         /// Gets the maximum cache size.
         /// </summary>
-        public int MaxSize { get; }
+        public int MaxSize { get; } = maxSize;
 
         /// <summary>
         /// Gets the cache hit ratio (0.0 to 1.0).
         /// </summary>
-        public double HitRatio { get; }
+        public double HitRatio { get; } = totalHits + totalMisses > 0 ?
+                (double)totalHits / (totalHits + totalMisses) : 0.0;
 
         /// <summary>
         /// Gets the average access time in milliseconds.
         /// </summary>
-        public double AverageAccessTime { get; }
+        public double AverageAccessTime { get; } = averageAccessTime;
     }
 
     /// <summary>
@@ -306,6 +287,6 @@ namespace ILGPU.Runtime.KernelCache
         /// <summary>
         /// Gets or sets whether to enable cache encryption (default: false).
         /// </summary>
-        public bool EnableEncryption { get; set; } = false;
+        public bool EnableEncryption { get; set; }
     }
 }

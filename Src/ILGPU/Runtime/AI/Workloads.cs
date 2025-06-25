@@ -84,40 +84,29 @@ namespace ILGPU.Runtime.AI
     /// Matrix multiplication workload.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
-    public sealed class MatrixMultiplicationWorkload<T> : IWorkload where T : unmanaged
+    /// <remarks>
+    /// Initializes a new instance of the MatrixMultiplicationWorkload class.
+    /// </remarks>
+    /// <param name="a">Matrix A.</param>
+    /// <param name="b">Matrix B.</param>
+    /// <param name="c">Result matrix C (optional).</param>
+    public sealed class MatrixMultiplicationWorkload<T>(ITensor<T> a, ITensor<T> b, ITensor<T>? c = null) : IWorkload where T : unmanaged
     {
-        /// <summary>
-        /// Initializes a new instance of the MatrixMultiplicationWorkload class.
-        /// </summary>
-        /// <param name="a">Matrix A.</param>
-        /// <param name="b">Matrix B.</param>
-        /// <param name="c">Result matrix C (optional).</param>
-        public MatrixMultiplicationWorkload(ITensor<T> a, ITensor<T> b, ITensor<T>? c = null)
-        {
-            A = a ?? throw new ArgumentNullException(nameof(a));
-            B = b ?? throw new ArgumentNullException(nameof(b));
-            C = c;
-            
-            // Calculate complexity (2 * M * N * K operations)
-            EstimatedComplexity = 2L * a.Shape[0] * b.Shape[1] * a.Shape[1];
-            MemoryRequirements = (a.Shape.Length + b.Shape.Length + 
-                                (c?.Shape.Length ?? a.Shape[0] * b.Shape[1])) * Interop.SizeOf<T>();
-        }
 
         /// <summary>
         /// Gets matrix A.
         /// </summary>
-        public ITensor<T> A { get; }
+        public ITensor<T> A { get; } = a ?? throw new ArgumentNullException(nameof(a));
 
         /// <summary>
         /// Gets matrix B.
         /// </summary>
-        public ITensor<T> B { get; }
+        public ITensor<T> B { get; } = b ?? throw new ArgumentNullException(nameof(b));
 
         /// <summary>
         /// Gets or sets the result matrix C.
         /// </summary>
-        public ITensor<T>? C { get; set; }
+        public ITensor<T>? C { get; set; } = c;
 
         /// <summary>
         /// Gets the workload type.
@@ -127,12 +116,13 @@ namespace ILGPU.Runtime.AI
         /// <summary>
         /// Gets the estimated computational complexity.
         /// </summary>
-        public long EstimatedComplexity { get; }
+        public long EstimatedComplexity { get; } = 2L * a.Shape[0] * b.Shape[1] * a.Shape[1];
 
         /// <summary>
         /// Gets the memory requirements.
         /// </summary>
-        public long MemoryRequirements { get; }
+        public long MemoryRequirements { get; } = (a.Shape.Length + b.Shape.Length +
+                                (c?.Shape.Length ?? a.Shape[0] * b.Shape[1])) * Interop.SizeOf<T>();
 
         /// <summary>
         /// Executes the matrix multiplication.
@@ -270,39 +260,29 @@ namespace ILGPU.Runtime.AI
     /// Distributed matrix multiplication workload.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
-    public sealed class DistributedMatrixMultiplicationWorkload<T> : IDistributedWorkload where T : unmanaged
+    /// <remarks>
+    /// Initializes a new instance of the DistributedMatrixMultiplicationWorkload class.
+    /// </remarks>
+    /// <param name="a">Matrix A.</param>
+    /// <param name="b">Matrix B.</param>
+    /// <param name="c">Result matrix C (optional).</param>
+    public sealed class DistributedMatrixMultiplicationWorkload<T>(ITensor<T> a, ITensor<T> b, ITensor<T>? c = null) : IDistributedWorkload where T : unmanaged
     {
-        /// <summary>
-        /// Initializes a new instance of the DistributedMatrixMultiplicationWorkload class.
-        /// </summary>
-        /// <param name="a">Matrix A.</param>
-        /// <param name="b">Matrix B.</param>
-        /// <param name="c">Result matrix C (optional).</param>
-        public DistributedMatrixMultiplicationWorkload(ITensor<T> a, ITensor<T> b, ITensor<T>? c = null)
-        {
-            A = a ?? throw new ArgumentNullException(nameof(a));
-            B = b ?? throw new ArgumentNullException(nameof(b));
-            C = c;
-            
-            EstimatedComplexity = 2L * a.Shape[0] * b.Shape[1] * a.Shape[1];
-            MemoryRequirements = (a.Shape.Length + b.Shape.Length + 
-                                (c?.Shape.Length ?? a.Shape[0] * b.Shape[1])) * Interop.SizeOf<T>();
-        }
 
         /// <summary>
         /// Gets matrix A.
         /// </summary>
-        public ITensor<T> A { get; }
+        public ITensor<T> A { get; } = a ?? throw new ArgumentNullException(nameof(a));
 
         /// <summary>
         /// Gets matrix B.
         /// </summary>
-        public ITensor<T> B { get; }
+        public ITensor<T> B { get; } = b ?? throw new ArgumentNullException(nameof(b));
 
         /// <summary>
         /// Gets or sets the result matrix C.
         /// </summary>
-        public ITensor<T>? C { get; set; }
+        public ITensor<T>? C { get; set; } = c;
 
         /// <summary>
         /// Gets the workload type.
@@ -312,12 +292,13 @@ namespace ILGPU.Runtime.AI
         /// <summary>
         /// Gets the estimated computational complexity.
         /// </summary>
-        public long EstimatedComplexity { get; }
+        public long EstimatedComplexity { get; } = 2L * a.Shape[0] * b.Shape[1] * a.Shape[1];
 
         /// <summary>
         /// Gets the memory requirements.
         /// </summary>
-        public long MemoryRequirements { get; }
+        public long MemoryRequirements { get; } = (a.Shape.Length + b.Shape.Length +
+                                (c?.Shape.Length ?? a.Shape[0] * b.Shape[1])) * Interop.SizeOf<T>();
 
         /// <summary>
         /// Gets whether this workload requires result aggregation.
@@ -354,12 +335,10 @@ namespace ILGPU.Runtime.AI
         /// <param name="partitions">The executed partitions.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A task representing the aggregation.</returns>
-        public async Task AggregateResultsAsync(IEnumerable<WorkloadPartition> partitions, CancellationToken cancellationToken = default)
-        {
+        public async Task AggregateResultsAsync(IEnumerable<WorkloadPartition> partitions, CancellationToken cancellationToken = default) =>
             // Results are already in the correct positions in C
             // No additional aggregation needed for row-wise partitioning
             await Task.CompletedTask;
-        }
 
         /// <summary>
         /// Executes the workload.
@@ -367,45 +346,36 @@ namespace ILGPU.Runtime.AI
         /// <param name="context">The execution context.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A task representing the operation.</returns>
-        public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default)
-        {
+        public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default) =>
             // For distributed workload, this should not be called directly
             throw new InvalidOperationException("Use DistributedWorkloadOrchestrator for distributed execution");
-        }
 
-        private ITensor<T> CreateTensorSlice(ITensor<T> tensor, int startRow, int endRow)
-        {
+        private ITensor<T> CreateTensorSlice(ITensor<T> tensor, int startRow, int endRow) =>
             // This would create a tensor slice/view
             // For now, return the original tensor as placeholder
-            return tensor;
-        }
+            tensor;
     }
 
     /// <summary>
     /// Workload partition for distributed execution.
     /// </summary>
-    public sealed class WorkloadPartition
+    /// <remarks>
+    /// Initializes a new instance of the WorkloadPartition class.
+    /// </remarks>
+    /// <param name="workload">The workload partition.</param>
+    /// <param name="strategy">The execution strategy.</param>
+    public sealed class WorkloadPartition(IWorkload workload, ExecutionStrategy strategy)
     {
-        /// <summary>
-        /// Initializes a new instance of the WorkloadPartition class.
-        /// </summary>
-        /// <param name="workload">The workload partition.</param>
-        /// <param name="strategy">The execution strategy.</param>
-        public WorkloadPartition(IWorkload workload, ExecutionStrategy strategy)
-        {
-            Workload = workload ?? throw new ArgumentNullException(nameof(workload));
-            Strategy = strategy ?? throw new ArgumentNullException(nameof(strategy));
-        }
 
         /// <summary>
         /// Gets the workload.
         /// </summary>
-        public IWorkload Workload { get; }
+        public IWorkload Workload { get; } = workload ?? throw new ArgumentNullException(nameof(workload));
 
         /// <summary>
         /// Gets the execution strategy.
         /// </summary>
-        public ExecutionStrategy Strategy { get; }
+        public ExecutionStrategy Strategy { get; } = strategy ?? throw new ArgumentNullException(nameof(strategy));
     }
 
     /// <summary>
@@ -519,10 +489,7 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         /// <param name="acceleratorType">The accelerator type.</param>
         /// <returns>The performance metrics.</returns>
-        public AcceleratorPerformanceMetrics? GetMetrics(AcceleratorType acceleratorType)
-        {
-            return _metrics.TryGetValue(acceleratorType, out var metrics) ? metrics : null;
-        }
+        public AcceleratorPerformanceMetrics? GetMetrics(AcceleratorType acceleratorType) => _metrics.TryGetValue(acceleratorType, out var metrics) ? metrics : null;
 
         /// <summary>
         /// Disposes the performance tracker.
@@ -574,10 +541,7 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         /// <param name="primitiveType">The primitive type.</param>
         /// <returns>The primitive metrics.</returns>
-        public PrimitiveMetrics? GetPrimitiveMetrics(PrimitiveType primitiveType)
-        {
-            return _primitiveMetrics.TryGetValue(primitiveType, out var metrics) ? metrics : null;
-        }
+        public PrimitiveMetrics? GetPrimitiveMetrics(PrimitiveType primitiveType) => _primitiveMetrics.TryGetValue(primitiveType, out var metrics) ? metrics : null;
     }
 
     /// <summary>

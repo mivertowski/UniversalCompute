@@ -107,7 +107,7 @@ namespace ILGPU.SourceGenerators.Generators
         {
             var validKernels = kernelMethods.Where(k => k is not null).Cast<KernelMethodInfo>().ToList();
 
-            if (!validKernels.Any())
+            if (validKernels.Count == 0)
                 return;
 
             // Group kernels by containing class
@@ -240,24 +240,16 @@ namespace ILGPU.SourceGenerators.Generators
     /// <summary>
     /// Information about a kernel method for code generation.
     /// </summary>
-    internal sealed class KernelMethodInfo
+    internal sealed class KernelMethodInfo(
+        MethodDeclarationSyntax methodSyntax,
+        IMethodSymbol methodSymbol,
+        ParameterAnalysisResult parameterAnalysis,
+        MethodBodyAnalysisResult bodyAnalysis)
     {
-        public MethodDeclarationSyntax MethodSyntax { get; }
-        public IMethodSymbol MethodSymbol { get; }
-        public ParameterAnalysisResult ParameterAnalysis { get; }
-        public MethodBodyAnalysisResult BodyAnalysis { get; }
-
-        public KernelMethodInfo(
-            MethodDeclarationSyntax methodSyntax,
-            IMethodSymbol methodSymbol,
-            ParameterAnalysisResult parameterAnalysis,
-            MethodBodyAnalysisResult bodyAnalysis)
-        {
-            MethodSyntax = methodSyntax;
-            MethodSymbol = methodSymbol;
-            ParameterAnalysis = parameterAnalysis;
-            BodyAnalysis = bodyAnalysis;
-        }
+        public MethodDeclarationSyntax MethodSyntax { get; } = methodSyntax;
+        public IMethodSymbol MethodSymbol { get; } = methodSymbol;
+        public ParameterAnalysisResult ParameterAnalysis { get; } = parameterAnalysis;
+        public MethodBodyAnalysisResult BodyAnalysis { get; } = bodyAnalysis;
     }
 
     /// <summary>
@@ -265,7 +257,7 @@ namespace ILGPU.SourceGenerators.Generators
     /// </summary>
     internal static class Descriptors
     {
-        public static readonly DiagnosticDescriptor InvalidKernelMethod = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor InvalidKernelMethod = new(
             "ILGPU001",
             "Invalid kernel method for AOT compilation",
             "Kernel method '{0}' cannot be used in AOT compilation: {1}",
@@ -273,7 +265,7 @@ namespace ILGPU.SourceGenerators.Generators
             DiagnosticSeverity.Error,
             isEnabledByDefault: true);
 
-        public static readonly DiagnosticDescriptor KernelLauncherGenerated = new DiagnosticDescriptor(
+        public static readonly DiagnosticDescriptor KernelLauncherGenerated = new(
             "ILGPU002",
             "AOT kernel launcher generated",
             "Generated AOT-compatible launcher for kernel method '{0}'",

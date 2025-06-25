@@ -218,7 +218,7 @@ namespace ILGPU.Backends.OpenCL
         private static readonly Dictionary<
             (CLDeviceVendor, ShuffleKind),
             string> ShuffleOperations =
-            new Dictionary<(CLDeviceVendor, ShuffleKind), string>()
+            new()
             {
                 {
                     (CLDeviceVendor.Intel, ShuffleKind.Generic),
@@ -272,7 +272,7 @@ namespace ILGPU.Backends.OpenCL
         private static readonly Dictionary<
             ArithmeticBasicValueType,
             CLUnaryCategory> UnaryCategoryLookup =
-            new Dictionary<ArithmeticBasicValueType, CLUnaryCategory>()
+            new()
             {
                 { ArithmeticBasicValueType.UInt1, CLUnaryCategory.Boolean },
 
@@ -294,7 +294,7 @@ namespace ILGPU.Backends.OpenCL
         private static readonly Dictionary<
             (UnaryArithmeticKind, CLUnaryCategory),
             (string, bool)> UnaryArithmeticOperations =
-            new Dictionary<(UnaryArithmeticKind, CLUnaryCategory), (string, bool)>()
+            new()
             {
                 // Basic arithmetic
                 
@@ -350,7 +350,7 @@ namespace ILGPU.Backends.OpenCL
         private static readonly Dictionary<
             (BinaryArithmeticKind, bool),
             (string, bool)> BinaryArithmeticOperations =
-            new Dictionary<(BinaryArithmeticKind, bool), (string, bool)>()
+            new()
             {
 
                 { (BinaryArithmeticKind.Add, false), ("+", false) },
@@ -390,13 +390,13 @@ namespace ILGPU.Backends.OpenCL
         private static readonly Dictionary<
             (TernaryArithmeticKind, bool),
             string> TernaryArithmeticOperations =
-            new Dictionary<(TernaryArithmeticKind, bool), string>()
+            new()
             {
                 { (TernaryArithmeticKind.MultiplyAdd, true), "fma" },
             };
 
         private static readonly Dictionary<AtomicKind, string> AtomicOperations =
-            new Dictionary<AtomicKind, string>()
+            new()
             {
                 { AtomicKind.Exchange, "atomic_exchange" },
                 { AtomicKind.Add, "atomic_fetch_add" },

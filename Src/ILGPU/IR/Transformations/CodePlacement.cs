@@ -46,7 +46,11 @@ namespace ILGPU.IR.Transformations
     /// This placement transformation should be used in combination with the
     /// <see cref="LoopInvariantCodeMotion"/> transformation to use values out of loops.
     /// </remarks>
-    public abstract class CodePlacement : SequentialUnorderedTransformation
+    /// <remarks>
+    /// Constructs a new instance while specifying the placement mode.
+    /// </remarks>
+    /// <param name="mode">The mode to use.</param>
+    public abstract class CodePlacement(CodePlacementMode mode) : SequentialUnorderedTransformation
     {
         #region Basic Types
 
@@ -259,17 +263,7 @@ namespace ILGPU.IR.Transformations
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new instance while specifying the placement mode.
-        /// </summary>
-        /// <param name="mode">The mode to use.</param>
-        protected CodePlacement(CodePlacementMode mode)
-        {
-            Mode = mode;
-        }
 
         #endregion
 
@@ -278,7 +272,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Returns the current placement mode.
         /// </summary>
-        public CodePlacementMode Mode { get; }
+        public CodePlacementMode Mode { get; } = mode;
 
         #endregion
     }
@@ -291,7 +285,11 @@ namespace ILGPU.IR.Transformations
     /// This placement transformation should be used in combination with the
     /// <see cref="LoopInvariantCodeMotion"/> transformation to use values out of loops.
     /// </remarks>
-    public class CodePlacement<TStrategy> : CodePlacement
+    /// <remarks>
+    /// Constructs a new instance while specifying the placement mode.
+    /// </remarks>
+    /// <param name="mode">The mode to use.</param>
+    public class CodePlacement<TStrategy>(CodePlacementMode mode) : CodePlacement(mode)
         where TStrategy : struct, CodePlacement.IPlacementStrategy
     {
         #region Placer Modes
@@ -317,17 +315,13 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Appends values by inserting them behind all phi values.
         /// </summary>
-        private readonly struct AppendMode : IPlacerMode
+        private readonly struct AppendMode(in BasicBlockMap<(Value[], int)> blocks) : IPlacerMode
         {
-            public AppendMode(in BasicBlockMap<(Value[], int)> blocks)
-            {
-                Blocks = blocks;
-            }
 
             /// <summary>
             /// Returns the current basic block map.
             /// </summary>
-            private BasicBlockMap<(Value[] Values, int NumPhis)> Blocks { get; }
+            private BasicBlockMap<(Value[] Values, int NumPhis)> Blocks { get; } = blocks;
 
             /// <summary>
             /// Determines the insert position according to the number of detected phi
@@ -374,7 +368,25 @@ namespace ILGPU.IR.Transformations
         /// blocks. Enabling movement of side effect values makes the whole placement
         /// algorithm significantly more aggressive.
         /// </summary>
-        private readonly struct Mover : IMover
+        /// <remarks>
+        /// Constructs a new mover.
+        /// </remarks>
+        /// <param name="builder">The parent builder.</param>
+        /// <param name="mode">The current placement mode.</param>
+        [method: SuppressMessage(
+                "Maintainability",
+                "CA1508:Avoid dead conditional code",
+                Justification = "There is no dead code in the method below")]
+        #endregion
+
+        #region Movement and Placement
+
+        /// <summary>
+        /// Tracks and validates the movement of values with side effects to different
+        /// blocks. Enabling movement of side effect values makes the whole placement
+        /// algorithm significantly more aggressive.
+        /// </summary>
+        private readonly struct Mover(Method.Builder builder, CodePlacementMode mode) : IMover
         {
             #region Instance
 
@@ -382,22 +394,7 @@ namespace ILGPU.IR.Transformations
             /// The internal movement analysis instance used to move values during code
             /// placement.
             /// </summary>
-            private readonly Movement<Method.Builder> movement;
-
-            /// <summary>
-            /// Constructs a new mover.
-            /// </summary>
-            /// <param name="builder">The parent builder.</param>
-            /// <param name="mode">The current placement mode.</param>
-            [SuppressMessage(
-                "Maintainability",
-                "CA1508:Avoid dead conditional code",
-                Justification = "There is no dead code in the method below")]
-            public Mover(Method.Builder builder, CodePlacementMode mode)
-            {
-                movement = new Movement<Method.Builder>(builder.SourceBlocks, builder);
-                Mode = mode;
-            }
+            private readonly Movement<Method.Builder> movement = new Movement<Method.Builder>(builder.SourceBlocks, builder);
 
             #endregion
 
@@ -416,7 +413,7 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the current placement mode.
             /// </summary>
-            private CodePlacementMode Mode { get; }
+            private CodePlacementMode Mode { get; } = mode;
 
             #endregion
 
@@ -598,24 +595,19 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Gathers phi values in all blocks and clears all block-internal lists.
         /// </summary>
-        private readonly struct GatherValuesInBlock :
+        private readonly struct GatherValuesInBlock(Method.Builder builder, List<PhiValue> phiValues) :
             IBasicBlockMapValueProvider<(Value[] Values, int NumPhis)>
         {
-            public GatherValuesInBlock(Method.Builder builder, List<PhiValue> phiValues)
-            {
-                Builder = builder;
-                PhiValues = phiValues;
-            }
 
             /// <summary>
             /// Returns the parent method builder.
             /// </summary>
-            private Method.Builder Builder { get; }
+            private Method.Builder Builder { get; } = builder;
 
             /// <summary>
             /// Returns the list of all phi values.
             /// </summary>
-            private List<PhiValue> PhiValues { get; }
+            private List<PhiValue> PhiValues { get; } = phiValues;
 
             /// <summary>
             /// Determines an array of all values of the given block in post order.
@@ -650,16 +642,7 @@ namespace ILGPU.IR.Transformations
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new instance while specifying the placement mode.
-        /// </summary>
-        /// <param name="mode">The mode to use.</param>
-        public CodePlacement(CodePlacementMode mode)
-            : base(mode)
-        { }
 
         #endregion
 

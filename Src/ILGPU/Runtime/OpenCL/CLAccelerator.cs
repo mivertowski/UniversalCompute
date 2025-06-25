@@ -189,7 +189,7 @@ namespace ILGPU.Runtime.OpenCL
                 {
                     var localGroupSizes = new IntPtr[]
                     {
-                        new IntPtr(MaxNumThreadsPerGroup)
+                        new(MaxNumThreadsPerGroup)
                     };
                     Capabilities.SubGroups = acceleratorId.TryGetKernelSubGroupInfo(
                         kernelPtr,
@@ -320,7 +320,7 @@ namespace ILGPU.Runtime.OpenCL
         protected override CLKernel CreateKernel(
             CLCompiledKernel compiledKernel,
             MethodInfo launcher) =>
-            new CLKernel(this, compiledKernel, launcher);
+            new(this, compiledKernel, launcher);
 
         /// <inheritdoc/>
         protected override AcceleratorStream CreateStreamInternal() =>
@@ -336,7 +336,7 @@ namespace ILGPU.Runtime.OpenCL
         /// </param>
         /// <returns>The created stream.</returns>
         public CLStream CreateStream(IntPtr ptr, bool responsible) =>
-            new CLStream(this, ptr, responsible);
+            new(this, ptr, responsible);
 
         /// <summary cref="Accelerator.Synchronize"/>
         protected unsafe override void SynchronizeInternal()

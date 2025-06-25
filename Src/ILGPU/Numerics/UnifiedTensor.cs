@@ -93,7 +93,7 @@ namespace ILGPU.Numerics
         private bool disposed;
         
         // Synchronization
-        private readonly object syncLock = new object();
+        private readonly object syncLock = new();
 
         /// <summary>
         /// Initializes a new unified tensor.
@@ -367,12 +367,10 @@ namespace ILGPU.Numerics
         }
 
         /// <inheritdoc/>
-        public async Task<ITensor<T>> AddTensorCoreAsync(ITensor<T> other, CancellationToken ct = default)
-        {
+        public async Task<ITensor<T>> AddTensorCoreAsync(ITensor<T> other, CancellationToken ct = default) =>
             // Tensor cores are typically not used for element-wise addition
             // Fall back to GPU general compute
-            return await AddAsync(other, ct);
-        }
+            await AddAsync(other, ct);
 
         /// <inheritdoc/>
         public async Task<ITensor<T>> TransposeAsync(CancellationToken ct = default)
@@ -572,50 +570,38 @@ namespace ILGPU.Numerics
             }
         }
 
-        private bool ShouldUseTensorCores()
-        {
-            return accelerator.SupportsTensorCores() &&
+        private bool ShouldUseTensorCores() => accelerator.SupportsTensorCores() &&
                    (typeof(T) == typeof(Half) || typeof(T) == typeof(float)) &&
                    Shape.Rank == 2 &&
                    Shape[0] >= 16 && Shape[1] >= 16;
-        }
 
-        private bool ShouldUseGpu()
-        {
-            return accelerator.AcceleratorType != AcceleratorType.CPU &&
+        private bool ShouldUseGpu() => accelerator.AcceleratorType != AcceleratorType.CPU &&
                    shape.Length > 1024; // Threshold for GPU efficiency
-        }
 
-        private async Task<ITensor<T>> MatMulGpuAsync(UnifiedTensor<T> other, CancellationToken ct)
-        {
-            return await Task.Run(() =>
-            {
-                EnsureGpuData();
-                other.EnsureGpuData();
+        private async Task<ITensor<T>> MatMulGpuAsync(UnifiedTensor<T> other, CancellationToken ct) => await Task.Run(() =>
+                                                                                                                {
+                                                                                                                    EnsureGpuData();
+                                                                                                                    other.EnsureGpuData();
 
-                var resultShape = new TensorShape(Shape[0], other.Shape[1]);
-                var result = new UnifiedTensor<T>(accelerator, resultShape, MemoryLayoutMode.GpuOptimized);
+                                                                                                                    var resultShape = new TensorShape(Shape[0], other.Shape[1]);
+                                                                                                                    var result = new UnifiedTensor<T>(accelerator, resultShape, MemoryLayoutMode.GpuOptimized);
 
-                // Use GPU kernels for matrix multiplication
-                // throw new NotImplementedException("GPU matrix multiplication will be implemented");
-                return (ITensor<T>)result;
-            }, ct);
-        }
+                                                                                                                    // Use GPU kernels for matrix multiplication
+                                                                                                                    // throw new NotImplementedException("GPU matrix multiplication will be implemented");
+                                                                                                                    return (ITensor<T>)result;
+                                                                                                                }, ct);
 
-        private async Task<ITensor<T>> AddGpuAsync(UnifiedTensor<T> other, CancellationToken ct)
-        {
-            return await Task.Run(() =>
-            {
-                EnsureGpuData();
-                other.EnsureGpuData();
+        private async Task<ITensor<T>> AddGpuAsync(UnifiedTensor<T> other, CancellationToken ct) => await Task.Run(() =>
+                                                                                                             {
+                                                                                                                 EnsureGpuData();
+                                                                                                                 other.EnsureGpuData();
 
-                var result = new UnifiedTensor<T>(accelerator, Shape, MemoryLayoutMode.GpuOptimized);
+                                                                                                                 var result = new UnifiedTensor<T>(accelerator, Shape, MemoryLayoutMode.GpuOptimized);
 
-                // Use GPU kernels for element-wise addition
-                // throw new NotImplementedException("GPU element-wise addition will be implemented");
-                return (ITensor<T>)result;
-            }, ct);
-        }
+                                                                                                                 // Use GPU kernels for element-wise addition
+                                                                                                                 // throw new NotImplementedException("GPU element-wise addition will be implemented");
+                                                                                                                 return (ITensor<T>)result;
+                                                                                                             }, ct);
 
         #endregion
 
@@ -660,10 +646,7 @@ namespace ILGPU.Numerics
         }
 
         /// <inheritdoc/>
-        public ITensor<T> Slice(int[] start, int[] length)
-        {
-            throw new NotSupportedException("UnifiedTensor slicing not yet implemented");
-        }
+        public ITensor<T> Slice(int[] start, int[] length) => throw new NotSupportedException("UnifiedTensor slicing not yet implemented");
 
         #endregion
 
@@ -714,10 +697,7 @@ namespace ILGPU.Numerics
         /// Creates a unified tensor from CPU data.
         /// </summary>
         public static UnifiedTensor<T> FromArray<T>(Accelerator accelerator, TensorShape shape, T[] data, MemoryLayoutMode layoutMode = MemoryLayoutMode.Auto)
-            where T : unmanaged, INumber<T>
-        {
-            return new UnifiedTensor<T>(accelerator, shape, data, layoutMode);
-        }
+            where T : unmanaged, INumber<T> => new UnifiedTensor<T>(accelerator, shape, data, layoutMode);
 
         /// <summary>
         /// Creates a unified tensor with random values.

@@ -199,11 +199,10 @@ namespace ILGPU.TensorCores
         /// Gets the number of elements in a matrix fragment based on dimensions and type.
         /// </summary>
         /// <returns>The number of elements per thread in the fragment.</returns>
-        private static int GetFragmentElements()
-        {
+        private static int GetFragmentElements() =>
             // Fragment elements are distributed across a 32-thread warp
             // The exact distribution depends on the tensor core architecture
-            return (M, N, K) switch
+            (M, N, K) switch
             {
                 (16, 16, 16) when typeof(T) == typeof(Half) => 8,      // 16x16 FP16 matrix = 8 elements per thread
                 (16, 16, 16) when typeof(T) == typeof(BFloat16) => 8,  // 16x16 BF16 matrix = 8 elements per thread
@@ -212,7 +211,6 @@ namespace ILGPU.TensorCores
                 (8, 32, 16) => 8,
                 _ => throw new NotSupportedException($"Unsupported tensor configuration: {M}x{N}x{K}")
             };
-        }
     }
 
     /// <summary>
@@ -307,17 +305,14 @@ namespace ILGPU.TensorCores
         /// </summary>
         /// <param name="other">The other fragment descriptor.</param>
         /// <returns>True if compatible for matrix multiplication.</returns>
-        public bool IsCompatibleWith<TOther>(MatrixFragmentDescriptor<TOther> other) 
-            where TOther : unmanaged
-        {
-            return (Kind, other.Kind) switch
+        public bool IsCompatibleWith<TOther>(MatrixFragmentDescriptor<TOther> other)
+            where TOther : unmanaged => (Kind, other.Kind) switch
             {
                 (TensorFragmentKind.MatrixA, TensorFragmentKind.MatrixB) => Columns == other.Rows,
                 (TensorFragmentKind.MatrixA, TensorFragmentKind.Accumulator) => Rows == other.Rows,
                 (TensorFragmentKind.MatrixB, TensorFragmentKind.Accumulator) => Columns == other.Columns,
                 _ => false
             };
-        }
     }
 
     /// <summary>

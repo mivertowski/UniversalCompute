@@ -18,19 +18,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks memory-barrier methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class MemoryBarrierIntrinsicAttribute : IntrinsicAttribute
+    sealed class MemoryBarrierIntrinsicAttribute(MemoryBarrierKind intrinsicKind) : IntrinsicAttribute
     {
-        public MemoryBarrierIntrinsicAttribute(MemoryBarrierKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.MemoryFence;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public MemoryBarrierKind IntrinsicKind { get; }
+        public MemoryBarrierKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

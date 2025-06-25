@@ -151,7 +151,7 @@ namespace ILGPU.Runtime
             this ArrayView<T> view,
             Index1D element)
             where T : unmanaged =>
-            new VariableView<T>(view.SubView(element, 1));
+            new(view.SubView(element, 1));
 
         /// <summary>
         /// Returns a variable view to the given element.
@@ -165,7 +165,7 @@ namespace ILGPU.Runtime
             this ArrayView<T> view,
             LongIndex1D element)
             where T : unmanaged =>
-            new VariableView<T>(view.SubView(element, 1L));
+            new(view.SubView(element, 1L));
 
         /// <summary>
         /// Converts this array view into a dense version.
@@ -340,7 +340,7 @@ namespace ILGPU.Runtime
         public static ArrayView2D<T, Stride2D.DenseY> AsTransposed<T>(
             this ArrayView2D<T, Stride2D.DenseX> view)
             where T : unmanaged =>
-            new ArrayView2D<T, Stride2D.DenseY>(
+            new(
                 view.BaseView,
                 new LongIndex2D(view.Extent.Y, view.Extent.X),
                 new Stride2D.DenseY(view.Stride.YStride));
@@ -354,7 +354,7 @@ namespace ILGPU.Runtime
         public static ArrayView2D<T, Stride2D.DenseX> AsTransposed<T>(
             this ArrayView2D<T, Stride2D.DenseY> view)
             where T : unmanaged =>
-            new ArrayView2D<T, Stride2D.DenseX>(
+            new(
                 view.BaseView,
                 new LongIndex2D(view.Extent.Y, view.Extent.X),
                 new Stride2D.DenseX(view.Stride.XStride));
@@ -368,7 +368,7 @@ namespace ILGPU.Runtime
         public static ArrayView2D<T, Stride2D.General> AsTransposed<T>(
             this ArrayView2D<T, Stride2D.General> view)
             where T : unmanaged =>
-            new ArrayView2D<T, Stride2D.General>(
+            new(
                 view.BaseView,
                 new LongIndex2D(view.Extent.Y, view.Extent.X),
                 new Stride2D.General((view.Stride.YStride, view.Stride.XStride)));
@@ -382,7 +382,7 @@ namespace ILGPU.Runtime
         public static ArrayView3D<T, Stride3D.DenseZY> AsTransposed<T>(
             this ArrayView3D<T, Stride3D.DenseXY> view)
             where T : unmanaged =>
-            new ArrayView3D<T, Stride3D.DenseZY>(
+            new(
                 view.BaseView,
                 new LongIndex3D(view.Extent.Z, view.Extent.Y, view.Extent.X),
                 new Stride3D.DenseZY(view.Stride.ZStride, view.Stride.YStride));
@@ -396,7 +396,7 @@ namespace ILGPU.Runtime
         public static ArrayView3D<T, Stride3D.DenseXY> AsTransposed<T>(
             this ArrayView3D<T, Stride3D.DenseZY> view)
             where T : unmanaged =>
-            new ArrayView3D<T, Stride3D.DenseXY>(
+            new(
                 view.BaseView,
                 new LongIndex3D(view.Extent.Z, view.Extent.Y, view.Extent.X),
                 new Stride3D.DenseXY(view.Stride.YStride, view.Stride.XStride));
@@ -410,7 +410,7 @@ namespace ILGPU.Runtime
         public static ArrayView3D<T, Stride3D.General> AsTransposed<T>(
             this ArrayView3D<T, Stride3D.General> view)
             where T : unmanaged =>
-            new ArrayView3D<T, Stride3D.General>(
+            new(
                 view.BaseView,
                 new LongIndex3D(view.Extent.Z, view.Extent.Y, view.Extent.X),
                 new Stride3D.General(
@@ -1930,7 +1930,7 @@ namespace ILGPU.Runtime
         /// <returns>The converted general 1D view.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ArrayView1D<T, Stride1D.General> To1DView() =>
-            new ArrayView1D<T, Stride1D.General>(
+            new(
                 BaseView,
                 Extent,
                 Stride.To1DStride());
@@ -2150,7 +2150,7 @@ namespace ILGPU.Runtime
         /// <returns>The converted general 1D view.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ArrayView1D<T, Stride1D.General> To1DView() =>
-            new ArrayView1D<T, Stride1D.General>(
+            new(
                 BaseView,
                 Extent.Size,
                 Stride.To1DStride());
@@ -2236,7 +2236,7 @@ namespace ILGPU.Runtime
         /// <returns>The converted general 1D view.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ArrayView1D<T, Stride1D.General> To1DView() =>
-            new ArrayView1D<T, Stride1D.General>(
+            new(
                 BaseView,
                 Extent.Size,
                 Stride.To1DStride());

@@ -65,7 +65,7 @@ namespace ILGPU.IR.Rewriting
         /// <returns>The specialized rewriter context.</returns>
         public SSARewriterContext<TVariable> SpecializeBuilder(
             BasicBlock.Builder newBuilder) =>
-            new SSARewriterContext<TVariable>(
+            new(
                 baseContext.SpecializeBuilder(newBuilder),
                 SSABuilder);
 
@@ -146,7 +146,7 @@ namespace ILGPU.IR.Rewriting
             BasicBlock.Builder builder,
             HashSet<Value> converted,
             SSABuilder<TVariable> data) =>
-            new SSARewriterContext<TVariable>(
+            new(
                 new RewriterContext(builder, converted),
                 data);
     }

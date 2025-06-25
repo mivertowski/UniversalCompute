@@ -276,10 +276,7 @@ namespace ILGPU.Runtime.Scheduling
             executionTimes[operationName].Add(duration);
         }
 
-        public void StartExecution(string operationName)
-        {
-            activeExecutions[operationName] = DateTime.UtcNow;
-        }
+        public void StartExecution(string operationName) => activeExecutions[operationName] = DateTime.UtcNow;
 
         public void EndExecution(string operationName)
         {
@@ -291,17 +288,14 @@ namespace ILGPU.Runtime.Scheduling
             }
         }
 
-        public DevicePerformanceMetrics ProfileDevice(Accelerator accelerator)
+        public DevicePerformanceMetrics ProfileDevice(Accelerator accelerator) => new DevicePerformanceMetrics
         {
-            return new DevicePerformanceMetrics
-            {
-                AverageLatencyMs = GetAverageTime("execution").TotalMilliseconds,
-                ThroughputOpsPerSecond = 1000.0 / Math.Max(1, GetAverageTime("execution").TotalMilliseconds),
-                MemoryBandwidthGBps = 100.0, // Placeholder
-                CacheHitRate = 0.85, // Placeholder
-                MemoryCapacityBytes = accelerator.MemorySize
-            };
-        }
+            AverageLatencyMs = GetAverageTime("execution").TotalMilliseconds,
+            ThroughputOpsPerSecond = 1000.0 / Math.Max(1, GetAverageTime("execution").TotalMilliseconds),
+            MemoryBandwidthGBps = 100.0, // Placeholder
+            CacheHitRate = 0.85, // Placeholder
+            MemoryCapacityBytes = accelerator.MemorySize
+        };
 
         public DevicePerformance ProfileDevice(ComputeDevice device, Accelerator accelerator)
         {

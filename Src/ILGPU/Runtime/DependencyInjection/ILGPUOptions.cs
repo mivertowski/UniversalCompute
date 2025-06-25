@@ -35,7 +35,7 @@ namespace ILGPU.Runtime.DependencyInjection
         /// <summary>
         /// Gets or sets whether profiling is enabled.
         /// </summary>
-        public bool EnableProfiling { get; set; } = false;
+        public bool EnableProfiling { get; set; }
 
         /// <summary>
         /// Gets or sets whether memory pooling is enabled.
@@ -50,7 +50,7 @@ namespace ILGPU.Runtime.DependencyInjection
         /// <summary>
         /// Gets or sets whether debug mode is enabled.
         /// </summary>
-        public bool EnableDebugAssertions { get; set; } = false;
+        public bool EnableDebugAssertions { get; set; }
 
         /// <summary>
         /// Gets or sets the context builder configurator.
@@ -77,7 +77,7 @@ namespace ILGPU.Runtime.DependencyInjection
         /// <summary>
         /// Gets or sets whether detailed timing is enabled.
         /// </summary>
-        public bool EnableDetailedTiming { get; set; } = false;
+        public bool EnableDetailedTiming { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of profiling sessions to retain.

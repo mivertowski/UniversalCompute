@@ -38,7 +38,7 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether this optimization is required or optional.
         /// </summary>
-        public bool Required { get; set; } = false;
+        public bool Required { get; set; }
     }
 
     /// <summary>
@@ -52,12 +52,12 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether to use Apple Matrix Extension (AMX) instructions.
         /// </summary>
-        public bool UseAMX { get; set; } = false;
+        public bool UseAMX { get; set; }
 
         /// <summary>
         /// Gets or sets whether to use Apple Neural Engine (ANE) when available.
         /// </summary>
-        public bool UseNeuralEngine { get; set; } = false;
+        public bool UseNeuralEngine { get; set; }
 
         /// <summary>
         /// Gets or sets whether to use Metal Performance Shaders.
@@ -81,7 +81,7 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether to use Intel Advanced Matrix Extensions (AMX).
         /// </summary>
-        public bool UseAMX { get; set; } = false;
+        public bool UseAMX { get; set; }
 
         /// <summary>
         /// Gets or sets whether to use Intel AVX-512 instructions.
@@ -96,12 +96,12 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether to use Intel Deep Learning Boost (DL Boost).
         /// </summary>
-        public bool UseDLBoost { get; set; } = false;
+        public bool UseDLBoost { get; set; }
 
         /// <summary>
         /// Gets or sets whether to use Intel Neural Processing Unit (NPU) when available.
         /// </summary>
-        public bool UseNPU { get; set; } = false;
+        public bool UseNPU { get; set; }
     }
 
     /// <summary>
@@ -115,7 +115,7 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether to use Tensor Cores for mixed precision operations.
         /// </summary>
-        public bool UseTensorCores { get; set; } = false;
+        public bool UseTensorCores { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum compute capability required.
@@ -130,7 +130,7 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether to use cuDNN for deep learning operations.
         /// </summary>
-        public bool UseCuDNN { get; set; } = false;
+        public bool UseCuDNN { get; set; }
 
         /// <summary>
         /// Gets or sets whether to use PTX assembly optimizations.
@@ -159,7 +159,7 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets or sets whether to use AMD Matrix Instruction (MFMA).
         /// </summary>
-        public bool UseMFMA { get; set; } = false;
+        public bool UseMFMA { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum GFX architecture version.

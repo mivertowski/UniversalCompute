@@ -19,18 +19,13 @@ namespace ILGPU.Tests
     /// <summary>
     /// Links test methods to kernels.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new kernel attribute.
+    /// </remarks>
+    /// <param name="methodName">The associated method name.</param>
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class KernelMethodAttribute : Attribute
+    public sealed class KernelMethodAttribute(string methodName) : Attribute
     {
-        /// <summary>
-        /// Constructs a new kernel attribute.
-        /// </summary>
-        /// <param name="methodName">The associated method name.</param>
-        public KernelMethodAttribute(string methodName)
-        {
-            MethodName = methodName
-                ?? throw new ArgumentNullException(nameof(methodName));
-        }
 
         /// <summary>
         /// Constructs a new kernel attribute.
@@ -46,7 +41,8 @@ namespace ILGPU.Tests
         /// <summary>
         /// Returns the kernel name.
         /// </summary>
-        public string MethodName { get; }
+        public string MethodName { get; } = methodName
+                ?? throw new ArgumentNullException(nameof(methodName));
 
         /// <summary>
         /// Returns the type in which the kernel method could be found (if any).

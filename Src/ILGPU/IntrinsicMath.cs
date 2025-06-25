@@ -562,7 +562,12 @@ namespace ILGPU
         /// <summary>
         /// Represents integer parts of an 64 bit integer.
         /// </summary>
-        public struct IntegerParts
+        /// <remarks>
+        /// Stores the given lower and upper parts.
+        /// </remarks>
+        /// <param name="lower">The lower part.</param>
+        /// <param name="upper">The upper part.</param>
+        public struct IntegerParts(uint lower, uint upper)
         {
             /// <summary>
             /// Converts the given value into lower and upper parts.
@@ -573,25 +578,14 @@ namespace ILGPU
             { }
 
             /// <summary>
-            /// Stores the given lower and upper parts.
-            /// </summary>
-            /// <param name="lower">The lower part.</param>
-            /// <param name="upper">The upper part.</param>
-            public IntegerParts(uint lower, uint upper)
-            {
-                Lower = lower;
-                Upper = upper;
-            }
-
-            /// <summary>
             /// The lower 32 bits.
             /// </summary>
-            public uint Lower { get; set; }
+            public uint Lower { get; set; } = lower;
 
             /// <summary>
             /// The upper 32 bits.
             /// </summary>
-            public uint Upper { get; set; }
+            public uint Upper { get; set; } = upper;
 
             /// <summary>
             /// Converts the parts into a single ulong value.
@@ -613,7 +607,7 @@ namespace ILGPU
         /// <param name="value">The value to decompose.</param>
         /// <returns>The lower and upper part.</returns>
         public static IntegerParts Decompose(ulong value) =>
-            new IntegerParts(value);
+            new(value);
 
         /// <summary>
         /// Composes an integer from the given lower and upper parts.

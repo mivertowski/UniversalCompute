@@ -204,21 +204,18 @@ namespace ILGPU.Core
         /// <param name="tensor">The tensor object.</param>
         /// <param name="accelerator">The target accelerator.</param>
         /// <returns>An ITensorCore representation.</returns>
-        public static ITensorCore<T> ConvertToUnified<T>(object tensor, Accelerator accelerator) 
-            where T : unmanaged
-        {
-            return tensor switch
+        public static ITensorCore<T> ConvertToUnified<T>(object tensor, Accelerator accelerator)
+            where T : unmanaged => tensor switch
             {
                 ITensorCore<T> unified => unified,
                 ILGPU.Numerics.ITensor<T> numericsTensor => numericsTensor.ToUnifiedTensor(accelerator),
                 MemoryBuffer1D<T, Stride1D.Dense> buffer => buffer.AsTensor(new TensorShape((int)buffer.Length)),
-                _ when tensor.GetType().IsGenericType && 
+                _ when tensor.GetType().IsGenericType &&
                        tensor.GetType().GetGenericTypeDefinition() == typeof(ILGPU.ML.Tensor<>) &&
                        typeof(T).GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(System.Numerics.INumber<>))
                     => ConvertMLTensorDynamic<T>(tensor, accelerator),
                 _ => throw new ArgumentException($"Unsupported tensor type: {tensor?.GetType()}")
             };
-        }
 
         private static ITensorCore<T> ConvertMLTensorDynamic<T>(object mlTensor, Accelerator accelerator) 
             where T : unmanaged
@@ -275,19 +272,15 @@ namespace ILGPU.Core
 
         #region Data Extraction Helpers
 
-        private static T[] ExtractMLTensorData<T>(ILGPU.ML.Tensor<T> mlTensor) where T : unmanaged, System.Numerics.INumber<T>
-        {
+        private static T[] ExtractMLTensorData<T>(ILGPU.ML.Tensor<T> mlTensor) where T : unmanaged, System.Numerics.INumber<T> =>
             // This would need to be implemented based on actual ML.Tensor API
             // For now, return empty array as placeholder
-            return new T[mlTensor.Shape.Size];
-        }
+            new T[mlTensor.Shape.Size];
 
-        private static T[] ExtractNumericsTensorData<T>(ILGPU.Numerics.ITensor<T> numericsTensor) where T : unmanaged
-        {
+        private static T[] ExtractNumericsTensorData<T>(ILGPU.Numerics.ITensor<T> numericsTensor) where T : unmanaged =>
             // This would need to be implemented based on actual Numerics.ITensor API
             // For now, return empty array as placeholder
-            return new T[numericsTensor.Shape.Length];
-        }
+            new T[numericsTensor.Shape.Length];
 
         private static TTarget ConvertElement<TSource, TTarget>(TSource source)
             where TSource : unmanaged

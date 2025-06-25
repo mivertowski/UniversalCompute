@@ -16,50 +16,55 @@ namespace ILGPU.Runtime.OpenCL
     /// <summary>
     /// Represents an OpenCL platform version.
     /// </summary>
-    public readonly struct CLPlatformVersion
+    /// <remarks>
+    /// Constructs a new OpenCL platform version.
+    /// </remarks>
+    /// <param name="major">The major version.</param>
+    /// <param name="minor">The minor version.</param>
+    public readonly struct CLPlatformVersion(int major, int minor)
     {
         #region Static
 
         /// <summary>
         /// The OpenCL API version 1.0.
         /// </summary>
-        public static readonly CLPlatformVersion CL10 = new CLPlatformVersion(1, 0);
+        public static readonly CLPlatformVersion CL10 = new(1, 0);
 
         /// <summary>
         /// The OpenCL API version 1.1.
         /// </summary>
-        public static readonly CLPlatformVersion CL11 = new CLPlatformVersion(1, 1);
+        public static readonly CLPlatformVersion CL11 = new(1, 1);
 
         /// <summary>
         /// The OpenCL API version 1.2.
         /// </summary>
-        public static readonly CLPlatformVersion CL12 = new CLPlatformVersion(1, 2);
+        public static readonly CLPlatformVersion CL12 = new(1, 2);
 
         /// <summary>
         /// The OpenCL API version 2.0.
         /// </summary>
-        public static readonly CLPlatformVersion CL20 = new CLPlatformVersion(2, 0);
+        public static readonly CLPlatformVersion CL20 = new(2, 0);
 
         /// <summary>
         /// The OpenCL API version 2.1.
         /// </summary>
-        public static readonly CLPlatformVersion CL21 = new CLPlatformVersion(2, 1);
+        public static readonly CLPlatformVersion CL21 = new(2, 1);
 
         /// <summary>
         /// The OpenCL API version 2.2.
         /// </summary>
-        public static readonly CLPlatformVersion CL22 = new CLPlatformVersion(2, 2);
+        public static readonly CLPlatformVersion CL22 = new(2, 2);
 
         /// <summary>
         /// The OpenCL API version 3.0.
         /// </summary>
-        public static readonly CLPlatformVersion CL30 = new CLPlatformVersion(3, 0);
+        public static readonly CLPlatformVersion CL30 = new(3, 0);
 
         /// <summary>
         /// The internal regex that is used to parse OpenCL versions.
         /// </summary>
         private static readonly Regex VersionRegex =
-            new Regex("\\s*OpenCL ([0-9]+).([0-9]+)\\s*.*");
+            new("\\s*OpenCL ([0-9]+).([0-9]+)\\s*.*");
 
         /// <summary>
         /// Tries to parse the given string expression into an OpenCL C version.
@@ -82,19 +87,7 @@ namespace ILGPU.Runtime.OpenCL
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new OpenCL platform version.
-        /// </summary>
-        /// <param name="major">The major version.</param>
-        /// <param name="minor">The minor version.</param>
-        public CLPlatformVersion(int major, int minor)
-        {
-            Major = major;
-            Minor = minor;
-        }
 
         #endregion
 
@@ -103,12 +96,12 @@ namespace ILGPU.Runtime.OpenCL
         /// <summary>
         /// The major OpenCL platform Version.
         /// </summary>
-        public int Major { get; }
+        public int Major { get; } = major;
 
         /// <summary>
         /// The minor OpenCL platform Version.
         /// </summary>
-        public int Minor { get; }
+        public int Minor { get; } = minor;
 
         #endregion
 

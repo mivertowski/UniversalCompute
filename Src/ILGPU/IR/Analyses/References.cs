@@ -225,7 +225,7 @@ namespace ILGPU.IR.Analyses
         /// Returns an enumerator to enumerate all method references.
         /// </summary>
         /// <returns>An enumerator to enumerate all method references.</returns>
-        public readonly Enumerator GetEnumerator() => new Enumerator(this);
+        public readonly Enumerator GetEnumerator() => new(this);
 
         #endregion
     }

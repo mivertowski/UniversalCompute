@@ -63,7 +63,7 @@ namespace ILGPU.Runtime.Cuda
         /// <param name="value">The CUDA driver value</param>
         /// <returns>The CUDA driver version</returns>
         public static CudaDriverVersion FromValue(int value) =>
-            new CudaDriverVersion(value);
+            new(value);
 
         #endregion
 

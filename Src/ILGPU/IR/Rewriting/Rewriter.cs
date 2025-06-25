@@ -96,22 +96,15 @@ namespace ILGPU.IR.Rewriting
         /// <summary>
         /// An adapter to use a static rewriter instance.
         /// </summary>
-        protected readonly struct StaticProcessor : IProcessor
+        /// <remarks>
+        /// Initializes a new static processor.
+        /// </remarks>
+        protected readonly struct StaticProcessor(
+            Rewriter<TContext, TContextProvider, TContextData, T> rewriter,
+            TContextData contextData,
+            T data,
+            HashSet<Value> toConvert) : IProcessor
         {
-            /// <summary>
-            /// Initializes a new static processor.
-            /// </summary>
-            public StaticProcessor(
-                Rewriter<TContext, TContextProvider, TContextData, T> rewriter,
-                TContextData contextData,
-                T data,
-                HashSet<Value> toConvert)
-            {
-                Rewriter = rewriter;
-                ContextData = contextData;
-                Data = data;
-                ToConvert = toConvert;
-            }
 
             /// <summary>
             /// Returns the underlying rewriter.
@@ -121,22 +114,22 @@ namespace ILGPU.IR.Rewriting
                 TContextProvider,
                 TContextData,
                 T> Rewriter
-            { get; }
+            { get; } = rewriter;
 
             /// <summary>
             /// Returns the current context data.
             /// </summary>
-            public TContextData ContextData { get; }
+            public TContextData ContextData { get; } = contextData;
 
             /// <summary>
             /// Returns the current data instance.
             /// </summary>
-            public T Data { get; }
+            public T Data { get; } = data;
 
             /// <summary>
             /// Returns the set of values to convert.
             /// </summary>
-            public HashSet<Value> ToConvert { get; }
+            public HashSet<Value> ToConvert { get; } = toConvert;
 
             /// <summary>
             /// Applies the current processing adapter.
@@ -163,20 +156,14 @@ namespace ILGPU.IR.Rewriting
         /// <summary>
         /// An adapter to use a dynamic rewriter instance.
         /// </summary>
-        protected struct DynamicProcessor : IProcessor
+        /// <remarks>
+        /// Initializes a new static processor.
+        /// </remarks>
+        protected struct DynamicProcessor(
+            Rewriter<TContext, TContextProvider, TContextData, T> rewriter,
+            TContextData contextData,
+            T data) : IProcessor
         {
-            /// <summary>
-            /// Initializes a new static processor.
-            /// </summary>
-            public DynamicProcessor(
-                Rewriter<TContext, TContextProvider, TContextData, T> rewriter,
-                TContextData contextData,
-                T data)
-            {
-                Rewriter = rewriter;
-                ContextData = contextData;
-                Data = data;
-            }
 
             /// <summary>
             /// Returns the underlying rewriter.
@@ -186,17 +173,17 @@ namespace ILGPU.IR.Rewriting
                 TContextProvider,
                 TContextData,
                 T> Rewriter
-            { get; }
+            { get; } = rewriter;
 
             /// <summary>
             /// Returns the current context data.
             /// </summary>
-            public TContextData ContextData { get; }
+            public TContextData ContextData { get; } = contextData;
 
             /// <summary>
             /// Returns the current data instance.
             /// </summary>
-            public T Data { get; }
+            public T Data { get; } = data;
 
             /// <summary>
             /// Applies the current processing adapter.

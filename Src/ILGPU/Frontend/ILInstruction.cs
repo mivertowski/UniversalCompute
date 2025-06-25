@@ -347,20 +347,15 @@ namespace ILGPU.Frontend
     /// <summary>
     /// Represents a collection of branch targets.
     /// </summary>
-    public sealed class ILInstructionBranchTargets
+    /// <remarks>
+    /// Constructs a new container for branch targets.
+    /// </remarks>
+    /// <param name="targets"></param>
+    public sealed class ILInstructionBranchTargets(params int[] targets)
     {
         #region Instance
 
-        private readonly int[] targetOffsets;
-
-        /// <summary>
-        /// Constructs a new container for branch targets.
-        /// </summary>
-        /// <param name="targets"></param>
-        public ILInstructionBranchTargets(params int[] targets)
-        {
-            targetOffsets = targets;
-        }
+        private readonly int[] targetOffsets = targets;
 
         #endregion
 
@@ -505,22 +500,17 @@ namespace ILGPU.Frontend
     /// <summary>
     /// Represents a context of instruction flags.
     /// </summary>
-    public struct ILInstructionFlagsContext : IEquatable<ILInstructionFlagsContext>
+    /// <remarks>
+    /// Constructs a new instruction-flag context.
+    /// </remarks>
+    /// <param name="flags">The instruction flags.</param>
+    /// <param name="argument">The flags argument.</param>
+    public struct ILInstructionFlagsContext(
+        ILInstructionFlags flags,
+        object? argument) : IEquatable<ILInstructionFlagsContext>
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new instruction-flag context.
-        /// </summary>
-        /// <param name="flags">The instruction flags.</param>
-        /// <param name="argument">The flags argument.</param>
-        public ILInstructionFlagsContext(
-            ILInstructionFlags flags,
-            object? argument)
-        {
-            Flags = flags;
-            Argument = argument;
-        }
+        #region Instance
 
         #endregion
 
@@ -529,12 +519,12 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the flags.
         /// </summary>
-        public ILInstructionFlags Flags { get; }
+        public ILInstructionFlags Flags { get; } = flags;
 
         /// <summary>
         /// Returns the flag argument.
         /// </summary>
-        public object? Argument { get; }
+        public object? Argument { get; } = argument;
 
         #endregion
 
@@ -635,39 +625,29 @@ namespace ILGPU.Frontend
     /// <summary>
     /// Represents a single IL instruction.
     /// </summary>
-    public sealed class ILInstruction : IEquatable<ILInstruction>
+    /// <remarks>
+    /// Constructs a new IL instruction.
+    /// </remarks>
+    /// <param name="offset">The instruction offset in bytes.</param>
+    /// <param name="type">The instruction type.</param>
+    /// <param name="flagsContext">The flags context.</param>
+    /// <param name="popCount">The number of elements to pop from the stack.</param>
+    /// <param name="pushCount">
+    /// The number of elements to push onto the stack.
+    /// </param>
+    /// <param name="argument">The instruction argument.</param>
+    /// <param name="location">The current location.</param>
+    public sealed class ILInstruction(
+        int offset,
+        ILInstructionType type,
+        ILInstructionFlagsContext flagsContext,
+        ushort popCount,
+        ushort pushCount,
+        object? argument,
+        Location location) : IEquatable<ILInstruction>
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new IL instruction.
-        /// </summary>
-        /// <param name="offset">The instruction offset in bytes.</param>
-        /// <param name="type">The instruction type.</param>
-        /// <param name="flagsContext">The flags context.</param>
-        /// <param name="popCount">The number of elements to pop from the stack.</param>
-        /// <param name="pushCount">
-        /// The number of elements to push onto the stack.
-        /// </param>
-        /// <param name="argument">The instruction argument.</param>
-        /// <param name="location">The current location.</param>
-        public ILInstruction(
-            int offset,
-            ILInstructionType type,
-            ILInstructionFlagsContext flagsContext,
-            ushort popCount,
-            ushort pushCount,
-            object? argument,
-            Location location)
-        {
-            Offset = offset;
-            InstructionType = type;
-            FlagsContext = flagsContext;
-            PopCount = popCount;
-            PushCount = pushCount;
-            Argument = argument;
-            Location = location ?? Location.Unknown;
-        }
+        #region Instance
 
         #endregion
 
@@ -676,12 +656,12 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the instruction offset in bytes.
         /// </summary>
-        public int Offset { get; }
+        public int Offset { get; } = offset;
 
         /// <summary>
         /// Returns the instruction type.
         /// </summary>
-        public ILInstructionType InstructionType { get; }
+        public ILInstructionType InstructionType { get; } = type;
 
         /// <summary>
         /// Returns the instruction flags.
@@ -691,22 +671,22 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the instruction-flags context.
         /// </summary>
-        public ILInstructionFlagsContext FlagsContext { get; }
+        public ILInstructionFlagsContext FlagsContext { get; } = flagsContext;
 
         /// <summary>
         /// Returns the number of elements to pop from the stack.
         /// </summary>
-        public ushort PopCount { get; }
+        public ushort PopCount { get; } = popCount;
 
         /// <summary>
         /// Returns the number of elements to push onto the stack.
         /// </summary>
-        public ushort PushCount { get; }
+        public ushort PushCount { get; } = pushCount;
 
         /// <summary>
         /// Returns the instruction argument.
         /// </summary>
-        public object? Argument { get; }
+        public object? Argument { get; } = argument;
 
         /// <summary>
         /// Returns true if the instruction is a call instruction.
@@ -740,7 +720,7 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the associated location.
         /// </summary>
-        public Location Location { get; }
+        public Location Location { get; } = location ?? Location.Unknown;
 
         #endregion
 

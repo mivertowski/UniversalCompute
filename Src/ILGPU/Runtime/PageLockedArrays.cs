@@ -115,7 +115,7 @@ namespace ILGPU.Runtime
         /// Represents an empty 1D array.
         /// </summary>
         public static readonly PageLockedArray1D<T> Empty =
-            new PageLockedArray1D<T>(null, LongIndex1D.Zero);
+            new(null, LongIndex1D.Zero);
 
         #endregion
 
@@ -208,6 +208,6 @@ namespace ILGPU.Runtime
             LongIndex1D extent,
             bool uninitialized)
             where T : unmanaged =>
-            new PageLockedArray1D<T>(accelerator, extent, uninitialized);
+            new(accelerator, extent, uninitialized);
     }
 }

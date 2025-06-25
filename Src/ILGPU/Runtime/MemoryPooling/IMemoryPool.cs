@@ -144,84 +144,71 @@ namespace ILGPU.Runtime.MemoryPooling
     /// <summary>
     /// Contains detailed statistics about a memory pool.
     /// </summary>
-    public sealed class MemoryPoolStatistics
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MemoryPoolStatistics"/> class.
+    /// </remarks>
+    public sealed class MemoryPoolStatistics(
+        long totalPoolSizeBytes,
+        long usedSizeBytes,
+        long availableSizeBytes,
+        int totalBuffers,
+        int rentedBuffers,
+        int availableBuffers,
+        long totalAllocations,
+        long totalDeallocations,
+        double hitRatio,
+        TimeSpan averageRentTime)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryPoolStatistics"/> class.
-        /// </summary>
-        public MemoryPoolStatistics(
-            long totalPoolSizeBytes,
-            long usedSizeBytes,
-            long availableSizeBytes,
-            int totalBuffers,
-            int rentedBuffers,
-            int availableBuffers,
-            long totalAllocations,
-            long totalDeallocations,
-            double hitRatio,
-            TimeSpan averageRentTime)
-        {
-            TotalPoolSizeBytes = totalPoolSizeBytes;
-            UsedSizeBytes = usedSizeBytes;
-            AvailableSizeBytes = availableSizeBytes;
-            TotalBuffers = totalBuffers;
-            RentedBuffers = rentedBuffers;
-            AvailableBuffers = availableBuffers;
-            TotalAllocations = totalAllocations;
-            TotalDeallocations = totalDeallocations;
-            HitRatio = hitRatio;
-            AverageRentTime = averageRentTime;
-        }
 
         /// <summary>
         /// Gets the total pool size in bytes.
         /// </summary>
-        public long TotalPoolSizeBytes { get; }
+        public long TotalPoolSizeBytes { get; } = totalPoolSizeBytes;
 
         /// <summary>
         /// Gets the currently used size in bytes.
         /// </summary>
-        public long UsedSizeBytes { get; }
+        public long UsedSizeBytes { get; } = usedSizeBytes;
 
         /// <summary>
         /// Gets the available size in bytes.
         /// </summary>
-        public long AvailableSizeBytes { get; }
+        public long AvailableSizeBytes { get; } = availableSizeBytes;
 
         /// <summary>
         /// Gets the total number of buffers in the pool.
         /// </summary>
-        public int TotalBuffers { get; }
+        public int TotalBuffers { get; } = totalBuffers;
 
         /// <summary>
         /// Gets the number of currently rented buffers.
         /// </summary>
-        public int RentedBuffers { get; }
+        public int RentedBuffers { get; } = rentedBuffers;
 
         /// <summary>
         /// Gets the number of available buffers.
         /// </summary>
-        public int AvailableBuffers { get; }
+        public int AvailableBuffers { get; } = availableBuffers;
 
         /// <summary>
         /// Gets the total number of allocations performed.
         /// </summary>
-        public long TotalAllocations { get; }
+        public long TotalAllocations { get; } = totalAllocations;
 
         /// <summary>
         /// Gets the total number of deallocations performed.
         /// </summary>
-        public long TotalDeallocations { get; }
+        public long TotalDeallocations { get; } = totalDeallocations;
 
         /// <summary>
         /// Gets the cache hit ratio (0.0 to 1.0).
         /// </summary>
-        public double HitRatio { get; }
+        public double HitRatio { get; } = hitRatio;
 
         /// <summary>
         /// Gets the average time buffers are rented.
         /// </summary>
-        public TimeSpan AverageRentTime { get; }
+        public TimeSpan AverageRentTime { get; } = averageRentTime;
 
         /// <summary>
         /// Gets the pool utilization percentage.

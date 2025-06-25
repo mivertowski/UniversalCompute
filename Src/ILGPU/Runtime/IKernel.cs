@@ -65,35 +65,29 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Represents kernel source code for compilation.
     /// </summary>
-    public readonly struct KernelSource
+    /// <remarks>
+    /// Initializes a new instance of the KernelSource struct.
+    /// </remarks>
+    /// <param name="source">The kernel source code.</param>
+    /// <param name="entryPoint">The entry point function name.</param>
+    /// <param name="language">The source language.</param>
+    public readonly struct KernelSource(string source, string entryPoint, KernelLanguage language)
     {
-        /// <summary>
-        /// Initializes a new instance of the KernelSource struct.
-        /// </summary>
-        /// <param name="source">The kernel source code.</param>
-        /// <param name="entryPoint">The entry point function name.</param>
-        /// <param name="language">The source language.</param>
-        public KernelSource(string source, string entryPoint, KernelLanguage language)
-        {
-            Source = source ?? throw new ArgumentNullException(nameof(source));
-            EntryPoint = entryPoint ?? throw new ArgumentNullException(nameof(entryPoint));
-            Language = language;
-        }
 
         /// <summary>
         /// Gets the kernel source code.
         /// </summary>
-        public string Source { get; }
+        public string Source { get; } = source ?? throw new ArgumentNullException(nameof(source));
 
         /// <summary>
         /// Gets the entry point function name.
         /// </summary>
-        public string EntryPoint { get; }
+        public string EntryPoint { get; } = entryPoint ?? throw new ArgumentNullException(nameof(entryPoint));
 
         /// <summary>
         /// Gets the source language.
         /// </summary>
-        public KernelLanguage Language { get; }
+        public KernelLanguage Language { get; } = language;
     }
 
     /// <summary>

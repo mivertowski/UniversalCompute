@@ -51,7 +51,7 @@ namespace ILGPU.TensorCores
             /// <summary>
             /// Gets the default configuration.
             /// </summary>
-            public static TensorConfig Default => new TensorConfig
+            public static TensorConfig Default => new()
             {
                 TileSize = 16,
                 Precision = TensorPrecision.FP16,
@@ -275,12 +275,10 @@ namespace ILGPU.TensorCores
             int padH,
             int padW,
             TensorConfig? config = null)
-            where T : unmanaged, INumber<T>
-        {
+            where T : unmanaged, INumber<T> =>
             // Convolution can be implemented as matrix multiplication
             // using im2col transformation
             throw new NotImplementedException("Tensor convolution will be implemented");
-        }
 
         /// <summary>
         /// Validates that matrix dimensions are compatible with tensor cores.

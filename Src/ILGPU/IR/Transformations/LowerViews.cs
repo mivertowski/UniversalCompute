@@ -24,7 +24,11 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// An abstract view type converter.
         /// </summary>
-        protected abstract class ViewTypeLowering : TypeLowering<ViewType>
+        /// <remarks>
+        /// Constructs a new type lowering.
+        /// </remarks>
+        /// <param name="typeContext">The parent type context.</param>
+        protected abstract class ViewTypeLowering(IRTypeContext typeContext) : TypeLowering<ViewType>(typeContext)
         {
             /// <summary>
             /// Constructs a new type lowering.
@@ -40,14 +44,6 @@ namespace ILGPU.IR.Transformations
             /// <param name="builder">The parent builder.</param>
             protected ViewTypeLowering(IRBuilder builder)
                 : this(builder.TypeContext)
-            { }
-
-            /// <summary>
-            /// Constructs a new type lowering.
-            /// </summary>
-            /// <param name="typeContext">The parent type context.</param>
-            protected ViewTypeLowering(IRTypeContext typeContext)
-                    : base(typeContext)
             { }
 
             /// <summary cref="TypeLowering{TType}.IsTypeDependent(TypeNode)"/>

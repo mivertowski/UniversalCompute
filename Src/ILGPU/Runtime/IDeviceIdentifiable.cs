@@ -56,28 +56,22 @@ namespace ILGPU.Runtime
     /// regardless of their underlying accelerator type, enabling generic programming
     /// patterns and dependency injection scenarios.
     /// </remarks>
-    public readonly struct DeviceId : IEquatable<DeviceId>, IComparable<DeviceId>
+    /// <remarks>
+    /// Initializes a new device ID.
+    /// </remarks>
+    /// <param name="value">The device identifier value.</param>
+    /// <param name="acceleratorType">The accelerator type.</param>
+    public readonly struct DeviceId(long value, AcceleratorType acceleratorType) : IEquatable<DeviceId>, IComparable<DeviceId>
     {
         /// <summary>
         /// The underlying device identifier value.
         /// </summary>
-        public long Value { get; }
+        public long Value { get; } = value;
 
         /// <summary>
         /// The accelerator type this device ID belongs to.
         /// </summary>
-        public AcceleratorType AcceleratorType { get; }
-
-        /// <summary>
-        /// Initializes a new device ID.
-        /// </summary>
-        /// <param name="value">The device identifier value.</param>
-        /// <param name="acceleratorType">The accelerator type.</param>
-        public DeviceId(long value, AcceleratorType acceleratorType)
-        {
-            Value = value;
-            AcceleratorType = acceleratorType;
-        }
+        public AcceleratorType AcceleratorType { get; } = acceleratorType;
 
         /// <summary>
         /// Creates a device ID from a CUDA device index.
@@ -85,7 +79,7 @@ namespace ILGPU.Runtime
         /// <param name="cudaDeviceId">The CUDA device ID.</param>
         /// <returns>A unified device ID.</returns>
         public static DeviceId FromCuda(int cudaDeviceId) =>
-            new DeviceId(cudaDeviceId, AcceleratorType.Cuda);
+            new(cudaDeviceId, AcceleratorType.Cuda);
 
         /// <summary>
         /// Creates a device ID from OpenCL platform and device pointers.
@@ -108,7 +102,7 @@ namespace ILGPU.Runtime
         /// </param>
         /// <returns>A unified device ID.</returns>
         public static DeviceId FromCPU(int configuration) =>
-            new DeviceId(configuration, AcceleratorType.CPU);
+            new(configuration, AcceleratorType.CPU);
 
         /// <summary>
         /// Creates a device ID for a Velocity device.
@@ -118,7 +112,7 @@ namespace ILGPU.Runtime
         /// </param>
         /// <returns>A unified device ID.</returns>
         public static DeviceId FromVelocity(int configuration) =>
-            new DeviceId(configuration, AcceleratorType.Velocity);
+            new(configuration, AcceleratorType.Velocity);
 
         /// <summary>
         /// Gets a value indicating whether this device ID represents a CUDA device.

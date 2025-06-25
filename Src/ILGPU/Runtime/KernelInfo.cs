@@ -19,7 +19,20 @@ namespace ILGPU.Runtime
     /// <summary>
     /// Provides detailed information about compiled kernels.
     /// </summary>
-    public sealed class KernelInfo : CompiledKernel.KernelInfo
+    /// <remarks>
+    /// Constructs a new kernel information object.
+    /// </remarks>
+    /// <param name="minGroupSize">The minimum group size (if known).</param>
+    /// <param name="minGridSize">The minimum grid size (if known).</param>
+    /// <param name="sharedAllocations">All shared allocations.</param>
+    /// <param name="functions">
+    /// An array containing detailed function information.
+    /// </param>
+    public sealed class KernelInfo(
+        int? minGroupSize,
+        int? minGridSize,
+        in AllocaKindInformation sharedAllocations,
+        ImmutableArray<CompiledKernel.FunctionInfo> functions) : CompiledKernel.KernelInfo(sharedAllocations, functions)
     {
         #region Static
 
@@ -58,26 +71,6 @@ namespace ILGPU.Runtime
                   ImmutableArray<CompiledKernel.FunctionInfo>.Empty)
         { }
 
-        /// <summary>
-        /// Constructs a new kernel information object.
-        /// </summary>
-        /// <param name="minGroupSize">The minimum group size (if known).</param>
-        /// <param name="minGridSize">The minimum grid size (if known).</param>
-        /// <param name="sharedAllocations">All shared allocations.</param>
-        /// <param name="functions">
-        /// An array containing detailed function information.
-        /// </param>
-        public KernelInfo(
-            int? minGroupSize,
-            int? minGridSize,
-            in AllocaKindInformation sharedAllocations,
-            ImmutableArray<CompiledKernel.FunctionInfo> functions)
-            : base(sharedAllocations, functions)
-        {
-            MinGroupSize = minGroupSize;
-            MinGridSize = minGridSize;
-        }
-
         #endregion
 
         #region Properties
@@ -85,12 +78,12 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Returns the estimated group size to gain maximum occupancy on this device.
         /// </summary>
-        public int? MinGroupSize { get; }
+        public int? MinGroupSize { get; } = minGroupSize;
 
         /// <summary>
         /// Returns the minimum grid size to gain maximum occupancy on this device.
         /// </summary>
-        public int? MinGridSize { get; }
+        public int? MinGridSize { get; } = minGridSize;
 
         #endregion
 

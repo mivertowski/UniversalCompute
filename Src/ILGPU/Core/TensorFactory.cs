@@ -35,11 +35,8 @@ namespace ILGPU.Core
         /// <param name="accelerator">The accelerator to create the tensor on.</param>
         /// <param name="shape">The tensor shape.</param>
         /// <returns>A new tensor.</returns>
-        public static ITensorCore<T> Create<T>(Accelerator accelerator, TensorShape shape) 
-            where T : unmanaged
-        {
-            return new UnifiedTensor<T>(accelerator, shape);
-        }
+        public static ITensorCore<T> Create<T>(Accelerator accelerator, TensorShape shape)
+            where T : unmanaged => new UnifiedTensor<T>(accelerator, shape);
 
         /// <summary>
         /// Creates a new tensor with the specified shape on the CPU.

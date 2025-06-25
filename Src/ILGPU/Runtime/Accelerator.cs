@@ -144,7 +144,7 @@ namespace ILGPU.Runtime
         /// Main object for accelerator synchronization.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly object syncRoot = new object();
+        private readonly object syncRoot = new();
 
         /// <summary>
         /// The current volatile native pointer of this instance.

@@ -193,7 +193,7 @@ namespace ILGPU.Runtime.OpenCL
         #region Instance
 
         private readonly clGetKernelSubGroupInfoKHR? getKernelSubGroupInfo;
-        private readonly HashSet<string> extensionSet = new HashSet<string>();
+        private readonly HashSet<string> extensionSet = new();
 
         /// <summary>
         /// Constructs a new OpenCL accelerator reference.
@@ -542,7 +542,7 @@ namespace ILGPU.Runtime.OpenCL
         /// <param name="context">The ILGPU context.</param>
         /// <returns>The created OpenCL accelerator.</returns>
         public CLAccelerator CreateCLAccelerator(Context context) =>
-            new CLAccelerator(context, this);
+            new(context, this);
 
         /// <summary>
         /// Resolves device information as typed structure value of type

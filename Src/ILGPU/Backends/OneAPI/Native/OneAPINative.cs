@@ -83,20 +83,16 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Creates a device handle.
         /// </summary>
-        internal static IntPtr CreateDevice(IntPtr deviceId, OneAPIDeviceType deviceType)
-        {
+        internal static IntPtr CreateDevice(IntPtr deviceId, OneAPIDeviceType deviceType) =>
             // In OneAPI/SYCL, device handles are typically managed through platform APIs
-            return deviceId;
-        }
+            deviceId;
 
         /// <summary>
         /// Releases a device handle.
         /// </summary>
-        internal static void ReleaseDevice(IntPtr device)
-        {
+        internal static void ReleaseDevice(IntPtr device) =>
             // Device handles are reference counted in OpenCL/SYCL
             clReleaseDevice(device);
-        }
 
         [LibraryImport(OpenCLLibrary)]
         private static partial int clReleaseDevice(IntPtr device);
@@ -128,10 +124,7 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Releases a context.
         /// </summary>
-        internal static void ReleaseContext(IntPtr context)
-        {
-            clReleaseContext(context);
-        }
+        internal static void ReleaseContext(IntPtr context) => clReleaseContext(context);
 
         /// <summary>
         /// Creates a command queue for the device.
@@ -153,18 +146,12 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Releases a command queue.
         /// </summary>
-        internal static void ReleaseQueue(IntPtr queue)
-        {
-            clReleaseCommandQueue(queue);
-        }
+        internal static void ReleaseQueue(IntPtr queue) => clReleaseCommandQueue(queue);
 
         /// <summary>
         /// Waits for all commands in the queue to complete.
         /// </summary>
-        internal static void QueueWait(IntPtr queue)
-        {
-            clFinish(queue);
-        }
+        internal static void QueueWait(IntPtr queue) => clFinish(queue);
 
         [LibraryImport(OpenCLLibrary)]
         private static partial IntPtr clCreateContext(
@@ -354,17 +341,14 @@ namespace ILGPU.Backends.OneAPI.Native
             throw new NotSupportedException($"Type {typeof(T)} not supported for device info query");
         }
 
-        private static OneAPIDeviceType ConvertToDeviceType(ulong clDeviceType)
+        private static OneAPIDeviceType ConvertToDeviceType(ulong clDeviceType) => clDeviceType switch
         {
-            return clDeviceType switch
-            {
-                0x01 => OneAPIDeviceType.Default,
-                0x02 => OneAPIDeviceType.CPU,
-                0x04 => OneAPIDeviceType.GPU,
-                0x08 => OneAPIDeviceType.Accelerator,
-                _ => OneAPIDeviceType.Default
-            };
-        }
+            0x01 => OneAPIDeviceType.Default,
+            0x02 => OneAPIDeviceType.CPU,
+            0x04 => OneAPIDeviceType.GPU,
+            0x08 => OneAPIDeviceType.Accelerator,
+            _ => OneAPIDeviceType.Default
+        };
 
         /// <summary>
         /// Checks if the device supports Unified Shared Memory.
@@ -438,19 +422,14 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets the maximum threads per EU (Intel-specific).
         /// </summary>
-        internal static int GetMaxThreadsPerEU(IntPtr device)
-        {
+        internal static int GetMaxThreadsPerEU(IntPtr device) =>
             // Intel GPUs typically have 7 threads per EU
-            return 7;
-        }
+            7;
 
         /// <summary>
         /// Gets the preferred work group size multiple.
         /// </summary>
-        internal static int GetPreferredWorkGroupSizeMultiple(IntPtr device)
-        {
-            return GetSubgroupSize(device);
-        }
+        internal static int GetPreferredWorkGroupSizeMultiple(IntPtr device) => GetSubgroupSize(device);
 
         #endregion
 
@@ -459,12 +438,10 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Checks if two devices can share memory.
         /// </summary>
-        internal static bool CanShareMemory(IntPtr device1, IntPtr device2)
-        {
+        internal static bool CanShareMemory(IntPtr device1, IntPtr device2) =>
             // Check if devices are on the same platform
             // In OneAPI/SYCL, USM enables sharing between devices
-            return SupportsUSM(device1) && SupportsUSM(device2);
-        }
+            SupportsUSM(device1) && SupportsUSM(device2);
 
         /// <summary>
         /// Enables peer access between contexts.

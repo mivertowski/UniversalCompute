@@ -21,16 +21,13 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class MatrixTests : TestBase
+    public abstract partial class MatrixTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected MatrixTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         #region MemberData
 
         public static TheoryData<int, int, int, int, float> DimensionsData =>
-            new TheoryData<int, int, int, int, float>
+            new()
             {
                 { 39, 42, 17, 2918291, 0.8f },
                 { 39, 42, 17, 2918291, 0.5f },

@@ -18,22 +18,16 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class AlgorithmsTestBase : TestBase
+    public abstract partial class AlgorithmsTestBase(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected AlgorithmsTestBase(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         /// <summary>
         /// Compares two numbers for equality, within a defined tolerance.
         /// </summary>
-        private class HalfPrecisionComparer
-            : EqualityComparer<Half>
+        private class HalfPrecisionComparer(uint decimalPlaces)
+                        : EqualityComparer<Half>
         {
-            public readonly float Margin;
-
-            public HalfPrecisionComparer(uint decimalPlaces) =>
-                Margin = MathF.Pow(10, -decimalPlaces);
+            public readonly float Margin = MathF.Pow(10, -decimalPlaces);
 
             public override bool Equals(Half x, Half y)
             {
@@ -62,13 +56,10 @@ namespace ILGPU.Algorithms.Tests
         /// <summary>
         /// Compares two numbers for equality, within a defined tolerance.
         /// </summary>
-        private class FloatPrecisionComparer
-            : EqualityComparer<float>
+        private class FloatPrecisionComparer(uint decimalPlaces)
+                        : EqualityComparer<float>
         {
-            public readonly float Margin;
-
-            public FloatPrecisionComparer(uint decimalPlaces) =>
-                Margin = MathF.Pow(10, -decimalPlaces);
+            public readonly float Margin = MathF.Pow(10, -decimalPlaces);
 
             public override bool Equals(float x, float y)
             {
@@ -96,13 +87,10 @@ namespace ILGPU.Algorithms.Tests
         /// <summary>
         /// Compares two numbers for equality, within a defined tolerance.
         /// </summary>
-        private class DoublePrecisionComparer
-            : EqualityComparer<double>
+        private class DoublePrecisionComparer(uint decimalPlaces)
+                        : EqualityComparer<double>
         {
-            public readonly double Margin;
-
-            public DoublePrecisionComparer(uint decimalPlaces) =>
-                Margin = Math.Pow(10, -decimalPlaces);
+            public readonly double Margin = Math.Pow(10, -decimalPlaces);
 
             public override bool Equals(double x, double y)
             {
@@ -130,13 +118,10 @@ namespace ILGPU.Algorithms.Tests
         /// <summary>
         /// Compares two numbers for equality, within a defined tolerance.
         /// </summary>
-        private class HalfRelativeErrorComparer
-            : EqualityComparer<Half>
+        private class HalfRelativeErrorComparer(float relativeError)
+                        : EqualityComparer<Half>
         {
-            public readonly float RelativeError;
-
-            public HalfRelativeErrorComparer(float relativeError) =>
-                RelativeError = relativeError;
+            public readonly float RelativeError = relativeError;
 
             public override bool Equals(Half x, Half y)
             {
@@ -172,13 +157,10 @@ namespace ILGPU.Algorithms.Tests
         /// <summary>
         /// Compares two numbers for equality, within a defined tolerance.
         /// </summary>
-        private class FloatRelativeErrorComparer
-            : EqualityComparer<float>
+        private class FloatRelativeErrorComparer(float relativeError)
+                        : EqualityComparer<float>
         {
-            public readonly float RelativeError;
-
-            public FloatRelativeErrorComparer(float relativeError) =>
-                RelativeError = relativeError;
+            public readonly float RelativeError = relativeError;
 
             public override bool Equals(float x, float y)
             {
@@ -214,13 +196,10 @@ namespace ILGPU.Algorithms.Tests
         /// <summary>
         /// Compares two numbers for equality, within a defined tolerance.
         /// </summary>
-        private class DoubleRelativeErrorComparer
-            : EqualityComparer<double>
+        private class DoubleRelativeErrorComparer(double relativeError)
+                        : EqualityComparer<double>
         {
-            public readonly double RelativeError;
-
-            public DoubleRelativeErrorComparer(double relativeError) =>
-                RelativeError = relativeError;
+            public readonly double RelativeError = relativeError;
 
             public override bool Equals(double x, double y)
             {

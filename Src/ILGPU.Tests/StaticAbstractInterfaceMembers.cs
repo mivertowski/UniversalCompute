@@ -17,13 +17,10 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class StaticAbstractInterfaceMembers : TestBase
+    public abstract class StaticAbstractInterfaceMembers(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
-        protected StaticAbstractInterfaceMembers(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
 
 #if NET7_0_OR_GREATER
 

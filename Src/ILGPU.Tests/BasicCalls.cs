@@ -19,13 +19,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract partial class BasicCalls : TestBase
+    public abstract partial class BasicCalls(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
         private const int Length = 32;
-
-        protected BasicCalls(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         internal static int GetValue()

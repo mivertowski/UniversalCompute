@@ -215,7 +215,7 @@ namespace ILGPU.Backends.EntryPoints
         /// Returns an enumerator to enumerate all types in the collection.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        public Enumerator GetEnumerator() => new Enumerator(ParameterTypes);
+        public Enumerator GetEnumerator() => new(ParameterTypes);
 
         /// <summary>
         /// Returns an enumerator to enumerate all types in the collection.

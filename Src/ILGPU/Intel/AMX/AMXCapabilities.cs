@@ -24,111 +24,96 @@ namespace ILGPU.Intel.AMX
     /// <summary>
     /// Represents the capabilities of Intel Advanced Matrix Extensions (AMX).
     /// </summary>
-    public readonly struct AMXCapabilities
+    /// <remarks>
+    /// Initializes a new instance of the AMXCapabilities struct.
+    /// </remarks>
+    /// <param name="isSupported">Whether AMX is supported.</param>
+    /// <param name="maxTiles">Maximum number of tiles.</param>
+    /// <param name="maxTileRows">Maximum tile rows.</param>
+    /// <param name="maxTileColumns">Maximum tile columns.</param>
+    /// <param name="maxTileBytes">Maximum tile size in bytes.</param>
+    /// <param name="maxConfigBytes">Maximum configuration size in bytes.</param>
+    /// <param name="supportsBF16">Whether BF16 is supported.</param>
+    /// <param name="supportsInt8">Whether INT8 is supported.</param>
+    /// <param name="supportsFloat32">Whether Float32 is supported.</param>
+    /// <param name="estimatedBandwidthGBps">Estimated bandwidth in GB/s.</param>
+    public readonly struct AMXCapabilities(
+        bool isSupported,
+        int maxTiles,
+        int maxTileRows,
+        int maxTileColumns,
+        int maxTileBytes,
+        int maxConfigBytes,
+        bool supportsBF16,
+        bool supportsInt8,
+        bool supportsFloat32,
+        double estimatedBandwidthGBps)
     {
-        /// <summary>
-        /// Initializes a new instance of the AMXCapabilities struct.
-        /// </summary>
-        /// <param name="isSupported">Whether AMX is supported.</param>
-        /// <param name="maxTiles">Maximum number of tiles.</param>
-        /// <param name="maxTileRows">Maximum tile rows.</param>
-        /// <param name="maxTileColumns">Maximum tile columns.</param>
-        /// <param name="maxTileBytes">Maximum tile size in bytes.</param>
-        /// <param name="maxConfigBytes">Maximum configuration size in bytes.</param>
-        /// <param name="supportsBF16">Whether BF16 is supported.</param>
-        /// <param name="supportsInt8">Whether INT8 is supported.</param>
-        /// <param name="supportsFloat32">Whether Float32 is supported.</param>
-        /// <param name="estimatedBandwidthGBps">Estimated bandwidth in GB/s.</param>
-        public AMXCapabilities(
-            bool isSupported,
-            int maxTiles,
-            int maxTileRows,
-            int maxTileColumns,
-            int maxTileBytes,
-            int maxConfigBytes,
-            bool supportsBF16,
-            bool supportsInt8,
-            bool supportsFloat32,
-            double estimatedBandwidthGBps)
-        {
-            IsSupported = isSupported;
-            MaxTiles = maxTiles;
-            MaxTileRows = maxTileRows;
-            MaxTileColumns = maxTileColumns;
-            MaxTileBytes = maxTileBytes;
-            MaxConfigBytes = maxConfigBytes;
-            SupportsBF16 = supportsBF16;
-            SupportsInt8 = supportsInt8;
-            SupportsFloat32 = supportsFloat32;
-            EstimatedBandwidthGBps = estimatedBandwidthGBps;
-        }
 
         /// <summary>
         /// Gets whether AMX is supported on this processor.
         /// </summary>
-        public bool IsSupported { get; }
+        public bool IsSupported { get; } = isSupported;
 
         /// <summary>
         /// Gets the maximum number of tiles (typically 8).
         /// </summary>
-        public int MaxTiles { get; }
+        public int MaxTiles { get; } = maxTiles;
 
         /// <summary>
         /// Gets the maximum number of rows per tile (typically 16).
         /// </summary>
-        public int MaxTileRows { get; }
+        public int MaxTileRows { get; } = maxTileRows;
 
         /// <summary>
         /// Gets the maximum number of columns per tile (typically 64 bytes).
         /// </summary>
-        public int MaxTileColumns { get; }
+        public int MaxTileColumns { get; } = maxTileColumns;
 
         /// <summary>
         /// Gets the maximum tile size in bytes (typically 1024).
         /// </summary>
-        public int MaxTileBytes { get; }
+        public int MaxTileBytes { get; } = maxTileBytes;
 
         /// <summary>
         /// Gets the maximum configuration size in bytes (typically 64).
         /// </summary>
-        public int MaxConfigBytes { get; }
+        public int MaxConfigBytes { get; } = maxConfigBytes;
 
         /// <summary>
         /// Gets whether BFloat16 operations are supported.
         /// </summary>
-        public bool SupportsBF16 { get; }
+        public bool SupportsBF16 { get; } = supportsBF16;
 
         /// <summary>
         /// Gets whether INT8 operations are supported.
         /// </summary>
-        public bool SupportsInt8 { get; }
+        public bool SupportsInt8 { get; } = supportsInt8;
 
         /// <summary>
         /// Gets whether Float32 operations are supported.
         /// </summary>
-        public bool SupportsFloat32 { get; }
+        public bool SupportsFloat32 { get; } = supportsFloat32;
 
         /// <summary>
         /// Gets the estimated memory bandwidth in GB/s.
         /// </summary>
-        public double EstimatedBandwidthGBps { get; }
+        public double EstimatedBandwidthGBps { get; } = estimatedBandwidthGBps;
 
         /// <summary>
         /// Gets the estimated peak performance in GOPS for the given data type.
         /// </summary>
         /// <param name="dataType">The data type.</param>
         /// <returns>Estimated GOPS performance.</returns>
-        public double GetEstimatedPerformance(AMXDataType dataType)
-        {
+        public double GetEstimatedPerformance(AMXDataType dataType) =>
             // Rough estimates based on Sapphire Rapids specifications
-            return dataType switch
+            dataType switch
             {
                 AMXDataType.BFloat16 => 512.0, // ~512 GOPS for BF16
                 AMXDataType.Int8 => 1024.0,    // ~1024 GOPS for INT8
                 AMXDataType.Float32 => 256.0,  // ~256 GOPS for FP32
                 _ => 100.0
             };
-        }
 
         /// <summary>
         /// Gets the optimal tile configuration for matrix dimensions.
@@ -213,9 +198,7 @@ namespace ILGPU.Intel.AMX
             }
         }
 
-        private static AMXCapabilities MapFromNative(AMXNativeCapabilities native)
-        {
-            return new AMXCapabilities(
+        private static AMXCapabilities MapFromNative(AMXNativeCapabilities native) => new AMXCapabilities(
                 native.IsSupported != 0,
                 native.MaxTiles,
                 native.MaxTileRows,
@@ -227,7 +210,6 @@ namespace ILGPU.Intel.AMX
                 native.SupportsFloat32 != 0,
                 native.EstimatedBandwidthGBps
             );
-        }
 
         /// <summary>
         /// Returns a string representation of the AMX capabilities.
@@ -295,16 +277,13 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         /// <param name="capabilities">The AMX capabilities.</param>
         /// <returns>A default tile configuration.</returns>
-        public static AMXTileConfiguration CreateDefault(AMXCapabilities capabilities)
+        public static AMXTileConfiguration CreateDefault(AMXCapabilities capabilities) => new AMXTileConfiguration
         {
-            return new AMXTileConfiguration
-            {
-                DataType = capabilities.SupportsBF16 ? AMXDataType.BFloat16 : AMXDataType.Float32,
-                TileRows = capabilities.MaxTileRows,
-                TileColumns = capabilities.MaxTileColumns,
-                Palette = 1 // Default palette
-            };
-        }
+            DataType = capabilities.SupportsBF16 ? AMXDataType.BFloat16 : AMXDataType.Float32,
+            TileRows = capabilities.MaxTileRows,
+            TileColumns = capabilities.MaxTileColumns,
+            Palette = 1 // Default palette
+        };
 
         /// <summary>
         /// Creates a tile configuration optimized for the given data type.
@@ -312,43 +291,37 @@ namespace ILGPU.Intel.AMX
         /// <param name="dataType">The data type.</param>
         /// <param name="capabilities">The AMX capabilities.</param>
         /// <returns>An optimized tile configuration.</returns>
-        public static AMXTileConfiguration CreateForDataType(AMXDataType dataType, AMXCapabilities capabilities)
+        public static AMXTileConfiguration CreateForDataType(AMXDataType dataType, AMXCapabilities capabilities) => new AMXTileConfiguration
         {
-            return new AMXTileConfiguration
+            DataType = dataType,
+            TileRows = capabilities.MaxTileRows,
+            TileColumns = capabilities.MaxTileColumns,
+            Palette = dataType switch
             {
-                DataType = dataType,
-                TileRows = capabilities.MaxTileRows,
-                TileColumns = capabilities.MaxTileColumns,
-                Palette = dataType switch
-                {
-                    AMXDataType.BFloat16 => 1,
-                    AMXDataType.Int8 => 2,
-                    AMXDataType.Float32 => 3,
-                    _ => 1
-                }
-            };
-        }
+                AMXDataType.BFloat16 => 1,
+                AMXDataType.Int8 => 2,
+                AMXDataType.Float32 => 3,
+                _ => 1
+            }
+        };
 
         /// <summary>
         /// Creates a new configuration with the specified data type.
         /// </summary>
         /// <param name="dataType">The new data type.</param>
         /// <returns>A new tile configuration.</returns>
-        public AMXTileConfiguration WithDataType(AMXDataType dataType)
+        public AMXTileConfiguration WithDataType(AMXDataType dataType) => new AMXTileConfiguration
         {
-            return new AMXTileConfiguration
+            DataType = dataType,
+            TileRows = TileRows,
+            TileColumns = TileColumns,
+            Palette = dataType switch
             {
-                DataType = dataType,
-                TileRows = TileRows,
-                TileColumns = TileColumns,
-                Palette = dataType switch
-                {
-                    AMXDataType.BFloat16 => 1,
-                    AMXDataType.Int8 => 2,
-                    AMXDataType.Float32 => 3,
-                    _ => Palette
-                }
-            };
-        }
+                AMXDataType.BFloat16 => 1,
+                AMXDataType.Int8 => 2,
+                AMXDataType.Float32 => 3,
+                _ => Palette
+            }
+        };
     }
 }

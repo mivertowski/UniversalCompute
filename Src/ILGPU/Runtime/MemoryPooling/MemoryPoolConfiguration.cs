@@ -136,7 +136,7 @@ namespace ILGPU.Runtime.MemoryPooling
         /// Creates a configuration optimized for high-performance scenarios.
         /// </summary>
         /// <returns>A high-performance memory pool configuration.</returns>
-        public static MemoryPoolConfiguration CreateHighPerformance() => new MemoryPoolConfiguration
+        public static MemoryPoolConfiguration CreateHighPerformance() => new()
         {
             MaxPoolSizeBytes = Environment.Is64BitProcess ? 2L * 1024 * 1024 * 1024 : 512L * 1024 * 1024,
             MaxBufferSizeBytes = 200L * 1024 * 1024,
@@ -153,7 +153,7 @@ namespace ILGPU.Runtime.MemoryPooling
         /// Creates a configuration optimized for low memory usage.
         /// </summary>
         /// <returns>A memory-efficient pool configuration.</returns>
-        public static MemoryPoolConfiguration CreateMemoryEfficient() => new MemoryPoolConfiguration
+        public static MemoryPoolConfiguration CreateMemoryEfficient() => new()
         {
             MaxPoolSizeBytes = Environment.Is64BitProcess ? 256L * 1024 * 1024 : 64L * 1024 * 1024,
             MaxBufferSizeBytes = 32L * 1024 * 1024,
@@ -170,7 +170,7 @@ namespace ILGPU.Runtime.MemoryPooling
         /// Creates a configuration optimized for development and debugging.
         /// </summary>
         /// <returns>A development-friendly pool configuration.</returns>
-        public static MemoryPoolConfiguration CreateDevelopment() => new MemoryPoolConfiguration
+        public static MemoryPoolConfiguration CreateDevelopment() => new()
         {
             MaxPoolSizeBytes = 128L * 1024 * 1024,
             MaxBufferSizeBytes = 16L * 1024 * 1024,

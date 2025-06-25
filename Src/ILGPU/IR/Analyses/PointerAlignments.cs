@@ -35,7 +35,7 @@ namespace ILGPU.IR.Analyses
             /// Empty allocation information.
             /// </summary>
             public static readonly AlignmentInfo Empty =
-                new AlignmentInfo(GlobalAnalysisValueResult<int>.Empty);
+                new(GlobalAnalysisValueResult<int>.Empty);
 
             #endregion
 
@@ -133,7 +133,7 @@ namespace ILGPU.IR.Analyses
         /// method.
         /// </param>
         public static PointerAlignments Create(int globalAlignment) =>
-            new PointerAlignments(globalAlignment);
+            new(globalAlignment);
 
         /// <summary>
         /// Applies a new alignment analysis to the given root method.

@@ -30,28 +30,24 @@ namespace ILGPU.Runtime
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static SpecializedValue<T> New<T>(T value)
             where T : unmanaged, IEquatable<T> =>
-            new SpecializedValue<T>(value);
+            new(value);
     }
 
     /// <summary>
     /// Represents a dynamically specialized value that can be passed to a kernel.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
+    /// <remarks>
+    /// Constructs a new specialized value.
+    /// </remarks>
+    /// <param name="value">The underlying value to use.</param>
     [StructLayout(LayoutKind.Sequential)]
-    public struct SpecializedValue<T> : IEquatable<SpecializedValue<T>>
+    [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public struct SpecializedValue<T>(T value) : IEquatable<SpecializedValue<T>>
         where T : unmanaged, IEquatable<T>
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new specialized value.
-        /// </summary>
-        /// <param name="value">The underlying value to use.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public SpecializedValue(T value)
-        {
-            Value = value;
-        }
+        #region Instance
 
         #endregion
 
@@ -60,7 +56,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets or sets the underlying value.
         /// </summary>
-        public T Value { get; set; }
+        public T Value { get; set; } = value;
 
         #endregion
 

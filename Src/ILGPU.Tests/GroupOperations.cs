@@ -19,12 +19,8 @@ using Xunit.Abstractions;
 namespace ILGPU.Tests
 {
     [Collection("DimensionOperations")]
-    public abstract class GroupOperations : TestBase
+    public abstract class GroupOperations(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected GroupOperations(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
-
         internal static void GroupDimensionKernel(ArrayView1D<int, Stride1D.Dense> data)
         {
             data[0] = Group.DimX;

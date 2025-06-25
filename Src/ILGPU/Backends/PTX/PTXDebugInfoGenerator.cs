@@ -92,7 +92,7 @@ namespace ILGPU.Backends.PTX
         /// Begins a new debug information scope.
         /// </summary>
         public PTXDebugInfoGeneratorScope BeginScope() =>
-            new PTXDebugInfoGeneratorScope(this);
+            new(this);
 
         /// <summary>
         /// Generates debug information for the given node.
@@ -125,7 +125,7 @@ namespace ILGPU.Backends.PTX
         /// An empty debug information generator.
         /// </summary>
         public static readonly PTXNoDebugInfoGenerator Empty =
-            new PTXNoDebugInfoGenerator();
+            new();
 
         #endregion
 
@@ -162,7 +162,7 @@ namespace ILGPU.Backends.PTX
         #region Instance
 
         private readonly Dictionary<string, int> fileMapping =
-            new Dictionary<string, int>();
+            new();
 
         /// <summary>
         /// Constructs a debug information generator.
@@ -290,7 +290,7 @@ namespace ILGPU.Backends.PTX
         #region Instance
 
         private readonly Dictionary<string, string[]> fileMapping =
-            new Dictionary<string, string[]>();
+            new();
 
         /// <summary>
         /// Constructs a debug information generator.

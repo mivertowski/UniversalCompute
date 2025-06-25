@@ -47,18 +47,14 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Information carried per value.
         /// </summary>
-        public readonly struct ValueInfo : IEquatable<ValueInfo>
+        /// <remarks>
+        /// Constructs a new value information instance.
+        /// </remarks>
+        /// <param name="kind">The associated value kind.</param>
+        public readonly struct ValueInfo(Uniforms.UniformKind kind) : IEquatable<ValueInfo>
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new value information instance.
-            /// </summary>
-            /// <param name="kind">The associated value kind.</param>
-            public ValueInfo(UniformKind kind)
-            {
-                Kind = kind;
-            }
+            #region Instance
 
             #endregion
 
@@ -67,7 +63,7 @@ namespace ILGPU.IR.Analyses
             /// <summary>
             /// Returns the current kind of the current uniform information instance.
             /// </summary>
-            public UniformKind Kind { get; }
+            public UniformKind Kind { get; } = kind;
 
             #endregion
 
@@ -114,7 +110,7 @@ namespace ILGPU.IR.Analyses
             /// <param name="kind">The kind to convert to.</param>
             /// <returns>The created value information instance.</returns>
             public static implicit operator ValueInfo(UniformKind kind) =>
-                new ValueInfo(kind);
+                new(kind);
 
             /// <summary>
             /// Returns true if the first and second information instances are the same.
@@ -151,7 +147,7 @@ namespace ILGPU.IR.Analyses
             /// Empty allocation information.
             /// </summary>
             public static readonly Info Empty =
-                new Info(GlobalAnalysisValueResult<ValueInfo>.Empty);
+                new(GlobalAnalysisValueResult<ValueInfo>.Empty);
 
             #endregion
 
@@ -208,7 +204,7 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Creates a new uniforms analysis.
         /// </summary>
-        public static Uniforms Create(Method entryPoint) => new Uniforms();
+        public static Uniforms Create(Method entryPoint) => new();
 
         /// <summary>
         /// Applies a new alignment analysis to the given root method.

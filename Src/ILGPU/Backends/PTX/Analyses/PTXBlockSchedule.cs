@@ -21,22 +21,17 @@ namespace ILGPU.Backends.PTX.Analyses
     /// <summary>
     /// Represents a PTX-specific block schedule.
     /// </summary>
-    abstract class PTXBlockSchedule
+    /// <remarks>
+    /// Constructs a new PTX block schedule.
+    /// </remarks>
+    /// <param name="entryBlock">The entry block.</param>
+    /// <param name="blocks">The underlying block collection.</param>
+    abstract class PTXBlockSchedule(
+        BasicBlock entryBlock,
+        ImmutableArray<BasicBlock> blocks)
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new PTX block schedule.
-        /// </summary>
-        /// <param name="entryBlock">The entry block.</param>
-        /// <param name="blocks">The underlying block collection.</param>
-        protected PTXBlockSchedule(
-            BasicBlock entryBlock,
-            ImmutableArray<BasicBlock> blocks)
-        {
-            EntryBlock = entryBlock;
-            Blocks = blocks;
-        }
+        #region Instance
 
         #endregion
 
@@ -45,12 +40,12 @@ namespace ILGPU.Backends.PTX.Analyses
         /// <summary>
         /// Returns the entry block.
         /// </summary>
-        public BasicBlock EntryBlock { get; }
+        public BasicBlock EntryBlock { get; } = entryBlock;
 
         /// <summary>
         /// Returns all blocks.
         /// </summary>
-        public ImmutableArray<BasicBlock> Blocks { get; }
+        public ImmutableArray<BasicBlock> Blocks { get; } = blocks;
 
         #endregion
 
@@ -97,19 +92,16 @@ namespace ILGPU.Backends.PTX.Analyses
     /// </summary>
     /// <typeparam name="TOrder">The current order.</typeparam>
     /// <typeparam name="TDirection">The control-flow direction.</typeparam>
-    abstract class PTXBlockSchedule<TOrder, TDirection> : PTXBlockSchedule
+    /// <remarks>
+    /// Constructs a new PTX block schedule.
+    /// </remarks>
+    /// <param name="blocks">The underlying block collection.</param>
+    abstract class PTXBlockSchedule<TOrder, TDirection>(in BasicBlockCollection<TOrder, TDirection> blocks) : PTXBlockSchedule(blocks.EntryBlock, blocks.ToImmutableArray())
         where TOrder : struct, ITraversalOrder
         where TDirection : struct, IControlFlowDirection
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new PTX block schedule.
-        /// </summary>
-        /// <param name="blocks">The underlying block collection.</param>
-        protected PTXBlockSchedule(in BasicBlockCollection<TOrder, TDirection> blocks)
-            : base(blocks.EntryBlock, blocks.ToImmutableArray())
-        { }
+        #region Instance
 
         #endregion
 
@@ -119,7 +111,7 @@ namespace ILGPU.Backends.PTX.Analyses
         /// Returns the entry block.
         /// </summary>
         public BasicBlockCollection<TOrder, TDirection> BasicBlockCollection =>
-            new BasicBlockCollection<TOrder, TDirection>(EntryBlock, Blocks);
+            new(EntryBlock, Blocks);
 
         #endregion
 

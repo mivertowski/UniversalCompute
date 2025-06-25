@@ -25,17 +25,11 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Base implementation for universal buffers with common stub functionality.
     /// </summary>
-    public abstract class BaseUniversalBuffer<T> : IUniversalBuffer<T>
+    public abstract class BaseUniversalBuffer<T>(long size, UniversalMemoryManager manager) : IUniversalBuffer<T>
         where T : unmanaged
     {
-        protected readonly long _length;
-        protected readonly UniversalMemoryManager _manager;
-
-        protected BaseUniversalBuffer(long size, UniversalMemoryManager manager)
-        {
-            _length = size;
-            _manager = manager ?? throw new ArgumentNullException(nameof(manager));
-        }
+        protected readonly long _length = size;
+        protected readonly UniversalMemoryManager _manager = manager ?? throw new ArgumentNullException(nameof(manager));
 
         public long Length => _length;
         public long SizeInBytes => _length * System.Runtime.CompilerServices.Unsafe.SizeOf<T>();
@@ -68,11 +62,9 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Apple Silicon unified memory buffer implementation.
     /// </summary>
-    public class AppleUnifiedBuffer<T> : BaseUniversalBuffer<T>
+    public class AppleUnifiedBuffer<T>(long size, UniversalMemoryManager manager) : BaseUniversalBuffer<T>(size, manager)
         where T : unmanaged
     {
-        public AppleUnifiedBuffer(long size, UniversalMemoryManager manager) : base(size, manager) { }
-
         public override MemoryPlacement Placement => MemoryPlacement.AppleUnified;
         public override bool SupportsZeroCopy => true;
         public override DataLocation CurrentLocation => DataLocation.Unified;
@@ -81,11 +73,9 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// CUDA managed memory buffer implementation.
     /// </summary>
-    public class CudaManagedBuffer<T> : BaseUniversalBuffer<T>
+    public class CudaManagedBuffer<T>(long size, UniversalMemoryManager manager) : BaseUniversalBuffer<T>(size, manager)
         where T : unmanaged
     {
-        public CudaManagedBuffer(long size, UniversalMemoryManager manager) : base(size, manager) { }
-
         public override MemoryPlacement Placement => MemoryPlacement.CudaManaged;
         public override DataLocation CurrentLocation => DataLocation.Unified;
     }
@@ -93,11 +83,9 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Intel integrated GPU shared memory buffer implementation.
     /// </summary>
-    public class IntelSharedBuffer<T> : BaseUniversalBuffer<T>
+    public class IntelSharedBuffer<T>(long size, UniversalMemoryManager manager) : BaseUniversalBuffer<T>(size, manager)
         where T : unmanaged
     {
-        public IntelSharedBuffer(long size, UniversalMemoryManager manager) : base(size, manager) { }
-
         public override MemoryPlacement Placement => MemoryPlacement.IntelShared;
         public override DataLocation CurrentLocation => DataLocation.Both;
     }
@@ -105,11 +93,9 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Pinned host memory buffer implementation.
     /// </summary>
-    public class PinnedHostBuffer<T> : BaseUniversalBuffer<T>
+    public class PinnedHostBuffer<T>(long size, UniversalMemoryManager manager) : BaseUniversalBuffer<T>(size, manager)
         where T : unmanaged
     {
-        public PinnedHostBuffer(long size, UniversalMemoryManager manager) : base(size, manager) { }
-
         public override MemoryPlacement Placement => MemoryPlacement.HostPinned;
         public override DataLocation CurrentLocation => DataLocation.Host;
     }
@@ -117,16 +103,10 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Standard universal buffer implementation.
     /// </summary>
-    public class StandardUniversalBuffer<T> : BaseUniversalBuffer<T>
+    public class StandardUniversalBuffer<T>(long size, MemoryPlacement placement, UniversalMemoryManager manager) : BaseUniversalBuffer<T>(size, manager)
         where T : unmanaged
     {
-        private readonly MemoryPlacement _placement;
-
-        public StandardUniversalBuffer(long size, MemoryPlacement placement, UniversalMemoryManager manager) 
-            : base(size, manager)
-        {
-            _placement = placement;
-        }
+        private readonly MemoryPlacement _placement = placement;
 
         public override MemoryPlacement Placement => _placement;
         public override DataLocation CurrentLocation => DataLocation.Host;
@@ -135,18 +115,11 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Wraps an existing memory buffer to provide universal buffer functionality.
     /// </summary>
-    public class WrappedMemoryBuffer<T> : BaseUniversalBuffer<T>
+    public class WrappedMemoryBuffer<T>(MemoryBuffer1D<T, Stride1D.Dense> memoryBuffer, UniversalMemoryManager manager, bool takeOwnership) : BaseUniversalBuffer<T>(memoryBuffer.Length, manager)
         where T : unmanaged
     {
-        private readonly MemoryBuffer1D<T, Stride1D.Dense> _wrappedBuffer;
-        private readonly bool _takeOwnership;
-
-        public WrappedMemoryBuffer(MemoryBuffer1D<T, Stride1D.Dense> memoryBuffer, UniversalMemoryManager manager, bool takeOwnership)
-            : base(memoryBuffer.Length, manager)
-        {
-            _wrappedBuffer = memoryBuffer ?? throw new ArgumentNullException(nameof(memoryBuffer));
-            _takeOwnership = takeOwnership;
-        }
+        private readonly MemoryBuffer1D<T, Stride1D.Dense> _wrappedBuffer = memoryBuffer ?? throw new ArgumentNullException(nameof(memoryBuffer));
+        private readonly bool _takeOwnership = takeOwnership;
 
         public override MemoryPlacement Placement => MemoryPlacement.DeviceLocal;
         public override DataLocation CurrentLocation => DataLocation.Device;

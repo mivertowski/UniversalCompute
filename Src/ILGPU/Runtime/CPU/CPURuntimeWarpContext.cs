@@ -53,43 +53,36 @@ namespace ILGPU.Runtime.CPU
         /// <summary>
         /// Represents a single configuration on how to perform a shuffle operation.
         /// </summary>
-        public readonly struct ShuffleConfig
+        /// <remarks>
+        /// Constructs a new shuffle configuration.
+        /// </remarks>
+        public readonly struct ShuffleConfig(
+            int currentLane,
+            int sourceLane,
+            int offset,
+            int width)
         {
-            /// <summary>
-            /// Constructs a new shuffle configuration.
-            /// </summary>
-            public ShuffleConfig(
-                int currentLane,
-                int sourceLane,
-                int offset,
-                int width)
-            {
-                CurrentLane = currentLane;
-                SourceLane = sourceLane;
-                Offset = offset;
-                Width = width;
-            }
 
             /// <summary>
             /// Returns the current contributing lane index.
             /// </summary>
-            public int CurrentLane { get; }
+            public int CurrentLane { get; } = currentLane;
 
             /// <summary>
             /// Returns the relative source lane to shuffle from.
             /// </summary>
-            public int SourceLane { get; }
+            public int SourceLane { get; } = sourceLane;
 
             /// <summary>
             /// Returns the absolute offset to convert the relative source lane value
             /// into an absolute lane index to shuffle from.
             /// </summary>
-            public int Offset { get; }
+            public int Offset { get; } = offset;
 
             /// <summary>
             /// Returns the logical warp size to use.
             /// </summary>
-            public int Width { get; }
+            public int Width { get; } = width;
 
             /// <summary>
             /// Returns true if the current relative source lane is in bounds of the
@@ -124,7 +117,7 @@ namespace ILGPU.Runtime.CPU
             /// <param name="sourceLane">The new source lane index to use.</param>
             /// <returns>The updated configuration.</returns>
             public readonly ShuffleConfig AdjustSourceLane(int sourceLane) =>
-                new ShuffleConfig(
+                new(
                     CurrentLane,
                     sourceLane,
                     Offset,
@@ -135,27 +128,22 @@ namespace ILGPU.Runtime.CPU
         /// Represents an operation that allocates and managed shuffle memory.
         /// </summary>
         /// <typeparam name="T">The element type.</typeparam>
-        private readonly struct GetShuffleMemory<T> : ILockedOperation<ArrayView<T>>
+        /// <remarks>
+        /// Constructs a new allocation operation.
+        /// </remarks>
+        private readonly struct GetShuffleMemory<T>(CPUMemoryBufferCache shuffleBuffer, int warpSize) : ILockedOperation<ArrayView<T>>
             where T : unmanaged
         {
-            /// <summary>
-            /// Constructs a new allocation operation.
-            /// </summary>
-            public GetShuffleMemory(CPUMemoryBufferCache shuffleBuffer, int warpSize)
-            {
-                ShuffleBuffer = shuffleBuffer;
-                WarpSize = warpSize;
-            }
 
             /// <summary>
             /// Returns the parent context.
             /// </summary>
-            public CPUMemoryBufferCache ShuffleBuffer { get; }
+            public CPUMemoryBufferCache ShuffleBuffer { get; } = shuffleBuffer;
 
             /// <summary>
             /// Returns the warp size.
             /// </summary>
-            public int WarpSize { get; }
+            public int WarpSize { get; } = warpSize;
 
             /// <summary>
             /// Allocates the required amount of shuffle memory.

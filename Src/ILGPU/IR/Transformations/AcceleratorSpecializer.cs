@@ -24,39 +24,46 @@ namespace ILGPU.IR.Transformations
     /// <remarks>
     /// Note that this class does not perform recursive specialization operations.
     /// </remarks>
-    public class AcceleratorSpecializer : SequentialUnorderedTransformation
+    /// <remarks>
+    /// Constructs a new device specializer.
+    /// </remarks>
+    /// <param name="acceleratorType">The accelerator type.</param>
+    /// <param name="warpSize">The warp size (if any).</param>
+    /// <param name="intPointerType">The native integer pointer type.</param>
+    /// <param name="enableAssertions">True, if the assertions are enabled.</param>
+    /// <param name="enableIOOperations">True, if the IO is enabled.</param>
+    public class AcceleratorSpecializer(
+        AcceleratorType acceleratorType,
+        int? warpSize,
+        PrimitiveType intPointerType,
+        bool enableAssertions,
+        bool enableIOOperations) : SequentialUnorderedTransformation
     {
         #region Nested Types
 
-        private readonly struct SpecializerData
+        /// <summary>
+        /// Constructs a new data instance.
+        /// </summary>
+        private readonly struct SpecializerData(
+            AcceleratorSpecializer specializer,
+            IRContext context,
+            List<Value> toImplement)
         {
-            /// <summary>
-            /// Constructs a new data instance.
-            /// </summary>
-            public SpecializerData(
-                AcceleratorSpecializer specializer,
-                IRContext context,
-                List<Value> toImplement)
-            {
-                ToImplement = toImplement;
-                Specializer = specializer;
-                Context = context;
-            }
 
             /// <summary>
             /// A list of values to be implemented in the next step.
             /// </summary>
-            public List<Value> ToImplement { get; }
+            public List<Value> ToImplement { get; } = toImplement;
 
             /// <summary>
             /// Returns the parent specializer instance.
             /// </summary>
-            public AcceleratorSpecializer Specializer { get; }
+            public AcceleratorSpecializer Specializer { get; } = specializer;
 
             /// <summary>
             /// Returns the current IR context.
             /// </summary>
-            public IRContext Context { get; }
+            public IRContext Context { get; } = context;
 
             /// <summary>
             /// Returns the current accelerator type.
@@ -238,7 +245,7 @@ namespace ILGPU.IR.Transformations
         /// The internal rewriter.
         /// </summary>
         private static readonly Rewriter<SpecializerData> Rewriter =
-            new Rewriter<SpecializerData>();
+            new();
 
         /// <summary>
         /// Registers all rewriting patterns.
@@ -260,30 +267,7 @@ namespace ILGPU.IR.Transformations
         }
 
         #endregion
-
         #region Instance
-
-        /// <summary>
-        /// Constructs a new device specializer.
-        /// </summary>
-        /// <param name="acceleratorType">The accelerator type.</param>
-        /// <param name="warpSize">The warp size (if any).</param>
-        /// <param name="intPointerType">The native integer pointer type.</param>
-        /// <param name="enableAssertions">True, if the assertions are enabled.</param>
-        /// <param name="enableIOOperations">True, if the IO is enabled.</param>
-        public AcceleratorSpecializer(
-            AcceleratorType acceleratorType,
-            int? warpSize,
-            PrimitiveType intPointerType,
-            bool enableAssertions,
-            bool enableIOOperations)
-        {
-            AcceleratorType = acceleratorType;
-            WarpSize = warpSize;
-            IntPointerType = intPointerType;
-            EnableAssertions = enableAssertions;
-            EnableIOOperations = enableIOOperations;
-        }
 
         #endregion
 
@@ -292,27 +276,27 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Returns the current accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType { get; }
+        public AcceleratorType AcceleratorType { get; } = acceleratorType;
 
         /// <summary>
         /// Returns the current warp size (if any).
         /// </summary>
-        public int? WarpSize { get; }
+        public int? WarpSize { get; } = warpSize;
 
         /// <summary>
         /// Returns the target-platform specific integer pointer type.
         /// </summary>
-        public PrimitiveType IntPointerType { get; }
+        public PrimitiveType IntPointerType { get; } = intPointerType;
 
         /// <summary>
         /// Returns true if assertions are enabled.
         /// </summary>
-        public bool EnableAssertions { get; }
+        public bool EnableAssertions { get; } = enableAssertions;
 
         /// <summary>
         /// Returns true if debug output is enabled.
         /// </summary>
-        public bool EnableIOOperations { get; }
+        public bool EnableIOOperations { get; } = enableIOOperations;
 
         #endregion
 

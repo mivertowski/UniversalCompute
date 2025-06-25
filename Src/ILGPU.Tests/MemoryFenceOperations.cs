@@ -16,15 +16,11 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class MemoryFenceOperations : TestBase
+    public abstract class MemoryFenceOperations(
+        ITestOutputHelper output,
+        TestContext testContext) : TestBase(output, testContext)
     {
         private const int Length = 1024;
-
-        protected MemoryFenceOperations(
-            ITestOutputHelper output,
-            TestContext testContext)
-            : base(output, testContext)
-        { }
 
         internal static void MemoryFenceGroupLevelKernel(
             ArrayView1D<int, Stride1D.Dense> data)

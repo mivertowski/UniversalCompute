@@ -29,34 +29,31 @@ namespace ILGPU.Backends
     /// <typeparam name="T">The main data type.</typeparam>
     /// <typeparam name="TCodeGenerator">The code-generator type.</typeparam>
     /// <typeparam name="TKernelBuilder">The kernel-builder type.</typeparam>
+    /// <remarks>
+    /// Constructs a new generic backend.
+    /// </remarks>
+    /// <param name="context">The context to use.</param>
+    /// <param name="capabilities">The supported capabilities.</param>
+    /// <param name="backendType">The backend type.</param>
+    /// <param name="argumentMapper">The argument mapper to use.</param>
     public abstract class CodeGeneratorBackend<
         TDelegate,
         T,
         TCodeGenerator,
-        TKernelBuilder> : Backend<TDelegate>
+        TKernelBuilder>(
+        Context context,
+        CapabilityContext capabilities,
+        BackendType backendType,
+        ArgumentMapper argumentMapper) : Backend<TDelegate>(
+              context,
+              capabilities,
+              backendType,
+              argumentMapper)
         where TDelegate : Delegate
         where TCodeGenerator : class, IBackendCodeGenerator<TKernelBuilder>
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new generic backend.
-        /// </summary>
-        /// <param name="context">The context to use.</param>
-        /// <param name="capabilities">The supported capabilities.</param>
-        /// <param name="backendType">The backend type.</param>
-        /// <param name="argumentMapper">The argument mapper to use.</param>
-        protected CodeGeneratorBackend(
-            Context context,
-            CapabilityContext capabilities,
-            BackendType backendType,
-            ArgumentMapper argumentMapper)
-            : base(
-                  context,
-                  capabilities,
-                  backendType,
-                  argumentMapper)
-        { }
+        #region Instance
 
         #endregion
 

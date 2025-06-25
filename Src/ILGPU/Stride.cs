@@ -210,28 +210,23 @@ namespace ILGPU
         /// <summary>
         /// An element-size based cast context.
         /// </summary>
-        public readonly struct ElementSizeCastContext : IStrideCastContext
+        /// <remarks>
+        /// Initializes a new element-size context.
+        /// </remarks>
+        /// <param name="elementSize">The source element size.</param>
+        /// <param name="newElementSize">The target element size.</param>
+        public readonly struct ElementSizeCastContext(int elementSize, int newElementSize) : IStrideCastContext
         {
-            /// <summary>
-            /// Initializes a new element-size context.
-            /// </summary>
-            /// <param name="elementSize">The source element size.</param>
-            /// <param name="newElementSize">The target element size.</param>
-            public ElementSizeCastContext(int elementSize, int newElementSize)
-            {
-                ElementSize = elementSize;
-                NewElementSize = newElementSize;
-            }
 
             /// <summary>
             /// Returns the source element size.
             /// </summary>
-            public int ElementSize { get; }
+            public int ElementSize { get; } = elementSize;
 
             /// <summary>
             /// Returns the target element size.
             /// </summary>
-            public int NewElementSize { get; }
+            public int NewElementSize { get; } = newElementSize;
 
             /// <inheritdoc/>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -253,7 +248,7 @@ namespace ILGPU
         public static ElementSizeCastContext CreateCastContext(
             int elementSize,
             int newElementSize) =>
-            new ElementSizeCastContext(elementSize, newElementSize);
+            new(elementSize, newElementSize);
     }
 
     partial class Stride1D
@@ -299,7 +294,7 @@ namespace ILGPU
             /// <returns>The constructed stride.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static DenseX FromExtent(Index2D extent) =>
-                new DenseX(extent.X);
+                new(extent.X);
 
             /// <summary>
             /// Constructs a 2D stride from the given 2D extent.
@@ -393,7 +388,7 @@ namespace ILGPU
             /// <summary>
             /// Returns the associated stride extent of the form (1, YStride).
             /// </summary>
-            public readonly Index2D StrideExtent => new Index2D(XStride, YStride);
+            public readonly Index2D StrideExtent => new(XStride, YStride);
 
             #endregion
 
@@ -514,13 +509,13 @@ namespace ILGPU
             /// Returns this stride as general 2D stride.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public readonly General AsGeneral() => new General(StrideExtent);
+            public readonly General AsGeneral() => new(StrideExtent);
 
             /// <summary>
             /// Converts this stride instance into a general 1D stride.
             /// </summary>
             public readonly Stride1D.General To1DStride() =>
-                new Stride1D.General(XStride);
+                new(XStride);
 
             #endregion
 
@@ -552,7 +547,7 @@ namespace ILGPU
             /// <returns>The constructed stride.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static DenseY FromExtent(Index2D extent) =>
-                new DenseY(extent.Y);
+                new(extent.Y);
 
             /// <summary>
             /// Constructs a 2D stride from the given 2D extent.
@@ -646,7 +641,7 @@ namespace ILGPU
             /// <summary>
             /// Returns the associated stride extent of the form (XStride, 1).
             /// </summary>
-            public readonly Index2D StrideExtent => new Index2D(XStride, YStride);
+            public readonly Index2D StrideExtent => new(XStride, YStride);
 
             #endregion
 
@@ -769,13 +764,13 @@ namespace ILGPU
             /// Returns this stride as general 2D stride.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public readonly General AsGeneral() => new General(StrideExtent);
+            public readonly General AsGeneral() => new(StrideExtent);
 
             /// <summary>
             /// Converts this stride instance into a general 1D stride.
             /// </summary>
             public readonly Stride1D.General To1DStride() =>
-                new Stride1D.General(YStride);
+                new(YStride);
 
             #endregion
 
@@ -918,7 +913,7 @@ namespace ILGPU
             /// Returns the associated stride extent of the form (1, YStride, ZStride).
             /// </summary>
             public readonly Index3D StrideExtent =>
-                new Index3D(XStride, YStride, ZStride);
+                new(XStride, YStride, ZStride);
 
             #endregion
 
@@ -1048,13 +1043,13 @@ namespace ILGPU
             /// Returns this stride as general 3D stride.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public readonly General AsGeneral() => new General(StrideExtent);
+            public readonly General AsGeneral() => new(StrideExtent);
 
             /// <summary>
             /// Converts this stride instance into a general 1D stride.
             /// </summary>
             public readonly Stride1D.General To1DStride() =>
-                new Stride1D.General(XStride);
+                new(XStride);
 
             #endregion
 
@@ -1194,7 +1189,7 @@ namespace ILGPU
             /// Returns the associated stride extent of the form (XStride, YStride, 1).
             /// </summary>
             public readonly Index3D StrideExtent =>
-                new Index3D(XStride, YStride, ZStride);
+                new(XStride, YStride, ZStride);
 
             #endregion
 
@@ -1324,13 +1319,13 @@ namespace ILGPU
             /// Returns this stride as general 3D stride.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public readonly General AsGeneral() => new General(StrideExtent);
+            public readonly General AsGeneral() => new(StrideExtent);
 
             /// <summary>
             /// Converts this stride instance into a general 1D stride.
             /// </summary>
             public readonly Stride1D.General To1DStride() =>
-                new Stride1D.General(ZStride);
+                new(ZStride);
 
             #endregion
 

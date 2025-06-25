@@ -23,94 +23,81 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Represents the capabilities of an Intel NPU device.
     /// </summary>
-    public readonly struct NPUCapabilities
+    /// <remarks>
+    /// Initializes a new instance of the NPUCapabilities struct.
+    /// </remarks>
+    /// <param name="generation">The NPU generation.</param>
+    /// <param name="computeUnits">The number of compute units.</param>
+    /// <param name="maxTops">Maximum TOPS (Tera Operations Per Second).</param>
+    /// <param name="memoryBandwidth">Memory bandwidth in GB/s.</param>
+    /// <param name="supportsBF16">Whether BFloat16 is supported.</param>
+    /// <param name="supportsInt8">Whether INT8 quantization is supported.</param>
+    /// <param name="supportsConvolution">Whether convolution operations are supported.</param>
+    /// <param name="supportsMatMul">Whether matrix multiplication is supported.</param>
+    /// <param name="supportsAttention">Whether attention operations are supported.</param>
+    /// <param name="supportsSparsity">Whether sparse operations are supported.</param>
+    public readonly struct NPUCapabilities(
+        NPUGeneration generation,
+        int computeUnits,
+        double maxTops,
+        double memoryBandwidth,
+        bool supportsBF16,
+        bool supportsInt8,
+        bool supportsConvolution,
+        bool supportsMatMul,
+        bool supportsAttention,
+        bool supportsSparsity)
     {
-        /// <summary>
-        /// Initializes a new instance of the NPUCapabilities struct.
-        /// </summary>
-        /// <param name="generation">The NPU generation.</param>
-        /// <param name="computeUnits">The number of compute units.</param>
-        /// <param name="maxTops">Maximum TOPS (Tera Operations Per Second).</param>
-        /// <param name="memoryBandwidth">Memory bandwidth in GB/s.</param>
-        /// <param name="supportsBF16">Whether BFloat16 is supported.</param>
-        /// <param name="supportsInt8">Whether INT8 quantization is supported.</param>
-        /// <param name="supportsConvolution">Whether convolution operations are supported.</param>
-        /// <param name="supportsMatMul">Whether matrix multiplication is supported.</param>
-        /// <param name="supportsAttention">Whether attention operations are supported.</param>
-        /// <param name="supportsSparsity">Whether sparse operations are supported.</param>
-        public NPUCapabilities(
-            NPUGeneration generation,
-            int computeUnits,
-            double maxTops,
-            double memoryBandwidth,
-            bool supportsBF16,
-            bool supportsInt8,
-            bool supportsConvolution,
-            bool supportsMatMul,
-            bool supportsAttention,
-            bool supportsSparsity)
-        {
-            Generation = generation;
-            ComputeUnits = computeUnits;
-            MaxTOPS = maxTops;
-            MemoryBandwidth = memoryBandwidth;
-            SupportsBF16 = supportsBF16;
-            SupportsInt8 = supportsInt8;
-            SupportsConvolution = supportsConvolution;
-            SupportsMatMul = supportsMatMul;
-            SupportsAttention = supportsAttention;
-            SupportsSparsity = supportsSparsity;
-        }
 
         /// <summary>
         /// Gets the NPU generation.
         /// </summary>
-        public NPUGeneration Generation { get; }
+        public NPUGeneration Generation { get; } = generation;
 
         /// <summary>
         /// Gets the number of compute units in the NPU.
         /// </summary>
-        public int ComputeUnits { get; }
+        public int ComputeUnits { get; } = computeUnits;
 
         /// <summary>
         /// Gets the maximum TOPS (Tera Operations Per Second) performance.
         /// </summary>
-        public double MaxTOPS { get; }
+        public double MaxTOPS { get; } = maxTops;
 
         /// <summary>
         /// Gets the memory bandwidth in GB/s.
         /// </summary>
-        public double MemoryBandwidth { get; }
+        public double MemoryBandwidth { get; } = memoryBandwidth;
 
         /// <summary>
         /// Gets whether BFloat16 operations are supported.
         /// </summary>
-        public bool SupportsBF16 { get; }
+        public bool SupportsBF16 { get; } = supportsBF16;
 
         /// <summary>
         /// Gets whether INT8 quantization is supported.
         /// </summary>
-        public bool SupportsInt8 { get; }
+        public bool SupportsInt8 { get; } = supportsInt8;
 
         /// <summary>
         /// Gets whether convolution operations are accelerated.
         /// </summary>
-        public bool SupportsConvolution { get; }
+        public bool SupportsConvolution { get; } = supportsConvolution;
 
         /// <summary>
         /// Gets whether matrix multiplication is accelerated.
         /// </summary>
-        public bool SupportsMatMul { get; }
+        public bool SupportsMatMul { get; } = supportsMatMul;
 
         /// <summary>
         /// Gets whether transformer attention operations are accelerated.
         /// </summary>
-        public bool SupportsAttention { get; }
+        public bool SupportsAttention { get; } = supportsAttention;
 
         /// <summary>
         /// Gets whether sparse operations are supported.
         /// </summary>
-        public bool SupportsSparsity { get; }
+        public bool SupportsSparsity { get; } = supportsSparsity;
 
         /// <summary>
         /// Detects whether Intel NPU is available on the current system.
@@ -146,34 +133,29 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         /// <param name="format">The model format to check.</param>
         /// <returns>True if the format is supported; otherwise, false.</returns>
-        public bool SupportsModelFormat(ModelFormat format)
+        public bool SupportsModelFormat(ModelFormat format) => format switch
         {
-            return format switch
-            {
-                ModelFormat.ONNX => true, // All NPU generations support ONNX
-                ModelFormat.OpenVINO => true, // Native Intel format
-                ModelFormat.TensorFlow => Generation >= NPUGeneration.NPU3,
-                ModelFormat.PyTorch => Generation >= NPUGeneration.NPU3,
-                _ => false
-            };
-        }
+            ModelFormat.ONNX => true, // All NPU generations support ONNX
+            ModelFormat.OpenVINO => true, // Native Intel format
+            ModelFormat.TensorFlow => Generation >= NPUGeneration.NPU3,
+            ModelFormat.PyTorch => Generation >= NPUGeneration.NPU3,
+            _ => false
+        };
 
         /// <summary>
         /// Gets the optimal batch size for the given model size.
         /// </summary>
         /// <param name="modelSizeMB">The model size in megabytes.</param>
         /// <returns>The recommended batch size.</returns>
-        public int GetOptimalBatchSize(double modelSizeMB)
-        {
+        public int GetOptimalBatchSize(double modelSizeMB) =>
             // Heuristic based on NPU generation and model size
-            return Generation switch
+            Generation switch
             {
                 NPUGeneration.NPU2 => modelSizeMB < 100 ? 4 : 2,
                 NPUGeneration.NPU3 => modelSizeMB < 100 ? 8 : 4,
                 NPUGeneration.NPU4 => modelSizeMB < 100 ? 16 : 8,
                 _ => 1
             };
-        }
 
         /// <summary>
         /// Gets the estimated power consumption for the given workload.
@@ -215,108 +197,90 @@ namespace ILGPU.Intel.NPU
         /// Returns a string representation of the NPU capabilities.
         /// </summary>
         /// <returns>A string describing the NPU capabilities.</returns>
-        public override string ToString()
-        {
-            return $"Intel NPU {Generation}: {MaxTOPS:F1} TOPS, {ComputeUnits} CUs, " +
+        public override string ToString() => $"Intel NPU {Generation}: {MaxTOPS:F1} TOPS, {ComputeUnits} CUs, " +
                    $"{MemoryBandwidth:F1} GB/s, BF16={SupportsBF16}, INT8={SupportsInt8}";
-        }
     }
 
     /// <summary>
     /// Performance metrics for Intel NPU.
     /// </summary>
-    public readonly struct NPUPerformanceMetrics
+    /// <remarks>
+    /// Initializes a new instance of the NPUPerformanceMetrics struct.
+    /// </remarks>
+    /// <param name="utilizationPercent">Current NPU utilization percentage.</param>
+    /// <param name="throughputTOPS">Current throughput in TOPS.</param>
+    /// <param name="powerConsumption">Current power consumption in watts.</param>
+    /// <param name="temperatureCelsius">Current temperature in Celsius.</param>
+    /// <param name="memoryUsage">Memory usage percentage.</param>
+    public readonly struct NPUPerformanceMetrics(
+        double utilizationPercent,
+        double throughputTOPS,
+        double powerConsumption,
+        double temperatureCelsius,
+        double memoryUsage)
     {
-        /// <summary>
-        /// Initializes a new instance of the NPUPerformanceMetrics struct.
-        /// </summary>
-        /// <param name="utilizationPercent">Current NPU utilization percentage.</param>
-        /// <param name="throughputTOPS">Current throughput in TOPS.</param>
-        /// <param name="powerConsumption">Current power consumption in watts.</param>
-        /// <param name="temperatureCelsius">Current temperature in Celsius.</param>
-        /// <param name="memoryUsage">Memory usage percentage.</param>
-        public NPUPerformanceMetrics(
-            double utilizationPercent,
-            double throughputTOPS,
-            double powerConsumption,
-            double temperatureCelsius,
-            double memoryUsage)
-        {
-            UtilizationPercent = utilizationPercent;
-            ThroughputTOPS = throughputTOPS;
-            PowerConsumption = powerConsumption;
-            TemperatureCelsius = temperatureCelsius;
-            MemoryUsage = memoryUsage;
-        }
 
         /// <summary>
         /// Gets the current NPU utilization percentage.
         /// </summary>
-        public double UtilizationPercent { get; }
+        public double UtilizationPercent { get; } = utilizationPercent;
 
         /// <summary>
         /// Gets the current throughput in TOPS.
         /// </summary>
-        public double ThroughputTOPS { get; }
+        public double ThroughputTOPS { get; } = throughputTOPS;
 
         /// <summary>
         /// Gets the current power consumption in watts.
         /// </summary>
-        public double PowerConsumption { get; }
+        public double PowerConsumption { get; } = powerConsumption;
 
         /// <summary>
         /// Gets the current temperature in Celsius.
         /// </summary>
-        public double TemperatureCelsius { get; }
+        public double TemperatureCelsius { get; } = temperatureCelsius;
 
         /// <summary>
         /// Gets the memory usage percentage.
         /// </summary>
-        public double MemoryUsage { get; }
+        public double MemoryUsage { get; } = memoryUsage;
     }
 
     /// <summary>
     /// Power information for Intel NPU.
     /// </summary>
-    public readonly struct NPUPowerInfo
+    /// <remarks>
+    /// Initializes a new instance of the NPUPowerInfo struct.
+    /// </remarks>
+    /// <param name="currentPower">Current power consumption in watts.</param>
+    /// <param name="maxPower">Maximum power limit in watts.</param>
+    /// <param name="thermalThrottling">Whether thermal throttling is active.</param>
+    /// <param name="powerEfficiency">Power efficiency in TOPS/Watt.</param>
+    public readonly struct NPUPowerInfo(
+        double currentPower,
+        double maxPower,
+        bool thermalThrottling,
+        double powerEfficiency)
     {
-        /// <summary>
-        /// Initializes a new instance of the NPUPowerInfo struct.
-        /// </summary>
-        /// <param name="currentPower">Current power consumption in watts.</param>
-        /// <param name="maxPower">Maximum power limit in watts.</param>
-        /// <param name="thermalThrottling">Whether thermal throttling is active.</param>
-        /// <param name="powerEfficiency">Power efficiency in TOPS/Watt.</param>
-        public NPUPowerInfo(
-            double currentPower,
-            double maxPower,
-            bool thermalThrottling,
-            double powerEfficiency)
-        {
-            CurrentPower = currentPower;
-            MaxPower = maxPower;
-            ThermalThrottling = thermalThrottling;
-            PowerEfficiency = powerEfficiency;
-        }
 
         /// <summary>
         /// Gets the current power consumption in watts.
         /// </summary>
-        public double CurrentPower { get; }
+        public double CurrentPower { get; } = currentPower;
 
         /// <summary>
         /// Gets the maximum power limit in watts.
         /// </summary>
-        public double MaxPower { get; }
+        public double MaxPower { get; } = maxPower;
 
         /// <summary>
         /// Gets whether thermal throttling is currently active.
         /// </summary>
-        public bool ThermalThrottling { get; }
+        public bool ThermalThrottling { get; } = thermalThrottling;
 
         /// <summary>
         /// Gets the current power efficiency in TOPS/Watt.
         /// </summary>
-        public double PowerEfficiency { get; }
+        public double PowerEfficiency { get; } = powerEfficiency;
     }
 }

@@ -33,19 +33,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks intrinsic interop methods.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class InteropIntrinsicAttribute : IntrinsicAttribute
+    sealed class InteropIntrinsicAttribute(InteropIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public InteropIntrinsicAttribute(InteropIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Interop;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public InteropIntrinsicKind IntrinsicKind { get; }
+        public InteropIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

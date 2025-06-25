@@ -88,23 +88,15 @@ namespace ILGPU.Tests.CPU
         /// <summary>
         /// High priority test work item.
         /// </summary>
-        private class HighPriorityWorkItem : TestWorkItem
+        private class HighPriorityWorkItem(string id) : TestWorkItem(id, 50, 512)
         {
-            public HighPriorityWorkItem(string id) : base(id, 50, 512)
-            {
-                // High priority items have priority 10
-            }
         }
 
         /// <summary>
         /// Memory-intensive test work item.
         /// </summary>
-        private class MemoryIntensiveWorkItem : TestWorkItem
+        private class MemoryIntensiveWorkItem(string id) : TestWorkItem(id, 200, 1024 * 1024 * 100)
         {
-            public MemoryIntensiveWorkItem(string id) : base(id, 200, 1024 * 1024 * 100) // 100MB
-            {
-            }
-
             public override bool CanExecuteOn(GPUInfo gpu)
             {
                 // Require significant memory
@@ -615,12 +607,8 @@ namespace ILGPU.Tests.CPU
         /// <summary>
         /// Work item that throws an exception for testing error handling.
         /// </summary>
-        private class FaultyWorkItem : MultiGPUWorkItem
+        private class FaultyWorkItem(string id) : MultiGPUWorkItem(id)
         {
-            public FaultyWorkItem(string id) : base(id)
-            {
-            }
-
             public override Task ExecuteAsync(GPUInfo gpu, CancellationToken cancellationToken)
             {
                 throw new InvalidOperationException("Test exception from work item");

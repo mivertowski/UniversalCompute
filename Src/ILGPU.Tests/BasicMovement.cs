@@ -22,13 +22,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
-    public abstract class BasicMovement : TestBase
+    public abstract class BasicMovement(ITestOutputHelper output, TestContext textContext) : TestBase(output, textContext)
     {
         private const int MaxLength = 32;
-
-        protected BasicMovement(ITestOutputHelper output, TestContext textContext)
-            : base(output, textContext)
-        { }
 
         public int Length => Math.Max(
             Math.Min(Accelerator.MaxNumThreadsPerGroup, MaxLength),

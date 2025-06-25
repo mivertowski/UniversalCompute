@@ -39,19 +39,14 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks warp methods that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class WarpIntrinsicAttribute : IntrinsicAttribute
+    sealed class WarpIntrinsicAttribute(WarpIntrinsicKind intrinsicKind) : IntrinsicAttribute
     {
-        public WarpIntrinsicAttribute(WarpIntrinsicKind intrinsicKind)
-        {
-            IntrinsicKind = intrinsicKind;
-        }
-
         public override IntrinsicType Type => IntrinsicType.Warp;
 
         /// <summary>
         /// Returns the assigned intrinsic kind.
         /// </summary>
-        public WarpIntrinsicKind IntrinsicKind { get; }
+        public WarpIntrinsicKind IntrinsicKind { get; } = intrinsicKind;
     }
 
     partial class Intrinsics

@@ -14,17 +14,14 @@ namespace ILGPU.IR.Types
     /// <summary>
     /// Represents an abstract object value.
     /// </summary>
-    public abstract class ObjectType : TypeNode
+    /// <remarks>
+    /// Constructs a new object type.
+    /// </remarks>
+    /// <param name="typeContext">The parent type context.</param>
+    public abstract class ObjectType(IRTypeContext typeContext) : TypeNode(typeContext)
     {
-        #region Instance
 
-        /// <summary>
-        /// Constructs a new object type.
-        /// </summary>
-        /// <param name="typeContext">The parent type context.</param>
-        protected ObjectType(IRTypeContext typeContext)
-            : base(typeContext)
-        { }
+        #region Instance
 
         #endregion
 

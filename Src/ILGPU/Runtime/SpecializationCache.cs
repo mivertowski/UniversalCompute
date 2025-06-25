@@ -40,38 +40,29 @@ namespace ILGPU.Runtime
     /// <typeparam name="TLoader">The associated loader type.</typeparam>
     /// <typeparam name="TArgs">The arguments key type for caching.</typeparam>
     /// <typeparam name="TDelegate">The launcher delegate type.</typeparam>
-    internal class SpecializationCache<TLoader, TArgs, TDelegate> : DisposeBase
+    /// <remarks>
+    /// Constructs a new specialization cache.
+    /// </remarks>
+    /// <param name="accelerator">The parent accelerator.</param>
+    /// <param name="kernelMethod">The IR kernel method.</param>
+    /// <param name="loader">The loader instance.</param>
+    /// <param name="entry">The associated entry point.</param>
+    /// <param name="specialization">The kernel specialization.</param>
+    internal class SpecializationCache<TLoader, TArgs, TDelegate>(
+        Accelerator accelerator,
+        Method kernelMethod,
+        TLoader loader,
+        EntryPointDescription entry,
+        KernelSpecialization specialization) : DisposeBase
         where TLoader : struct, Accelerator.IKernelLoader
         where TArgs : struct, ISpecializationCacheArgs
         where TDelegate : Delegate
     {
         #region Instance
 
-        private readonly ReaderWriterLockSlim cacheLock = new ReaderWriterLockSlim();
+        private readonly ReaderWriterLockSlim cacheLock = new();
         private readonly Dictionary<TArgs, TDelegate> kernelCache =
-            new Dictionary<TArgs, TDelegate>();
-
-        /// <summary>
-        /// Constructs a new specialization cache.
-        /// </summary>
-        /// <param name="accelerator">The parent accelerator.</param>
-        /// <param name="kernelMethod">The IR kernel method.</param>
-        /// <param name="loader">The loader instance.</param>
-        /// <param name="entry">The associated entry point.</param>
-        /// <param name="specialization">The kernel specialization.</param>
-        public SpecializationCache(
-            Accelerator accelerator,
-            Method kernelMethod,
-            TLoader loader,
-            EntryPointDescription entry,
-            KernelSpecialization specialization)
-        {
-            Accelerator = accelerator;
-            KernelMethod = kernelMethod;
-            Loader = loader;
-            Entry = entry;
-            KernelSpecialization = specialization;
-        }
+            new();
 
         #endregion
 
@@ -80,27 +71,27 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Returns the associated accelerator.
         /// </summary>
-        public Accelerator Accelerator { get; }
+        public Accelerator Accelerator { get; } = accelerator;
 
         /// <summary>
         /// Returns the associated raw kernel method.
         /// </summary>
-        public Method KernelMethod { get; }
+        public Method KernelMethod { get; } = kernelMethod;
 
         /// <summary>
         /// Returns the associated kernel loader.
         /// </summary>
-        public TLoader Loader { get; }
+        public TLoader Loader { get; } = loader;
 
         /// <summary>
         /// Returns the current entry point description.
         /// </summary>
-        public EntryPointDescription Entry { get; }
+        public EntryPointDescription Entry { get; } = entry;
 
         /// <summary>
         /// Returns the current kernel specialization.
         /// </summary>
-        public KernelSpecialization KernelSpecialization { get; }
+        public KernelSpecialization KernelSpecialization { get; } = specialization;
 
         #endregion
 

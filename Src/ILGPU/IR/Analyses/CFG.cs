@@ -138,7 +138,7 @@ namespace ILGPU.IR.Analyses
                 /// </summary>
                 /// <returns>The resulting node enumerator.</returns>
                 public Enumerator GetEnumerator() =>
-                    new Enumerator(CFG, links.GetEnumerator());
+                    new(CFG, links.GetEnumerator());
 
                 #endregion
             }
@@ -186,14 +186,14 @@ namespace ILGPU.IR.Analyses
             /// <summary>
             /// Returns the predecessors of this node.
             /// </summary>
-            public NodeCollection Predecessors => new NodeCollection(
+            public NodeCollection Predecessors => new(
                 CFG,
                 GetPredecessors());
 
             /// <summary>
             /// Returns the successors of this node.
             /// </summary>
-            public NodeCollection Successors => new NodeCollection(
+            public NodeCollection Successors => new(
                 CFG,
                 GetSuccessors());
 
@@ -322,7 +322,7 @@ namespace ILGPU.IR.Analyses
         /// <param name="blocks">The block collection.</param>
         public static CFG<TOrder, TDirection> Create(
             in BasicBlockCollection<TOrder, TDirection> blocks) =>
-            new CFG<TOrder, TDirection>(blocks);
+            new(blocks);
 
         #endregion
 
@@ -357,7 +357,7 @@ namespace ILGPU.IR.Analyses
         /// <summary>
         /// Returns the root node.
         /// </summary>
-        public Node Root => new Node(
+        public Node Root => new(
             this,
             Blocks.EntryBlock,
             numbering[Blocks.EntryBlock]);
@@ -367,7 +367,7 @@ namespace ILGPU.IR.Analyses
         /// </summary>
         /// <param name="block">The basic block to resolve.</param>
         /// <returns>The resolved basic block.</returns>
-        public Node this[BasicBlock block] => new Node(
+        public Node this[BasicBlock block] => new(
             this,
             block,
             numbering[block]);
@@ -383,7 +383,7 @@ namespace ILGPU.IR.Analyses
         /// <returns>The resulting node enumerator.</returns>
         public Enumerator<BasicBlockCollection<TOrder, TDirection>.Enumerator>
             GetEnumerator() =>
-            new Enumerator<BasicBlockCollection<TOrder, TDirection>.Enumerator>(
+            new(
                 this,
                 Blocks.GetEnumerator());
 

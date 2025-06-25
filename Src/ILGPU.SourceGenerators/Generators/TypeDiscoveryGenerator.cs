@@ -126,7 +126,7 @@ namespace ILGPU.SourceGenerators.Generators
         {
             var validTypes = types.Where(t => t is not null).Cast<KernelTypeInfo>().ToList();
 
-            if (!validTypes.Any())
+            if (validTypes.Count == 0)
                 return;
 
             var sourceCode = GenerateTypeRegistryClass(validTypes);
@@ -246,16 +246,10 @@ namespace ILGPU.SourceGenerators.Generators
     /// <summary>
     /// Information about a type for kernel usage analysis.
     /// </summary>
-    internal sealed class KernelTypeInfo
+    internal sealed class KernelTypeInfo(INamedTypeSymbol typeSymbol, KernelTypeAnalysis analysis)
     {
-        public INamedTypeSymbol TypeSymbol { get; }
-        public KernelTypeAnalysis Analysis { get; }
-
-        public KernelTypeInfo(INamedTypeSymbol typeSymbol, KernelTypeAnalysis analysis)
-        {
-            TypeSymbol = typeSymbol;
-            Analysis = analysis;
-        }
+        public INamedTypeSymbol TypeSymbol { get; } = typeSymbol;
+        public KernelTypeAnalysis Analysis { get; } = analysis;
     }
 
     /// <summary>

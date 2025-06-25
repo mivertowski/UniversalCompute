@@ -52,7 +52,7 @@ namespace ILGPU.IR
         /// <param name="name">The name of the method reference.</param>
         /// <returns>The created method handle.</returns>
         public static MethodHandle Create(string name) =>
-            new MethodHandle(0, name);
+            new(0, name);
 
         #endregion
 
@@ -317,7 +317,7 @@ namespace ILGPU.IR
         /// <param name="returnType">The return type to specialize.</param>
         /// <returns>The specialized method declaration.</returns>
         public MethodDeclaration Specialize(TypeNode returnType) =>
-            new MethodDeclaration(Handle, returnType, Source, Flags);
+            new(Handle, returnType, Source, Flags);
 
         /// <summary>
         /// Returns true if this declaration has the given method flags.
@@ -332,14 +332,14 @@ namespace ILGPU.IR
         /// </summary>
         /// <param name="flags">The flags to add.</param>
         public MethodDeclaration AddFlags(MethodFlags flags) =>
-            new MethodDeclaration(Handle, ReturnType, Source, Flags | flags);
+            new(Handle, ReturnType, Source, Flags | flags);
 
         /// <summary>
         /// Removes the given flags from this declaration.
         /// </summary>
         /// <param name="flags">The flags to remove.</param>
         public MethodDeclaration RemoveFlags(MethodFlags flags) =>
-            new MethodDeclaration(Handle, ReturnType, Source, Flags & ~flags);
+            new(Handle, ReturnType, Source, Flags & ~flags);
 
         #endregion
 

@@ -24,7 +24,10 @@ namespace ILGPU.Backends.Velocity
     /// <summary>
     /// An abstract target specializer used to generated vectorized instructions.
     /// </summary>
-    abstract class VelocityTargetSpecializer
+    abstract class VelocityTargetSpecializer(
+        int warpSize,
+        Type warpType32,
+        Type warpType64)
     {
         #region Static
 
@@ -99,18 +102,7 @@ namespace ILGPU.Backends.Velocity
         internal static void DebuggerBreakImpl() => Debugger.Break();
 
         #endregion
-
         #region Instance
-
-        protected VelocityTargetSpecializer(
-            int warpSize,
-            Type warpType32,
-            Type warpType64)
-        {
-            WarpSize = warpSize;
-            WarpType32 = warpType32;
-            WarpType64 = warpType64;
-        }
 
         #endregion
 
@@ -119,19 +111,19 @@ namespace ILGPU.Backends.Velocity
         /// <summary>
         /// Returns the warp size associated with this target specializer.
         /// </summary>
-        public int WarpSize { get; }
+        public int WarpSize { get; } = warpSize;
 
         /// <summary>
         /// Returns the type representing a current warp value instance operating on 32
         /// bit values.
         /// </summary>
-        public Type WarpType32 { get; }
+        public Type WarpType32 { get; } = warpType32;
 
         /// <summary>
         /// Returns the type representing a current warp value instance operating on 64
         /// bit values.
         /// </summary>
-        public Type WarpType64 { get; }
+        public Type WarpType64 { get; } = warpType64;
 
         #endregion
 

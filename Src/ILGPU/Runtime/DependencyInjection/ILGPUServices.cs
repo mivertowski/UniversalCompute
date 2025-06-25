@@ -100,14 +100,9 @@ namespace ILGPU.Runtime.DependencyInjection
     /// <summary>
     /// Default implementation of context factory.
     /// </summary>
-    internal sealed class DefaultContextFactory : IContextFactory
+    internal sealed class DefaultContextFactory(IOptions<ILGPUOptions> options) : IContextFactory
     {
-        private readonly IOptions<ILGPUOptions> _options;
-
-        public DefaultContextFactory(IOptions<ILGPUOptions> options)
-        {
-            _options = options ?? throw new ArgumentNullException(nameof(options));
-        }
+        private readonly IOptions<ILGPUOptions> _options = options ?? throw new ArgumentNullException(nameof(options));
 
         public Context CreateContext()
         {
@@ -127,14 +122,9 @@ namespace ILGPU.Runtime.DependencyInjection
     /// <summary>
     /// Default implementation of accelerator factory.
     /// </summary>
-    internal sealed class DefaultAcceleratorFactory : IAcceleratorFactory
+    internal sealed class DefaultAcceleratorFactory(IOptions<ILGPUOptions> options) : IAcceleratorFactory
     {
-        private readonly IOptions<ILGPUOptions> _options;
-
-        public DefaultAcceleratorFactory(IOptions<ILGPUOptions> options)
-        {
-            _options = options ?? throw new ArgumentNullException(nameof(options));
-        }
+        private readonly IOptions<ILGPUOptions> _options = options ?? throw new ArgumentNullException(nameof(options));
 
         public Accelerator CreateAccelerator(Context context, AcceleratorType acceleratorType)
         {

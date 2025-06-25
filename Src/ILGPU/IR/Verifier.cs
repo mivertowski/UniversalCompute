@@ -32,7 +32,7 @@ namespace ILGPU.IR
         /// The internal mapping of error messages.
         /// </summary>
         private readonly Dictionary<Node, string> errors =
-            new Dictionary<Node, string>();
+            new();
 
         #endregion
 
@@ -112,20 +112,15 @@ namespace ILGPU.IR
         /// <summary>
         /// An abstract verifier.
         /// </summary>
-        private abstract class VerifierBase
+        /// <remarks>
+        /// Constructs a new verifier base.
+        /// </remarks>
+        /// <param name="method">The method to verify.</param>
+        /// <param name="result">The verification result.</param>
+        private abstract class VerifierBase(Method method, VerificationResult result)
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new verifier base.
-            /// </summary>
-            /// <param name="method">The method to verify.</param>
-            /// <param name="result">The verification result.</param>
-            protected VerifierBase(Method method, VerificationResult result)
-            {
-                Method = method ?? throw new ArgumentNullException(nameof(method));
-                Result = result ?? throw new ArgumentNullException(nameof(result));
-            }
+            #region Instance
 
             #endregion
 
@@ -134,12 +129,12 @@ namespace ILGPU.IR
             /// <summary>
             /// Returns the method to verify.
             /// </summary>
-            public Method Method { get; }
+            public Method Method { get; } = method ?? throw new ArgumentNullException(nameof(method));
 
             /// <summary>
             /// The verification result.
             /// </summary>
-            public VerificationResult Result { get; }
+            public VerificationResult Result { get; } = result ?? throw new ArgumentNullException(nameof(result));
 
             #endregion
 
@@ -179,7 +174,12 @@ namespace ILGPU.IR
         /// <summary>
         /// Verifiers the general structure of the control flow.
         /// </summary>
-        private sealed class ControlFlowVerifier : VerifierBase
+        /// <remarks>
+        /// Constructs a new control-flow verifier.
+        /// </remarks>
+        /// <param name="method">The method to verify.</param>
+        /// <param name="result">The verification result.</param>
+        private sealed class ControlFlowVerifier(Method method, VerificationResult result) : VerifierBase(method, result)
         {
             #region Instance
 
@@ -187,15 +187,6 @@ namespace ILGPU.IR
                 new(new BasicBlock.Comparer());
             private readonly Dictionary<BasicBlock, HashSet<BasicBlock>> successors =
                 new(new BasicBlock.Comparer());
-
-            /// <summary>
-            /// Constructs a new control-flow verifier.
-            /// </summary>
-            /// <param name="method">The method to verify.</param>
-            /// <param name="result">The verification result.</param>
-            public ControlFlowVerifier(Method method, VerificationResult result)
-                : base(method, result)
-            { }
 
             #endregion
 
@@ -299,22 +290,18 @@ namespace ILGPU.IR
         /// <summary>
         /// Verifiers the general SSA value properties of the program.
         /// </summary>
-        private sealed class ValueVerifier : VerifierBase
+        /// <remarks>
+        /// Constructs a new value verifier.
+        /// </remarks>
+        /// <param name="method">The method to verify.</param>
+        /// <param name="result">The verification result.</param>
+        private sealed class ValueVerifier(Method method, VerificationResult result) : VerifierBase(method, result)
         {
             #region Instance
 
-            private readonly HashSet<Value> values = new HashSet<Value>();
+            private readonly HashSet<Value> values = new();
             private readonly Dictionary<BasicBlock, HashSet<Value>> mapping =
-                new Dictionary<BasicBlock, HashSet<Value>>(new BasicBlock.Comparer());
-
-            /// <summary>
-            /// Constructs a new value verifier.
-            /// </summary>
-            /// <param name="method">The method to verify.</param>
-            /// <param name="result">The verification result.</param>
-            public ValueVerifier(Method method, VerificationResult result)
-                : base(method, result)
-            { }
+                new(new BasicBlock.Comparer());
 
             #endregion
 
@@ -487,7 +474,7 @@ namespace ILGPU.IR
         private sealed class NoVerifier : Verifier
         {
             private static readonly VerificationResult NoResult =
-                new VerificationResult();
+                new();
 
             /// <summary>
             /// Performs no verification step.
@@ -515,7 +502,7 @@ namespace ILGPU.IR
         /// <summary>
         /// Returns a verifier instance that verifies all IR methods.
         /// </summary>
-        public static readonly Verifier Instance = new Verifier();
+        public static readonly Verifier Instance = new();
 
         /// <summary>
         /// Returns an empty verifier that does not perform any verification steps.

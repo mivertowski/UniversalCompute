@@ -449,11 +449,9 @@ namespace ILGPU.ML
 
         #region Matrix Multiplication Implementations
 
-        private static void TensorCoreMatMul(Tensor<T> a, Tensor<T> b, Tensor<T> result)
-        {
+        private static void TensorCoreMatMul(Tensor<T> a, Tensor<T> b, Tensor<T> result) =>
             // Tensor core operations require specialized implementations for each precision
             throw new NotImplementedException("Tensor core matrix multiplication requires specialized precision-specific implementation");
-        }
 
         private static void RegularMatMul(Tensor<T> a, Tensor<T> b, Tensor<T> result)
         {
@@ -547,10 +545,7 @@ namespace ILGPU.ML
         /// Creates a tensor from CPU data.
         /// </summary>
         public static Tensor<T> FromArray<T>(Accelerator accelerator, TensorShape shape, T[] data)
-            where T : unmanaged, INumber<T>
-        {
-            return new Tensor<T>(accelerator, shape, data);
-        }
+            where T : unmanaged, INumber<T> => new Tensor<T>(accelerator, shape, data);
 
         private static void FillOnesKernel<T>(Index1D index, ArrayView<T> output)
             where T : unmanaged, INumber<T>

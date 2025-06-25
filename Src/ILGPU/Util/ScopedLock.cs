@@ -84,7 +84,7 @@ namespace ILGPU.Util
         /// Enters a new write lock.
         /// </summary>
         public WriteScopedLock EnterWriteScope() =>
-            new WriteScopedLock(syncLock);
+            new(syncLock);
 
         /// <summary>
         /// Releases the upgradeable read lock.
@@ -103,20 +103,20 @@ namespace ILGPU.Util
         /// </summary>
         public static ReadOnlyScopedLock EnterReadScope(
             this ReaderWriterLockSlim readerWriterLock) =>
-            new ReadOnlyScopedLock(readerWriterLock);
+            new(readerWriterLock);
 
         /// <summary>
         /// Enters a new upgradeable read scope.
         /// </summary>
         public static UpgradeableScopedLock EnterUpgradeableReadScope(
             this ReaderWriterLockSlim readerWriterLock) =>
-            new UpgradeableScopedLock(readerWriterLock);
+            new(readerWriterLock);
 
         /// <summary>
         /// Enters a new write scope.
         /// </summary>
         public static WriteScopedLock EnterWriteScope(
             this ReaderWriterLockSlim readerWriterLock) =>
-            new WriteScopedLock(readerWriterLock);
+            new(readerWriterLock);
     }
 }

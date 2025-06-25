@@ -257,13 +257,13 @@ namespace ILGPU.IR.Construction
         /// Maps old phi nodes to new phi builders.
         /// </summary>
         private readonly List<(PhiValue, PhiValue.Builder)> phiMapping =
-            new List<(PhiValue, PhiValue.Builder)>();
+            new();
 
         /// <summary>
         /// Maps old nodes to new nodes.
         /// </summary>
         private readonly Dictionary<Value, Value> valueMapping =
-            new Dictionary<Value, Value>();
+            new();
 
         /// <summary>
         /// Constructs a new IR rebuilder.

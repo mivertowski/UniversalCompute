@@ -23,8 +23,13 @@ namespace ILGPU.Backends.SeparateViews
     /// and relies on separate driver support to map the actual device
     /// pointers to allocated memory buffers.
     /// </summary>
+    /// <remarks>
+    /// Constructs a new array view implementation.
+    /// </remarks>
+    /// <param name="index">The index into the view.</param>
+    /// <param name="length">The length information.</param>
     [StructLayout(LayoutKind.Sequential)]
-    public unsafe readonly struct ViewImplementation
+    public unsafe readonly struct ViewImplementation(long index, long length)
     {
         #region Static
 
@@ -64,7 +69,7 @@ namespace ILGPU.Backends.SeparateViews
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ViewImplementation Create<T>(ArrayView<T> source)
             where T : unmanaged =>
-            new ViewImplementation(source.Index, source.Length);
+            new(source.Index, source.Length);
 
         /// <summary>
         /// Returns the index field of a view implementation.
@@ -93,7 +98,7 @@ namespace ILGPU.Backends.SeparateViews
             "Microsoft.Design",
             "CA1051: DoNotDeclareVisibleInstanceFields",
             Justification = "Implementation type that simplifies code generation")]
-        public readonly long Index;
+        public readonly long Index = index;
 
         /// <summary>
         /// The length.
@@ -102,18 +107,7 @@ namespace ILGPU.Backends.SeparateViews
             "Microsoft.Design",
             "CA1051: DoNotDeclareVisibleInstanceFields",
             Justification = "Implementation type that simplifies code generation")]
-        public readonly long Length;
-
-        /// <summary>
-        /// Constructs a new array view implementation.
-        /// </summary>
-        /// <param name="index">The index into the view.</param>
-        /// <param name="length">The length information.</param>
-        public ViewImplementation(long index, long length)
-        {
-            Index = index;
-            Length = length;
-        }
+        public readonly long Length = length;
 
         #endregion
     }

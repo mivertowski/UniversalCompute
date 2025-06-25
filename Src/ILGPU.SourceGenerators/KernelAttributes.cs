@@ -35,7 +35,7 @@ namespace ILGPU.SourceGenerators
         /// <summary>
         /// Indicates whether this kernel should be optimized for specific GPU architectures.
         /// </summary>
-        public bool ArchitectureSpecific { get; set; } = false;
+        public bool ArchitectureSpecific { get; set; }
 
         /// <summary>
         /// Specifies the optimization level for the generated launcher.

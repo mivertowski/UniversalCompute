@@ -68,21 +68,17 @@ namespace ILGPU.IR
         /// <summary>
         /// Represents a function predicate for functions to transform.
         /// </summary>
-        public readonly struct ToTransform : IMethodCollectionPredicate
+        /// <remarks>
+        /// Constructs a new function predicate.
+        /// </remarks>
+        /// <param name="flags">The desired flags that should not be set.</param>
+        public readonly struct ToTransform(MethodTransformationFlags flags) : IMethodCollectionPredicate
         {
-            /// <summary>
-            /// Constructs a new function predicate.
-            /// </summary>
-            /// <param name="flags">The desired flags that should not be set.</param>
-            public ToTransform(MethodTransformationFlags flags)
-            {
-                Flags = flags;
-            }
 
             /// <summary>
             /// Returns the flags that should not be set on the target function.
             /// </summary>
-            public MethodTransformationFlags Flags { get; }
+            public MethodTransformationFlags Flags { get; } = flags;
 
             /// <summary cref="IMethodCollectionPredicate.Match(Method)"/>
             public bool Match(Method method) =>
@@ -93,9 +89,13 @@ namespace ILGPU.IR
         /// <summary>
         /// Represents a predicate based on a hash set implementation.
         /// </summary>
-        public readonly struct SetPredicate : IMethodCollectionPredicate
+        /// <remarks>
+        /// Constructs a new set predicate using a method set.
+        /// </remarks>
+        /// <param name="methods">The method set to use.</param>
+        public readonly struct SetPredicate(HashSet<Method> methods) : IMethodCollectionPredicate
         {
-            private readonly HashSet<Method> methodSet;
+            private readonly HashSet<Method> methodSet = methods;
 
             /// <summary>
             /// Constructs a new set predicate using a method collection.
@@ -104,15 +104,6 @@ namespace ILGPU.IR
             public SetPredicate(in MethodCollection methods)
                 : this(methods.ToSet())
             { }
-
-            /// <summary>
-            /// Constructs a new set predicate using a method set.
-            /// </summary>
-            /// <param name="methods">The method set to use.</param>
-            public SetPredicate(HashSet<Method> methods)
-            {
-                methodSet = methods;
-            }
 
             /// <summary>
             /// Returns true if the given method is contained in the encapsulated set.
@@ -235,7 +226,7 @@ namespace ILGPU.IR
         /// Returns an enumerator that enumerates all stored values.
         /// </summary>
         /// <returns>An enumerator that enumerates all stored values.</returns>
-        public readonly Enumerator GetEnumerator() => new Enumerator(Collection);
+        public readonly Enumerator GetEnumerator() => new(Collection);
 
         /// <summary cref="IEnumerable{T}.GetEnumerator"/>
         IEnumerator<Method> IEnumerable<Method>.GetEnumerator() => GetEnumerator();

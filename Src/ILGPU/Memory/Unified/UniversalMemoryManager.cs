@@ -166,11 +166,8 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         /// <param name="accelerator">The accelerator.</param>
         /// <returns>The accelerator memory manager.</returns>
-        internal AcceleratorMemoryManager GetAcceleratorManager(Accelerator accelerator)
-        {
-            return _acceleratorManagers.GetOrAdd(accelerator, 
+        internal AcceleratorMemoryManager GetAcceleratorManager(Accelerator accelerator) => _acceleratorManagers.GetOrAdd(accelerator,
                 acc => new AcceleratorMemoryManager(acc));
-        }
 
         /// <summary>
         /// Records memory usage for tracking and optimization.
@@ -178,10 +175,7 @@ namespace ILGPU.Memory.Unified
         /// <param name="accelerator">The accelerator.</param>
         /// <param name="sizeInBytes">The allocated size in bytes.</param>
         /// <param name="placement">The memory placement used.</param>
-        internal void RecordAllocation(Accelerator accelerator, long sizeInBytes, MemoryPlacement placement)
-        {
-            _usageTracker.RecordAllocation(accelerator, sizeInBytes, placement);
-        }
+        internal void RecordAllocation(Accelerator accelerator, long sizeInBytes, MemoryPlacement placement) => _usageTracker.RecordAllocation(accelerator, sizeInBytes, placement);
 
         /// <summary>
         /// Records memory deallocation for tracking.
@@ -189,10 +183,7 @@ namespace ILGPU.Memory.Unified
         /// <param name="accelerator">The accelerator.</param>
         /// <param name="sizeInBytes">The deallocated size in bytes.</param>
         /// <param name="placement">The memory placement used.</param>
-        internal void RecordDeallocation(Accelerator accelerator, long sizeInBytes, MemoryPlacement placement)
-        {
-            _usageTracker.RecordDeallocation(accelerator, sizeInBytes, placement);
-        }
+        internal void RecordDeallocation(Accelerator accelerator, long sizeInBytes, MemoryPlacement placement) => _usageTracker.RecordDeallocation(accelerator, sizeInBytes, placement);
 
         /// <summary>
         /// Gets optimal buffer placement recommendations based on current usage patterns.
@@ -275,56 +266,46 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Provides placement recommendations based on usage patterns.
     /// </summary>
-    public readonly struct MemoryPlacementRecommendations
+    /// <remarks>
+    /// Initializes a new instance of the MemoryPlacementRecommendations struct.
+    /// </remarks>
+    public readonly struct MemoryPlacementRecommendations(
+        MemoryPlacement smallBuffers,
+        MemoryPlacement mediumBuffers,
+        MemoryPlacement largeBuffers,
+        MemoryPlacement frequentlyAccessed,
+        MemoryPlacement readOnly,
+        string[] optimizationHints)
     {
         /// <summary>
         /// Gets the recommended placement for small buffers (&lt; 64KB).
         /// </summary>
-        public MemoryPlacement SmallBuffers { get; }
+        public MemoryPlacement SmallBuffers { get; } = smallBuffers;
 
         /// <summary>
         /// Gets the recommended placement for medium buffers (64KB - 16MB).
         /// </summary>
-        public MemoryPlacement MediumBuffers { get; }
+        public MemoryPlacement MediumBuffers { get; } = mediumBuffers;
 
         /// <summary>
         /// Gets the recommended placement for large buffers (&gt; 16MB).
         /// </summary>
-        public MemoryPlacement LargeBuffers { get; }
+        public MemoryPlacement LargeBuffers { get; } = largeBuffers;
 
         /// <summary>
         /// Gets the recommended placement for frequently accessed buffers.
         /// </summary>
-        public MemoryPlacement FrequentlyAccessed { get; }
+        public MemoryPlacement FrequentlyAccessed { get; } = frequentlyAccessed;
 
         /// <summary>
         /// Gets the recommended placement for read-only buffers.
         /// </summary>
-        public MemoryPlacement ReadOnly { get; }
+        public MemoryPlacement ReadOnly { get; } = readOnly;
 
         /// <summary>
         /// Gets additional optimization hints.
         /// </summary>
-        public string[] OptimizationHints { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the MemoryPlacementRecommendations struct.
-        /// </summary>
-        public MemoryPlacementRecommendations(
-            MemoryPlacement smallBuffers,
-            MemoryPlacement mediumBuffers,
-            MemoryPlacement largeBuffers,
-            MemoryPlacement frequentlyAccessed,
-            MemoryPlacement readOnly,
-            string[] optimizationHints)
-        {
-            SmallBuffers = smallBuffers;
-            MediumBuffers = mediumBuffers;
-            LargeBuffers = largeBuffers;
-            FrequentlyAccessed = frequentlyAccessed;
-            ReadOnly = readOnly;
-            OptimizationHints = optimizationHints;
-        }
+        public string[] OptimizationHints { get; } = optimizationHints;
     }
 
 }

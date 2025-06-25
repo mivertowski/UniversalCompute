@@ -168,7 +168,7 @@ namespace ILGPU.Runtime.Velocity
         /// <param name="context">The ILGPU context.</param>
         /// <returns>The created CPU accelerator.</returns>
         public VelocityAccelerator CreateVelocityAccelerator(Context context) =>
-            new VelocityAccelerator(context, this);
+            new(context, this);
 
         #endregion
 

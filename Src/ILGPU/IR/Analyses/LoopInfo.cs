@@ -38,19 +38,15 @@ namespace ILGPU.IR.Analyses
         /// block of a particular loop. This emulates a return exit block without any
         /// successors.
         /// </summary>
-        private readonly struct ExitSuccessorProvider :
+        /// <remarks>
+        /// Constructs a new successor provider.
+        /// </remarks>
+        /// <param name="exitBlock">The exit block.</param>
+        private readonly struct ExitSuccessorProvider(BasicBlock exitBlock) :
             ITraversalSuccessorsProvider<TDirection>
         {
-            #region Instance
 
-            /// <summary>
-            /// Constructs a new successor provider.
-            /// </summary>
-            /// <param name="exitBlock">The exit block.</param>
-            public ExitSuccessorProvider(BasicBlock exitBlock)
-            {
-                ExitBlock = exitBlock;
-            }
+            #region Instance
 
             #endregion
 
@@ -60,7 +56,7 @@ namespace ILGPU.IR.Analyses
             /// Returns the unique exit block (the first block that does not belong to
             /// the loop).
             /// </summary>
-            public BasicBlock ExitBlock { get; }
+            public BasicBlock ExitBlock { get; } = exitBlock;
 
             #endregion
 
@@ -85,25 +81,19 @@ namespace ILGPU.IR.Analyses
         /// the header blocks of a particular loop. This emulates a return exit block
         /// without any successors.
         /// </summary>
-        private readonly struct ExitAndHeaderSuccessorProvider :
+        /// <remarks>
+        /// Constructs a new successor provider.
+        /// </remarks>
+        /// <param name="exitBlock">The exit block.</param>
+        /// <param name="headerBlock">The header block.</param>
+        private readonly struct ExitAndHeaderSuccessorProvider(
+            BasicBlock exitBlock,
+            BasicBlock headerBlock) :
             ITraversalSuccessorsProvider<TDirection>
         {
             #region Instance
 
-            private readonly ExitSuccessorProvider exitProvider;
-
-            /// <summary>
-            /// Constructs a new successor provider.
-            /// </summary>
-            /// <param name="exitBlock">The exit block.</param>
-            /// <param name="headerBlock">The header block.</param>
-            public ExitAndHeaderSuccessorProvider(
-                BasicBlock exitBlock,
-                BasicBlock headerBlock)
-            {
-                exitProvider = new ExitSuccessorProvider(exitBlock);
-                HeaderBlock = headerBlock;
-            }
+            private readonly ExitSuccessorProvider exitProvider = new ExitSuccessorProvider(exitBlock);
 
             #endregion
 
@@ -113,7 +103,7 @@ namespace ILGPU.IR.Analyses
             /// Returns the unique header block (the first block that belongs to the
             /// loop).
             /// </summary>
-            public BasicBlock HeaderBlock { get; }
+            public BasicBlock HeaderBlock { get; } = headerBlock;
 
             #endregion
 
@@ -596,7 +586,7 @@ namespace ILGPU.IR.Analyses
         /// <returns>The created loop information container.</returns>
         public static LoopInfos<TOrder, TDirection> Create(
             Loops<TOrder, TDirection> loops) =>
-            new LoopInfos<TOrder, TDirection>(loops);
+            new(loops);
 
         #endregion
 

@@ -33,7 +33,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Represents unknown or unavailable device information.
         /// </summary>
-        public static readonly DeviceErrorInfo Unknown = new();
+        public static readonly DeviceErrorInfo Unknown;
 
         /// <summary>
         /// Initializes a new instance of the DeviceErrorInfo struct.

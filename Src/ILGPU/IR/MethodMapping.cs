@@ -174,10 +174,10 @@ namespace ILGPU.IR
         #region Instance
 
         private readonly Dictionary<MethodBase, MethodHandle> managedMethods =
-            new Dictionary<MethodBase, MethodHandle>();
+            new();
         private readonly Dictionary<MethodHandle, int> methods =
-            new Dictionary<MethodHandle, int>();
-        private readonly List<T> dataList = new List<T>();
+            new();
+        private readonly List<T> dataList = new();
 
         #endregion
 
@@ -212,7 +212,7 @@ namespace ILGPU.IR
         /// Constructs a readonly object view.
         /// </summary>
         /// <returns>The created readonly object view.</returns>
-        public ReadOnlyCollection AsReadOnly() => new ReadOnlyCollection(this);
+        public ReadOnlyCollection AsReadOnly() => new(this);
 
         /// <summary>
         /// Tries to resolve the given managed method to function reference.
@@ -317,7 +317,7 @@ namespace ILGPU.IR
         /// Returns an enumerator that enumerates all stored values.
         /// </summary>
         /// <returns>An enumerator that enumerates all stored values.</returns>
-        public Enumerator GetEnumerator() => new Enumerator(dataList);
+        public Enumerator GetEnumerator() => new(dataList);
 
         #endregion
     }

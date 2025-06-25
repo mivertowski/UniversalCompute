@@ -107,10 +107,7 @@ namespace ILGPU.CrossPlatform
         /// This is automatically translated to the appropriate barrier instruction
         /// for each backend (CUDA __syncthreads(), OpenCL barrier(), etc.).
         /// </summary>
-        public static void SynchronizeGroup()
-        {
-            Group.Barrier();
-        }
+        public static void SynchronizeGroup() => Group.Barrier();
 
         /// <summary>
         /// Checks if the current thread is the first thread in its work group/block.
@@ -152,9 +149,6 @@ namespace ILGPU.CrossPlatform
         /// </summary>
         /// <param name="bound">The 1D bound to check against.</param>
         /// <returns>True if the current thread is within bounds.</returns>
-        public static bool IsWithinBounds(int bound)
-        {
-            return GlobalIndex1D < bound;
-        }
+        public static bool IsWithinBounds(int bound) => GlobalIndex1D < bound;
     }
 }

@@ -197,55 +197,45 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Provides statistics about universal buffer memory usage.
     /// </summary>
-    public readonly struct UniversalBufferStats
+    /// <remarks>
+    /// Initializes a new instance of the UniversalBufferStats struct.
+    /// </remarks>
+    public readonly struct UniversalBufferStats(
+        long totalAllocatedBytes,
+        int migrationCount,
+        double totalMigrationTimeMs,
+        double averageMigrationBandwidthGBps,
+        int activeCopies,
+        DataLocation currentLocation)
     {
         /// <summary>
         /// Gets the total memory allocated for this buffer across all locations.
         /// </summary>
-        public long TotalAllocatedBytes { get; }
+        public long TotalAllocatedBytes { get; } = totalAllocatedBytes;
 
         /// <summary>
         /// Gets the number of times data has been migrated between locations.
         /// </summary>
-        public int MigrationCount { get; }
+        public int MigrationCount { get; } = migrationCount;
 
         /// <summary>
         /// Gets the total time spent on data migrations in milliseconds.
         /// </summary>
-        public double TotalMigrationTimeMs { get; }
+        public double TotalMigrationTimeMs { get; } = totalMigrationTimeMs;
 
         /// <summary>
         /// Gets the average bandwidth achieved during migrations in GB/s.
         /// </summary>
-        public double AverageMigrationBandwidthGBps { get; }
+        public double AverageMigrationBandwidthGBps { get; } = averageMigrationBandwidthGBps;
 
         /// <summary>
         /// Gets the number of accelerators that have copies of this buffer.
         /// </summary>
-        public int ActiveCopies { get; }
+        public int ActiveCopies { get; } = activeCopies;
 
         /// <summary>
         /// Gets the current data location.
         /// </summary>
-        public DataLocation CurrentLocation { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the UniversalBufferStats struct.
-        /// </summary>
-        public UniversalBufferStats(
-            long totalAllocatedBytes,
-            int migrationCount,
-            double totalMigrationTimeMs,
-            double averageMigrationBandwidthGBps,
-            int activeCopies,
-            DataLocation currentLocation)
-        {
-            TotalAllocatedBytes = totalAllocatedBytes;
-            MigrationCount = migrationCount;
-            TotalMigrationTimeMs = totalMigrationTimeMs;
-            AverageMigrationBandwidthGBps = averageMigrationBandwidthGBps;
-            ActiveCopies = activeCopies;
-            CurrentLocation = currentLocation;
-        }
+        public DataLocation CurrentLocation { get; } = currentLocation;
     }
 }

@@ -18,31 +18,25 @@ namespace ILGPU.Frontend.Intrinsic
     /// Marks compare intrinsics that are built in.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    sealed class CompareIntriniscAttribute : IntrinsicAttribute
+    sealed class CompareIntriniscAttribute(
+        CompareKind intrinsicKind,
+        CompareFlags intrinsicFlags) : IntrinsicAttribute
     {
         public CompareIntriniscAttribute(CompareKind intrinsicKind)
             : this(intrinsicKind, CompareFlags.None)
         { }
-
-        public CompareIntriniscAttribute(
-            CompareKind intrinsicKind,
-            CompareFlags intrinsicFlags)
-        {
-            IntrinsicKind = intrinsicKind;
-            IntrinsicFlags = intrinsicFlags;
-        }
 
         public override IntrinsicType Type => IntrinsicType.Compare;
 
         /// <summary>
         /// Returns the associated intrinsic kind.
         /// </summary>
-        public CompareKind IntrinsicKind { get; }
+        public CompareKind IntrinsicKind { get; } = intrinsicKind;
 
         /// <summary>
         /// Returns the associated intrinsic flags.
         /// </summary>
-        public CompareFlags IntrinsicFlags { get; }
+        public CompareFlags IntrinsicFlags { get; } = intrinsicFlags;
     }
 
     partial class Intrinsics

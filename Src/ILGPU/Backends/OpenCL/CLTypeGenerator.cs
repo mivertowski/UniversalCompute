@@ -170,9 +170,9 @@ namespace ILGPU.Backends.OpenCL
         #region Instance
 
         private readonly ReaderWriterLockSlim readerWriterLock =
-            new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+            new(LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<TypeNode, string> mapping =
-            new Dictionary<TypeNode, string>();
+            new();
 
         /// <summary>
         /// Constructs a new type generator and defines all required types

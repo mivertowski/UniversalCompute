@@ -335,7 +335,7 @@ namespace ILGPU
         /// <returns>The negated half value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Half Neg(Half halfValue) =>
-            new Half((ushort)(halfValue.RawValue ^ SignBitMask));
+            new((ushort)(halfValue.RawValue ^ SignBitMask));
 
         /// <summary>
         /// Returns the absolute value of the given half value.
@@ -344,7 +344,7 @@ namespace ILGPU
         /// <returns>The absolute value.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Half Abs(Half half) =>
-            new Half((ushort)(half.RawValue & ExponentMantissaMask));
+            new((ushort)(half.RawValue & ExponentMantissaMask));
 
         /// <summary>
         /// Returns true if the given half value represents a NaN value.

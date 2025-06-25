@@ -179,8 +179,8 @@ namespace ILGPU.Algorithms.Tests.CPU
         #region MemberData
 
         public static TheoryData<object, int, float, float, float> TestData =>
-            new TheoryData<object, int, float, float, float>
-        {
+            new()
+            {
             { new HimmelblauFunction(), 8192, 0.5f, 0.5f, 0.5f },
             { new EasomFunction(), 81920, 0.5f, 0.5f, 0.5f },
             { new ShafferFunction4(), 8192, 0.5f, 0.5f, 0.5f },

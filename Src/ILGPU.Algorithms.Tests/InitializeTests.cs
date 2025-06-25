@@ -16,17 +16,14 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
-    public abstract partial class InitializeTests : TestBase
+    public abstract partial class InitializeTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
     {
-        protected InitializeTests(ITestOutputHelper output, TestContext testContext)
-            : base(output, testContext)
-        { }
 
         #region MemberData
 
         public static TheoryData<object, int> SimpleTestData =>
-            new TheoryData<object, int>
-        {
+            new()
+            {
             { sbyte.MinValue, 1 },
             { byte.MaxValue, 1 },
             { short.MinValue, 1 },

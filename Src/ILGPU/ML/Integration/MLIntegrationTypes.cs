@@ -335,73 +335,55 @@ namespace ILGPU.ML.Integration
             return await Task.WhenAll(tasks);
         }
 
-        private Accelerator SelectAccelerator(ComputeSchedulingPolicy policy)
-        {
+        private Accelerator SelectAccelerator(ComputeSchedulingPolicy policy) =>
             // Simple round-robin for now
-            return _accelerators.Values.First();
-        }
+            _accelerators.Values.First();
 
         /// <summary>
         /// Gets performance statistics for all accelerators.
         /// </summary>
-        public PerformanceAnalysis GetPerformanceStats()
+        public PerformanceAnalysis GetPerformanceStats() => new PerformanceAnalysis
         {
-            return new PerformanceAnalysis
-            {
-                TotalExecutionTimeMs = 1000.0,
-                GpuUtilizationPercent = 85.0,
-                MemoryBandwidthUtilizationPercent = 75.0,
-                ComputeEfficiency = 0.9,
-                BottleneckAnalysis = "Memory bandwidth limited",
-                OptimizationSuggestions = new List<string> { "Increase batch size", "Optimize memory access patterns" }
-            };
-        }
+            TotalExecutionTimeMs = 1000.0,
+            GpuUtilizationPercent = 85.0,
+            MemoryBandwidthUtilizationPercent = 75.0,
+            ComputeEfficiency = 0.9,
+            BottleneckAnalysis = "Memory bandwidth limited",
+            OptimizationSuggestions = new List<string> { "Increase batch size", "Optimize memory access patterns" }
+        };
 
         /// <summary>
         /// Executes a computation with ML model.
         /// </summary>
         public async Task<TOutput> ExecuteAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput input)
             where TInput : class
-            where TOutput : class
-        {
-            return await model.PredictAsync(input);
-        }
+            where TOutput : class => await model.PredictAsync(input);
 
         /// <summary>
         /// Executes batch computation with ML model.
         /// </summary>
         public async Task<TOutput[]> ExecuteBatchAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput[] inputs)
             where TInput : class
-            where TOutput : class
-        {
-            return await model.PredictBatchAsync(inputs);
-        }
+            where TOutput : class => await model.PredictBatchAsync(inputs);
 
         /// <summary>
         /// Optimizes scheduling for better performance.
         /// </summary>
-        public async Task OptimizeSchedulingAsync()
-        {
+        public async Task OptimizeSchedulingAsync() =>
             // Placeholder implementation
             await Task.CompletedTask;
-        }
 
         /// <summary>
         /// Optimizes memory usage across accelerators.
         /// </summary>
-        public async Task OptimizeMemoryAsync()
-        {
+        public async Task OptimizeMemoryAsync() =>
             // Placeholder implementation
             await Task.CompletedTask;
-        }
 
         /// <summary>
         /// Analyzes performance across accelerators.
         /// </summary>
-        public PerformanceAnalysis AnalyzePerformance()
-        {
-            return GetPerformanceStats();
-        }
+        public PerformanceAnalysis AnalyzePerformance() => GetPerformanceStats();
 
         /// <summary>
         /// Disposes the hybrid compute orchestrator.
@@ -555,30 +537,25 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public async Task<OptimizedModel> OptimizeAsync(
             object model,
-            ModelCompilationOptions options)
-        {
+            ModelCompilationOptions options) =>
             // Placeholder implementation
-            return new OptimizedModel
+            new OptimizedModel
             {
                 OriginalModel = model,
                 OptimizationApplied = true,
                 OptimizationDetails = new List<string> { "Graph fusion", "Memory layout optimization" },
                 OptimizedGraph = model as ComputeGraph ?? new ComputeGraph()
             };
-        }
 
         /// <summary>
         /// Analyzes model for optimization opportunities.
         /// </summary>
-        public ModelAnalysisResult AnalyzeModel(object model)
+        public ModelAnalysisResult AnalyzeModel(object model) => new ModelAnalysisResult
         {
-            return new ModelAnalysisResult
-            {
-                TotalOperations = 1000,
-                OptimizableOperations = 800,
-                EstimatedSpeedup = 1.5
-            };
-        }
+            TotalOperations = 1000,
+            OptimizableOperations = 800,
+            EstimatedSpeedup = 1.5
+        };
 
         /// <summary>
         /// Disposes the model optimizer.
@@ -720,10 +697,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Disposes the compiled model.
         /// </summary>
-        public void Dispose()
-        {
-            Metadata?.Clear();
-        }
+        public void Dispose() => Metadata?.Clear();
     }
 
     /// <summary>
@@ -988,10 +962,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Registers a compute backend.
         /// </summary>
-        public void RegisterBackend(string name, IComputeBackend backend)
-        {
-            _backends[name] = backend;
-        }
+        public void RegisterBackend(string name, IComputeBackend backend) => _backends[name] = backend;
 
         /// <summary>
         /// Executes a computation on the specified backend.
@@ -1009,52 +980,40 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Executes an execution plan with input tensors.
         /// </summary>
-        public async Task<Dictionary<string, ITensor<float>>> ExecuteAsync(ExecutionPlan plan, Dictionary<string, ITensor<float>> inputs)
-        {
+        public async Task<Dictionary<string, ITensor<float>>> ExecuteAsync(ExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
             // Placeholder implementation
-            return await Task.FromResult(new Dictionary<string, ITensor<float>>());
-        }
+            await Task.FromResult(new Dictionary<string, ITensor<float>>());
 
         /// <summary>
         /// Executes a pre-compiled execution plan.
         /// </summary>
-        public async Task<Dictionary<string, ITensor<float>>> ExecuteCompiledAsync(CompiledExecutionPlan plan, Dictionary<string, ITensor<float>> inputs)
-        {
+        public async Task<Dictionary<string, ITensor<float>>> ExecuteCompiledAsync(CompiledExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
             // Placeholder implementation
-            return await Task.FromResult(new Dictionary<string, ITensor<float>>());
-        }
+            await Task.FromResult(new Dictionary<string, ITensor<float>>());
 
         /// <summary>
         /// Gets execution provider statistics.
         /// </summary>
-        public ExecutionProviderStats GetStats()
+        public ExecutionProviderStats GetStats() => new ExecutionProviderStats
         {
-            return new ExecutionProviderStats
-            {
-                ProviderName = "UniversalComputeEngine",
-                ExecutionCount = 0,
-                TotalExecutionTimeMs = 0,
-                AverageExecutionTimeMs = 0,
-                SuccessRate = 1.0
-            };
-        }
+            ProviderName = "UniversalComputeEngine",
+            ExecutionCount = 0,
+            TotalExecutionTimeMs = 0,
+            AverageExecutionTimeMs = 0,
+            SuccessRate = 1.0
+        };
 
         /// <summary>
         /// Optimizes memory usage based on workload analysis.
         /// </summary>
-        public async Task OptimizeMemoryAsync(WorkloadAnalysis analysis)
-        {
+        public async Task OptimizeMemoryAsync(WorkloadAnalysis analysis) =>
             // Placeholder implementation
             await Task.CompletedTask;
-        }
 
         /// <summary>
         /// Disposes the universal compute engine.
         /// </summary>
-        public void Dispose()
-        {
-            _backends.Clear();
-        }
+        public void Dispose() => _backends.Clear();
     }
 
     /// <summary>
@@ -1143,14 +1102,11 @@ namespace ILGPU.ML.Integration
         /// Creates a named ONNX value.
         /// </summary>
         public static NamedOnnxValue CreateFromArray<T>(string name, T[] data)
-            where T : unmanaged
-        {
-            return new NamedOnnxValue
+            where T : unmanaged => new NamedOnnxValue
             {
                 Name = name,
                 Value = data,
                 DataType = typeof(T).Name
             };
-        }
     }
 }
