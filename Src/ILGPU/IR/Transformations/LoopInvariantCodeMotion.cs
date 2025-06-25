@@ -32,7 +32,7 @@ namespace ILGPU.IR.Transformations
         /// <summary>
         /// Manages knowledge loop invariance.
         /// </summary>
-        private readonly struct LoopInvariance(Loops<ReversePostOrder, Forwards>.Loop loop)
+        private readonly struct LoopInvariance(Loops<ReversePostOrder, Forwards>.Node loop)
         {
             #region Instance
 

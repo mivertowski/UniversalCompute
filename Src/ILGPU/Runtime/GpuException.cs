@@ -96,6 +96,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         protected GpuException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -128,7 +129,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete]
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -225,6 +226,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         private GpuMemoryException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -247,7 +249,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete]
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -282,6 +284,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         private GpuKernelException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -304,7 +307,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete]
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -337,6 +340,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         private GpuDeviceException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -353,7 +357,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete]
+        [Obsolete("Binary serialization is obsolete and should not be used.")]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);

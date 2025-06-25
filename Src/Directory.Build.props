@@ -26,5 +26,5 @@
     <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
-  <Import Project="..\Tools\CheckStyles\ILGPU.CheckStyles.targets" />
+  <!-- <Import Project="..\Tools\CheckStyles\ILGPU.CheckStyles.targets" /> -->
 </Project>

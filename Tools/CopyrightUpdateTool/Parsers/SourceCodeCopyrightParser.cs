@@ -173,19 +173,37 @@ namespace CopyrightUpdateTool.Parsers
             FileInfo file,
             CancellationToken cancellationToken)
         {
-            // Search for the copyright block between two lines of "// ----------".
-            var linePrefix = GetLinePrefix(file);
-            var prefix = Regex.Escape(linePrefix + LineDelimiter.Repeat(10));
-            var delim = Regex.Escape(LineDelimiter);
-            var copyrightText = Regex.Escape(Config.CopyrightText);
+            var fileContent = await File.ReadAllTextAsync(file.FullName, cancellationToken);
+            var licenseType = Config.GetLicenseType(file.FullName, fileContent);
 
-            var pattern =
-                $"^(?<{CaptureGroups.Prefix}>.*)"
-                + $"(?<{CaptureGroups.Copyright}>{prefix}.*?{copyrightText}\\s*"
-                + $"(?<{CaptureGroups.StartingYear}>[\\d]*).*?{prefix}[{delim}]+"
-                + $")"
-                + $"(?<{CaptureGroups.Suffix}>.*)$";
-            return await ParseUsingRegexAsync(file, pattern, cancellationToken);
+            if (licenseType == LicenseType.BusinessSourceLicense)
+            {
+                // Parse BSL license format (simple copyright block without decorative borders)
+                var bslPattern = 
+                    $"^(?<{CaptureGroups.Prefix}>.*?)"
+                    + $"(?<{CaptureGroups.Copyright}>//.* Copyright \\(c\\)\\s*"
+                    + $"(?<{CaptureGroups.StartingYear}>[\\d]*).*?"
+                    + $"// Change License: Apache License, Version 2\\.0\\s*)"
+                    + $"(?<{CaptureGroups.Suffix}>.*)$";
+                
+                return await ParseUsingRegexAsync(file, bslPattern, cancellationToken);
+            }
+            else
+            {
+                // Parse original ILGPU license format (with decorative borders)
+                var linePrefix = GetLinePrefix(file);
+                var prefix = Regex.Escape(linePrefix + LineDelimiter.Repeat(10));
+                var delim = Regex.Escape(LineDelimiter);
+                var copyrightText = Regex.Escape(Config.OriginalCopyrightText);
+
+                var pattern =
+                    $"^(?<{CaptureGroups.Prefix}>.*)"
+                    + $"(?<{CaptureGroups.Copyright}>{prefix}.*?{copyrightText}\\s*"
+                    + $"(?<{CaptureGroups.StartingYear}>[\\d]*).*?{prefix}[{delim}]+"
+                    + $")"
+                    + $"(?<{CaptureGroups.Suffix}>.*)$";
+                return await ParseUsingRegexAsync(file, pattern, cancellationToken);
+            }
         }
 
         /// <inheritdoc cref="BaseCopyrightParser.GenerateCopyrightAsync(
@@ -193,6 +211,53 @@ namespace CopyrightUpdateTool.Parsers
         ///     int?,
         ///     CancellationToken)" />
         protected async override Task<string> GenerateCopyrightAsync(
+            FileInfo file,
+            int? startingYear,
+            CancellationToken cancellationToken)
+        {
+            var fileContent = await File.ReadAllTextAsync(file.FullName, cancellationToken);
+            var licenseType = Config.GetLicenseType(file.FullName, fileContent);
+
+            if (licenseType == LicenseType.BusinessSourceLicense)
+            {
+                return await GenerateBusinessSourceLicenseAsync(file, startingYear, cancellationToken);
+            }
+            else
+            {
+                return await GenerateOriginalLicenseAsync(file, startingYear, cancellationToken);
+            }
+        }
+
+        private async Task<string> GenerateBusinessSourceLicenseAsync(
+            FileInfo file,
+            int? startingYear,
+            CancellationToken cancellationToken)
+        {
+            var linePrefix = GetLinePrefix(file);
+            var endingYear = await VersionControlService.GetCopyrightYearEndAsync(
+                file,
+                CopyrightYearEndType.LastCommitToFile);
+
+            var copyrightYear =
+                startingYear.HasValue && startingYear.Value != endingYear
+                ? $"{startingYear.Value}-{endingYear}"
+                : $"{endingYear}";
+
+            var lines = new List<string>();
+            lines.Add($"Copyright (c) {copyrightYear} {Config.NewCopyrightOwner}");
+            lines.AddRange(Config.BusinessSourceLicenseText);
+
+            // Append the comment prefix to each line.
+            var commentLines = lines.Select(line => $"{linePrefix}{line}".TrimEnd());
+            var copyrightHeader = string.Join(Environment.NewLine, commentLines);
+
+            var hasExistingCopyrightHeader = startingYear.HasValue;
+            if (!hasExistingCopyrightHeader)
+                copyrightHeader += Environment.NewLine + Environment.NewLine;
+            return copyrightHeader;
+        }
+
+        private async Task<string> GenerateOriginalLicenseAsync(
             FileInfo file,
             int? startingYear,
             CancellationToken cancellationToken)
@@ -219,8 +284,8 @@ namespace CopyrightUpdateTool.Parsers
                 ? $"{startingYear.Value}-{endingYear}"
                 : $"{endingYear}";
             var copyrightLine =
-                $"{Config.CopyrightText} {copyrightYear} {Config.CopyrightOwner}";
-            var websiteLine = Config.CopyrightOwnerWebsite;
+                $"{Config.OriginalCopyrightText} {copyrightYear} {Config.OriginalCopyrightOwner}";
+            var websiteLine = Config.OriginalCopyrightOwnerWebsite;
             var fileLine = MakeFilenameLine(file);
 
             var lines = new List<string>();
@@ -231,7 +296,7 @@ namespace CopyrightUpdateTool.Parsers
             lines.Add(string.Empty);
             lines.Add(fileLine);
             lines.Add(string.Empty);
-            lines.AddRange(Config.CopyrightLicenseText);
+            lines.AddRange(Config.OriginalCopyrightLicenseText);
             lines.Add(dashLine);
 
             // Append the comment prefix to each line.

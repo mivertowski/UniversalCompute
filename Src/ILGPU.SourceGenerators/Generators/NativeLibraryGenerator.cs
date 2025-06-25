@@ -32,44 +32,46 @@ namespace ILGPU.SourceGenerators.Generators
     /// to replace DllImport for AOT compatibility.
     /// </summary>
     [Generator]
-    public sealed class NativeLibraryGenerator : ISourceGenerator
+    public sealed class NativeLibraryGenerator : IIncrementalGenerator
     {
-        public void Execute(GeneratorExecutionContext context)
+        public void Initialize(IncrementalGeneratorInitializationContext context)
         {
-            try
-            {
-                // Generate CUDA API LibraryImport bindings
-                var cudaXml = LoadEmbeddedResource("CudaAPI.xml");
-                if (!string.IsNullOrEmpty(cudaXml))
-                {
-                    GenerateLibraryImportsFromXmlContent(context, cudaXml, "CudaAPI");
-                }
+            // Create a provider that triggers generation on any compilation
+            var provider = context.CompilationProvider
+                .Select((compilation, _) => compilation);
 
-                // Generate OpenCL API LibraryImport bindings
-                var openclXml = LoadEmbeddedResource("CLAPI.xml");
-                if (!string.IsNullOrEmpty(openclXml))
-                {
-                    GenerateLibraryImportsFromXmlContent(context, openclXml, "CLAPI");
-                }
-            }
-            catch (Exception ex)
+            context.RegisterSourceOutput(provider, (spc, compilation) =>
             {
-                context.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "ILGPU0001",
-                        "Native library generation failed",
-                        "Failed to generate native library imports: {0}",
-                        "CodeGeneration",
-                        DiagnosticSeverity.Error,
-                        true),
-                    Location.None,
-                    ex.Message));
-            }
-        }
+                try
+                {
+                    // Generate CUDA API LibraryImport bindings
+                    var cudaXml = LoadEmbeddedResource("CudaAPI.xml");
+                    if (!string.IsNullOrEmpty(cudaXml))
+                    {
+                        GenerateLibraryImportsFromXmlContent(spc, cudaXml, "CudaAPI");
+                    }
 
-        public void Initialize(GeneratorInitializationContext context)
-        {
-            // No initialization needed
+                    // Generate OpenCL API LibraryImport bindings
+                    var openclXml = LoadEmbeddedResource("CLAPI.xml");
+                    if (!string.IsNullOrEmpty(openclXml))
+                    {
+                        GenerateLibraryImportsFromXmlContent(spc, openclXml, "CLAPI");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    spc.ReportDiagnostic(Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "ILGPU0001",
+                            "Native library generation failed",
+                            "Failed to generate native library imports: {0}",
+                            "CodeGeneration",
+                            DiagnosticSeverity.Error,
+                            true),
+                        Location.None,
+                        ex.Message));
+                }
+            });
         }
 
         private static string? LoadEmbeddedResource(string resourceName)
@@ -96,7 +98,7 @@ namespace ILGPU.SourceGenerators.Generators
             }
         }
 
-        private static void GenerateLibraryImportsFromXmlContent(GeneratorExecutionContext context, string xmlContent, string apiName)
+        private static void GenerateLibraryImportsFromXmlContent(SourceProductionContext context, string xmlContent, string apiName)
         {
             try
             {
