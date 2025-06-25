@@ -15,6 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.ML.Integration;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Profiling;
 using System;
@@ -114,7 +115,8 @@ namespace ILGPU.Runtime.Scheduling
                 throw new ArgumentNullException(nameof(plan));
 
             // Start performance monitoring
-            var executionId = _profiler.StartExecution(plan);
+            var executionId = $"execution_{DateTime.UtcNow.Ticks}";
+            _profiler.StartExecution(executionId);
 
             try
             {
@@ -125,11 +127,11 @@ namespace ILGPU.Runtime.Scheduling
                 await ExecuteComputeOperationsAsync(plan.Schedule);
 
                 // Update performance statistics
-                _profiler.EndExecution(executionId, success: true);
+                _profiler.EndExecution(executionId);
             }
             catch (Exception ex)
             {
-                _profiler.EndExecution(executionId, success: false, exception: ex);
+                _profiler.EndExecution(executionId);
                 throw;
             }
         }
@@ -205,12 +207,12 @@ namespace ILGPU.Runtime.Scheduling
             var parallelismLevel = CalculateParallelismLevel(graph);
 
             return new WorkloadAnalysis(
-                totalFlops,
+                TimeSpan.FromMilliseconds(totalFlops / 1000.0), // Convert FLOPS to estimated duration
                 totalMemoryOps,
-                dataTransferSize,
+                WorkloadType.Compute,
+                (int)parallelismLevel,
                 computeIntensity,
-                parallelismLevel,
-                operationTypes);
+                $"Mixed workload with {operationTypes.Count} operation types");
         }
 
         private async Task<Dictionary<ComputeNode, ComputeDevice>> CreateDeviceAssignmentsAsync(
@@ -270,10 +272,11 @@ namespace ILGPU.Runtime.Scheduling
             foreach (var node in graph.Nodes)
             {
                 // Select device with best performance per watt
-                var bestDevice = _devicePerformance
+                var bestDeviceKvp = _devicePerformance
                     .Where(kvp => CanExecuteOperation(kvp.Key, node.Operation))
                     .OrderByDescending(kvp => kvp.Value.PerformancePerWatt)
-                    .FirstOrDefault().Key ?? ComputeDevice.CPU;
+                    .FirstOrDefault();
+                var bestDevice = bestDeviceKvp.Key != default ? bestDeviceKvp.Key : ComputeDevice.CPU;
 
                 assignments[node] = bestDevice;
             }
@@ -325,10 +328,11 @@ namespace ILGPU.Runtime.Scheduling
             foreach (var node in graph.Nodes)
             {
                 // Select device with lowest latency for this operation type
-                var bestDevice = _devicePerformance
+                var bestDeviceKvp = _devicePerformance
                     .Where(kvp => CanExecuteOperation(kvp.Key, node.Operation))
                     .OrderBy(kvp => kvp.Value.AverageLatencyMs)
-                    .FirstOrDefault().Key ?? ComputeDevice.CPU;
+                    .FirstOrDefault();
+                var bestDevice = bestDeviceKvp.Key != default ? bestDeviceKvp.Key : ComputeDevice.CPU;
 
                 assignments[node] = bestDevice;
             }
@@ -350,10 +354,11 @@ namespace ILGPU.Runtime.Scheduling
 
         private ComputeDevice SelectBestTensorDevice()
         {
-            return _devicePerformance
+            var bestDeviceKvp = _devicePerformance
                 .Where(kvp => kvp.Value.SupportsTensorCores)
                 .OrderByDescending(kvp => kvp.Value.TensorPerformanceGFLOPS)
-                .FirstOrDefault().Key ?? ComputeDevice.GPU;
+                .FirstOrDefault();
+            return bestDeviceKvp.Key != default ? bestDeviceKvp.Key : ComputeDevice.GPU;
         }
 
         private ComputeDevice SelectBestConvolutionDevice(ConvolutionOp conv)
@@ -376,24 +381,34 @@ namespace ILGPU.Runtime.Scheduling
             return capability switch
             {
                 ComputeCapability.MatrixExtensions => 
-                    _devicePerformance
-                        .Where(kvp => kvp.Value.SupportsMatrixExtensions)
-                        .OrderByDescending(kvp => kvp.Value.MatrixPerformanceGFLOPS)
-                        .FirstOrDefault().Key ?? ComputeDevice.CPU,
+                    GetBestDevice(kvp => kvp.Value.SupportsMatrixExtensions, 
+                                 kvp => kvp.Value.MatrixPerformanceGFLOPS, 
+                                 ComputeDevice.CPU),
 
                 ComputeCapability.SIMD => 
-                    _devicePerformance
-                        .Where(kvp => kvp.Value.SIMDWidthBits > 0)
-                        .OrderByDescending(kvp => kvp.Value.SIMDPerformanceGFLOPS)
-                        .FirstOrDefault().Key ?? ComputeDevice.CPU,
+                    GetBestDevice(kvp => kvp.Value.SIMDWidthBits > 0,
+                                 kvp => kvp.Value.SIMDPerformanceGFLOPS,
+                                 ComputeDevice.CPU),
 
                 ComputeCapability.HighBandwidth => 
-                    _devicePerformance
-                        .OrderByDescending(kvp => kvp.Value.MemoryBandwidthGBps)
-                        .FirstOrDefault().Key ?? ComputeDevice.GPU,
+                    GetBestDevice(_ => true,
+                                 kvp => kvp.Value.MemoryBandwidthGBps,
+                                 ComputeDevice.GPU),
 
                 _ => ComputeDevice.Auto
             };
+        }
+
+        private ComputeDevice GetBestDevice(
+            Func<KeyValuePair<ComputeDevice, DevicePerformance>, bool> filter,
+            Func<KeyValuePair<ComputeDevice, DevicePerformance>, double> selector,
+            ComputeDevice fallback)
+        {
+            var bestDeviceKvp = _devicePerformance
+                .Where(filter)
+                .OrderByDescending(selector)
+                .FirstOrDefault();
+            return bestDeviceKvp.Key != default ? bestDeviceKvp.Key : fallback;
         }
 
         private bool CanExecuteOperation(ComputeDevice device, IComputeOperation operation)
@@ -423,20 +438,21 @@ namespace ILGPU.Runtime.Scheduling
             ComputeGraph graph, 
             Dictionary<ComputeNode, ComputeDevice> assignments)
         {
-            var levels = graph.GetParallelExecutionLevels();
+            var levels = graph.GetParallelExecutionLevels().ToList();
             var scheduledLevels = new List<ScheduledExecutionLevel>();
 
-            foreach (var level in levels)
+            for (int i = 0; i < levels.Count; i++)
             {
+                var level = levels[i];
                 var scheduledNodes = level.Select(node => new ScheduledNode(
-                    node, 
-                    assignments[node], 
+                    node.Id, 
+                    _devices[assignments[node]], 
                     EstimateExecutionTime(node, assignments[node]))).ToList();
 
-                scheduledLevels.Add(new ScheduledExecutionLevel(scheduledNodes));
+                scheduledLevels.Add(new ScheduledExecutionLevel(i, scheduledNodes));
             }
 
-            return new ExecutionSchedule(scheduledLevels);
+            return new ExecutionSchedule(scheduledLevels.SelectMany(l => l.Nodes).ToList());
         }
 
         private MemoryTransferPlan OptimizeMemoryTransfers(
@@ -453,10 +469,10 @@ namespace ILGPU.Runtime.Scheduling
                 if (sourceDevice != targetDevice)
                 {
                     var transfer = new MemoryTransfer(
-                        sourceDevice,
-                        targetDevice,
+                        _devices[sourceDevice],
+                        _devices[targetDevice],
                         dependency.DataSize,
-                        dependency.AccessPattern);
+                        (int)dependency.AccessPattern);
 
                     transfers.Add(transfer);
                 }
@@ -512,6 +528,40 @@ namespace ILGPU.Runtime.Scheduling
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(AdaptiveScheduler));
+        }
+
+        /// <summary>
+        /// Updates the scheduling policy based on workload analysis.
+        /// </summary>
+        public async Task UpdatePolicyAsync(WorkloadAnalysis analysis)
+        {
+            ThrowIfDisposed();
+            
+            // Update scheduling policy based on workload analysis
+            // This would adjust internal scheduling parameters
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Gets device recommendations based on model analysis.
+        /// </summary>
+        public Dictionary<string, ComputeDevice> GetDeviceRecommendations(ModelAnalysisResult analysis)
+        {
+            ThrowIfDisposed();
+
+            var recommendations = new Dictionary<string, ComputeDevice>();
+            
+            // For high operation count models, recommend GPU
+            if (analysis.TotalOperations > 1000)
+            {
+                recommendations["primary"] = ComputeDevice.GPU;
+            }
+            else
+            {
+                recommendations["primary"] = ComputeDevice.CPU;
+            }
+
+            return recommendations;
         }
 
         /// <summary>

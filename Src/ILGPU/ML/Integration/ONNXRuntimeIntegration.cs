@@ -246,7 +246,7 @@ namespace ILGPU.ML.Integration
 
             var onnxModel = await LoadONNXModelAsync(modelPath);
             var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel);
-            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph);
+            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, new ModelCompilationOptions());
 
             var compiledModel = new CompiledModel(modelPath, optimizedGraph, onnxModel.InputNames, onnxModel.OutputNames);
             _modelCache[modelPath] = compiledModel;
@@ -268,10 +268,10 @@ namespace ILGPU.ML.Integration
             return await Task.FromResult(new ComputeGraph());
         }
 
-        private async Task<Dictionary<string, ITensor>> ConvertInputsToTensorsAsync(
+        private async Task<Dictionary<string, ITensor<float>>> ConvertInputsToTensorsAsync(
             IReadOnlyCollection<NamedOnnxValue> inputs)
         {
-            var tensorInputs = new Dictionary<string, ITensor>();
+            var tensorInputs = new Dictionary<string, ITensor<float>>();
 
             foreach (var input in inputs)
             {
@@ -282,14 +282,14 @@ namespace ILGPU.ML.Integration
             return tensorInputs;
         }
 
-        private async Task<ITensor> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue)
+        private async Task<ITensor<float>> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue)
         {
             // Implementation would convert ONNX tensor format to ILGPU tensor format
-            return await Task.FromResult<ITensor>(null);
+            return await Task.FromResult<ITensor<float>>(null);
         }
 
         private async Task<NamedOnnxValue[]> ConvertTensorsToOutputsAsync(
-            Dictionary<string, ITensor> tensors,
+            Dictionary<string, ITensor<float>> tensors,
             IEnumerable<string> outputNames)
         {
             var outputs = new List<NamedOnnxValue>();
@@ -306,7 +306,7 @@ namespace ILGPU.ML.Integration
             return outputs.ToArray();
         }
 
-        private async Task<NamedOnnxValue> ConvertTensorToOnnxValueAsync(string name, ITensor tensor)
+        private async Task<NamedOnnxValue> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor)
         {
             // Implementation would convert ILGPU tensor back to ONNX format
             return await Task.FromResult<NamedOnnxValue>(null);
@@ -360,9 +360,12 @@ namespace ILGPU.ML.Integration
             var frequencies = samples.Select(s => s.Frequency).ToList();
 
             return new WorkloadAnalysis(
-                batchSizes.Any() ? (int)batchSizes.Average() : 1,
+                TimeSpan.FromMilliseconds(batchSizes.Any() ? batchSizes.Average() * 10 : 10),
+                modelSizes.Any() ? (long)modelSizes.Average() * 1024 : 1024,
+                WorkloadType.Compute,
+                1, // Priority
                 modelSizes.Any() ? modelSizes.Average() : 0,
-                frequencies.Any() ? frequencies.Average() : 0);
+                "ONNX workload analysis");
         }
 
         private void ClearModelCache()
@@ -520,4 +523,5 @@ namespace ILGPU.ML.Integration
         /// </summary>
         Optimal
     }
+
 }

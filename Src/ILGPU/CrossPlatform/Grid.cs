@@ -98,7 +98,7 @@ namespace ILGPU.CrossPlatform
         {
             get
             {
-                return Grid.IdxXY;
+                return ILGPU.Grid.IdxXY;
             }
         }
 

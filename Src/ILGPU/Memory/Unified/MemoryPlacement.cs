@@ -15,6 +15,10 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace ILGPU.Memory.Unified
 {
     /// <summary>
@@ -275,41 +279,6 @@ namespace ILGPU.Memory.Unified
         }
     }
 
-    /// <summary>
-    /// Describes the expected memory access pattern.
-    /// </summary>
-    public enum MemoryAccessPattern
-    {
-        /// <summary>
-        /// Unknown or mixed access pattern.
-        /// </summary>
-        Unknown,
-
-        /// <summary>
-        /// Sequential access pattern (streaming).
-        /// </summary>
-        Sequential,
-
-        /// <summary>
-        /// Random access pattern.
-        /// </summary>
-        Random,
-
-        /// <summary>
-        /// Mostly read operations.
-        /// </summary>
-        ReadHeavy,
-
-        /// <summary>
-        /// Mostly write operations.
-        /// </summary>
-        WriteHeavy,
-
-        /// <summary>
-        /// Frequent read-modify-write operations.
-        /// </summary>
-        ReadModifyWrite
-    }
 }
 
 namespace ILGPU.Memory.Unified

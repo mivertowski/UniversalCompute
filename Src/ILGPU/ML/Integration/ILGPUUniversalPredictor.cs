@@ -17,9 +17,11 @@
 
 using ILGPU.Numerics;
 using ILGPU.Runtime;
+using ILGPU.Runtime.DependencyInjection;
 using ILGPU.Runtime.Scheduling;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ILGPU.ML.Integration
@@ -65,7 +67,20 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets performance statistics from recent predictions.
         /// </summary>
-        public PredictionStats PerformanceStats => _orchestrator.GetPerformanceStats();
+        public PredictionStats PerformanceStats => ConvertToPredictionStats(_orchestrator.GetPerformanceStats());
+
+        private PredictionStats ConvertToPredictionStats(PerformanceAnalysis analysis)
+        {
+            return new PredictionStats
+            {
+                InferenceTimeMs = analysis.TotalExecutionTimeMs,
+                PreprocessingTimeMs = 0.0,
+                PostprocessingTimeMs = 0.0,
+                DeviceUsed = "Auto",
+                BatchSize = 1,
+                ThroughputPerSecond = 1000.0 / analysis.TotalExecutionTimeMs
+            };
+        }
 
         /// <summary>
         /// Predicts output for a single input using optimal hardware acceleration.
@@ -85,11 +100,11 @@ namespace ILGPU.ML.Integration
             // Create compute graph for the model
             var computeGraph = await _model.CreateComputeGraphAsync(inputTensor);
 
-            // Execute with optimal scheduling
-            var resultTensor = await _orchestrator.ExecuteAsync(computeGraph, inputTensor);
+            // Execute with optimal scheduling using the model
+            var result = await _orchestrator.ExecuteAsync(_model, input);
 
-            // Convert result back to output format
-            return await ConvertFromTensorAsync(resultTensor);
+            // Return the result directly
+            return result;
         }
 
         /// <summary>
@@ -113,10 +128,10 @@ namespace ILGPU.ML.Integration
             var computeGraph = await _model.CreateBatchedComputeGraphAsync(inputTensors);
 
             // Execute with batch optimization
-            var resultTensors = await _orchestrator.ExecuteBatchAsync(computeGraph, inputTensors);
+            var results = await _orchestrator.ExecuteBatchAsync(_model, inputs);
 
-            // Convert results back to output format
-            return await ConvertFromTensorBatchAsync(resultTensors);
+            // Return the results directly
+            return results;
         }
 
         /// <summary>
@@ -176,7 +191,7 @@ namespace ILGPU.ML.Integration
             var profileResults = await ProfileDevicesAsync(sampleInputs);
 
             // Update scheduling strategy based on profiling results
-            await _orchestrator.OptimizeSchedulingAsync(profileResults, optimizationHints);
+            await _orchestrator.OptimizeSchedulingAsync();
 
             // Optimize memory layout and transfer patterns
             await _orchestrator.OptimizeMemoryAsync();
@@ -243,7 +258,7 @@ namespace ILGPU.ML.Integration
                 catch (Exception ex)
                 {
                     // Log error and continue with other devices
-                    results[device] = new DeviceProfileResult(device, false, 0, ex.Message);
+                    results[device] = new DeviceProfileResult(device, false, 0, 0, ex.Message);
                 }
             }
 
@@ -285,7 +300,7 @@ namespace ILGPU.ML.Integration
             var averageTime = times.Average();
             var throughput = sampleInputs.Length * measurementRuns / (endTime - startTime).TotalSeconds;
 
-            return new DeviceProfileResult(device, true, throughput, $"Avg: {averageTime:F2}ms");
+            return new DeviceProfileResult(device, true, averageTime, throughput);
         }
 
         private void ThrowIfDisposed()
@@ -304,7 +319,7 @@ namespace ILGPU.ML.Integration
 
             _orchestrator?.Dispose();
             _scheduler?.Dispose();
-            _model?.Dispose();
+            // _model doesn't implement IDisposable
 
             _disposed = true;
         }

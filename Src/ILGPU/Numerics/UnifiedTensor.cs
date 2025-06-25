@@ -129,13 +129,13 @@ namespace ILGPU.Numerics
             currentLocation = MemoryLocation.CPU;
         }
 
-        /// <inheritdoc/>
-        public TensorShape Shape => shape;
-
         /// <summary>
         /// Gets the accelerator used by this tensor.
         /// </summary>
         public Accelerator Accelerator => accelerator;
+
+        /// <inheritdoc/>
+        public TensorShape Shape => shape;
 
         /// <inheritdoc/>
         public ComputeLocation Location => currentLocation switch

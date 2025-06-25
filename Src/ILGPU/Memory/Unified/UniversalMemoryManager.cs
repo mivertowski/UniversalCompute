@@ -45,7 +45,9 @@ namespace ILGPU.Memory.Unified
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _acceleratorManagers = new ConcurrentDictionary<Accelerator, AcceleratorMemoryManager>();
             _usageTracker = new MemoryUsageTracker();
-            _placementOptimizer = new MemoryPlacementOptimizer();
+            _placementOptimizer = new MemoryPlacementOptimizer(
+                context.Devices.Select(device => device.CreateAccelerator(context)),
+                _usageTracker);
 
             // Initialize accelerator managers for all available accelerators
             foreach (var device in context.Devices)
@@ -199,7 +201,17 @@ namespace ILGPU.Memory.Unified
         public MemoryPlacementRecommendations GetPlacementRecommendations()
         {
             ThrowIfDisposed();
-            return _placementOptimizer.GetRecommendations(_usageTracker.GetCurrentUsage());
+            var suggestions = _placementOptimizer.GetRecommendations().Result;
+            
+            // Convert suggestions to placement recommendations
+            return new MemoryPlacementRecommendations(
+                MemoryPlacement.HostAccessible,  // smallBuffers
+                MemoryPlacement.DeviceLocal,     // mediumBuffers  
+                MemoryPlacement.DeviceLocal,     // largeBuffers
+                MemoryPlacement.HostPinned,      // frequentlyAccessed
+                MemoryPlacement.ReadOnlyOptimized, // readOnly
+                suggestions.Select(s => s.Reason).ToArray() // optimizationHints
+            );
         }
 
         /// <summary>
@@ -315,82 +327,4 @@ namespace ILGPU.Memory.Unified
         }
     }
 
-    /// <summary>
-    /// Provides global memory usage statistics across all accelerators.
-    /// </summary>
-    public readonly struct GlobalMemoryStats
-    {
-        /// <summary>
-        /// Gets the total allocated memory across all accelerators in bytes.
-        /// </summary>
-        public long TotalAllocatedBytes { get; }
-
-        /// <summary>
-        /// Gets the number of active buffers across all accelerators.
-        /// </summary>
-        public int ActiveBufferCount { get; }
-
-        /// <summary>
-        /// Gets the total number of memory migrations performed.
-        /// </summary>
-        public long TotalMigrations { get; }
-
-        /// <summary>
-        /// Gets the average memory utilization percentage across all accelerators.
-        /// </summary>
-        public double AverageUtilizationPercent { get; }
-
-        /// <summary>
-        /// Gets per-accelerator memory statistics.
-        /// </summary>
-        public IReadOnlyDictionary<AcceleratorType, AcceleratorMemoryStats> PerAcceleratorStats { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the GlobalMemoryStats struct.
-        /// </summary>
-        public GlobalMemoryStats(
-            long totalAllocatedBytes,
-            int activeBufferCount,
-            long totalMigrations,
-            double averageUtilizationPercent,
-            IReadOnlyDictionary<AcceleratorType, AcceleratorMemoryStats> perAcceleratorStats)
-        {
-            TotalAllocatedBytes = totalAllocatedBytes;
-            ActiveBufferCount = activeBufferCount;
-            TotalMigrations = totalMigrations;
-            AverageUtilizationPercent = averageUtilizationPercent;
-            PerAcceleratorStats = perAcceleratorStats;
-        }
-    }
-
-    /// <summary>
-    /// Provides memory statistics for a specific accelerator type.
-    /// </summary>
-    public readonly struct AcceleratorMemoryStats
-    {
-        /// <summary>
-        /// Gets the allocated memory for this accelerator type in bytes.
-        /// </summary>
-        public long AllocatedBytes { get; }
-
-        /// <summary>
-        /// Gets the number of active buffers for this accelerator type.
-        /// </summary>
-        public int ActiveBuffers { get; }
-
-        /// <summary>
-        /// Gets the memory utilization percentage for this accelerator type.
-        /// </summary>
-        public double UtilizationPercent { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the AcceleratorMemoryStats struct.
-        /// </summary>
-        public AcceleratorMemoryStats(long allocatedBytes, int activeBuffers, double utilizationPercent)
-        {
-            AllocatedBytes = allocatedBytes;
-            ActiveBuffers = activeBuffers;
-            UtilizationPercent = utilizationPercent;
-        }
-    }
 }

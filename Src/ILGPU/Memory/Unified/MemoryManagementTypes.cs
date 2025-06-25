@@ -18,6 +18,7 @@
 using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -54,7 +55,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Allocates memory on the accelerator.
         /// </summary>
-        public MemoryBuffer<T> Allocate<T>(long length)
+        public MemoryBuffer1D<T, Stride1D.Dense> Allocate<T>(long length)
             where T : unmanaged
         {
             var buffer = _accelerator.Allocate1D<T>(length);
@@ -109,6 +110,36 @@ namespace ILGPU.Memory.Unified
         }
 
         /// <summary>
+        /// Performs cleanup operations on the memory manager.
+        /// </summary>
+        public void Cleanup()
+        {
+            lock (_syncLock)
+            {
+                // Remove any orphaned allocations
+                var orphanedAllocations = _allocations
+                    .Where(kvp => DateTime.UtcNow - kvp.Value.AllocationTime > TimeSpan.FromMinutes(10))
+                    .ToList();
+
+                foreach (var orphaned in orphanedAllocations)
+                {
+                    _allocations.Remove(orphaned.Key);
+                    Interlocked.Add(ref _totalAllocatedBytes, -orphaned.Value.SizeBytes);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Optimizes memory usage asynchronously.
+        /// </summary>
+        public async Task OptimizeAsync()
+        {
+            // Perform optimization operations
+            Cleanup();
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Disposes the memory manager.
         /// </summary>
         public void Dispose()
@@ -132,7 +163,7 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Tracks memory usage across accelerators.
     /// </summary>
-    public class MemoryUsageTracker
+    public class MemoryUsageTracker : IDisposable
     {
         private readonly Dictionary<Accelerator, MemoryUsageStats> _usageStats = new();
         private readonly object _syncLock = new();
@@ -183,6 +214,94 @@ namespace ILGPU.Memory.Unified
                     .FirstOrDefault();
             }
         }
+
+        /// <summary>
+        /// Gets global memory statistics across all accelerators.
+        /// </summary>
+        public GlobalMemoryStats GetGlobalStats()
+        {
+            lock (_syncLock)
+            {
+                var totalAllocated = _usageStats.Values.Sum(s => s.TotalAllocatedBytes);
+                var totalAllocations = _usageStats.Values.Sum(s => s.AllocationCount);
+                var peakUsage = _usageStats.Values.Max(s => s.PeakAllocationBytes);
+
+                return new GlobalMemoryStats
+                {
+                    TotalAllocatedBytes = totalAllocated,
+                    TotalAllocations = totalAllocations,
+                    PeakUsageBytes = peakUsage,
+                    AcceleratorCount = _usageStats.Count
+                };
+            }
+        }
+
+        /// <summary>
+        /// Gets current memory usage information.
+        /// </summary>
+        public MemoryUsageInfo GetCurrentUsage()
+        {
+            lock (_syncLock)
+            {
+                var totalMemory = _usageStats.Values.Sum(s => s.TotalAllocatedBytes);
+                var availableMemory = Math.Max(0, totalMemory * 0.8); // Assume 80% utilization threshold
+
+                return new MemoryUsageInfo(totalMemory, (long)availableMemory);
+            }
+        }
+
+        /// <summary>
+        /// Records an allocation for tracking.
+        /// </summary>
+        public void RecordAllocation(Accelerator accelerator, long bytes, MemoryPlacement placement = MemoryPlacement.Auto)
+        {
+            lock (_syncLock)
+            {
+                if (_usageStats.TryGetValue(accelerator, out var stats))
+                {
+                    stats.TotalAllocatedBytes += bytes;
+                    stats.AllocationCount++;
+                    stats.PeakAllocationBytes = Math.Max(stats.PeakAllocationBytes, stats.TotalAllocatedBytes);
+                    _usageStats[accelerator] = stats;
+                }
+                else
+                {
+                    _usageStats[accelerator] = new MemoryUsageStats
+                    {
+                        TotalAllocatedBytes = bytes,
+                        AllocationCount = 1,
+                        PeakAllocationBytes = bytes
+                    };
+                }
+            }
+        }
+
+        /// <summary>
+        /// Records a deallocation for tracking.
+        /// </summary>
+        public void RecordDeallocation(Accelerator accelerator, long bytes, MemoryPlacement placement = MemoryPlacement.Auto)
+        {
+            lock (_syncLock)
+            {
+                if (_usageStats.TryGetValue(accelerator, out var stats))
+                {
+                    stats.TotalAllocatedBytes = Math.Max(0, stats.TotalAllocatedBytes - bytes);
+                    stats.AllocationCount = Math.Max(0, stats.AllocationCount - 1);
+                    _usageStats[accelerator] = stats;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Disposes the memory usage tracker.
+        /// </summary>
+        public void Dispose()
+        {
+            lock (_syncLock)
+            {
+                _usageStats.Clear();
+            }
+        }
     }
 
     /// <summary>
@@ -209,7 +328,7 @@ namespace ILGPU.Memory.Unified
     /// <summary>
     /// Optimizes memory placement across accelerators.
     /// </summary>
-    public class MemoryPlacementOptimizer
+    public class MemoryPlacementOptimizer : IDisposable
     {
         private readonly List<Accelerator> _accelerators;
         private readonly MemoryUsageTracker _usageTracker;
@@ -284,6 +403,60 @@ namespace ILGPU.Memory.Unified
             
             return suggestions;
         }
+
+        /// <summary>
+        /// Gets the optimal memory placement for the specified parameters.
+        /// </summary>
+        public MemoryPlacement GetOptimalPlacement<T>(
+            long size, 
+            MemoryAccessPattern accessPattern, 
+            MemoryUsageInfo usageInfo) where T : unmanaged
+        {
+            var requiredBytes = size * Interop.SizeOf<T>();
+            
+            // For very small data, prefer zero-copy if available
+            if (requiredBytes < 64 * 1024) // 64KB
+            {
+                return MemoryPlacement.HostAccessible;
+            }
+
+            // For large data with sequential access, prefer high bandwidth
+            if (accessPattern == MemoryAccessPattern.Sequential && requiredBytes > 1024 * 1024) // 1MB
+            {
+                return MemoryPlacement.DeviceLocal;
+            }
+
+            // For random access, prefer low latency
+            if (accessPattern == MemoryAccessPattern.Random)
+            {
+                return MemoryPlacement.HostPinned;
+            }
+
+            // Check memory pressure
+            if (usageInfo.AvailableMemory < requiredBytes * 2)
+            {
+                return MemoryPlacement.HostAccessible;
+            }
+
+            // Default to device local memory
+            return MemoryPlacement.DeviceLocal;
+        }
+
+        /// <summary>
+        /// Gets optimization recommendations for memory usage.
+        /// </summary>
+        public async Task<List<MemoryTransferSuggestion>> GetRecommendations()
+        {
+            return await SuggestTransfersAsync();
+        }
+
+        /// <summary>
+        /// Disposes the memory placement optimizer.
+        /// </summary>
+        public void Dispose()
+        {
+            _accelerators?.Clear();
+        }
     }
 
     /// <summary>
@@ -339,6 +512,11 @@ namespace ILGPU.Memory.Unified
     public enum MemoryAccessPattern
     {
         /// <summary>
+        /// Unknown or unspecified access pattern.
+        /// </summary>
+        Unknown,
+
+        /// <summary>
         /// Sequential access pattern.
         /// </summary>
         Sequential,
@@ -366,7 +544,27 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Read-write access.
         /// </summary>
-        ReadWrite
+        ReadWrite,
+
+        /// <summary>
+        /// Streaming access pattern.
+        /// </summary>
+        Streaming,
+
+        /// <summary>
+        /// Transpose access pattern.
+        /// </summary>
+        Transpose,
+
+        /// <summary>
+        /// Gather access pattern.
+        /// </summary>
+        Gather,
+
+        /// <summary>
+        /// Scatter access pattern.
+        /// </summary>
+        Scatter
     }
 
     /// <summary>
@@ -393,5 +591,31 @@ namespace ILGPU.Memory.Unified
         /// Round-robin placement.
         /// </summary>
         RoundRobin
+    }
+
+    /// <summary>
+    /// Global memory statistics across all accelerators.
+    /// </summary>
+    public struct GlobalMemoryStats
+    {
+        public long TotalAllocatedBytes { get; init; }
+        public int TotalAllocations { get; init; }
+        public long PeakUsageBytes { get; init; }
+        public int AcceleratorCount { get; init; }
+    }
+
+    /// <summary>
+    /// Memory usage information for placement decisions.
+    /// </summary>
+    public readonly struct MemoryUsageInfo
+    {
+        public long TotalMemory { get; }
+        public long AvailableMemory { get; }
+
+        public MemoryUsageInfo(long totalMemory, long availableMemory)
+        {
+            TotalMemory = totalMemory;
+            AvailableMemory = availableMemory;
+        }
     }
 }

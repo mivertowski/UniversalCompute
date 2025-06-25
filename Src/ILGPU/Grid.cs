@@ -60,6 +60,12 @@ namespace ILGPU
         public static Index3D Index => new Index3D(IdxX, IdxY, IdxZ);
 
         /// <summary>
+        /// Returns the 2D index within the scheduled thread grid.
+        /// </summary>
+        /// <returns>The 2D grid index.</returns>
+        public static Index2D IdxXY => new Index2D(IdxX, IdxY);
+
+        /// <summary>
         /// Returns the X dimension of the scheduled thread grid.
         /// </summary>
         /// <returns>The X grid dimension.</returns>
