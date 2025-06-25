@@ -242,7 +242,7 @@ namespace ILGPU.Backends.IL
         private readonly ReaderWriterLockSlim readerWriterLock =
             new(LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<TypeNode, (Type Linear, Type Vectorized)>
-            typeMapping = new();
+            typeMapping = [];
 
         #endregion
 

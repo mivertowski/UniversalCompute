@@ -16,13 +16,9 @@ using ILGPU.IR.Values;
 using ILGPU.Util;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Loop = ILGPU.IR.Analyses.Loops<
     ILGPU.IR.Analyses.TraversalOrders.ReversePostOrder,
     ILGPU.IR.Analyses.ControlFlowDirection.Forwards>.Node;
-using Loops = ILGPU.IR.Analyses.Loops<
-    ILGPU.IR.Analyses.TraversalOrders.ReversePostOrder,
-    ILGPU.IR.Analyses.ControlFlowDirection.Forwards>;
 
 namespace ILGPU.IR.Transformations
 {
@@ -115,7 +111,7 @@ namespace ILGPU.IR.Transformations
         /// <param name="numBlocks">The number of blocks of the parent loop.</param>
         private struct Mover(int numBlocks)
         {
-            private readonly HashSet<Value> visited = new HashSet<Value>();
+            private readonly HashSet<Value> visited = [];
             private InlineList<Value> toMove = InlineList<Value>.Create(numBlocks << 1);
 
             /// <summary>

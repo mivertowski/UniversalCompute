@@ -33,7 +33,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// </summary>
         private readonly Dictionary<MethodBase, MethodDebugInformation>
             debugInformation =
-            new();
+            [];
 
         /// <summary>
         /// The internal reader provider.

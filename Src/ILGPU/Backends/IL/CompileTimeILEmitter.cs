@@ -9,14 +9,11 @@
 // Source License. See LICENSE.txt for details.
 // ---------------------------------------------------------------------------------------
 
-using ILGPU.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ILGPU.Backends.IL
@@ -46,8 +43,8 @@ namespace ILGPU.Backends.IL
             this.sourceBuilder = sourceBuilder;
             this.indentLevel = indentLevel;
             
-            locals = new List<CompileTimeLocal>();
-            labels = new List<CompileTimeLabel>();
+            locals = [];
+            labels = [];
         }
 
         #endregion

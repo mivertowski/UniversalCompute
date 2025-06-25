@@ -58,17 +58,17 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets detailed kernel execution records.
         /// </summary>
-        public List<KernelExecutionRecord> KernelExecutions { get; init; } = new();
+        public List<KernelExecutionRecord> KernelExecutions { get; init; } = [];
 
         /// <summary>
         /// Gets detailed memory operation records.
         /// </summary>
-        public List<MemoryOperationRecord> MemoryOperations { get; init; } = new();
+        public List<MemoryOperationRecord> MemoryOperations { get; init; } = [];
 
         /// <summary>
         /// Gets custom event records.
         /// </summary>
-        public List<CustomEventRecord> CustomEvents { get; init; } = new();
+        public List<CustomEventRecord> CustomEvents { get; init; } = [];
 
         /// <summary>
         /// Gets system information at the time of profiling.
@@ -83,12 +83,12 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets session-level metadata.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; init; } = new();
+        public Dictionary<string, object> Metadata { get; init; } = [];
 
         /// <summary>
         /// Gets performance recommendations based on the profiling data.
         /// </summary>
-        public List<PerformanceRecommendation> Recommendations { get; init; } = new();
+        public List<PerformanceRecommendation> Recommendations { get; init; } = [];
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets custom metadata for this execution.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; init; } = new();
+        public Dictionary<string, object> Metadata { get; init; } = [];
 
         /// <summary>
         /// Gets any errors that occurred during execution.
@@ -235,7 +235,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets custom metadata for this operation.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; init; } = new();
+        public Dictionary<string, object> Metadata { get; init; } = [];
     }
 
     /// <summary>
@@ -266,7 +266,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets the event metadata.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; init; } = new();
+        public Dictionary<string, object> Metadata { get; init; } = [];
     }
 
     /// <summary>
@@ -348,7 +348,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets accelerator-specific capabilities.
         /// </summary>
-        public Dictionary<string, object> Capabilities { get; init; } = new();
+        public Dictionary<string, object> Capabilities { get; init; } = [];
     }
 
     /// <summary>
@@ -379,7 +379,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets specific suggestions for improvement.
         /// </summary>
-        public List<string> Suggestions { get; init; } = new();
+        public List<string> Suggestions { get; init; } = [];
 
         /// <summary>
         /// Gets the estimated performance impact.
@@ -389,7 +389,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets related metrics that support this recommendation.
         /// </summary>
-        public Dictionary<string, object> SupportingMetrics { get; init; } = new();
+        public Dictionary<string, object> SupportingMetrics { get; init; } = [];
     }
 
     /// <summary>

@@ -111,7 +111,7 @@ namespace ILGPU.Intel.NPU
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Create NPU-compatible neural network representation
-                var appleNetwork = new ILGPU.Apple.NeuralEngine.NeuralNetwork("NPU_Converted", new ILGPU.Apple.NeuralEngine.NeuralOperation[0]);
+                var appleNetwork = new ILGPU.Apple.NeuralEngine.NeuralNetwork("NPU_Converted", []);
                 using var npuContext = new NPUInferenceContext(appleNetwork, Capabilities);
                 
                 // Execute inference on NPU

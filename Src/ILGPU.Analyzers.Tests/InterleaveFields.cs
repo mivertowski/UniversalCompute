@@ -10,7 +10,6 @@
 // ---------------------------------------------------------------------------------------
 
 using System.Threading.Tasks;
-using VerifyXunit;
 using Xunit;
 using VerifyCS =
     ILGPU.Analyzers.Tests.IncrementalGeneratorVerifier<

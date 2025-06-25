@@ -59,7 +59,7 @@ namespace ILGPU.Backends.Velocity.Analyses
         /// <summary>
         /// The set of all loop masks.
         /// </summary>
-        private readonly Dictionary<Loop, ILLocal> loopMasks = new();
+        private readonly Dictionary<Loop, ILLocal> loopMasks = [];
 
         /// <summary>
         /// Maps blocks to their input masks.

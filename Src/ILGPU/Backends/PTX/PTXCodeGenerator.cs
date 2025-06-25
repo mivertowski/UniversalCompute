@@ -283,7 +283,7 @@ RegisterAllocator<PTXRegisterKind>.Register register,
         private readonly Dictionary<BasicBlock, string> blockLookup = new(
             new BasicBlock.Comparer());
 
-        private readonly Dictionary<(Encoding, string), string> stringConstants = new();
+        private readonly Dictionary<(Encoding, string), string> stringConstants = [];
         private readonly PhiBindings phiBindings;
         private readonly Dictionary<Value, Register> intermediatePhiRegisters;
         private readonly string labelPrefix;

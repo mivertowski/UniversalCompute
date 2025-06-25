@@ -278,7 +278,7 @@ namespace ILGPU.IR
         private InlineList<BasicBlock> successors;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private List<ValueReference> values = new();
+        private List<ValueReference> values = [];
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Builder? builder = null;

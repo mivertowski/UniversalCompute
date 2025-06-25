@@ -29,7 +29,7 @@ namespace ILGPU.Runtime.Profiling
         private readonly PerformanceProfiler profiler = profiler;
         private readonly string executionId = executionId;
         private readonly Stopwatch stopwatch = Stopwatch.StartNew();
-        private readonly Dictionary<string, object> metadata = new();
+        private readonly Dictionary<string, object> metadata = [];
         private TimeSpan compilationTime;
         private int sharedMemorySize;
         private int registerCount;

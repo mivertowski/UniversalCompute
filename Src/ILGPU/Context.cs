@@ -195,9 +195,9 @@ namespace ILGPU
             {
                 InliningAttributeBuilder = new CustomAttributeBuilder(
                     typeof(MethodImplAttribute).GetConstructor(
-                        new Type[] { typeof(MethodImplOptions) })
+                        [typeof(MethodImplOptions)])
                         .ThrowIfNull(),
-                    new object[] { MethodImplOptions.AggressiveInlining });
+                    [MethodImplOptions.AggressiveInlining]);
             }
             catch (PlatformNotSupportedException)
             {
@@ -445,7 +445,7 @@ namespace ILGPU
             var type = DeviceTypeAttribute.GetAcceleratorType(typeof(TDevice));
             return deviceMapping.TryGetValue(type, out var devices)
                 ? new DeviceCollection<TDevice>(devices)
-                : new DeviceCollection<TDevice>(new List<Device>());
+                : new DeviceCollection<TDevice>([]);
         }
 
         /// <summary>

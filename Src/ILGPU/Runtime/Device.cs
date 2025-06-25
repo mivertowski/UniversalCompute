@@ -462,7 +462,7 @@ namespace ILGPU.Runtime
         /// The set of all registered devices.
         /// </summary>
         private readonly HashSet<Device> registered =
-            new();
+            [];
 
         /// <summary>
         /// Stores all registered accelerator device objects.

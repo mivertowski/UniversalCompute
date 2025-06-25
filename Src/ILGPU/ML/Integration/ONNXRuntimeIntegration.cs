@@ -54,7 +54,7 @@ namespace ILGPU.ML.Integration
 
             _computeEngine = new UniversalComputeEngine(_scheduler);
             _modelOptimizer = new ModelOptimizer(options.OptimizationLevel);
-            _modelCache = new Dictionary<string, CompiledModel>();
+            _modelCache = [];
         }
 
         /// <summary>

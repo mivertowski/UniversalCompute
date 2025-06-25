@@ -15,14 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Apple.NeuralEngine.Native;
-using ILGPU.Backends.Metal;
-using ILGPU.Numerics;
-using ILGPU.Numerics.AI;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 #if ENABLE_ANE_ACCELERATOR
 namespace ILGPU.Apple.NeuralEngine
 {

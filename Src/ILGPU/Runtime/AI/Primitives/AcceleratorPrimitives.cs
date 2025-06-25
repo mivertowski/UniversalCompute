@@ -15,17 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Apple.NeuralEngine;
-using ILGPU.Backends.Metal;
-using ILGPU.Backends.OneAPI;
-using ILGPU.Intel.AMX;
-using ILGPU.Intel.NPU;
-using ILGPU.Numerics;
-using ILGPU.Numerics.AI;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace ILGPU.Runtime.AI
 {
 #if ENABLE_METAL_ACCELERATOR

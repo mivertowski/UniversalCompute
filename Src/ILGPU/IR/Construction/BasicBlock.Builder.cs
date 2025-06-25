@@ -48,7 +48,7 @@ namespace ILGPU.IR
             /// <summary>
             /// A collection of values to remove
             /// </summary>
-            private readonly HashSet<Value> toRemove = new();
+            private readonly HashSet<Value> toRemove = [];
 
             /// <summary>
             /// The current insert position for new instructions.

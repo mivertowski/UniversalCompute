@@ -64,9 +64,9 @@ namespace ILGPU.IR.Types
         private readonly ReaderWriterLockSlim typeLock = new(
             LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<TypeNode, TypeNode> unifiedTypes =
-            new();
+            [];
         private readonly Dictionary<(Type, MemoryAddressSpace), TypeNode> typeMapping =
-            new();
+            [];
         private readonly PrimitiveType[] basicValueTypes;
 
         /// <summary>

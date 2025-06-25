@@ -78,12 +78,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input shapes.
         /// </summary>
-        public Dictionary<string, int[]> InputShapes { get; set; } = new();
+        public Dictionary<string, int[]> InputShapes { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the output shapes.
         /// </summary>
-        public Dictionary<string, int[]> OutputShapes { get; set; } = new();
+        public Dictionary<string, int[]> OutputShapes { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the model type.
@@ -165,7 +165,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization suggestions.
         /// </summary>
-        public List<string> OptimizationSuggestions { get; set; } = new();
+        public List<string> OptimizationSuggestions { get; set; } = [];
     }
 
     /// <summary>
@@ -244,7 +244,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the individual device results.
         /// </summary>
-        public List<DeviceProfileResult> Results { get; set; } = new();
+        public List<DeviceProfileResult> Results { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the best device for the workload.
@@ -268,7 +268,7 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public DeviceProfileResults(Dictionary<ComputeDevice, DeviceProfileResult> results)
         {
-            Results = new List<DeviceProfileResult>(results.Values);
+            Results = [.. results.Values];
             BestDevice = results.OrderByDescending(r => r.Value.MeasuredPerformanceGFLOPS).FirstOrDefault().Key.ToString();
             ProfilingDurationMs = 1000.0; // Placeholder
         }
@@ -287,7 +287,7 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public HybridComputeOrchestrator(IEnumerable<Accelerator> accelerators)
         {
-            _accelerators = new Dictionary<string, Accelerator>();
+            _accelerators = [];
             foreach (var acc in accelerators)
             {
                 _accelerators[acc.Name] = acc;
@@ -300,7 +300,7 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public HybridComputeOrchestrator(AdaptiveScheduler scheduler, PredictionContext context)
         {
-            _accelerators = new Dictionary<string, Accelerator>();
+            _accelerators = [];
             _loadBalancer = new LoadBalancer();
             // Initialize with scheduler and context
         }
@@ -349,7 +349,7 @@ namespace ILGPU.ML.Integration
             MemoryBandwidthUtilizationPercent = 75.0,
             ComputeEfficiency = 0.9,
             BottleneckAnalysis = "Memory bandwidth limited",
-            OptimizationSuggestions = new List<string> { "Increase batch size", "Optimize memory access patterns" }
+            OptimizationSuggestions = ["Increase batch size", "Optimize memory access patterns"]
         };
 
         /// <summary>
@@ -480,7 +480,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets custom compilation flags.
         /// </summary>
-        public Dictionary<string, object> CustomFlags { get; set; } = new();
+        public Dictionary<string, object> CustomFlags { get; set; } = [];
     }
 
     /// <summary>
@@ -543,7 +543,7 @@ namespace ILGPU.ML.Integration
             {
                 OriginalModel = model,
                 OptimizationApplied = true,
-                OptimizationDetails = new List<string> { "Graph fusion", "Memory layout optimization" },
+                OptimizationDetails = ["Graph fusion", "Memory layout optimization"],
                 OptimizedGraph = model as ComputeGraph ?? new ComputeGraph()
             };
 
@@ -584,7 +584,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization details.
         /// </summary>
-        public List<string> OptimizationDetails { get; set; } = new();
+        public List<string> OptimizationDetails { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the optimized compute graph.
@@ -633,7 +633,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets suggested optimizations.
         /// </summary>
-        public string[] SuggestedOptimizations { get; set; } = new[] { "Graph fusion", "Memory optimization" };
+        public string[] SuggestedOptimizations { get; set; } = ["Graph fusion", "Memory optimization"];
     }
 
     /// <summary>
@@ -659,7 +659,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets compilation metadata.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; set; } = new();
+        public Dictionary<string, object> Metadata { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the compute graph.
@@ -669,12 +669,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input names.
         /// </summary>
-        public List<string> InputNames { get; set; } = new();
+        public List<string> InputNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the output names.
         /// </summary>
-        public List<string> OutputNames { get; set; } = new();
+        public List<string> OutputNames { get; set; } = [];
 
         /// <summary>
         /// Initializes a new instance of the CompiledModel class.
@@ -713,7 +713,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the execution steps.
         /// </summary>
-        public List<ExecutionStep> Steps { get; set; } = new();
+        public List<ExecutionStep> Steps { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the estimated execution time.
@@ -787,7 +787,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets kernel parameters.
         /// </summary>
-        public List<KernelParameter> Parameters { get; set; } = new();
+        public List<KernelParameter> Parameters { get; set; } = [];
 
         /// <summary>
         /// Initializes a new instance of the CompiledKernel class.
@@ -803,7 +803,7 @@ namespace ILGPU.ML.Integration
         {
             KernelName = $"{node.Operation.GetType().Name}_{device}";
             EntryPoint = "main";
-            CompiledCode = new byte[] { 0x00 }; // Placeholder
+            CompiledCode = [0x00]; // Placeholder
         }
     }
 
@@ -841,12 +841,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the layer timings.
         /// </summary>
-        public Dictionary<string, double> LayerTimings { get; set; } = new();
+        public Dictionary<string, double> LayerTimings { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the memory usage per layer.
         /// </summary>
-        public Dictionary<string, long> LayerMemoryUsage { get; set; } = new();
+        public Dictionary<string, long> LayerMemoryUsage { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the total inference time.
@@ -942,7 +942,7 @@ namespace ILGPU.ML.Integration
     /// </summary>
     public class UniversalComputeEngine : IDisposable
     {
-        private readonly Dictionary<string, IComputeBackend> _backends = new();
+        private readonly Dictionary<string, IComputeBackend> _backends = [];
 
         /// <summary>
         /// Initializes a new instance of the UniversalComputeEngine class.
@@ -1050,12 +1050,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input names.
         /// </summary>
-        public List<string> InputNames { get; set; } = new();
+        public List<string> InputNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the output names.
         /// </summary>
-        public List<string> OutputNames { get; set; } = new();
+        public List<string> OutputNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the model version.

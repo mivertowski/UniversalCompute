@@ -278,11 +278,11 @@ namespace ILGPU.IR.Transformations
 
                 // Gather region information about nodes from all successors. Furthermore,
                 // we can check whether the regions are distinct or share nodes.
-                Gathered = new HashSet<BasicBlock>()
-                {
+                Gathered =
+                [
                     // Assume that the current node has already been found to avoid loops
                     block,
-                };
+                ];
                 var regions = new Regions(block, successors.Length);
                 int minRegionSize = int.MaxValue;
                 int maxRegionSize = 0;

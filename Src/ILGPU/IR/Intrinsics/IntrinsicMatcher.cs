@@ -133,7 +133,7 @@ namespace ILGPU.IR.Intrinsics
         #region Instance
 
         private readonly Dictionary<MethodInfo, T?> entries =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new intrinsic matcher.

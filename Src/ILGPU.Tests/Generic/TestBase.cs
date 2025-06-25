@@ -217,10 +217,10 @@ namespace ILGPU.Tests
             where TIndex : struct, IIndex
             where T : unmanaged
         {
-            var kernelMethod = KernelMethodAttribute.GetKernelMethod(new Type[]
-            {
+            var kernelMethod = KernelMethodAttribute.GetKernelMethod(
+            [
                 typeof(T)
-            });
+            ]);
             Execute(kernelMethod, dimension, arguments);
         }
 
@@ -235,11 +235,11 @@ namespace ILGPU.Tests
             where T1 : unmanaged
             where T2 : unmanaged
         {
-            var kernelMethod = KernelMethodAttribute.GetKernelMethod(new Type[]
-            {
+            var kernelMethod = KernelMethodAttribute.GetKernelMethod(
+            [
                 typeof(T1),
                 typeof(T2)
-            });
+            ]);
             Execute(kernelMethod, dimension, arguments);
         }
 
@@ -257,12 +257,12 @@ namespace ILGPU.Tests
             where T2 : unmanaged
             where T3 : unmanaged
         {
-            var kernelMethod = KernelMethodAttribute.GetKernelMethod(new Type[]
-            {
+            var kernelMethod = KernelMethodAttribute.GetKernelMethod(
+            [
                 typeof(T1),
                 typeof(T2),
                 typeof(T3)
-            });
+            ]);
             Execute(kernelMethod, dimension, arguments);
         }
 

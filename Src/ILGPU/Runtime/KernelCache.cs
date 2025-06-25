@@ -322,10 +322,8 @@ Accelerator.CachedCompiledKernelKey compiledKernelKey,
                 return;
             }
 
-            compiledKernelCache = new Dictionary<
-                CachedCompiledKernelKey,
-                WeakReference<CompiledKernel>>();
-            kernelCache = new Dictionary<CachedKernelKey, CachedKernel>();
+            compiledKernelCache = [];
+            kernelCache = [];
         }
 
         #endregion
@@ -608,9 +606,7 @@ Accelerator.CachedCompiledKernelKey compiledKernelKey,
             if (compiledKernelCache.AsNotNull().Count >= MinNumberOfKernelsInGC)
             {
                 var oldCompiledKernels = compiledKernelCache.AsNotNull();
-                compiledKernelCache = new Dictionary<
-                    CachedCompiledKernelKey,
-                    WeakReference<CompiledKernel>>();
+                compiledKernelCache = [];
                 foreach (var entry in oldCompiledKernels)
                 {
                     if (entry.Value.TryGetTarget(out CompiledKernel? _))
@@ -621,7 +617,7 @@ Accelerator.CachedCompiledKernelKey compiledKernelKey,
             if (kernelCache.AsNotNull().Count >= MinNumberOfKernelsInGC)
             {
                 var oldKernels = kernelCache.AsNotNull();
-                kernelCache = new Dictionary<CachedKernelKey, CachedKernel>();
+                kernelCache = [];
                 foreach (var entry in oldKernels)
                 {
                     if (entry.Value.TryGetKernel(out object? _))

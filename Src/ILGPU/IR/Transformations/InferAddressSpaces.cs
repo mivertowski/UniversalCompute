@@ -559,7 +559,7 @@ namespace ILGPU.IR.Transformations
 
             #region Instance
 
-            private readonly Dictionary<Parameter, Parameter> oldParameters = new Dictionary<Parameter, Parameter>();
+            private readonly Dictionary<Parameter, Parameter> oldParameters = [];
 
             #endregion
 

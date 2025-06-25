@@ -144,13 +144,12 @@ namespace ILGPU.Runtime.Cuda
         /// Ordered list of library name combinations to try loading.
         /// </summary>
         private static readonly (string Prefix, string Suffix)[] WslLibraryCombinations =
-            new[]
-            {
+            [
                 ( string.Empty, ".so" ),
                 ( "lib",        ".so" ),
                 ( string.Empty, string.Empty ),
                 ( "lib",        string.Empty )
-            };
+            ];
 
         /// <summary>
         /// Attempts to load the Cuda DLL from the WSL folder.

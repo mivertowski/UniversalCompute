@@ -16,8 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.ML.Integration;
-using ILGPU.Runtime;
-using ILGPU.Runtime.Profiling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +49,7 @@ namespace ILGPU.Runtime.Scheduling
             _policy = policy;
             _profiler = new PerformanceProfiler();
             _loadBalancer = new LoadBalancer();
-            _devicePerformance = new Dictionary<ComputeDevice, DevicePerformance>();
+            _devicePerformance = [];
 
             // Initialize device performance characteristics
             InitializeDevicePerformance();

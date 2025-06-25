@@ -17,7 +17,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics;
 
 namespace ILGPU.Intel.AMX.Native
 {

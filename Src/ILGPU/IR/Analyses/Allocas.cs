@@ -394,7 +394,7 @@ namespace ILGPU.IR.Analyses
         /// <param name="capacity">The initial stack capacity.</param>
         private AllocaAlignments(int capacity)
         {
-            visited = new HashSet<Value>();
+            visited = [];
             toProcess = new Stack<Value>(capacity);
         }
 

@@ -13,7 +13,6 @@ using ILGPU.Algorithms.ScanReduceOperations;
 using ILGPU.Algorithms.Vectors;
 using ILGPU.Runtime;
 using ILGPU.Util;
-using ILGPU;
 using System;
 using System.Diagnostics;
 using System.Numerics;

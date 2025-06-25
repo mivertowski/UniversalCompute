@@ -193,7 +193,7 @@ namespace ILGPU.IR.Types
 
         private readonly ReaderWriterLockSlim cachingLock = new();
         private readonly Dictionary<Type, TypeInformation> typeInfoMapping =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new type context.

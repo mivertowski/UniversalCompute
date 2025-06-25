@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Intel.NPU.Native;
-using System;
 
 namespace ILGPU.Intel.NPU
 {

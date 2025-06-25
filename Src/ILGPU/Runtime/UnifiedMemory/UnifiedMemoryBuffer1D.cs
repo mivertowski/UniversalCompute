@@ -15,10 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.Cuda;
 using System;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Runtime.UnifiedMemory
 {

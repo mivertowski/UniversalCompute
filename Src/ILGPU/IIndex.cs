@@ -89,7 +89,7 @@ namespace ILGPU
         /// An internal mapping of the <see cref="IndexType"/> values to managed types.
         /// </summary>
         private static readonly Type?[] ManagedIndexTypes =
-        {
+        [
             null,
             typeof(Index1D),
             typeof(Index2D),
@@ -98,7 +98,7 @@ namespace ILGPU
             typeof(LongIndex2D),
             typeof(LongIndex3D),
             typeof(KernelConfig)
-        };
+        ];
 
         /// <summary>
         /// Asserts that the given long range can be accessed using a 32-bit integer.

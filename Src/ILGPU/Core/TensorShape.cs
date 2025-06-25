@@ -16,8 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using System;
-using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace ILGPU.Core
 {

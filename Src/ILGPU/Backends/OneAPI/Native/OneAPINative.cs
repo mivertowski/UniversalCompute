@@ -106,7 +106,7 @@ namespace ILGPU.Backends.OneAPI.Native
         /// </summary>
         internal static IntPtr CreateContext(IntPtr device)
         {
-            IntPtr[] devices = { device };
+            IntPtr[] devices = [device];
             var context = clCreateContext(
                 IntPtr.Zero,
                 1,
@@ -193,8 +193,8 @@ namespace ILGPU.Backends.OneAPI.Native
 
             try
             {
-                IntPtr[] sources = { sourcePtr };
-                nuint[] lengths = { (nuint)sourceBytes.Length };
+                IntPtr[] sources = [sourcePtr];
+                nuint[] lengths = [(nuint)sourceBytes.Length];
                 
                 var program = clCreateProgramWithSource(
                     context,
@@ -207,7 +207,7 @@ namespace ILGPU.Backends.OneAPI.Native
                     throw new InvalidOperationException($"Failed to create program: {errCode}");
                 
                 // Build the program
-                IntPtr[] devices = { device };
+                IntPtr[] devices = [device];
                 var buildResult = clBuildProgram(
                     program,
                     1,
@@ -473,12 +473,12 @@ namespace ILGPU.Backends.OneAPI.Native
             clGetPlatformIDs(0, null, out var numPlatforms);
             
             if (numPlatforms == 0)
-                return new List<IntPtr>();
+                return [];
             
             var platforms = new IntPtr[numPlatforms];
             clGetPlatformIDs(numPlatforms, platforms, out _);
             
-            return new List<IntPtr>(platforms);
+            return [.. platforms];
         }
 
         /// <summary>
@@ -491,12 +491,12 @@ namespace ILGPU.Backends.OneAPI.Native
             clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 0, null, out var numDevices);
             
             if (numDevices == 0)
-                return new List<IntPtr>();
+                return [];
             
             var devices = new IntPtr[numDevices];
             clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, numDevices, devices, out _);
             
-            return new List<IntPtr>(devices);
+            return [.. devices];
         }
 
         /// <summary>

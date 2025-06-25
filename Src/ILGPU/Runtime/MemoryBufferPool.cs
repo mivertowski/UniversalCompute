@@ -32,8 +32,8 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Standard bucket sizes for optimal memory usage patterns.
         /// </summary>
-        private static readonly long[] BucketSizes = new long[]
-        {
+        private static readonly long[] BucketSizes =
+        [
             1024,       // 1KB
             4096,       // 4KB  
             16384,      // 16KB
@@ -43,7 +43,7 @@ namespace ILGPU.Runtime
             4194304,    // 4MB
             16777216,   // 16MB
             67108864,   // 64MB
-        };
+        ];
 
         /// <summary>
         /// Maximum number of buffers to keep in each bucket.

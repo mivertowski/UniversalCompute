@@ -91,7 +91,7 @@ namespace ILGPU.IR.Intrinsics
             #region Instance
 
             private readonly List<IntrinsicImplementation> implementations =
-                new();
+                [];
 
             #endregion
 

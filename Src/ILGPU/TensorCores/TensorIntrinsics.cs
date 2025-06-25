@@ -15,10 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.IR;
-using ILGPU.IR.Values;
-using ILGPU.Runtime;
-using ILGPU.Runtime.Cuda;
 using System;
 using System.Runtime.CompilerServices;
 using System.Numerics;

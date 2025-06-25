@@ -40,8 +40,7 @@ namespace ILGPU.Backends.IL
         /// Caches all constant op codes.
         /// </summary>
         private static readonly OpCode[] ConstantOpCodes =
-            new OpCode[]
-            {
+            [
                 OpCodes.Ldc_I4_M1,
                 OpCodes.Ldc_I4_0,
                 OpCodes.Ldc_I4_1,
@@ -52,7 +51,7 @@ namespace ILGPU.Backends.IL
                 OpCodes.Ldc_I4_6,
                 OpCodes.Ldc_I4_7,
                 OpCodes.Ldc_I4_8,
-            };
+            ];
 
         /// <summary>
         /// Stores the constructor of the <see cref="Half"/> type.
@@ -61,10 +60,9 @@ namespace ILGPU.Backends.IL
             typeof(Half).GetConstructor(
                     BindingFlags.NonPublic | BindingFlags.CreateInstance,
                     null,
-                    new Type[]
-                    {
+                    [
                         typeof(ushort)
-                    },
+                    ],
                     null)
                 .AsNotNull();
 
@@ -311,7 +309,7 @@ namespace ILGPU.Backends.IL
                 MethodAttributes.Public | MethodAttributes.Virtual |
                 MethodAttributes.NewSlot | MethodAttributes.Final,
                 typeof(bool),
-                new Type[] { typeBuilder });
+                [typeBuilder]);
 
             var emitter = new ILEmitter(equals.GetILGenerator());
             var falseLabel = emitter.DeclareLabel();
@@ -326,7 +324,7 @@ namespace ILGPU.Backends.IL
 
                 emitter.EmitCall(field.FieldType.GetMethod(
                     EqualsInfo.Name,
-                    new Type[] { field.FieldType })
+                    [field.FieldType])
                     .AsNotNull());
 
                 // IMPORTANT: Each field can branch to the false label. However, if we
@@ -366,7 +364,7 @@ namespace ILGPU.Backends.IL
                 EqualsInfo.Name,
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 typeof(bool),
-                new Type[] { typeof(object) });
+                [typeof(object)]);
 
             var emitter = new ILEmitter(equals.GetILGenerator());
             var falseLabel = emitter.DeclareLabel();

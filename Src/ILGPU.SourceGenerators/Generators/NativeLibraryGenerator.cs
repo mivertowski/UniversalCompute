@@ -567,7 +567,7 @@ namespace ILGPU.SourceGenerators.Generators
                 
                 if (!libraryToPlatforms.ContainsKey(libName))
                 {
-                    libraryToPlatforms[libName] = new List<string>();
+                    libraryToPlatforms[libName] = [];
                 }
                 libraryToPlatforms[libName].Add(platformName);
             }
@@ -600,7 +600,7 @@ namespace ILGPU.SourceGenerators.Generators
         public string Name { get; set; } = string.Empty;
         public string ReturnType { get; set; } = string.Empty;
         public string? StringMarshalling { get; set; }
-        public List<ParameterInfo> Parameters { get; set; } = new List<ParameterInfo>();
+        public List<ParameterInfo> Parameters { get; set; } = [];
         public bool IsUnsafe { get; set; }
     }
 
@@ -622,7 +622,7 @@ namespace ILGPU.SourceGenerators.Generators
     {
         public int Id { get; set; }
         public string LibraryName { get; set; } = string.Empty;
-        public List<string> Platforms { get; set; } = new List<string>();
+        public List<string> Platforms { get; set; } = [];
         public string RepresentativePlatform { get; set; } = string.Empty;
     }
 }

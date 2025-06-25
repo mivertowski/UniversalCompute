@@ -244,7 +244,7 @@ namespace ILGPU.Backends.EntryPoints
         /// Maps parameter indices to view-parameter intervals.
         /// </summary>
         private readonly Dictionary<int, (int, int)> viewParameterMapping =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new entry point targeting the given method.

@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace ILGPU.Runtime.LINQ
 {
@@ -349,7 +348,7 @@ namespace ILGPU.Runtime.LINQ
             // Create buffer using reflection for generic types
             var allocateMethod = typeof(Accelerator).GetMethod("Allocate1D")!
                 .MakeGenericMethod(outputType);
-            return allocateMethod.Invoke(accelerator, new object[] { length })!;
+            return allocateMethod.Invoke(accelerator, [length])!;
         }
 
         /// <summary>
@@ -435,7 +434,7 @@ namespace ILGPU.Runtime.LINQ
         private void SetBufferData(object buffer, Array data)
         {
             var copyFromMethod = buffer.GetType().GetMethod("CopyFromCPU");
-            copyFromMethod!.Invoke(buffer, new object[] { data });
+            copyFromMethod!.Invoke(buffer, [data]);
         }
 
         /// <summary>

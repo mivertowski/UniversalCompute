@@ -34,8 +34,8 @@ namespace ILGPU.Runtime.Scheduling
         /// </summary>
         public ComputeGraph()
         {
-            _nodes = new List<ComputeNode>();
-            _dependencies = new List<DataDependency>();
+            _nodes = [];
+            _dependencies = [];
         }
 
         /// <summary>

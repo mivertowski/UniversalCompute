@@ -22,7 +22,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,12 +55,12 @@ namespace ILGPU.Runtime.Profiling
         #region Fields
 
         private readonly object sessionLock = new();
-        private readonly ConcurrentBag<ProfileSessionReport> completedSessions = new();
+        private readonly ConcurrentBag<ProfileSessionReport> completedSessions = [];
         private readonly ConcurrentDictionary<string, KernelExecutionRecord> activeKernelExecutions = new();
         private readonly ConcurrentDictionary<string, MemoryOperationRecord> activeMemoryOperations = new();
-        private readonly List<KernelExecutionRecord> currentKernelExecutions = new();
-        private readonly List<MemoryOperationRecord> currentMemoryOperations = new();
-        private readonly List<CustomEventRecord> currentCustomEvents = new();
+        private readonly List<KernelExecutionRecord> currentKernelExecutions = [];
+        private readonly List<MemoryOperationRecord> currentMemoryOperations = [];
+        private readonly List<CustomEventRecord> currentCustomEvents = [];
         private readonly Accelerator accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
         
         private volatile bool isProfilingEnabled = enabledByDefault;
@@ -198,7 +197,7 @@ namespace ILGPU.Runtime.Profiling
                 EventName = eventName,
                 Timestamp = DateTime.UtcNow,
                 Duration = duration,
-                Metadata = metadata ?? new Dictionary<string, object>()
+                Metadata = metadata ?? []
             };
 
             lock (currentCustomEvents)
@@ -333,9 +332,9 @@ namespace ILGPU.Runtime.Profiling
                 StartTime = currentSessionStart,
                 EndTime = endTime,
                 Metrics = metrics,
-                KernelExecutions = new List<KernelExecutionRecord>(currentKernelExecutions),
-                MemoryOperations = new List<MemoryOperationRecord>(currentMemoryOperations),
-                CustomEvents = new List<CustomEventRecord>(currentCustomEvents),
+                KernelExecutions = [.. currentKernelExecutions],
+                MemoryOperations = [.. currentMemoryOperations],
+                CustomEvents = [.. currentCustomEvents],
                 SystemInfo = GetSystemInformation(),
                 AcceleratorInfo = GetAcceleratorInformation(),
                 Recommendations = recommendations

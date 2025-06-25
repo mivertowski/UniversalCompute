@@ -94,7 +94,7 @@ namespace ILGPU.Util
             while (expression.Length > 0)
             {
                 // Search for next {
-                int foundIndex = expression.IndexOfAny(new[] { '{', '}' });
+                int foundIndex = expression.IndexOfAny(['{', '}']);
                 if (foundIndex < 0)
                 {
                     result.Add(new FormatExpression(expression));

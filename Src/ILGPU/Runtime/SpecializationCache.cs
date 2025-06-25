@@ -62,7 +62,7 @@ namespace ILGPU.Runtime
 
         private readonly ReaderWriterLockSlim cacheLock = new();
         private readonly Dictionary<TArgs, TDelegate> kernelCache =
-            new();
+            [];
 
         #endregion
 

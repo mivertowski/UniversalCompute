@@ -374,7 +374,7 @@ namespace ILGPU.IR.Analyses
         public static AnalysisValueMapping<T> Create<T>()
             where T : struct, IEquatable<T> =>
             new(
-                new Dictionary<Value, AnalysisValue<T>>());
+                []);
     }
 
     /// <summary>
@@ -390,6 +390,6 @@ namespace ILGPU.IR.Analyses
         public static AnalysisReturnValueMapping<T> Create<T>()
             where T : struct, IEquatable<T> =>
             new(
-                new Dictionary<Method, AnalysisValue<T>>());
+                []);
     }
 }

@@ -44,7 +44,7 @@ namespace ILGPU.Runtime.AI
         public WorkloadOrchestrator(Context context, IEnumerable<Accelerator> accelerators)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _acceleratorProfiles = new List<AcceleratorProfile>();
+            _acceleratorProfiles = [];
             _scheduler = new WorkloadScheduler();
             _performanceTracker = new PerformanceTracker();
 

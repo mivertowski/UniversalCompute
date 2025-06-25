@@ -250,7 +250,7 @@ namespace ILGPU.Runtime.MultiGPU
         /// <summary>
         /// Gets the results from individual GPUs.
         /// </summary>
-        public Dictionary<int, object> GPUResults { get; } = gpuResults ?? new Dictionary<int, object>();
+        public Dictionary<int, object> GPUResults { get; } = gpuResults ?? [];
 
         /// <summary>
         /// Gets the error information if the operation failed.
@@ -388,11 +388,11 @@ namespace ILGPU.Runtime.MultiGPU
         /// <summary>
         /// Gets the GPU utilization percentages.
         /// </summary>
-        public Dictionary<int, double> GPUUtilization { get; } = gpuUtilization ?? new Dictionary<int, double>();
+        public Dictionary<int, double> GPUUtilization { get; } = gpuUtilization ?? [];
 
         /// <summary>
         /// Gets the memory utilization percentages.
         /// </summary>
-        public Dictionary<int, double> MemoryUtilization { get; } = memoryUtilization ?? new Dictionary<int, double>();
+        public Dictionary<int, double> MemoryUtilization { get; } = memoryUtilization ?? [];
     }
 }

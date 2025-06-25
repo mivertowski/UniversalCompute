@@ -85,7 +85,7 @@ namespace ILGPU.IR.Intrinsics
 
             /// <summary cref="IGenericArgumentResolver.ResolveGenericArguments"/>
             public Type[] ResolveGenericArguments() =>
-                new Type[] { Value.Type.LoadManagedType() };
+                [Value.Type.LoadManagedType()];
         }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace ILGPU.IR.Intrinsics
             switch (implementation.Mode)
             {
                 case IntrinsicImplementationMode.Redirect:
-                    implementationMapping = new Dictionary<MappingKey, Method>();
+                    implementationMapping = [];
                     break;
                 case IntrinsicImplementationMode.GenerateCode:
                     if (!TargetMethod.IsGenericMethod)
@@ -314,7 +314,7 @@ namespace ILGPU.IR.Intrinsics
                     }
                     else
                     {
-                        delegateMapping = new Dictionary<MappingKey, TDelegate>();
+                        delegateMapping = [];
                     }
                     break;
                 default:

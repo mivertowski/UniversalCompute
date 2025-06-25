@@ -454,12 +454,12 @@ namespace ILGPU.SourceGenerators.Generators
 
     internal class KernelOptimizationAnalysis
     {
-        public List<string> ConstantParameters { get; } = new List<string>();
-        public List<string> SpecializableParameters { get; } = new List<string>();
-        public List<LoopUnrollInfo> LoopUnrollCandidates { get; } = new List<LoopUnrollInfo>();
-        public List<ElementAccessExpressionSyntax> PrefetchOpportunities { get; } = new List<ElementAccessExpressionSyntax>();
-        public List<ElementAccessExpressionSyntax> CoalescingOpportunities { get; } = new List<ElementAccessExpressionSyntax>();
-        public List<AssignmentExpressionSyntax> VectorizationCandidates { get; } = new List<AssignmentExpressionSyntax>();
+        public List<string> ConstantParameters { get; } = [];
+        public List<string> SpecializableParameters { get; } = [];
+        public List<LoopUnrollInfo> LoopUnrollCandidates { get; } = [];
+        public List<ElementAccessExpressionSyntax> PrefetchOpportunities { get; } = [];
+        public List<ElementAccessExpressionSyntax> CoalescingOpportunities { get; } = [];
+        public List<AssignmentExpressionSyntax> VectorizationCandidates { get; } = [];
     }
 
     internal class LoopUnrollInfo

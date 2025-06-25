@@ -91,7 +91,7 @@ namespace ILGPU.Frontend.Intrinsic
 
         private static readonly DeviceFunctionHandler<IntrinsicAttribute>[]
             IntrinsicHandlers =
-        {
+        [
             (ref InvocationContext context, IntrinsicAttribute attribute) =>
                 HandleAcceleratorOperation(
                     ref context,
@@ -152,7 +152,7 @@ namespace ILGPU.Frontend.Intrinsic
                 HandleLanguageOperation(
                     ref context,
                     attribute.AsNotNullCast<LanguageIntrinsicAttribute>()),
-        };
+        ];
 
         #endregion
 

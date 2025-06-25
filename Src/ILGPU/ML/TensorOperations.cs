@@ -19,7 +19,6 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using ILGPU.Runtime;
-using ILGPU.Runtime.Cuda;
 using ILGPU.TensorCores;
 
 namespace ILGPU.ML

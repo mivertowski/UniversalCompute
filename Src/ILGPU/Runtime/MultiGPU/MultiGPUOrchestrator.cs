@@ -41,7 +41,7 @@ namespace ILGPU.Runtime.MultiGPU
 
         private long totalOperations;
         private TimeSpan totalExecutionTime;
-        private readonly List<TimeSpan> executionTimes = new();
+        private readonly List<TimeSpan> executionTimes = [];
         private bool disposed;
 
         #endregion
@@ -63,7 +63,7 @@ namespace ILGPU.Runtime.MultiGPU
             loadStats = new ConcurrentDictionary<int, double>();
 
             // Initialize GPU information
-            availableGPUs = new List<GPUInfo>();
+            availableGPUs = [];
             int index = 0;
             foreach (var accelerator in accelerators)
             {
@@ -503,7 +503,7 @@ namespace ILGPU.Runtime.MultiGPU
             var assignments = new Dictionary<GPUInfo, List<MultiGPUWorkItem>>();
             foreach (var gpu in gpus)
             {
-                assignments[gpu] = new List<MultiGPUWorkItem>();
+                assignments[gpu] = [];
             }
 
             switch (options.DistributionStrategy)

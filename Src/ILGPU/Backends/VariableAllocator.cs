@@ -184,7 +184,7 @@ namespace ILGPU.Backends
         #region Instance
 
         private readonly Dictionary<Value, Variable> variableLookup =
-            new();
+            [];
         private int idCounter;
 
         /// <summary>

@@ -313,7 +313,7 @@ namespace ILGPU.IR.Rewriting
             out HashSet<Value> converted)
             where TProcessor : struct, IProcessor
         {
-            converted = new HashSet<Value>();
+            converted = [];
             bool applied = false;
 
             // Apply to all parameters

@@ -57,7 +57,7 @@ namespace ILGPU.Tests
             where T : unmanaged, IEquatable<T>
         {
             var method = KernelMethodAttribute.GetKernelMethod(
-                new Type[] { typeof(T) });
+                [typeof(T)]);
             var kernel = Accelerator.LoadAutoGroupedKernel(
                 new Action<Index1D, ArrayView1D<T, Stride1D.Dense>, SpecializedValue<T>>(
                     SpecializedImplicitValueKernel));
@@ -88,7 +88,7 @@ namespace ILGPU.Tests
             where T : unmanaged, IEquatable<T>
         {
             var method = KernelMethodAttribute.GetKernelMethod(
-                new Type[] { typeof(T) });
+                [typeof(T)]);
             var kernel = Accelerator.LoadKernel(
                 new Action<ArrayView1D<T, Stride1D.Dense>, SpecializedValue<T>>(
                     SpecializedExplicitValueKernel));

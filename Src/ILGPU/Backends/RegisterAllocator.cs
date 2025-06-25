@@ -318,9 +318,9 @@ namespace ILGPU.Backends
         #region Instance
 
         private readonly Dictionary<Value, RegisterEntry> registerLookup =
-            new();
+            [];
         private readonly Dictionary<Value, Value> aliases =
-            new();
+            [];
 
         #endregion
 

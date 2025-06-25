@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ILGPU.Runtime.KernelCache
 {
@@ -28,7 +27,7 @@ namespace ILGPU.Runtime.KernelCache
     /// </summary>
     public static class AcceleratorKernelCache
     {
-        private static readonly Dictionary<Accelerator, IKernelCache> acceleratorCaches = new();
+        private static readonly Dictionary<Accelerator, IKernelCache> acceleratorCaches = [];
         private static readonly object lockObject = new();
 
         /// <summary>
@@ -283,7 +282,7 @@ namespace ILGPU.Runtime.KernelCache
                 {
                     var parameterType = action.Method.GetParameters().First().ParameterType;
                     var genericMethod = loadKernelMethod.MakeGenericMethod(parameterType);
-                    var newKernel = (TDelegate)genericMethod.Invoke(null, new object[] { accelerator, action })!;
+                    var newKernel = (TDelegate)genericMethod.Invoke(null, [accelerator, action])!;
                 
                     // Store in cache
                     var kernelMetadata = new Dictionary<string, object>

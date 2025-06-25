@@ -48,9 +48,7 @@ namespace ILGPU.IR.Intrinsics
             public ImplementationTransformer(Backend backend)
             {
                 Debug.Assert(backend != null, "Invalid backend");
-                mappings = new Dictionary<
-                    IntrinsicImplementation,
-                    IntrinsicMapping<TDelegate>>();
+                mappings = [];
                 Backend = backend;
             }
 
@@ -172,7 +170,7 @@ namespace ILGPU.IR.Intrinsics
                 codeGenerationPhase = contextCodeGenerationPhase
                     .BeginFrontendCodeGeneration();
 
-                mappings = new Dictionary<MethodInfo, MappingEntry>();
+                mappings = [];
             }
 
             #endregion

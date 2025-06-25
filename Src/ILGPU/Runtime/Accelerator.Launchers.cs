@@ -63,7 +63,7 @@ namespace ILGPU.Runtime
                 return;
             }
 
-            launchCache = new Dictionary<Delegate, Delegate>();
+            launchCache = [];
         }
 
         #endregion

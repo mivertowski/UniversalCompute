@@ -19,7 +19,6 @@ using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.UnifiedMemory;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 

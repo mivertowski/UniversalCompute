@@ -322,7 +322,7 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Maps converted values to their associated field references.
             /// </summary>
-            private Dictionary<Value, ConstructionFieldRef> ConvertedValues { get; } = new Dictionary<Value, ConstructionFieldRef>();
+            private Dictionary<Value, ConstructionFieldRef> ConvertedValues { get; } = [];
 
             /// <summary>
             /// Returns true if the given alloca should be converted.
@@ -668,7 +668,7 @@ namespace ILGPU.IR.Transformations
             private Dictionary<
                 Value,
                 (int ArrayLength, int NumElementFields)> ArrayData
-            { get; } = new Dictionary<Value, (int, int)>();
+            { get; } = [];
 
             /// <summary>
             /// Returns true if the given alloca should be converted.

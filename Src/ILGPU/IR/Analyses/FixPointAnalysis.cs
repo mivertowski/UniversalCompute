@@ -1001,12 +1001,12 @@ namespace ILGPU.IR.Analyses
             /// <summary>
             /// Returns the current value mapping.
             /// </summary>
-            public Dictionary<Value, AnalysisValue<T>> ValueMapping { get; } = new Dictionary<Value, AnalysisValue<T>>();
+            public Dictionary<Value, AnalysisValue<T>> ValueMapping { get; } = [];
 
             /// <summary>
             /// Returns the set of visited configurations.
             /// </summary>
-            public HashSet<GlobalAnalysisEntry<T>> Visited { get; } = new HashSet<GlobalAnalysisEntry<T>>();
+            public HashSet<GlobalAnalysisEntry<T>> Visited { get; } = [];
 
             /// <summary>
             /// Returns the current stack.

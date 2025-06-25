@@ -100,7 +100,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Select),
-                    new[] { typeof(TSource), typeof(TResult) },
+                    [typeof(TSource), typeof(TResult)],
                     source.Expression,
                     System.Linq.Expressions.Expression.Quote(
                         System.Linq.Expressions.Expression.Lambda(
@@ -131,7 +131,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Where),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression,
                     System.Linq.Expressions.Expression.Quote(
                         System.Linq.Expressions.Expression.Lambda(
@@ -157,7 +157,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Sum),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression));
         }
 
@@ -177,7 +177,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Average),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression));
         }
 
@@ -197,7 +197,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Min),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression));
         }
 
@@ -217,7 +217,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Max),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression));
         }
 
@@ -237,7 +237,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Count),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression));
         }
 
@@ -260,7 +260,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Any),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression,
                     System.Linq.Expressions.Expression.Quote(
                         System.Linq.Expressions.Expression.Lambda(
@@ -289,7 +289,7 @@ namespace ILGPU.Runtime.LINQ
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.All),
-                    new[] { typeof(T) },
+                    [typeof(T)],
                     source.Expression,
                     System.Linq.Expressions.Expression.Quote(
                         System.Linq.Expressions.Expression.Lambda(

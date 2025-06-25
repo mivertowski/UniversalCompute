@@ -99,7 +99,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets kernel execution statistics by kernel name.
         /// </summary>
-        public Dictionary<string, KernelStatistics> KernelStats { get; init; } = new();
+        public Dictionary<string, KernelStatistics> KernelStats { get; init; } = [];
 
         /// <summary>
         /// Gets the total number of threads executed.
@@ -150,7 +150,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets memory operation statistics by operation type.
         /// </summary>
-        public Dictionary<MemoryOperationType, MemoryOperationStatistics> OperationStats { get; init; } = new();
+        public Dictionary<MemoryOperationType, MemoryOperationStatistics> OperationStats { get; init; } = [];
 
         /// <summary>
         /// Gets the memory pool hit ratio if pooling is enabled.
@@ -216,7 +216,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets accelerator-specific metrics.
         /// </summary>
-        public Dictionary<string, object> AcceleratorSpecificMetrics { get; init; } = new();
+        public Dictionary<string, object> AcceleratorSpecificMetrics { get; init; } = [];
     }
 
     /// <summary>
@@ -232,7 +232,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets custom event statistics by event name.
         /// </summary>
-        public Dictionary<string, EventStatistics> EventStats { get; init; } = new();
+        public Dictionary<string, EventStatistics> EventStats { get; init; } = [];
     }
 
     /// <summary>
@@ -293,7 +293,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets custom metadata.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; init; } = new();
+        public Dictionary<string, object> Metadata { get; init; } = [];
     }
 
     /// <summary>
@@ -380,6 +380,6 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets aggregated metadata.
         /// </summary>
-        public Dictionary<string, object> AggregatedMetadata { get; init; } = new();
+        public Dictionary<string, object> AggregatedMetadata { get; init; } = [];
     }
 }

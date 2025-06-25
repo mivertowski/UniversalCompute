@@ -46,7 +46,7 @@ namespace ILGPU.IR.Analyses
 
                 phiValues = PhiValueList.Create(
                     Math.Max(method.Blocks.Count >> 2, 4));
-                phiValueSet = new HashSet<PhiValue>();
+                phiValueSet = [];
 
                 Method = method;
             }

@@ -17,7 +17,6 @@
 
 using ILGPU.Numerics;
 using ILGPU.Numerics.AI;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 

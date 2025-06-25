@@ -265,8 +265,8 @@ namespace ILGPU.Backends.IL
             Debug.Assert(generator != null, "Invalid generator");
             Generator = generator;
 
-            declaredLocals = new List<LocalBuilder>();
-            declaredLabels = new List<Label>();
+            declaredLocals = [];
+            declaredLabels = [];
         }
 
         #endregion
@@ -438,8 +438,8 @@ namespace ILGPU.Backends.IL
         public DebugILEmitter(TextWriter writer)
         {
             Debug.Assert(writer != null, "Invalid stream writer");
-            locals = new List<ILLocal>();
-            labels = new List<ILLabel>();
+            locals = [];
+            labels = [];
             Writer = writer;
         }
 

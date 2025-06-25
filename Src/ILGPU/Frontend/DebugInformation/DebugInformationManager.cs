@@ -227,10 +227,10 @@ namespace ILGPU.Frontend.DebugInformation
         private readonly ReaderWriterLockSlim cacheLock =
             new(LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<string, string> pdbFiles =
-            new();
-        private readonly HashSet<string> lookupDirectories = new();
+            [];
+        private readonly HashSet<string> lookupDirectories = [];
         private readonly Dictionary<Assembly, AssemblyDebugInformation> assemblies =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new debug-information manager.

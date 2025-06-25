@@ -23,7 +23,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ILGPU.Backends;
 
 namespace ILGPU.Runtime.KernelCache
 {
@@ -43,7 +42,7 @@ namespace ILGPU.Runtime.KernelCache
         private long totalHits;
         private long totalMisses;
         private long totalEvictions;
-        private readonly List<double> accessTimeHistory = new();
+        private readonly List<double> accessTimeHistory = [];
         private bool disposed;
 
         #endregion

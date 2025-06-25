@@ -168,52 +168,52 @@ namespace ILGPU.Backends.OpenCL
         public const string GetLaneIndexOperation = "get_sub_group_local_id()";
 
         private static readonly string[] MemoryFenceFlags =
-        {
+        [
             "CLK_GLOBAL_MEM_FENCE",
             "CLK_LOCAL_MEM_FENCE",
-        };
+        ];
 
         private static readonly string[] AddressSpacePrefixes =
-        {
+        [
             "__generic",
             "global",
             "local",
             "private",
-        };
+        ];
 
         private static readonly string?[] AddressSpaceCastOperations =
-        {
+        [
             null,
             "to_global",
             "to_local",
             "to_private",
-        };
+        ];
 
         private static readonly string[] BarrierOperations =
-        {
+        [
             "sub_group_barrier",
             "work_group_barrier",
-        };
+        ];
 
         private static readonly string?[] PredicateBarrierOperations =
-        {
+        [
             null,
             "work_group_all",
             "work_group_any",
-        };
+        ];
 
         private static readonly string[] MemoryScopes =
-        {
+        [
             "memory_scope_work_group",
             "memory_scope_device",
             "memory_scope_device"
-        };
+        ];
 
         private static readonly string[] BroadcastOperations =
-        {
+        [
             "sub_group_broadcast",
             "work_group_broadcast",
-        };
+        ];
 
         private static readonly Dictionary<
             (CLDeviceVendor, ShuffleKind),
@@ -239,14 +239,14 @@ namespace ILGPU.Backends.OpenCL
             };
 
         private static readonly string[] CompareOperations =
-        {
+        [
             "==",
             "!=",
             "<",
             "<=",
             ">",
             ">="
-        };
+        ];
 
         /// <summary>
         /// Identifies the permitted value types for unary arithmetic operations.

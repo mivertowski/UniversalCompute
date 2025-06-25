@@ -48,13 +48,13 @@ namespace ILGPU.Runtime.Velocity
     {
         #region Static
 
-        private static readonly Type[] VelocitySpecializers = new Type[]
-        {
+        private static readonly Type[] VelocitySpecializers =
+        [
             typeof(Scalar),
 #if NET7_0_OR_GREATER
             typeof(Vec128),
 #endif
-        };
+        ];
 
         #endregion
 

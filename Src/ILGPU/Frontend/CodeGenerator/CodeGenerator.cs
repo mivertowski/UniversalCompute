@@ -32,10 +32,10 @@ namespace ILGPU.Frontend
         #region Instance
 
         private readonly Block.CFGBuilder cfgBuilder;
-        private readonly HashSet<VariableRef> variables = new();
+        private readonly HashSet<VariableRef> variables = [];
         private readonly Dictionary<VariableRef, (TypeNode, ConvertFlags)>
             variableTypes =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new code generator.

@@ -34,8 +34,8 @@ namespace ILGPU.Runtime
     public static class GpuErrorHandler
     {
         private static readonly object ErrorCountLock = new();
-        private static readonly Dictionary<GpuErrorCode, int> ErrorCounts = new();
-        private static readonly List<IGpuErrorLogger> ErrorLoggers = new();
+        private static readonly Dictionary<GpuErrorCode, int> ErrorCounts = [];
+        private static readonly List<IGpuErrorLogger> ErrorLoggers = [];
 
         /// <summary>
         /// Gets or sets whether automatic error recovery is enabled.

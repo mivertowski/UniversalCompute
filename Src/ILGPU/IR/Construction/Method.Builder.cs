@@ -165,7 +165,7 @@ namespace ILGPU.IR
             /// All created basic block builders.
             /// </summary>
             private readonly List<BasicBlock.Builder> basicBlockBuilders =
-                new();
+                [];
 
             /// <summary>
             /// Constructs a new method builder.

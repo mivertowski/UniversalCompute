@@ -12,13 +12,10 @@
 using ILGPU.Backends.EntryPoints;
 using ILGPU.IR;
 using ILGPU.IR.Analyses;
-using ILGPU.IR.Analyses.ControlFlowDirection;
-using ILGPU.IR.Analyses.TraversalOrders;
 using ILGPU.IR.Intrinsics;
 using ILGPU.IR.Values;
 using ILGPU.Util;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ILGPU.Backends.OpenCL
@@ -457,7 +454,7 @@ VariableAllocator.Variable variable,
 
                     if (!phiMapping.TryGetValue(targetBlock, out var phiVariables))
                     {
-                        phiVariables = new List<Variable>();
+                        phiVariables = [];
                         phiMapping.Add(targetBlock, phiVariables);
                     }
                     phiVariables.Add(variable);

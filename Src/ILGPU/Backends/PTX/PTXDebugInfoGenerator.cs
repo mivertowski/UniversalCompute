@@ -162,7 +162,7 @@ namespace ILGPU.Backends.PTX
         #region Instance
 
         private readonly Dictionary<string, int> fileMapping =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a debug information generator.
@@ -290,7 +290,7 @@ namespace ILGPU.Backends.PTX
         #region Instance
 
         private readonly Dictionary<string, string[]> fileMapping =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a debug information generator.

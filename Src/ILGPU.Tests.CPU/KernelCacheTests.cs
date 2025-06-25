@@ -20,7 +20,6 @@ using ILGPU.Runtime.KernelCache;
 using ILGPU.Runtime.CPU;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -503,17 +502,17 @@ namespace ILGPU.Tests.CPU
         {
             var key1 = KernelCacheExtensions.CreateCacheKey(
                 "TestKernel", 
-                new object[] { typeof(int), typeof(float) }, 
+                [typeof(int), typeof(float)], 
                 "CPU_Device_0");
                 
             var key2 = KernelCacheExtensions.CreateCacheKey(
                 "TestKernel", 
-                new object[] { typeof(int), typeof(double) }, 
+                [typeof(int), typeof(double)], 
                 "CPU_Device_0");
                 
             var key3 = KernelCacheExtensions.CreateCacheKey(
                 "TestKernel", 
-                new object[] { typeof(int), typeof(float) }, 
+                [typeof(int), typeof(float)], 
                 "GPU_Device_0");
             
             Assert.NotEqual(key1, key2); // Different parameter types

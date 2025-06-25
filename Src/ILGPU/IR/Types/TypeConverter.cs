@@ -115,7 +115,7 @@ namespace ILGPU.IR.Types
         where TType : TypeNode
     {
         private readonly Dictionary<Value, TypeNode> typeMapping =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new type lowering.

@@ -78,15 +78,15 @@ namespace ILGPU.Algorithms.Tests
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
-            private static readonly float[] GlobalLowerBounds = new float[]
-            {
+            private static readonly float[] GlobalLowerBounds =
+            [
                 -5.0f, -5.0f
-            };
+            ];
 
-            private static readonly float[] GlobalUpperBounds = new float[]
-            {
+            private static readonly float[] GlobalUpperBounds =
+            [
                 5.0f, 5.0f
-            };
+            ];
 
             /// <summary>
             /// The optimal result.
@@ -131,15 +131,15 @@ namespace ILGPU.Algorithms.Tests
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
-            private static readonly float[] GlobalLowerBounds = new float[]
-            {
+            private static readonly float[] GlobalLowerBounds =
+            [
                 -100.0f, -100.0f
-            };
+            ];
 
-            private static readonly float[] GlobalUpperBounds = new float[]
-            {
+            private static readonly float[] GlobalUpperBounds =
+            [
                 100.0f, 100.0f
-            };
+            ];
 
             /// <summary>
             /// The optimal result.
@@ -184,15 +184,15 @@ namespace ILGPU.Algorithms.Tests
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
-            private static readonly float[] GlobalLowerBounds = new float[]
-            {
+            private static readonly float[] GlobalLowerBounds =
+            [
                 -100.0f, -100.0f
-            };
+            ];
 
-            private static readonly float[] GlobalUpperBounds = new float[]
-            {
+            private static readonly float[] GlobalUpperBounds =
+            [
                 100.0f, 100.0f
-            };
+            ];
 
             /// <summary>
             /// The optimal result.
@@ -237,15 +237,15 @@ namespace ILGPU.Algorithms.Tests
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
-            private static readonly float[] GlobalLowerBounds = new float[]
-            {
+            private static readonly float[] GlobalLowerBounds =
+            [
                 -1.5f, -1.5f
-            };
+            ];
 
-            private static readonly float[] GlobalUpperBounds = new float[]
-            {
+            private static readonly float[] GlobalUpperBounds =
+            [
                 1.5f, 1.5f
-            };
+            ];
 
             /// <summary>
             /// The optimal result.
@@ -293,15 +293,15 @@ namespace ILGPU.Algorithms.Tests
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
-            private static readonly float[] GlobalLowerBounds = new float[]
-            {
+            private static readonly float[] GlobalLowerBounds =
+            [
                 -1.0f, -1.0f
-            };
+            ];
 
-            private static readonly float[] GlobalUpperBounds = new float[]
-            {
+            private static readonly float[] GlobalUpperBounds =
+            [
                 0.75f, 1.0f
-            };
+            ];
 
             /// <summary>
             /// The optimal result.
@@ -373,8 +373,8 @@ namespace ILGPU.Algorithms.Tests
                     32,
                     64,
                     4,
-                    new float[] { 0.0f, 0.0f, 0.0f, 0.0f},
-                    new float[] { PSO.Omega, PSO.PhiG, PSO.PhiP }),
+                    [0.0f, 0.0f, 0.0f, 0.0f],
+                    [PSO.Omega, PSO.PhiG, PSO.PhiP]),
                 new DistanceF32x2(1.3f),
                 0.0f,
                 2.0f,
@@ -389,8 +389,8 @@ namespace ILGPU.Algorithms.Tests
                     512,
                     2048,
                     6,
-                    new float[] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
-                    new float[] { PSO.Omega, PSO.PhiG, PSO.PhiP }),
+                    [0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f],
+                    [PSO.Omega, PSO.PhiG, PSO.PhiP]),
                 new DistanceF32x2(4.7f),
                 0.0f,
                 20.0f,

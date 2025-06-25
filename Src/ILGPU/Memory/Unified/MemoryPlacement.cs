@@ -154,26 +154,26 @@ namespace ILGPU.Memory.Unified
         /// <returns>An array of memory placement information.</returns>
         public static MemoryPlacementInfo[] GetAvailablePlacements()
         {
-            var placements = new List<MemoryPlacementInfo>();
-
-            // Add standard placements that are always available
-            placements.Add(new MemoryPlacementInfo(
+            var placements = new List<MemoryPlacementInfo>
+            {
+                // Add standard placements that are always available
+                new MemoryPlacementInfo(
                 MemoryPlacement.DeviceLocal,
                 supportsZeroCopy: false,
                 supportsAutoMigration: false,
                 relativeBandwidth: 1.0f,
                 relativeLatency: 1.0f,
                 isAvailable: true,
-                description: "Standard device memory"));
-
-            placements.Add(new MemoryPlacementInfo(
+                description: "Standard device memory"),
+                new MemoryPlacementInfo(
                 MemoryPlacement.HostPinned,
                 supportsZeroCopy: false,
                 supportsAutoMigration: false,
                 relativeBandwidth: 0.8f,
                 relativeLatency: 2.0f,
                 isAvailable: true,
-                description: "Host pinned memory"));
+                description: "Host pinned memory")
+            };
 
             // Platform-specific placements
             if (PlatformDetection.IsAppleSilicon)

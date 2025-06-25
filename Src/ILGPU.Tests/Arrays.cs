@@ -864,7 +864,7 @@ namespace ILGPU.Tests
             Index1D index,
             ArrayView<int> buffer)
         {
-            int[] values = new[] { 0, 1 };
+            int[] values = [0, 1];
 
             if (index == values[0])
                 buffer[index] = 42;
@@ -888,7 +888,7 @@ namespace ILGPU.Tests
             ArrayView<int> buffer,
             int constant)
         {
-            int[] values = new[] { 0, 1 };
+            int[] values = [0, 1];
 
             if (Bitwise.And(index == values[1], constant == values[0]))
                 buffer[index] = 42;

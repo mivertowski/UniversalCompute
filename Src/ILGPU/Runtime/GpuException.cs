@@ -116,7 +116,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets additional context information about the error.
         /// </summary>
-        public Dictionary<string, object> Context { get; } = new();
+        public Dictionary<string, object> Context { get; } = [];
 
         /// <summary>
         /// Gets recovery suggestions for this error.
@@ -128,6 +128,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -148,25 +149,25 @@ namespace ILGPU.Runtime
                     "Enable memory pooling to reuse buffers",
                     "Consider using paged memory for large allocations"
                 },
-            GpuErrorCode.DeviceNotFound => new[]
-            {
+            GpuErrorCode.DeviceNotFound =>
+            [
                     "Verify GPU drivers are installed and up to date",
                     "Check that the device is properly connected",
                     "Ensure the accelerator type matches available hardware"
-                },
-            GpuErrorCode.KernelLaunchFailed => new[]
-            {
+                ],
+            GpuErrorCode.KernelLaunchFailed =>
+            [
                     "Check kernel parameters and memory bounds",
                     "Verify kernel configuration is valid",
                     "Ensure all memory buffers are properly allocated"
-                },
-            GpuErrorCode.InvalidOperation => new[]
-            {
+                ],
+            GpuErrorCode.InvalidOperation =>
+            [
                     "Check that the operation is supported on this device",
                     "Verify the current device state",
                     "Ensure proper initialization before operation"
-                },
-            _ => new[] { "Consult ILGPU documentation for troubleshooting guidance" }
+                ],
+            _ => ["Consult ILGPU documentation for troubleshooting guidance"]
         };
 
         /// <summary>
@@ -246,6 +247,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -302,6 +304,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -350,6 +353,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);

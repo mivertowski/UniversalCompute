@@ -15,12 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends.Metal.Native;
-using ILGPU.Runtime;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
 #if ENABLE_METAL_ACCELERATOR
 namespace ILGPU.Backends.Metal
 {

@@ -17,7 +17,6 @@
 
 using ILGPU.Runtime;
 using System;
-using System.Numerics;
 using System.Threading.Tasks;
 
 namespace ILGPU.Memory.Unified

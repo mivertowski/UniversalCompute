@@ -296,7 +296,7 @@ namespace ILGPU
         /// </summary>
         protected internal ContextProperties()
         {
-            extensionProperties = new Dictionary<string, object>();
+            extensionProperties = [];
         }
 
         /// <summary>

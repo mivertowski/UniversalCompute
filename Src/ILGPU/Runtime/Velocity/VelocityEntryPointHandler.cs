@@ -40,14 +40,14 @@ namespace ILGPU.Runtime.Velocity
         /// Represents all entry point parameters expected by a Velocity kernel entry
         /// point function.
         /// </summary>
-        public static readonly Type[] EntryPointParameterTypes = new Type[]
-        {
+        public static readonly Type[] EntryPointParameterTypes =
+        [
             typeof(VelocityGroupExecutionContext),
             typeof(int),
             typeof(int),
             typeof(long),
             typeof(long),
             typeof(VelocityParameters),
-        };
+        ];
     }
 }

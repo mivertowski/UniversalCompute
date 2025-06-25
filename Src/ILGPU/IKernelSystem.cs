@@ -15,7 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Util;
 using System;
 
 namespace ILGPU

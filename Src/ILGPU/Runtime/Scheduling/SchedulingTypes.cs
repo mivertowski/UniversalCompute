@@ -17,8 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ILGPU.Runtime.Scheduling
 {
@@ -28,7 +26,7 @@ namespace ILGPU.Runtime.Scheduling
         public long MemoryRequirement { get; set; }
         public WorkloadType Type { get; set; }
         public int Priority { get; set; }
-        public Dictionary<string, object> Properties { get; set; } = new();
+        public Dictionary<string, object> Properties { get; set; } = [];
 
         public WorkloadAnalysis()
         {
@@ -55,11 +53,11 @@ namespace ILGPU.Runtime.Scheduling
 
     public class ExecutionSchedule
     {
-        public List<ScheduledNode> Nodes { get; set; } = new();
+        public List<ScheduledNode> Nodes { get; set; } = [];
         public TimeSpan TotalDuration { get; set; }
         public double Efficiency { get; set; }
-        public List<ParallelExecutionGroup> ParallelGroups { get; set; } = new();
-        public List<ScheduledExecutionLevel> Levels { get; set; } = new();
+        public List<ParallelExecutionGroup> ParallelGroups { get; set; } = [];
+        public List<ScheduledExecutionLevel> Levels { get; set; } = [];
 
         public ExecutionSchedule()
         {
@@ -77,7 +75,7 @@ namespace ILGPU.Runtime.Scheduling
         public TimeSpan StartTime { get; set; }
         public TimeSpan Duration { get; set; }
         public Accelerator TargetAccelerator { get; set; } = null!;
-        public List<string> Dependencies { get; set; } = new();
+        public List<string> Dependencies { get; set; } = [];
         public double EstimatedTimeMs { get; set; }
 
         public ScheduledNode()
@@ -94,7 +92,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class ParallelExecutionGroup
     {
-        public List<ScheduledNode> Nodes { get; set; } = new();
+        public List<ScheduledNode> Nodes { get; set; } = [];
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
     }
@@ -102,7 +100,7 @@ namespace ILGPU.Runtime.Scheduling
     public class ScheduledExecutionLevel
     {
         public int Level { get; set; }
-        public List<ScheduledNode> Nodes { get; set; } = new();
+        public List<ScheduledNode> Nodes { get; set; } = [];
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public double ParallelismFactor { get; set; }
@@ -120,7 +118,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class MemoryTransferPlan
     {
-        public List<MemoryTransfer> Transfers { get; set; } = new();
+        public List<MemoryTransfer> Transfers { get; set; } = [];
         public long TotalBytes { get; set; }
         public TimeSpan EstimatedTime { get; set; }
         public double Bandwidth { get; set; }
@@ -163,7 +161,7 @@ namespace ILGPU.Runtime.Scheduling
         public double OverallEfficiency { get; set; }
         public TimeSpan TotalTime { get; set; }
         public ComputeGraph Graph { get; set; } = new();
-        public Dictionary<ComputeNode, ComputeDevice> Assignments { get; set; } = new();
+        public Dictionary<ComputeNode, ComputeDevice> Assignments { get; set; } = [];
 
         public ExecutionPlan()
         {
@@ -188,14 +186,14 @@ namespace ILGPU.Runtime.Scheduling
 
         public LoadBalancer()
         {
-            this.accelerators = new List<Accelerator>();
-            this.currentLoads = new Dictionary<Accelerator, double>();
+            this.accelerators = [];
+            this.currentLoads = [];
         }
 
         public LoadBalancer(IEnumerable<Accelerator> accelerators)
         {
-            this.accelerators = new List<Accelerator>(accelerators);
-            this.currentLoads = new Dictionary<Accelerator, double>();
+            this.accelerators = [.. accelerators];
+            this.currentLoads = [];
             foreach (var acc in this.accelerators)
             {
                 this.currentLoads[acc] = 0.0;
@@ -263,15 +261,15 @@ namespace ILGPU.Runtime.Scheduling
 
         public PerformanceProfiler()
         {
-            executionTimes = new Dictionary<string, List<TimeSpan>>();
-            activeExecutions = new Dictionary<string, DateTime>();
+            executionTimes = [];
+            activeExecutions = [];
         }
 
         public void RecordExecution(string operationName, TimeSpan duration)
         {
             if (!executionTimes.ContainsKey(operationName))
             {
-                executionTimes[operationName] = new List<TimeSpan>();
+                executionTimes[operationName] = [];
             }
             executionTimes[operationName].Add(duration);
         }

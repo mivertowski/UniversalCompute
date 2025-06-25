@@ -107,12 +107,12 @@ namespace ILGPU.Backends.Velocity
         /// <summary>
         /// A dictionary mapping values to IL locals.
         /// </summary>
-        private readonly Dictionary<Value, ILLocal> locals = new();
+        private readonly Dictionary<Value, ILLocal> locals = [];
 
         /// <summary>
         /// Temporary locals for initialization.
         /// </summary>
-        private readonly Dictionary<TypeNode, ILLocal> nullLocals = new();
+        private readonly Dictionary<TypeNode, ILLocal> nullLocals = [];
 
         private readonly PhiBindings phiBindings;
         private readonly Dictionary<Value, ILLocal> intermediatePhis;

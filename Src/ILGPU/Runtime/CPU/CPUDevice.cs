@@ -146,14 +146,14 @@ namespace ILGPU.Runtime.CPU
         /// <see cref="CPUDevice"/> instances.
         /// </summary>
         public static readonly ImmutableArray<CPUDevice> All =
-            ImmutableArray.Create(new CPUDevice[]
-        {
+            ImmutableArray.Create(
+        [
             Default,
             Nvidia,
             AMD,
             LegacyAMD,
             Intel,
-        });
+        ]);
 
         /// <summary>
         /// Gets a specific CPU device.

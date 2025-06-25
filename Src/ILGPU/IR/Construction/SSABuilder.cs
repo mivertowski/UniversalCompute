@@ -162,14 +162,14 @@ namespace ILGPU.IR.Construction
             /// Value cache for SSA GetValue and SetValue functionality.
             /// </summary>
             private readonly Dictionary<TVariable, Value> values =
-                new();
+                [];
 
             /// <summary>
             /// Container for incomplete "phis" that have to be wired during block
             /// sealing.
             /// </summary>
             private readonly Dictionary<TVariable, IncompletePhi> incompletePhis =
-                new();
+                [];
 
             /// <summary>
             /// Constructs a new SSA block.

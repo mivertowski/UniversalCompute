@@ -33,7 +33,7 @@ namespace ILGPU.Memory.Unified
     public class AcceleratorMemoryManager(Accelerator accelerator) : IDisposable
     {
         private readonly Accelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        private readonly Dictionary<IntPtr, MemoryAllocation> _allocations = new();
+        private readonly Dictionary<IntPtr, MemoryAllocation> _allocations = [];
         private long _totalAllocatedBytes;
         private readonly object _syncLock = new();
 
@@ -160,7 +160,7 @@ namespace ILGPU.Memory.Unified
     /// </summary>
     public class MemoryUsageTracker : IDisposable
     {
-        private readonly Dictionary<Accelerator, MemoryUsageStats> _usageStats = new();
+        private readonly Dictionary<Accelerator, MemoryUsageStats> _usageStats = [];
         private readonly object _syncLock = new();
 
         /// <summary>

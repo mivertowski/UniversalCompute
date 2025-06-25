@@ -186,11 +186,11 @@ namespace ILGPU.Backends.EntryPoints
         /// Represents the associated constructor taking two integer parameters.
         /// </summary>
         internal static ConstructorInfo Constructor = typeof(SharedMemorySpecification).
-            GetConstructor(new Type[]
-            {
+            GetConstructor(
+            [
                 typeof(int),
                 typeof(bool)
-            })
+            ])
             .ThrowIfNull();
 
         #endregion

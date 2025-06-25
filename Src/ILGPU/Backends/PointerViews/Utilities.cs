@@ -52,11 +52,11 @@ namespace ILGPU.Backends.PointerViews
         /// <param name="implType">The view implementation type.</param>
         /// <returns>The resolved view constructor.</returns>
         public static ConstructorInfo GetViewConstructor(Type implType) =>
-            implType.GetConstructor(new Type[]
-            {
+            implType.GetConstructor(
+            [
                 typeof(ArrayView<>).MakeGenericType(
                     implType.GetGenericArguments()[0])
-            })
+            ])
             .ThrowIfNull();
 
         /// <summary>

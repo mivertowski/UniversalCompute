@@ -33,11 +33,11 @@ namespace ILGPU
         /// Represents a kernel constructor for implicitly grouped kernels.
         /// </summary>
         internal static readonly ConstructorInfo ImplicitlyGroupedKernelConstructor =
-            typeof(KernelConfig).GetConstructor(new Type[]
-                {
+            typeof(KernelConfig).GetConstructor(
+                [
                     typeof(Index3D),
                     typeof(Index3D)
-                })
+                ])
             .ThrowIfNull();
 
         #endregion
@@ -506,11 +506,11 @@ namespace ILGPU
         /// Represents the associated constructor.
         /// </summary>
         internal static ConstructorInfo Constructor = typeof(RuntimeKernelConfig).
-            GetConstructor(new Type[]
-            {
+            GetConstructor(
+            [
                 typeof(KernelConfig),
                 typeof(SharedMemorySpecification)
-            })
+            ])
             .ThrowIfNull();
 
         #endregion

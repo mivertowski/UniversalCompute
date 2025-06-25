@@ -500,7 +500,7 @@ namespace ILGPU.Backends.EntryPoints
         /// The internal type mapping (from old to new types).
         /// </summary>
         private readonly Dictionary<Type, Type> typeMapping =
-            new();
+            [];
 
         /// <summary>
         /// Constructs a new argument mapper.

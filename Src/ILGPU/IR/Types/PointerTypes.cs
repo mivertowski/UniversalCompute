@@ -66,12 +66,12 @@ namespace ILGPU.IR.Types
         /// Caches all known address space type converters.
         /// </summary>
         private static readonly AddressSpaceConverter[] TypeConverters =
-        {
+        [
             new(MemoryAddressSpace.Generic),
             new(MemoryAddressSpace.Global),
             new(MemoryAddressSpace.Shared),
             new(MemoryAddressSpace.Local),
-        };
+        ];
 
         /// <summary>
         /// Returns a cached version of an <see cref="AddressSpaceConverter"/> for known

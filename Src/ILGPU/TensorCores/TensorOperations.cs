@@ -19,7 +19,6 @@ using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
 using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace ILGPU.TensorCores
 {
@@ -323,29 +322,29 @@ namespace ILGPU.TensorCores
                 var arch = cuda.Architecture;
                 if (arch.Major >= 9) // SM_90+
                 {
-                    return new[] { 
+                    return [ 
                         TensorPrecision.FP16, TensorPrecision.BF16, TensorPrecision.TF32, 
                         TensorPrecision.INT8, TensorPrecision.FP8_E4M3, TensorPrecision.FP8_E5M2 
-                    };
+                    ];
                 }
                 else if (arch.Major >= 8) // SM_80+
                 {
-                    return new[] { 
+                    return [ 
                         TensorPrecision.FP16, TensorPrecision.BF16, TensorPrecision.TF32, 
                         TensorPrecision.INT8 
-                    };
+                    ];
                 }
                 else if (arch.Major == 7 && arch.Minor >= 5) // SM_75+
                 {
-                    return new[] { 
+                    return [ 
                         TensorPrecision.FP16, TensorPrecision.INT8 
-                    };
+                    ];
                 }
                 else if (arch.Major == 7 && arch.Minor >= 0) // SM_70+
                 {
-                    return new[] { 
+                    return [ 
                         TensorPrecision.FP16 
-                    };
+                    ];
                 }
                 return Array.Empty<TensorPrecision>();
             }

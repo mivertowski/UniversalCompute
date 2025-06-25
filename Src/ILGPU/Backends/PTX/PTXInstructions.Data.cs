@@ -10,7 +10,6 @@
 // ---------------------------------------------------------------------------------------
 
 using ILGPU.IR.Values;
-using System;
 using System.Collections.Generic;
 
 // disable: max_line_length
@@ -117,44 +116,44 @@ namespace ILGPU.Backends.PTX
             };
 
         private static readonly string[] AddressSpaceCastOperations =
-        {
+        [
             "cvta",
             "cvta.to",
-        };
+        ];
 
         private static readonly string[] AddressSpaceCastOperationSuffix =
-        {
+        [
             "u32",
             "u64",
-        };
+        ];
 
         private static readonly string[] BarrierOperations =
-        {
+        [
             "bar.warp.sync",
             "bar.sync",
-        };
+        ];
 
         private static readonly string[] PredicateBarrierOperations =
-        {
+        [
             "bar.red.popc.u32",
             "bar.red.and.pred",
             "bar.red.or.pred",
-        };
+        ];
 
         private static readonly string[] MemoryBarrierOperations =
-        {
+        [
             "membar.cta",
             "membar.gl",
             "membar.sys",
-        };
+        ];
 
         private static readonly string[] ShuffleOperations =
-        {
+        [
             "shfl.sync.idx.b32",
             "shfl.sync.down.b32",
             "shfl.sync.up.b32",
             "shfl.sync.bfly.b32",
-        };
+        ];
 
         private static readonly Dictionary<BasicValueType, string> SelectValueOperations =
             new()

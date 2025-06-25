@@ -37,10 +37,10 @@ namespace ILGPU.Backends.OpenCL
             /// do not require a ".0f" suffix.
             /// </summary>
             private static readonly char[] FormattedFloatLiteralTokens =
-            {
+            [
                 '.',
                 'E'
-            };
+            ];
 
             #endregion
 

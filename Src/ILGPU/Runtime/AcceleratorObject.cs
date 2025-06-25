@@ -288,7 +288,7 @@ namespace ILGPU.Runtime
                 return;
 
             var oldObjects = childObjects;
-            childObjects = new List<WeakReference<AcceleratorObject>>();
+            childObjects = [];
             foreach (var childObject in oldObjects)
             {
                 if (childObject.TryGetTarget(out AcceleratorObject? _))

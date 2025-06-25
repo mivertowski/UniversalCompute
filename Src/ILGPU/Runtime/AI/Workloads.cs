@@ -453,7 +453,7 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         public PerformanceTracker()
         {
-            _metrics = new Dictionary<AcceleratorType, AcceleratorPerformanceMetrics>();
+            _metrics = [];
         }
 
         /// <summary>
@@ -516,7 +516,7 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         public AcceleratorPerformanceMetrics()
         {
-            _primitiveMetrics = new Dictionary<PrimitiveType, PrimitiveMetrics>();
+            _primitiveMetrics = [];
         }
 
         /// <summary>

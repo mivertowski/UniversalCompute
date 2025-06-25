@@ -18,12 +18,10 @@
 using System;
 using System.Buffers;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ILGPU.Runtime;
-using ILGPU.Numerics.Hybrid;
 using ILGPU.TensorCores;
 using ILGPU.SIMD;
 

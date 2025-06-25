@@ -94,7 +94,7 @@ namespace ILGPU.SourceGenerators.Analysis
     {
         public bool IsValid { get; private set; } = true;
         public string? Error { get; private set; }
-        public List<string> Warnings { get; } = new List<string>();
+        public List<string> Warnings { get; } = [];
 
         public void AddWarning(string warning)
         {

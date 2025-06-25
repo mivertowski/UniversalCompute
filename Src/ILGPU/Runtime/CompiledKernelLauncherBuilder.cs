@@ -10,9 +10,7 @@
 // ---------------------------------------------------------------------------------------
 
 using ILGPU.Backends.EntryPoints;
-using ILGPU.Backends.IL;
 using ILGPU.Resources;
-using ILGPU.Util;
 using System;
 using System.Diagnostics;
 using System.Reflection;

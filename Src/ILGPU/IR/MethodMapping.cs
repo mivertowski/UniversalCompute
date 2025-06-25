@@ -174,10 +174,10 @@ namespace ILGPU.IR
         #region Instance
 
         private readonly Dictionary<MethodBase, MethodHandle> managedMethods =
-            new();
+            [];
         private readonly Dictionary<MethodHandle, int> methods =
-            new();
-        private readonly List<T> dataList = new();
+            [];
+        private readonly List<T> dataList = [];
 
         #endregion
 

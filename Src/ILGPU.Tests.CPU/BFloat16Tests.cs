@@ -56,7 +56,7 @@ namespace ILGPU.Tests.CPU
         [Fact]
         public void BFloat16_RoundTrip_PreservesValue()
         {
-            float[] testValues = { 0.0f, 1.0f, -1.0f, 42.0f, -42.0f, 0.5f, -0.5f };
+            float[] testValues = [0.0f, 1.0f, -1.0f, 42.0f, -42.0f, 0.5f, -0.5f];
 
             foreach (var value in testValues)
             {

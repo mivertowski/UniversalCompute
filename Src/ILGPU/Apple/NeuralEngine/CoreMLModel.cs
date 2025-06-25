@@ -50,8 +50,8 @@ namespace ILGPU.Apple.NeuralEngine
 
             _modelPath = modelPath;
             _capabilities = capabilities;
-            _inputShapes = new Dictionary<string, TensorShape>();
-            _outputShapes = new Dictionary<string, TensorShape>();
+            _inputShapes = [];
+            _outputShapes = [];
 
             // Load the Core ML model
             _modelHandle = ANENative.LoadCoreMLModel(modelPath);

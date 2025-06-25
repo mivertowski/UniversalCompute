@@ -32,7 +32,7 @@ namespace ILGPU.IR
         /// The internal mapping of error messages.
         /// </summary>
         private readonly Dictionary<Node, string> errors =
-            new();
+            [];
 
         #endregion
 
@@ -299,7 +299,7 @@ namespace ILGPU.IR
         {
             #region Instance
 
-            private readonly HashSet<Value> values = new();
+            private readonly HashSet<Value> values = [];
             private readonly Dictionary<BasicBlock, HashSet<Value>> mapping =
                 new(new BasicBlock.Comparer());
 
@@ -313,7 +313,7 @@ namespace ILGPU.IR
             private void VerifyValues()
             {
                 foreach (var block in Method.Blocks)
-                    mapping.Add(block, new HashSet<Value>());
+                    mapping.Add(block, []);
 
                 foreach (var param in Method.Parameters)
                 {

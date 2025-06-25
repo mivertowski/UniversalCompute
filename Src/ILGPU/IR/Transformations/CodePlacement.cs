@@ -469,7 +469,7 @@ namespace ILGPU.IR.Transformations
                 Mover = mover;
                 strategy = new TStrategy();
                 strategy.Init(mover.Dominators.CFG.Count);
-                placed = new HashSet<Value>();
+                placed = [];
             }
 
             /// <summary>

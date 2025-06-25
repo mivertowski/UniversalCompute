@@ -39,20 +39,20 @@ namespace ILGPU.Runtime.CPU
         /// Contains the required parameter types of the default task constructor.
         /// </summary>
         internal static readonly Type[] ConstructorParameterTypes =
-        {
+        [
             typeof(CPUKernelExecutionHandler),
             typeof(KernelConfig),
             typeof(RuntimeKernelConfig)
-        };
+        ];
 
         /// <summary>
         /// Contains the required parameter types of the task-execution method.
         /// </summary>
         internal static readonly Type[] ExecuteParameterTypes =
-        {
+        [
             typeof(CPUAcceleratorTask), // task
             typeof(int)                 // linear index
-        };
+        ];
 
         /// <summary>
         /// Gets a task-specific constructor.

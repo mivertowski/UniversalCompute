@@ -32,8 +32,8 @@ namespace ILGPU.Backends.Velocity.Scalar
         /// <summary>
         /// Maps basic types to vectorized basic types.
         /// </summary>
-        private static readonly Type[] VectorizedBasicTypeMapping = new Type[]
-        {
+        private static readonly Type[] VectorizedBasicTypeMapping =
+        [
             ScalarOperations2.WarpType32, // None/Unknown
 
             ScalarOperations2.WarpType32, // Int1
@@ -45,7 +45,7 @@ namespace ILGPU.Backends.Velocity.Scalar
             ScalarOperations2.WarpType32, // Float16
             ScalarOperations2.WarpType32, // Float32
             ScalarOperations2.WarpType64, // Float64
-        };
+        ];
 
         #endregion
         #region Instance

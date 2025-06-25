@@ -221,8 +221,8 @@ namespace ILGPU.Backends
                 Methods = References.CreateRecursive(
                     kernelMethod.Blocks,
                     new MethodCollections.AllMethods());
-                allocaMapping = new Dictionary<Method, Allocas>();
-                notImplementedIntrinsics = new List<Method>();
+                allocaMapping = [];
+                notImplementedIntrinsics = [];
 
                 var sharedAllocations = ImmutableArray.
                     CreateBuilder<AllocaInformation>(20);

@@ -238,7 +238,7 @@ namespace ILGPU.Tests
 
             using var buffer = Accelerator.Allocate1D<Nested>(1);
             Execute(buffer.IntExtent, buffer.View, value);
-            Verify(buffer.View, new Nested[] { nested });
+            Verify(buffer.View, [nested]);
         }
 
         internal static void StructureSetNestedKernel(
@@ -271,7 +271,7 @@ namespace ILGPU.Tests
 
             using var buffer = Accelerator.Allocate1D<Parent>(1);
             Execute(buffer.Length, buffer.View, nested);
-            Verify(buffer.View, new Parent[] { value });
+            Verify(buffer.View, [value]);
         }
 
         public static TheoryData<object> StructureEmptyTypeData => new()
@@ -315,7 +315,7 @@ namespace ILGPU.Tests
 
             using var buffer = Accelerator.Allocate1D<TestStruct<EmptyStruct, T>>(1);
             Execute<Index1D, EmptyStruct, T>(buffer.IntExtent, buffer.View, expected);
-            Verify(buffer.View, new[] { expected });
+            Verify(buffer.View, [expected]);
         }
 
         [Theory]
@@ -336,7 +336,7 @@ namespace ILGPU.Tests
                 buffer.IntExtent,
                 buffer.View,
                 expected);
-            Verify(buffer.View, new[] { expected });
+            Verify(buffer.View, [expected]);
         }
 
         internal struct UnsignedFieldStruct

@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ILGPU.Backends;
 
 namespace ILGPU.Runtime.KernelCache
 {
@@ -67,7 +66,7 @@ namespace ILGPU.Runtime.KernelCache
         /// <summary>
         /// Gets the metadata dictionary.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; } = metadata ?? new Dictionary<string, object>();
+        public Dictionary<string, object> Metadata { get; } = metadata ?? [];
 
         /// <summary>
         /// Records an access to this cache entry.

@@ -62,13 +62,13 @@ namespace ILGPU.Frontend
             #region Instance
 
             private readonly Dictionary<int, int> offsetMapping =
-                new();
+                [];
             private readonly Dictionary<int, Block> blockMapping =
-                new();
+                [];
             private readonly Dictionary<BasicBlock, Block> basicBlockMapping =
                 new(new BasicBlock.Comparer());
             private readonly Dictionary<Block, List<Block>> successorMapping =
-                new();
+                [];
 
             /// <summary>
             /// Constructs a new CFG builder.
@@ -174,7 +174,7 @@ namespace ILGPU.Frontend
             {
                 if (!successorMapping.TryGetValue(current, out List<Block>? successors))
                 {
-                    successors = new List<Block>();
+                    successors = [];
                     successorMapping.Add(current, successors);
                 }
                 successors.Add(successor);

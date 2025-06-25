@@ -39,7 +39,7 @@ namespace ILGPU.IR.Analyses
             internal static readonly Comparison<Entry> Comparison =
                 (first, second) => first.Method.Id.CompareTo(second.Method.Id);
 
-            private readonly HashSet<Method> usesSet = new();
+            private readonly HashSet<Method> usesSet = [];
             private List<Method>? uses;
 
             internal Entry(Method method, References references, in T? data)
@@ -99,9 +99,7 @@ namespace ILGPU.IR.Analyses
             /// </summary>
             internal void FinishUses()
             {
-                uses = new List<Method>(usesSet.Count);
-                foreach (var use in usesSet)
-                    uses.Add(use);
+                uses = [.. usesSet];
                 uses.Sort(Method.Comparison);
             }
 
@@ -217,9 +215,9 @@ namespace ILGPU.IR.Analyses
         #region Instance
 
         private readonly Dictionary<Method, Entry> entries =
-            new();
-        private readonly List<Entry> sinks = new();
-        private readonly List<Entry> postOrder = new();
+            [];
+        private readonly List<Entry> sinks = [];
+        private readonly List<Entry> postOrder = [];
 
         /// <summary>
         /// Constructs a new structure instance.

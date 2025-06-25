@@ -58,7 +58,7 @@ namespace ILGPU.Runtime
                 nameof(ISpecializationCacheArgs.GetSpecializedArg),
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 typeof(object),
-                new Type[] { typeof(int) });
+                [typeof(int)]);
 
             var emitter = new ILEmitter(getArgMethod.GetILGenerator());
 
@@ -78,10 +78,9 @@ namespace ILGPU.Runtime
                 // Wrap in a specialized instance
                 var fieldReturnType = specializedType.MakeGenericType(field.FieldType);
                 var instanceConstructor = fieldReturnType.GetConstructor(
-                    new Type[]
-                    {
+                    [
                         field.FieldType
-                    })
+                    ])
                     .AsNotNull();
                 emitter.EmitNewObject(instanceConstructor);
 

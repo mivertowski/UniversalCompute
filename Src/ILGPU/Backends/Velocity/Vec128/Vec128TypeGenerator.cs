@@ -35,8 +35,8 @@ namespace ILGPU.Backends.Velocity.Vec128
         /// <summary>
         /// Maps basic types to vectorized basic types.
         /// </summary>
-        private static readonly Type[] VectorizedBasicTypeMapping = new Type[]
-        {
+        private static readonly Type[] VectorizedBasicTypeMapping =
+        [
             Vec128Operations.WarpType32, // None/Unknown
 
             Vec128Operations.WarpType32, // Int1
@@ -48,7 +48,7 @@ namespace ILGPU.Backends.Velocity.Vec128
             Vec128Operations.WarpType32, // Float16
             Vec128Operations.WarpType32, // Float32
             Vec128Operations.WarpType64, // Float64
-        };
+        ];
 
         #endregion
         #region Instance
