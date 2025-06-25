@@ -38,6 +38,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILGPU.SourceGenerators", "I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILGPU.Tests.Velocity128", "ILGPU.Tests.Velocity128\ILGPU.Tests.Velocity128.csproj", "{422BA1AE-858D-4AA4-815B-CF42A429D305}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILGPU.Benchmarks", "ILGPU.Benchmarks\ILGPU.Benchmarks.csproj", "{93FA47C8-EF9D-C7AA-437E-09034ED4E050}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{422BA1AE-858D-4AA4-815B-CF42A429D305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{422BA1AE-858D-4AA4-815B-CF42A429D305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{422BA1AE-858D-4AA4-815B-CF42A429D305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93FA47C8-EF9D-C7AA-437E-09034ED4E050}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93FA47C8-EF9D-C7AA-437E-09034ED4E050}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93FA47C8-EF9D-C7AA-437E-09034ED4E050}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93FA47C8-EF9D-C7AA-437E-09034ED4E050}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
