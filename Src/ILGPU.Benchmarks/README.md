@@ -1,6 +1,6 @@
 # ILGPU Benchmarks
 
-Comprehensive benchmark suite for ILGPU Phase 6 implementations including Tensor Core integration, SIMD unification, and performance profiling.
+Comprehensive benchmark suite for ILGPU Phase 6 implementations including Tensor Core integration, SIMD unification, specialized hardware acceleration, and performance profiling.
 
 ## Features Benchmarked
 
@@ -28,12 +28,28 @@ Comprehensive benchmark suite for ILGPU Phase 6 implementations including Tensor
 - Memory pooling and allocation
 - Cache efficiency patterns
 
+### Hardware Acceleration
+- **Intel NPU (Neural Processing Unit)** - Real hardware via OpenVINO plugins
+- **Intel AMX (Advanced Matrix Extensions)** - Native tile operations
+- **Apple Neural Engine** - Core ML integration (macOS)
+- **Automatic hardware detection** with capability reporting
+- **Plugin-based architecture** for specialized accelerators
+
 ## Running Benchmarks
 
 ### Interactive Mode (Default)
 ```bash
 cd Src/ILGPU.Benchmarks
 dotnet run --configuration Release
+```
+
+### Hardware Detection & Diagnostics
+```bash
+# Quick hardware detection and capability check
+dotnet run --configuration Release -- --diagnose
+
+# Hardware information display
+dotnet run --configuration Release -- --hardware-info
 ```
 
 ### Unattended Mode (CI/CD Integration)
@@ -56,10 +72,11 @@ The unattended mode generates multiple output formats:
 1. **Quick Performance Suite** - Fast validation benchmarks
 2. **Tensor Core Benchmarks** - Comprehensive tensor operations
 3. **SIMD Benchmarks** - Vector processing performance
-4. **Hybrid Processing Benchmarks** - CPU/GPU coordination
-5. **Memory Benchmarks** - Memory operation optimization
-6. **Comprehensive Suite** - All benchmarks (may take hours)
-7. **Burn-in Test** - Maximum load testing
+4. **Hardware Acceleration Benchmarks** - Intel NPU, AMX, Apple Neural Engine
+5. **Hybrid Processing Benchmarks** - CPU/GPU coordination
+6. **Memory Benchmarks** - Memory operation optimization
+7. **Comprehensive Suite** - All benchmarks (may take hours)
+8. **Burn-in Test** - Maximum load testing
 
 ### Configuration
 
@@ -67,8 +84,25 @@ Benchmark behavior can be configured via `appsettings.json`:
 
 - **Tensor Core Settings**: Compute capability requirements, precision preferences
 - **SIMD Settings**: Platform detection, vector sizes, fallback behavior
+- **Hardware Acceleration**: NPU/AMX/ANE plugin preferences, detection overrides
 - **Memory Settings**: Unified memory, buffer sizes, pooling
 - **Burn-in Settings**: Duration, monitoring, safety thresholds
+
+### Hardware Plugin Installation
+
+For real hardware acceleration support:
+
+```bash
+# Intel NPU support (when available)
+dotnet add package ILGPU.HardwareAccelerators.Intel.NPU
+
+# Apple Neural Engine support (macOS only, when available)
+dotnet add package ILGPU.HardwareAccelerators.Apple.NeuralEngine
+
+# Intel AMX support is built-in (no plugin required)
+```
+
+See [HARDWARE_ACCELERATION.md](../../HARDWARE_ACCELERATION.md) for detailed hardware setup and plugin development.
 
 ### Output
 
@@ -90,6 +124,12 @@ Benchmark results are saved in multiple formats:
 - `PlatformIntrinsicsBenchmarks` - AVX/SSE/NEON intrinsics
 - `MatrixVectorBenchmarks` - Linear algebra operations
 - `CpuGpuComparisonBenchmarks` - Cross-platform performance
+
+### Hardware Acceleration
+- `IntelNPUBenchmarks` - Neural Processing Unit benchmarks
+- `IntelAMXBenchmarks` - Advanced Matrix Extensions benchmarks  
+- `AppleNeuralEngineBenchmarks` - Apple Neural Engine benchmarks
+- `AIPerformancePrimitivesBenchmarks` - AI acceleration primitives
 
 ### Advanced Processing
 - `HybridProcessingBenchmarks` - Heterogeneous computing
@@ -115,10 +155,15 @@ Benchmark results are saved in multiple formats:
 - CUDA 11.0+ drivers
 - OpenCL 1.2+ drivers
 
+### Hardware Acceleration Support
+- **Intel NPU**: Intel Core Ultra processors (Meteor Lake+) with OpenVINO 2024.0+
+- **Intel AMX**: Intel Xeon Sapphire Rapids or 13th/14th gen Core processors
+- **Apple Neural Engine**: Apple Silicon (M1/M2/M3) with macOS 11.0+
+
 ### Platform Support
-- **Windows**: Full support (CUDA, AVX, SSE)
-- **Linux**: Full support (CUDA, AVX, SSE)
-- **macOS**: CPU-only (NEON on ARM64)
+- **Windows**: Full support (CUDA, AVX, SSE, Intel NPU, Intel AMX)
+- **Linux**: Full support (CUDA, AVX, SSE, Intel AMX)
+- **macOS**: CPU + Apple Neural Engine (NEON on ARM64, ANE on Apple Silicon)
 
 ## Understanding Results
 
@@ -144,9 +189,15 @@ Benchmark results are saved in multiple formats:
 
 ### Common Issues
 - **CUDA not available**: Benchmarks fall back to CPU
+- **Hardware acceleration not detected**: Install appropriate drivers and plugins
 - **Out of memory**: Reduce problem sizes in configuration
 - **Driver issues**: Ensure latest GPU drivers installed
 - **Platform limitations**: Some features may not be available
+
+### Hardware-Specific Issues
+- **Intel NPU not detected**: Verify OpenVINO drivers and plugin installation
+- **Intel AMX not available**: Check processor support (13th gen Core+ or Sapphire Rapids+)
+- **Apple Neural Engine inactive**: Ensure Core ML framework is available and plugin installed
 
 ### Performance Tips
 - Close other applications during benchmarking
@@ -211,7 +262,8 @@ The benchmark suite automatically:
 
 This benchmark suite is designed to:
 - Validate Phase 6 implementation performance
-- Identify optimization opportunities
+- Test real hardware acceleration (NPU, AMX, Neural Engine)
+- Identify optimization opportunities across diverse hardware
 - Regression test performance changes
 - Guide hardware-specific optimizations
 - Support continuous performance monitoring
