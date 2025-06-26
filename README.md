@@ -232,22 +232,32 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## License
 
-UniversalCompute is dual-licensed:
+UniversalCompute has a dual licensing structure that respects the original ILGPU project's contributions:
 
-- **Business Source License 1.1** for commercial use (current)
-- **Apache License 2.0** after June 24, 2029
+### Foundation Components (ILGPU Core)
+- **License**: University of Illinois/NCSA Open Source License
+- **Copyright**: (c) 2016-2024 ILGPU Project. All rights reserved.
+- **Developer**: Marcel Koester and the ILGPU Project team
+- **Website**: www.ilgpu.net
 
-See [LICENSE.txt](LICENSE.txt) for detailed terms.
+### UniversalCompute Extensions
+- **License**: Business Source License 1.1 (converts to Apache License 2.0 on June 24, 2029)
+- **Copyright**: (c) 2024-2025 Michael Ivertowski, Ernst & Young Ltd. Switzerland
+- **Coverage**: Hardware accelerator abstractions, FFT framework, native AOT support, and modernization features
+
+See [LICENSE.txt](LICENSE.txt) for complete licensing details.
 
 ## Acknowledgments
 
-UniversalCompute builds upon the excellent foundation provided by:
+UniversalCompute is built upon the exceptional groundwork laid by the **ILGPU Project team**, led by Marcel Koester. We extend our deepest gratitude to the original ILGPU contributors who created the foundational GPU computing framework that makes UniversalCompute possible.
 
-- **ILGPU Project** - Original GPU computing framework
-- **Intel oneAPI** - Performance libraries and tools
-- **NVIDIA CUDA** - GPU computing platform
-- **Apple Core ML** - Machine learning framework
-- **Microsoft .NET** - Runtime and compiler infrastructure
+**Key Contributors and Technologies:**
+
+- **ILGPU Project Team** - Marcel Koester and contributors who built the original high-performance GPU computing framework
+- **Intel oneAPI Team** - Performance libraries and optimization tools
+- **NVIDIA CUDA Team** - GPU computing platform and development tools
+- **Apple Core ML Team** - Machine learning framework and Neural Engine support
+- **Microsoft .NET Team** - Runtime infrastructure and compiler technology
 
 ## Support
 
