@@ -18,6 +18,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples.HardwareComparison", "05_HardwareComparison\Examples.HardwareComparison.csproj", "{E5F6A1B2-C3D4-2345-6789-012345678901}"
 EndProject
 
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples.PerformanceBenchmarks", "06_PerformanceBenchmarks\Examples.PerformanceBenchmarks.csproj", "{G7H8I9J0-K1L2-4567-8901-234567890123}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples.FFTOperations", "07_FFTOperations\Examples.FFTOperations.csproj", "{H8I9J0K1-L2M3-5678-9012-345678901234}"
+EndProject
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Examples.Common", "Common\Examples.Common.csproj", "{F6A1B2C3-D4E5-3456-7890-123456789012}"
 EndProject
 
@@ -52,6 +58,16 @@ Global
 		{E5F6A1B2-C3D4-2345-6789-012345678901}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5F6A1B2-C3D4-2345-6789-012345678901}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5F6A1B2-C3D4-2345-6789-012345678901}.Release|Any CPU.Build.0 = Release|Any CPU
+		
+		{G7H8I9J0-K1L2-4567-8901-234567890123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{G7H8I9J0-K1L2-4567-8901-234567890123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{G7H8I9J0-K1L2-4567-8901-234567890123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{G7H8I9J0-K1L2-4567-8901-234567890123}.Release|Any CPU.Build.0 = Release|Any CPU
+		
+		{H8I9J0K1-L2M3-5678-9012-345678901234}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{H8I9J0K1-L2M3-5678-9012-345678901234}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{H8I9J0K1-L2M3-5678-9012-345678901234}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{H8I9J0K1-L2M3-5678-9012-345678901234}.Release|Any CPU.Build.0 = Release|Any CPU
 		
 		{F6A1B2C3-D4E5-3456-7890-123456789012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F6A1B2C3-D4E5-3456-7890-123456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU

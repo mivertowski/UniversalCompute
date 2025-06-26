@@ -87,8 +87,23 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      - name: Restore packages
+        run: |
+          if ("${{ matrix.path }}" -eq "Samples") {
+            dotnet restore Samples/ILGPU.Samples.sln
+            dotnet restore Samples/Examples.sln
+          } else {
+            dotnet restore ${{ matrix.path }}
+          }
+
       - name: Build
-        run: dotnet build ${{ matrix.path }} --configuration=Release -p:TreatWarningsAsErrors=true
+        run: |
+          if ("${{ matrix.path }}" -eq "Samples") {
+            dotnet build Samples/ILGPU.Samples.sln --configuration=Release -p:TreatWarningsAsErrors=true --no-restore
+            dotnet build Samples/Examples.sln --configuration=Release -p:TreatWarningsAsErrors=true --no-restore
+          } else {
+            dotnet build ${{ matrix.path }} --configuration=Release -p:TreatWarningsAsErrors=true --no-restore
+          }
 
   # Run tests for all supported combinations of OS/library/framework.
   test-library:
