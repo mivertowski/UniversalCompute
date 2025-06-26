@@ -818,6 +818,200 @@ static async Task DemoNPUInference(Accelerator npuAccelerator)
 
 ---
 
+## 📦 Native AOT Hardware Support
+
+Native Ahead-of-Time compilation with hardware-specific optimizations for deployment without JIT compilation.
+
+### Hardware-Specific AOT Compilation
+
+```csharp
+using UniversalCompute.AOT;
+
+// Configure AOT compilation with hardware optimizations
+var aotConfig = new AOTConfiguration()
+    .WithTargetHardware(TargetHardware.Auto) // Detects at compile time
+    .WithOptimizationLevel(OptimizationLevel.MaxPerformance)
+    .WithInstructionSetOptimization(enabled: true)
+    .WithProfileGuidedOptimization(enabled: true);
+
+// Generate hardware-specific AOT binaries
+var aotCompiler = new HardwareAOTCompiler(aotConfig);
+
+// Compile for specific hardware targets
+await aotCompiler.CompileForTarget(new CompilationTarget
+{
+    Platform = TargetPlatform.Windows,
+    Architecture = TargetArchitecture.X64,
+    HardwareFeatures = new[]
+    {
+        HardwareFeature.AVX512,
+        HardwareFeature.IntelAMX,
+        HardwareFeature.CudaCompute80
+    }
+});
+
+// Multi-target compilation for deployment flexibility
+var targets = new[]
+{
+    new CompilationTarget { Platform = TargetPlatform.Windows, Architecture = TargetArchitecture.X64 },
+    new CompilationTarget { Platform = TargetPlatform.Linux, Architecture = TargetArchitecture.X64 },
+    new CompilationTarget { Platform = TargetPlatform.MacOS, Architecture = TargetArchitecture.ARM64 }
+};
+
+foreach (var target in targets)
+{
+    var binary = await aotCompiler.CompileForTarget(target);
+    Console.WriteLine($"Generated: {binary.OutputPath} ({binary.Size.ToMB():F1} MB)");
+    Console.WriteLine($"Optimizations: {string.Join(", ", binary.AppliedOptimizations)}");
+}
+```
+
+### Platform-Optimized Binaries
+
+```csharp
+// Create platform-specific optimized builds
+var platformOptimizer = new PlatformOptimizer();
+
+// Windows with CUDA and Intel extensions
+var windowsBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
+{
+    Platform = TargetPlatform.Windows,
+    EnabledAccelerators = new[]
+    {
+        AcceleratorType.Cuda,
+        AcceleratorType.IntelAMX,
+        AcceleratorType.IntelNPU
+    },
+    OptimizationFlags = OptimizationFlags.AggressiveInlining | 
+                       OptimizationFlags.VectorizeLoops |
+                       OptimizationFlags.UnrollLoops
+});
+
+// Linux with OpenCL and CPU optimizations
+var linuxBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
+{
+    Platform = TargetPlatform.Linux,
+    EnabledAccelerators = new[]
+    {
+        AcceleratorType.OpenCL,
+        AcceleratorType.CPU,
+        AcceleratorType.Velocity
+    },
+    CPUOptimizations = CPUOptimizationLevel.Native,
+    EnableAutoVectorization = true
+});
+
+// macOS with Apple Neural Engine
+var macOSBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
+{
+    Platform = TargetPlatform.MacOS,
+    Architecture = TargetArchitecture.ARM64,
+    EnabledAccelerators = new[]
+    {
+        AcceleratorType.AppleNeuralEngine,
+        AcceleratorType.Metal,
+        AcceleratorType.CPU
+    },
+    AppleSpecificOptimizations = AppleOptimizations.UnifiedMemory |
+                                AppleOptimizations.NeuralEngineAcceleration
+});
+```
+
+### Runtime Hardware Detection
+
+```csharp
+// AOT runtime with hardware detection
+public class AOTHardwareRuntime
+{
+    private readonly Dictionary<HardwareProfile, CompiledBinary> _binaries;
+    
+    public async Task<Accelerator> InitializeOptimalAccelerator()
+    {
+        // Detect current hardware capabilities
+        var hardwareProfile = HardwareDetector.GetCurrentProfile();
+        
+        Console.WriteLine($"Detected Hardware Profile:");
+        Console.WriteLine($"  CPU: {hardwareProfile.CPUModel}");
+        Console.WriteLine($"  Instruction Sets: {string.Join(", ", hardwareProfile.SupportedInstructionSets)}");
+        Console.WriteLine($"  GPU: {hardwareProfile.GPUModel ?? "None"}");
+        Console.WriteLine($"  Compute Capability: {hardwareProfile.ComputeCapability}");
+        Console.WriteLine($"  Special Accelerators: {string.Join(", ", hardwareProfile.SpecialAccelerators)}");
+        
+        // Select optimal pre-compiled binary
+        var optimalBinary = SelectOptimalBinary(hardwareProfile);
+        
+        // Load hardware-optimized kernels
+        var kernelLoader = new AOTKernelLoader(optimalBinary);
+        var accelerator = await kernelLoader.CreateAccelerator();
+        
+        // Verify hardware features are utilized
+        var utilization = kernelLoader.GetFeatureUtilization();
+        Console.WriteLine($"\nHardware Feature Utilization:");
+        foreach (var feature in utilization)
+        {
+            Console.WriteLine($"  {feature.FeatureName}: {(feature.IsUtilized ? "✓" : "✗")}");
+        }
+        
+        return accelerator;
+    }
+    
+    private CompiledBinary SelectOptimalBinary(HardwareProfile profile)
+    {
+        // Score each binary based on hardware match
+        var scoredBinaries = _binaries
+            .Select(kvp => new
+            {
+                Binary = kvp.Value,
+                Score = CalculateHardwareMatchScore(kvp.Key, profile)
+            })
+            .OrderByDescending(x => x.Score)
+            .ToList();
+        
+        var selected = scoredBinaries.First();
+        Console.WriteLine($"\nSelected binary: {selected.Binary.Name}");
+        Console.WriteLine($"Hardware match score: {selected.Score:F1}/10");
+        
+        return selected.Binary;
+    }
+}
+```
+
+### Deployment Optimization
+
+```csharp
+// Optimize deployment package with hardware variants
+var deploymentOptimizer = new DeploymentOptimizer();
+
+var deploymentPackage = await deploymentOptimizer.CreateDeploymentPackage(new DeploymentConfiguration
+{
+    ApplicationName = "MyGPUApp",
+    TargetPlatforms = new[] { TargetPlatform.Windows, TargetPlatform.Linux },
+    IncludeHardwareVariants = new[]
+    {
+        new HardwareVariant { Type = AcceleratorType.Cuda, MinComputeCapability = 6.0f },
+        new HardwareVariant { Type = AcceleratorType.OpenCL, MinVersion = "2.0" },
+        new HardwareVariant { Type = AcceleratorType.CPU, RequiredFeatures = new[] { "AVX2" } }
+    },
+    OptimizationStrategy = DeploymentOptimizationStrategy.SizeVsPerformanceBalanced,
+    EnableRuntimeFallback = true
+});
+
+Console.WriteLine($"Deployment package created: {deploymentPackage.Path}");
+Console.WriteLine($"Total size: {deploymentPackage.TotalSize.ToMB():F1} MB");
+Console.WriteLine($"Variants included: {deploymentPackage.VariantCount}");
+
+// Analyze deployment coverage
+var coverage = deploymentOptimizer.AnalyzeHardwareCoverage(deploymentPackage);
+Console.WriteLine($"\nHardware Coverage Analysis:");
+Console.WriteLine($"  NVIDIA GPUs: {coverage.NvidiaCoverage:P0}");
+Console.WriteLine($"  AMD GPUs: {coverage.AmdCoverage:P0}");
+Console.WriteLine($"  Intel GPUs: {coverage.IntelCoverage:P0}");
+Console.WriteLine($"  CPU fallback: {coverage.CpuFallbackAvailable ? "Yes" : "No"}");
+Console.WriteLine($"  Estimated market coverage: {coverage.EstimatedMarketCoverage:P0}");
+```
+
+---
+
 ## 🍎 Apple Neural Engine
 
 Hardware-accelerated AI inference on Apple Silicon Macs.
@@ -906,6 +1100,315 @@ static async Task DemoANEInference(Accelerator aneAccelerator)
         Console.WriteLine($"ANE inference demo: {ex.Message}");
     }
 }
+```
+
+---
+
+## 🚀 Advanced Hardware Features
+
+### Tensor Core Utilization (NVIDIA)
+
+```csharp
+// Enable and optimize tensor core operations
+using var context = Context.Create().CUDA()
+    .WithTensorCoreOptimization(enabled: true);
+
+var cudaAccel = context.CreateCudaAccelerator(0) as CudaAccelerator;
+
+if (cudaAccel.DeviceInfo.SupportsTensorCores)
+{
+    // Configure tensor core operations
+    var tensorConfig = new TensorCoreConfiguration
+    {
+        Precision = TensorPrecision.TF32, // or FP16, BF16, INT8
+        MatrixLayout = MatrixLayout.ColumnMajor,
+        EnableMixedPrecision = true,
+        AutoPadding = true // Automatically pad matrices for tensor core alignment
+    };
+    
+    cudaAccel.ConfigureTensorCores(tensorConfig);
+    
+    // Tensor core optimized matrix multiplication
+    var matrixSize = 4096; // Must be multiple of tensor core tile size
+    using var matrixA = cudaAccel.AllocateTensor2D<float>(matrixSize, matrixSize);
+    using var matrixB = cudaAccel.AllocateTensor2D<float>(matrixSize, matrixSize);
+    using var matrixC = cudaAccel.AllocateTensor2D<float>(matrixSize, matrixSize);
+    
+    // Load tensor core optimized kernel
+    var tensorKernel = cudaAccel.LoadTensorCoreKernel<Index2D, TensorView2D<float>, TensorView2D<float>, TensorView2D<float>>(
+        TensorMatrixMultiply);
+    
+    // Execute with tensor cores
+    var stopwatch = Stopwatch.StartNew();
+    tensorKernel(new Index2D(matrixSize/16, matrixSize/16), matrixA.View, matrixB.View, matrixC.View);
+    cudaAccel.Synchronize();
+    stopwatch.Stop();
+    
+    var tflops = (2.0 * matrixSize * matrixSize * matrixSize) / (stopwatch.ElapsedMilliseconds / 1000.0) / 1e12;
+    Console.WriteLine($"Tensor Core Performance: {tflops:F2} TFLOPS");
+}
+```
+
+### Matrix Engines (Intel AMX)
+
+```csharp
+// Advanced AMX tile operations
+if (AMXCapabilities.IsAMXSupported())
+{
+    using var amxAccel = context.CreateAMXAccelerator();
+    
+    // Configure AMX tiles for optimal performance
+    var tileConfig = new AMXTileConfiguration
+    {
+        TileCount = 8,
+        TileLayout = new[]
+        {
+            new TileDescriptor { Rows = 16, Columns = 64, DataType = AMXDataType.BF16 },
+            new TileDescriptor { Rows = 16, Columns = 64, DataType = AMXDataType.BF16 },
+            new TileDescriptor { Rows = 16, Columns = 64, DataType = AMXDataType.Float32 }
+        }
+    };
+    
+    amxAccel.ConfigureTiles(tileConfig);
+    
+    // Load AMX-optimized GEMM kernel
+    var amxGemm = amxAccel.LoadAMXKernel<AMXGemmParams>(AMXGemmKernel);
+    
+    // Execute tiled matrix multiplication
+    var gemmParams = new AMXGemmParams
+    {
+        M = 1024, N = 1024, K = 1024,
+        Alpha = 1.0f, Beta = 0.0f,
+        TransA = false, TransB = false
+    };
+    
+    amxGemm(gemmParams, matrixA.View, matrixB.View, matrixC.View);
+}
+```
+
+### Neural Engine Scheduling (Apple)
+
+```csharp
+// Advanced Apple Neural Engine scheduling
+if (ANECapabilities.IsANESupported())
+{
+    using var aneAccel = context.CreateANEAccelerator();
+    
+    // Configure ANE scheduler for optimal inference
+    var aneScheduler = new ANEScheduler(aneAccel)
+    {
+        BatchingStrategy = ANEBatchingStrategy.Dynamic,
+        PowerMode = ANEPowerMode.HighPerformance,
+        EnablePipelining = true,
+        MaxConcurrentModels = 3
+    };
+    
+    // Load multiple models for concurrent execution
+    var models = new[]
+    {
+        await aneScheduler.LoadModel("detection_model.mlmodel"),
+        await aneScheduler.LoadModel("classification_model.mlmodel"),
+        await aneScheduler.LoadModel("segmentation_model.mlmodel")
+    };
+    
+    // Schedule inference pipeline
+    var pipeline = aneScheduler.CreateInferencePipeline()
+        .AddStage(models[0], "detection")
+        .AddStage(models[1], "classification", dependsOn: "detection")
+        .AddStage(models[2], "segmentation", parallelWith: "classification");
+    
+    // Execute pipeline with automatic scheduling
+    var results = await pipeline.ExecuteAsync(inputData);
+}
+```
+
+### NPU Workload Optimization (Intel)
+
+```csharp
+// Intel NPU with advanced workload optimization
+if (NPUCapabilities.IsNPUSupported())
+{
+    using var npuAccel = context.CreateNPUAccelerator();
+    
+    // Create NPU workload optimizer
+    var workloadOptimizer = new NPUWorkloadOptimizer(npuAccel)
+    {
+        OptimizationTarget = NPUOptimizationTarget.Throughput,
+        PowerBudget = 15.0f, // Watts
+        LatencyTarget = TimeSpan.FromMilliseconds(10)
+    };
+    
+    // Analyze and optimize model
+    var optimizedModel = await workloadOptimizer.OptimizeModel(originalModel, new OptimizationHints
+    {
+        InputShape = new[] { 1, 3, 224, 224 },
+        ExpectedBatchSizes = new[] { 1, 4, 8, 16 },
+        PrecisionRequirement = PrecisionRequirement.Mixed,
+        SparsityAware = true
+    });
+    
+    Console.WriteLine($"Model optimization results:");
+    Console.WriteLine($"  Size reduction: {optimizedModel.SizeReduction:P0}");
+    Console.WriteLine($"  Expected speedup: {optimizedModel.ExpectedSpeedup:F1}x");
+    Console.WriteLine($"  Power efficiency gain: {optimizedModel.PowerEfficiencyGain:P0}");
+    
+    // Execute with dynamic batching
+    var dynamicBatcher = new NPUDynamicBatcher(npuAccel, optimizedModel)
+    {
+        MaxBatchSize = 16,
+        MaxLatency = TimeSpan.FromMilliseconds(20),
+        AdaptiveBatching = true
+    };
+    
+    // Process requests with automatic batching
+    await dynamicBatcher.ProcessRequestsAsync(incomingRequests);
+}
+```
+
+---
+
+## 🔗 Cross-Accelerator Coordination Examples
+
+### Multi-GPU Pipeline with NVLink
+
+```csharp
+// Create multi-GPU pipeline with NVLink communication
+var gpuDevices = context.GetCudaDevices().Where(d => d.SupportsNVLink).ToList();
+
+if (gpuDevices.Count >= 2)
+{
+    var multiGPUPipeline = new MultiGPUPipeline(context)
+        .WithNVLinkOptimization(enabled: true)
+        .WithPeerToPeerTransfers(enabled: true);
+    
+    // Configure GPU topology
+    var topology = multiGPUPipeline.DiscoverTopology();
+    Console.WriteLine($"GPU Topology: {topology.Description}");
+    Console.WriteLine($"NVLink bandwidth: {topology.NVLinkBandwidthGBps} GB/s");
+    
+    // Create pipeline stages across GPUs
+    var stage1 = multiGPUPipeline.AddStage("preprocessing", gpuDevices[0], async (data) =>
+    {
+        // Preprocessing on GPU 0
+        return await PreprocessData(data);
+    });
+    
+    var stage2 = multiGPUPipeline.AddStage("inference", gpuDevices[1], async (data) =>
+    {
+        // Inference on GPU 1 with direct NVLink transfer
+        return await RunInference(data);
+    });
+    
+    // Execute pipeline with automatic data routing
+    var results = await multiGPUPipeline.ExecuteAsync(inputData);
+}
+```
+
+### Hybrid CPU-GPU-NPU Workflow
+
+```csharp
+// Create hybrid accelerator workflow
+var hybridOrchestrator = new HybridAcceleratorOrchestrator(context)
+    .WithIntelligentRouting(enabled: true)
+    .WithDataFlowOptimization(enabled: true);
+
+// Register different accelerators for specific tasks
+hybridOrchestrator.RegisterAccelerator(cpuAccel, WorkloadType.Preprocessing);
+hybridOrchestrator.RegisterAccelerator(gpuAccel, WorkloadType.Training);
+hybridOrchestrator.RegisterAccelerator(npuAccel, WorkloadType.Inference);
+
+// Define complex workflow
+var workflow = hybridOrchestrator.CreateWorkflow("image_processing_pipeline")
+    .AddTask("load_images", AcceleratorType.CPU, async (ctx) =>
+    {
+        return await LoadAndDecodeImages(ctx.Input);
+    })
+    .AddTask("preprocess", AcceleratorType.CPU, async (ctx) =>
+    {
+        return await PreprocessImages(ctx.GetOutput("load_images"));
+    })
+    .AddTask("feature_extraction", AcceleratorType.Cuda, async (ctx) =>
+    {
+        return await ExtractFeatures(ctx.GetOutput("preprocess"));
+    })
+    .AddTask("classification", AcceleratorType.IntelNPU, async (ctx) =>
+    {
+        return await ClassifyImages(ctx.GetOutput("feature_extraction"));
+    })
+    .WithDataFlowHints(new DataFlowHints
+    {
+        PreferZeroCopy = true,
+        EnablePrefetching = true,
+        OptimizeForLatency = false
+    });
+
+// Execute workflow with automatic accelerator coordination
+var workflowResult = await workflow.ExecuteAsync(imageData);
+
+Console.WriteLine($"Workflow execution completed:");
+Console.WriteLine($"  Total time: {workflowResult.TotalExecutionTime.TotalMilliseconds:F2} ms");
+Console.WriteLine($"  Data transferred: {workflowResult.TotalDataTransferred.ToMB():F1} MB");
+Console.WriteLine($"  Accelerator utilization:");
+foreach (var util in workflowResult.AcceleratorUtilization)
+{
+    Console.WriteLine($"    {util.AcceleratorName}: {util.Utilization:P1}");
+}
+```
+
+### Distributed Inference Across Heterogeneous Hardware
+
+```csharp
+// Create distributed inference system
+var distributedInference = new DistributedInferenceSystem(context)
+    .WithLoadBalancing(LoadBalancingStrategy.LatencyAware)
+    .WithFailover(enabled: true)
+    .WithModelReplication(enabled: true);
+
+// Deploy model across different hardware
+var modelDeployments = new[]
+{
+    new ModelDeployment
+    {
+        Model = "resnet50",
+        TargetAccelerator = cudaAccel,
+        Priority = Priority.High,
+        MaxBatchSize = 32
+    },
+    new ModelDeployment
+    {
+        Model = "resnet50_quantized",
+        TargetAccelerator = npuAccel,
+        Priority = Priority.Medium,
+        MaxBatchSize = 64
+    },
+    new ModelDeployment
+    {
+        Model = "resnet50_lite",
+        TargetAccelerator = cpuAccel,
+        Priority = Priority.Low,
+        MaxBatchSize = 8
+    }
+};
+
+foreach (var deployment in modelDeployments)
+{
+    await distributedInference.DeployModel(deployment);
+}
+
+// Process inference requests with automatic routing
+var inferenceRouter = distributedInference.CreateRouter(new RoutingPolicy
+{
+    Strategy = RoutingStrategy.CostOptimized,
+    LatencyBudget = TimeSpan.FromMilliseconds(50),
+    AccuracyRequirement = 0.95f
+});
+
+// Handle incoming requests
+inferenceRouter.RequestReceived += async (sender, request) =>
+{
+    var result = await inferenceRouter.RouteRequestAsync(request);
+    Console.WriteLine($"Request {request.Id} processed by {result.ProcessedBy} in {result.Latency.TotalMilliseconds:F2} ms");
+};
 ```
 
 ---
@@ -1080,11 +1583,15 @@ public class AcceleratorBenchmark
     public static async Task CompareAccelerators(Context context, int workloadSize = 1_000_000)
     {
         Console.WriteLine($"🏁 Enhanced Accelerator Performance Comparison (workload size: {workloadSize:N0})");
-        Console.WriteLine("=" + new string('=', 90));
+        Console.WriteLine("=" + new string('=', 100));
         
         var results = new List<BenchmarkResult>();
-        var monitor = new HardwareMonitor();
+        var monitor = new HardwareMonitor()
+            .WithPowerMonitoring(enabled: true)
+            .WithThermalMonitoring(enabled: true)
+            .WithPerformanceCounters(enabled: true);
         
+        // Discover and benchmark all accelerators
         foreach (var device in context.Devices)
         {
             try
@@ -1104,24 +1611,39 @@ public class AcceleratorBenchmark
         // Sort by overall performance score
         results.Sort((a, b) => b.OverallScore.CompareTo(a.OverallScore));
         
-        // Display comprehensive results
+        // Display comprehensive results with new metrics
         Console.WriteLine($"\n📊 Comprehensive Benchmark Results:");
-        Console.WriteLine($"{"Rank",5} | {"Accelerator",20} | {"Time(ms)",8} | {"Throughput",10} | {"Power(W)",8} | {"Temp(°C)",8} | {"Score",8}");
-        Console.WriteLine(new string('-', 80));
+        Console.WriteLine($"{"Rank",4} | {"Accelerator",20} | {"Time(ms)",8} | {"GFLOPS",8} | {"GB/s",8} | {"Power",7} | {"Temp",6} | {"Eff",6} | {"Score",6}");
+        Console.WriteLine(new string('-', 100));
         
         for (int i = 0; i < results.Count; i++)
         {
             var result = results[i];
-            Console.WriteLine($"{i+1,5} | {result.AcceleratorName,-20} | {result.ExecutionTime.TotalMilliseconds,8:F2} | {result.ThroughputGBps,7:F1} GB/s | {result.AveragePower,8:F1} | {result.PeakTemperature,8:F1} | {result.OverallScore,8:F1}");
+            Console.WriteLine($"{i+1,4} | {result.AcceleratorName,-20} | {result.ExecutionTime.TotalMilliseconds,8:F2} | " +
+                            $"{result.ComputeGFLOPS,8:F1} | {result.ThroughputGBps,8:F1} | {result.AveragePower,7:F1}W | " +
+                            $"{result.PeakTemperature,6:F1}°C | {result.PowerEfficiency,6:F1} | {result.OverallScore,6:F1}");
         }
         
+        // Enhanced performance analysis
         Console.WriteLine($"\n🏆 Performance Analysis:");
         var best = results.First();
         Console.WriteLine($"Best overall: {best.AcceleratorName} (Score: {best.OverallScore:F1}/10)");
         Console.WriteLine($"Fastest execution: {results.OrderBy(r => r.ExecutionTime).First().AcceleratorName}");
-        Console.WriteLine($"Highest throughput: {results.OrderByDescending(r => r.ThroughputGBps).First().AcceleratorName}");
-        Console.WriteLine($"Most power efficient: {results.OrderByDescending(r => r.PowerEfficiency).First().AcceleratorName}");
-        Console.WriteLine($"Coolest running: {results.OrderBy(r => r.PeakTemperature).First().AcceleratorName}");
+        Console.WriteLine($"Highest compute: {results.OrderByDescending(r => r.ComputeGFLOPS).First().AcceleratorName} ({results.Max(r => r.ComputeGFLOPS):F1} GFLOPS)");
+        Console.WriteLine($"Highest bandwidth: {results.OrderByDescending(r => r.ThroughputGBps).First().AcceleratorName} ({results.Max(r => r.ThroughputGBps):F1} GB/s)");
+        Console.WriteLine($"Most power efficient: {results.OrderByDescending(r => r.PowerEfficiency).First().AcceleratorName} ({results.Max(r => r.PowerEfficiency):F1} GFLOPS/W)");
+        Console.WriteLine($"Coolest running: {results.OrderBy(r => r.PeakTemperature).First().AcceleratorName} ({results.Min(r => r.PeakTemperature):F1}°C)");
+        
+        // Hardware utilization summary
+        Console.WriteLine($"\n📈 Hardware Utilization Summary:");
+        foreach (var result in results.Take(3))
+        {
+            Console.WriteLine($"{result.AcceleratorName}:");
+            Console.WriteLine($"  Compute utilization: {result.ComputeUtilization:P1}");
+            Console.WriteLine($"  Memory utilization: {result.MemoryUtilization:P1}");
+            Console.WriteLine($"  Cache efficiency: {result.CacheEfficiency:P1}");
+            Console.WriteLine($"  Thermal headroom: {100 - (result.PeakTemperature / result.MaxTemperature * 100):F1}%");
+        }
     }
     
     private static async Task<BenchmarkResult> BenchmarkAcceleratorComprehensive(Accelerator accelerator, int workloadSize, HardwareMonitor monitor)
@@ -1210,15 +1732,19 @@ public class BenchmarkResult
     public AcceleratorType AcceleratorType { get; set; }
     public TimeSpan ExecutionTime { get; set; }
     public double ThroughputGBps { get; set; }
+    public double ComputeGFLOPS { get; set; }
     public float AveragePower { get; set; }
     public float PeakPower { get; set; }
     public float PeakTemperature { get; set; }
     public float AverageTemperature { get; set; }
+    public float MaxTemperature { get; set; }
     public float MemoryUtilization { get; set; }
     public float ComputeUtilization { get; set; }
+    public float CacheEfficiency { get; set; }
     public double PowerEfficiency { get; set; }
     public double ThermalEfficiency { get; set; }
     public float OverallScore { get; set; }
+    public List<OptimizationSuggestion> Suggestions { get; set; }
 }
 ```
 
@@ -1458,6 +1984,94 @@ foreach (var issue in compatibility.Issues)
         Console.WriteLine($"   Solution: {issue.SuggestedSolution}");
     }
 }
+
+// Detailed hardware diagnostics
+var diagnostics = HardwareDiagnostics.RunComprehensiveDiagnostics();
+Console.WriteLine($"\n🔍 Hardware Diagnostics Report:");
+Console.WriteLine($"CPU Features: {string.Join(", ", diagnostics.CPUFeatures)}");
+Console.WriteLine($"GPU Devices: {diagnostics.GPUCount}");
+Console.WriteLine($"OpenCL Platforms: {diagnostics.OpenCLPlatformCount}");
+Console.WriteLine($"CUDA Runtime: {diagnostics.CUDAVersion ?? "Not installed"}");
+Console.WriteLine($"Intel Extensions: {diagnostics.IntelExtensionsAvailable}");
+Console.WriteLine($"Apple Metal: {diagnostics.MetalAvailable}");
+```
+
+### Cross-Accelerator Memory Issues
+
+**Problem**: Memory coherency problems across devices
+```csharp
+// Enable strict memory coherency
+memoryManager.SetCoherencyMode(CoherencyMode.Strong);
+
+// Add memory barriers
+memoryManager.InsertMemoryBarrier(MemoryBarrierType.DeviceWide);
+
+// Verify memory consistency
+var consistencyChecker = new MemoryConsistencyChecker(memoryManager);
+var issues = await consistencyChecker.VerifyConsistency();
+if (issues.Any())
+{
+    foreach (var issue in issues)
+    {
+        Console.WriteLine($"Memory consistency issue: {issue.Description}");
+        Console.WriteLine($"  Affected buffers: {string.Join(", ", issue.AffectedBuffers)}");
+        Console.WriteLine($"  Suggested fix: {issue.SuggestedFix}");
+    }
+}
+```
+
+### Tensor Core / Matrix Engine Issues
+
+**Problem**: Poor performance with tensor operations
+```csharp
+// Verify tensor core alignment
+var alignmentChecker = new TensorAlignmentChecker();
+if (!alignmentChecker.IsAligned(matrixDimensions))
+{
+    var aligned = alignmentChecker.GetAlignedDimensions(matrixDimensions);
+    Console.WriteLine($"⚠️ Matrix dimensions not aligned for tensor cores");
+    Console.WriteLine($"  Current: {matrixDimensions}");
+    Console.WriteLine($"  Aligned: {aligned}");
+    Console.WriteLine($"  Padding required: {aligned.TotalPadding} elements");
+}
+
+// Check precision compatibility
+var precisionAnalyzer = new PrecisionAnalyzer();
+var analysis = precisionAnalyzer.AnalyzePrecisionRequirements(model);
+Console.WriteLine($"Precision analysis:");
+Console.WriteLine($"  Minimum precision: {analysis.MinimumPrecision}");
+Console.WriteLine($"  Recommended: {analysis.RecommendedPrecision}");
+Console.WriteLine($"  Tensor core compatible: {analysis.TensorCoreCompatible}");
+```
+
+### NPU/Neural Engine Loading Issues
+
+**Problem**: Model fails to load on NPU
+```csharp
+// Validate model compatibility
+var validator = new NPUModelValidator();
+var validation = await validator.ValidateModel(modelPath);
+
+if (!validation.IsCompatible)
+{
+    Console.WriteLine($"❌ Model not compatible with NPU:");
+    foreach (var issue in validation.Issues)
+    {
+        Console.WriteLine($"  - {issue.Layer}: {issue.Problem}");
+        if (issue.CanAutoFix)
+        {
+            Console.WriteLine($"    Auto-fix available: {issue.AutoFixDescription}");
+        }
+    }
+    
+    // Attempt model conversion
+    if (validation.CanConvert)
+    {
+        var converter = new NPUModelConverter();
+        var convertedModel = await converter.ConvertModel(modelPath, validation.ConversionHints);
+        Console.WriteLine($"✓ Model converted successfully: {convertedModel.Path}");
+    }
+}
 ```
 
 ---
@@ -1470,6 +2084,11 @@ foreach (var issue in compatibility.Issues)
 - **[Adaptive Scheduling](Adaptive-Scheduling)** - Intelligent workload distribution
 - **[Cross-Accelerator Coordination](Cross-Accelerator-Coordination)** - Multi-device workflows
 - **[Native AOT Deployment](Native-AOT-Deployment)** - Hardware-optimized binaries
+- **[Tensor Operations](Tensor-Operations)** - Tensor core and matrix engine utilization
+- **[Power Management](Power-Management)** - Thermal and power optimization strategies
+- **[Hardware Profiling](Hardware-Profiling)** - Performance counter analysis
+- **[Model Optimization](Model-Optimization)** - NPU and neural engine optimization
+- **[Multi-GPU Computing](Multi-GPU-Computing)** - NVLink and peer-to-peer transfers
 - **[API Reference](API-Reference)** - Complete hardware accelerator API documentation
 - **[Troubleshooting Guide](Troubleshooting-Guide)** - Common issues and solutions
 

@@ -25,7 +25,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.ML
+namespace ILGPU.Tests.UniversalCompute.ML
 {
     /// <summary>
     /// Comprehensive tests for ONNX Runtime integration and execution provider.

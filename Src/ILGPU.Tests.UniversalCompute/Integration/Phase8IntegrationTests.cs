@@ -27,7 +27,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.Integration
+namespace ILGPU.Tests.UniversalCompute.Integration
 {
     /// <summary>
     /// Comprehensive integration tests for Phase 8 Universal Compute Platform.

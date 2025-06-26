@@ -24,7 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.Scheduling
+namespace ILGPU.Tests.UniversalCompute.Scheduling
 {
     /// <summary>
     /// Comprehensive tests for AdaptiveScheduler and related scheduling infrastructure.

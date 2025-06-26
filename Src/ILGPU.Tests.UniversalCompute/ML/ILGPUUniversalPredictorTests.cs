@@ -24,7 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.ML
+namespace ILGPU.Tests.UniversalCompute.ML
 {
     /// <summary>
     /// Comprehensive tests for ILGPUUniversalPredictor and ML framework integration.

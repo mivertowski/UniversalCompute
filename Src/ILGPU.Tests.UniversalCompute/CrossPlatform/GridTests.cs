@@ -20,7 +20,7 @@ using ILGPU.CrossPlatform;
 using System;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.CrossPlatform
+namespace ILGPU.Tests.UniversalCompute.CrossPlatform
 {
     /// <summary>
     /// Comprehensive tests for Grid universal indexing abstraction.

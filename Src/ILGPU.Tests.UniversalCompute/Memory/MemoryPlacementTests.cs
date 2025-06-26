@@ -23,7 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.Memory
+namespace ILGPU.Tests.UniversalCompute.Memory
 {
     /// <summary>
     /// Comprehensive tests for memory placement strategies and optimization.

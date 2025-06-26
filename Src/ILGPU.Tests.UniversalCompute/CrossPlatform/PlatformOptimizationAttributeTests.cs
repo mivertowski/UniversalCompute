@@ -21,7 +21,7 @@ using System;
 using System.Reflection;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.CrossPlatform
+namespace ILGPU.Tests.UniversalCompute.CrossPlatform
 {
     /// <summary>
     /// Comprehensive tests for platform-specific optimization attributes.

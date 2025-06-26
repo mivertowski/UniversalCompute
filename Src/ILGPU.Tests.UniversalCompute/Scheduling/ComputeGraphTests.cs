@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace ILGPU.Tests.Phase8.Scheduling
+namespace ILGPU.Tests.UniversalCompute.Scheduling
 {
     /// <summary>
     /// Comprehensive tests for ComputeGraph and compute operation types.
