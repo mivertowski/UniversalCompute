@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>ILGPU.Examples.Common</AssemblyName>
+    <RootNamespace>ILGPU.Examples.Common</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Src/ILGPU/ILGPU.csproj" />
+    <ProjectReference Include="../../Src/ILGPU.Algorithms/ILGPU.Algorithms.csproj" />
+  </ItemGroup>
+
+</Project>
