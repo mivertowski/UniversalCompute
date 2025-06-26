@@ -48,14 +48,14 @@ namespace ILGPU.SourceGenerators.Generators
                     var cudaXml = LoadEmbeddedResource("CudaAPI.xml");
                     if (!string.IsNullOrEmpty(cudaXml))
                     {
-                        GenerateLibraryImportsFromXmlContent(spc, cudaXml, "CudaAPI");
+                        GenerateLibraryImportsFromXmlContent(spc, cudaXml!, "CudaAPI");
                     }
 
                     // Generate OpenCL API LibraryImport bindings
                     var openclXml = LoadEmbeddedResource("CLAPI.xml");
                     if (!string.IsNullOrEmpty(openclXml))
                     {
-                        GenerateLibraryImportsFromXmlContent(spc, openclXml, "CLAPI");
+                        GenerateLibraryImportsFromXmlContent(spc, openclXml!, "CLAPI");
                     }
                 }
                 catch (Exception ex)
@@ -152,9 +152,9 @@ namespace ILGPU.SourceGenerators.Generators
             var linux = libraryNamesElement.Element("Linux")?.Value;
             var macOS = libraryNamesElement.Element("MacOS")?.Value;
 
-            if (!string.IsNullOrEmpty(windows)) result["Windows"] = windows;
-            if (!string.IsNullOrEmpty(linux)) result["Linux"] = linux;
-            if (!string.IsNullOrEmpty(macOS)) result["MacOS"] = macOS;
+            if (!string.IsNullOrEmpty(windows)) result["Windows"] = windows!;
+            if (!string.IsNullOrEmpty(linux)) result["Linux"] = linux!;
+            if (!string.IsNullOrEmpty(macOS)) result["MacOS"] = macOS!;
 
             return result;
         }
@@ -185,8 +185,8 @@ namespace ILGPU.SourceGenerators.Generators
 
                 entryPoints.Add(new EntryPointInfo
                 {
-                    Name = name,
-                    ReturnType = returnType,
+                    Name = name!,
+                    ReturnType = returnType!,
                     StringMarshalling = stringMarshalling,
                     Parameters = parameters,
                     IsUnsafe = isUnsafe
@@ -417,9 +417,9 @@ namespace ILGPU.SourceGenerators.Generators
                 
                 if (!string.IsNullOrEmpty(flags))
                 {
-                    if (flags.Contains("Out"))
+                    if (flags!.Contains("Out"))
                         return $"out {paramName}";
-                    if (flags.Contains("Ref"))
+                    if (flags!.Contains("Ref"))
                         return $"ref {paramName}";
                 }
                 

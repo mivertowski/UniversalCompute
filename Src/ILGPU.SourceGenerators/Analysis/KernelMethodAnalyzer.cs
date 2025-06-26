@@ -76,10 +76,12 @@ namespace ILGPU.SourceGenerators.Analysis
                 // Check for supported parameter types
                 if (IsArrayViewType(parameterType))
                 {
+                    var elementType = GetArrayViewElementType(parameterType);
                     analyzedParameters.Add(new AnalyzedParameter(
                         parameter, 
                         ParameterKind.ArrayView, 
-                        GetArrayViewElementType(parameterType)));
+                        parameterType,
+                        elementType));
                 }
                 else if (IsPrimitiveType(parameterType))
                 {
