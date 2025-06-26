@@ -267,4 +267,4 @@ UniversalCompute is built upon the exceptional groundwork laid by the **ILGPU Pr
 
 ---
 
-**Copyright (c) 2024-2025 ILGPU Project. All rights reserved.**
+**Copyright (c) 2024-2025 UniversalCompute Project. All rights reserved.**
