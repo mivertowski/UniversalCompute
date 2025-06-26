@@ -13,9 +13,7 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0
-
-using Microsoft.CodeAnalysis;
+// Change License: Apache License, Version 2.0using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;

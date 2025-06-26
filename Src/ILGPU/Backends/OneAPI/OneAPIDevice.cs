@@ -13,9 +13,7 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0
-
-#if ENABLE_ONEAPI_ACCELERATOR
+// Change License: Apache License, Version 2.0#if ENABLE_ONEAPI_ACCELERATOR
 namespace ILGPU.Backends.OneAPI
 {
     /// <summary>

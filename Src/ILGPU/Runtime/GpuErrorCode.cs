@@ -13,9 +13,7 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0
-
-namespace ILGPU.Runtime
+// Change License: Apache License, Version 2.0namespace ILGPU.Runtime
 {
     /// <summary>
     /// Represents specific GPU error codes for enhanced error classification.

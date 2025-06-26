@@ -13,9 +13,7 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0
-
-using ILGPU.Backends;
+// Change License: Apache License, Version 2.0using ILGPU.Backends;
 using ILGPU.Runtime;
 using System;
 using System.Runtime.InteropServices;

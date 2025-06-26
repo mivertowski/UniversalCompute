@@ -1,4 +1,15 @@
 // ---------------------------------------------------------------------------------------
+//                                    ILGPU Samples
+//                           Copyright (c) 2025 ILGPU Project
+//                                    www.ilgpu.net
+//
+// File: Program.cs
+//
+// This file is part of ILGPU and is distributed under the University of Illinois Open
+// Source License. See LICENSE.txt for details.
+// ---------------------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------------------
 //                           ILGPU Phase 8 Universal Compute Platform
 //                    01-UniversalKernels: Write-Once, Run-Anywhere Programming
 // ---------------------------------------------------------------------------------------

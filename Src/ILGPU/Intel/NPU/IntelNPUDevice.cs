@@ -13,9 +13,7 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0
-
-using ILGPU.Runtime;
+// Change License: Apache License, Version 2.0using ILGPU.Runtime;
 using System;
 
 namespace ILGPU.Intel.NPU
