@@ -8,7 +8,7 @@ This guide will help you install and set up UniversalCompute in your .NET projec
 
 | Component | Minimum | Recommended |
 |-----------|---------|------------|
-| **.NET Version** | .NET 6.0+ | .NET 8.0+ |
+| **.NET Version** | .NET 9.0 (preview language features enabled) | .NET 9.0 (preview language features enabled) |
 | **Operating System** | Windows 10, Linux (Ubuntu 20.04+), macOS 11.0+ | Latest versions |
 | **Architecture** | x64 | x64 or ARM64 |
 | **Memory** | 4GB RAM | 16GB+ RAM |
@@ -61,7 +61,7 @@ cd UniversalCompute
 dotnet build Src --configuration=Release
 
 # Run tests (optional)
-dotnet test Src/ILGPU.Tests.CPU --configuration=Release
+dotnet test Src/ILGPU.Tests.CPU --configuration=Release --framework=net9.0
 
 # Create local NuGet package
 dotnet pack Src/ILGPU --configuration=Release --output ./packages
@@ -191,6 +191,7 @@ catch
 1. **Install required workloads:**
    - .NET desktop development
    - .NET Multi-platform App UI development (for cross-platform)
+   - .NET 9.0 preview support
 
 2. **Enable unsafe code globally:**
    - Project Properties → Build → General → Unsafe code ✓
@@ -198,20 +199,27 @@ catch
 3. **Configure debugging:**
    - Tools → Options → Debugging → General → Enable native code debugging ✓
 
+4. **Enable preview language features:**
+   - Project Properties → Build → Advanced → Language version → Preview
+
 ### JetBrains Rider
 
 1. **Configure build settings:**
    - File → Settings → Build, Execution, Deployment → Toolset and Build
-   - Ensure .NET 8.0+ SDK is selected
+   - Ensure .NET 9.0 SDK with preview features is selected
 
 2. **Enable unsafe code:**
    - Project settings → Build → Allow unsafe code ✓
+
+3. **Enable preview language features:**
+   - Project settings → Build → Language version → Preview
 
 ### Visual Studio Code
 
 1. **Install extensions:**
    - C# for Visual Studio Code
    - .NET Install Tool for Extension Authors
+   - .NET 9.0 preview support
 
 2. **Configure launch.json:**
 ```json
@@ -222,7 +230,7 @@ catch
       "name": ".NET Core Launch",
       "type": "coreclr",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/Debug/net8.0/MyApp.dll",
+      "program": "${workspaceFolder}/bin/Debug/net9.0/MyApp.dll",
       "args": [],
       "cwd": "${workspaceFolder}",
       "console": "internalConsole",
@@ -237,7 +245,7 @@ catch
 ### Common Issues
 
 #### Issue: "Could not load file or assembly"
-**Solution:** Ensure all dependencies are installed and the correct .NET runtime is available.
+**Solution:** Ensure all dependencies are installed and the correct .NET 9.0 runtime with preview features is available.
 
 #### Issue: "No suitable accelerator found"
 **Solution:** 
@@ -247,9 +255,9 @@ catch
 
 #### Issue: Native AOT compilation fails
 **Solution:**
-1. Ensure `PublishAot` is properly configured
-2. Check for incompatible dependencies
-3. Use `--self-contained` flag during publish
+1. Ensure `PublishAot` is properly configured for .NET 9.0
+2. Check for incompatible dependencies with preview features
+3. Use `--self-contained` flag with `--framework=net9.0` during publish
 
 #### Issue: Performance lower than expected
 **Solution:**

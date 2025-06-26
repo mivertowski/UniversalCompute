@@ -139,8 +139,12 @@ The samples are organized into categories based on complexity and feature areas.
 
 ### Prerequisites
 ```bash
-# Install .NET 8.0 or later
+# Install .NET 9.0 with preview language features
 dotnet --version
+# Should show 9.0.x or higher
+
+# Enable preview features for enhanced performance
+export DOTNET_EnablePreviewFeatures=true
 
 # Clone the repository
 git clone https://github.com/mivertowski/UniversalCompute.git
@@ -156,7 +160,7 @@ dotnet build ILGPU.Samples.sln
 dotnet run --project SimpleKernel/SimpleKernel.csproj
 
 # Run with specific configuration
-dotnet run --project 01_GettingStarted/Examples.GettingStarted.csproj --configuration Release
+dotnet run --project 01_GettingStarted/Examples.GettingStarted.csproj --configuration Release --framework=net9.0
 ```
 
 ### Hardware-Specific Samples
@@ -188,7 +192,8 @@ Each sample includes:
    - Run DeviceInfo sample to diagnose
 
 2. **Build Errors**
-   - Verify .NET SDK version (8.0 or later required)
+   - Verify .NET SDK version (.NET 9.0 with preview features required)
+   - Enable preview features in your project files
    - Check NuGet package restoration
    - Ensure platform-specific dependencies are installed
 

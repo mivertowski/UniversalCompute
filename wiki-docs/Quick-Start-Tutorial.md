@@ -5,9 +5,9 @@ Get up and running with UniversalCompute in 15 minutes! This tutorial will guide
 ## 📋 Prerequisites
 
 Before starting, ensure you have:
-- ✅ [.NET 8.0+ SDK installed](https://dotnet.microsoft.com/download)
+- ✅ [.NET 9.0 SDK with preview language features installed](https://dotnet.microsoft.com/download)
 - ✅ [UniversalCompute package installed](Installation-Guide)
-- ✅ A compatible IDE (Visual Studio, Rider, or VS Code)
+- ✅ A compatible IDE with .NET 9.0 preview support (Visual Studio 2022, Rider, or VS Code)
 - ✅ [Optional] CUDA-compatible GPU for maximum performance
 
 ## 🎯 What We'll Build
@@ -31,8 +31,8 @@ cd UniversalComputeDemo
 # Add UniversalCompute packages
 dotnet add package UniversalCompute --version 1.0.0-alpha1
 dotnet add package UniversalCompute.DependencyInjection --version 1.0.0-alpha1
-dotnet add package Microsoft.Extensions.Hosting --version 8.0.0
-dotnet add package Microsoft.Extensions.Logging.Console --version 8.0.0
+dotnet add package Microsoft.Extensions.Hosting --version 9.0.0
+dotnet add package Microsoft.Extensions.Logging.Console --version 9.0.0
 
 # Enable source generators and unsafe code
 ```
@@ -42,7 +42,8 @@ Edit your `.csproj` file to enable source generation and unsafe code:
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>preview</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -54,8 +55,8 @@ Edit your `.csproj` file to enable source generation and unsafe code:
   <ItemGroup>
     <PackageReference Include="UniversalCompute" Version="1.0.0-alpha1" />
     <PackageReference Include="UniversalCompute.DependencyInjection" Version="1.0.0-alpha1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
   </ItemGroup>
 </Project>
 ```
@@ -664,10 +665,11 @@ First, let's prepare for Native AOT by updating your `.csproj`:
 
 ```xml
 <PropertyGroup>
-  <!-- Add these for Native AOT support -->
+  <!-- Add these for Native AOT support with .NET 9.0 enhancements -->
   <PublishAot>true</PublishAot>
   <InvariantGlobalization>true</InvariantGlobalization>
   <TrimMode>full</TrimMode>
+  <EnablePreviewFeatures>true</EnablePreviewFeatures>
 </PropertyGroup>
 ```
 
@@ -937,20 +939,21 @@ Deploy your application as a self-contained native binary:
 
 ```bash
 # Publish for Native AOT (Windows)
-dotnet publish -r win-x64 -c Release
+dotnet publish -r win-x64 -c Release --framework=net9.0
 
 # Publish for Native AOT (Linux)
-dotnet publish -r linux-x64 -c Release
+dotnet publish -r linux-x64 -c Release --framework=net9.0
 
 # Publish for Native AOT (macOS)
-dotnet publish -r osx-x64 -c Release
+dotnet publish -r osx-x64 -c Release --framework=net9.0
 ```
 
 The resulting binary will be:
 - **Self-contained**: No .NET runtime required
-- **Fast startup**: Near-instant application launch
-- **Small footprint**: Optimized binary size
-- **High performance**: Native code execution
+- **Fast startup**: Near-instant application launch with .NET 9.0 optimizations
+- **Small footprint**: Optimized binary size with enhanced trimming
+- **High performance**: Native code execution with preview language features
+- **Modern C# features**: Latest language enhancements for better performance
 
 ## 📚 What's Next?
 

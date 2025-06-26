@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>$(LibraryUnitTestTargetFrameworks)</TargetFrameworks>
+    <TargetFramework>net9.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <StartupObject />
   </PropertyGroup>
@@ -10,12 +10,10 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)' != '$(LibraryLatestUnitTestTargetFramework)'">
-    <NoWarn>$(NoWarn);nullable</NoWarn>
-  </PropertyGroup>
 
   <PropertyGroup>
-    <LangVersion>latest</LangVersion>
+    <LangVersion>preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 

@@ -12,7 +12,7 @@ UniversalCompute is a high-performance computing framework that provides unified
 
 ### Key Features
 
-- **🚀 Native AOT Support** - Full ahead-of-time compilation support for .NET 8+ applications
+- **🚀 Native AOT Support** - Full ahead-of-time compilation support for .NET 9.0 with preview language features
 - **🔧 Hardware Abstraction** - Unified API for CPU, GPU, NPU, Neural Engine, and specialized accelerators
 - **⚡ High Performance** - Optimized kernels and memory management for maximum throughput
 - **🎯 Multi-Platform** - Support for Windows, Linux, and macOS across x64 and ARM64 architectures
@@ -163,8 +163,9 @@ Comprehensive examples are available in the `Examples/` directory:
 
 ### Prerequisites
 
-- .NET 8.0 SDK or later
-- Visual Studio 2022 (Windows) or JetBrains Rider (cross-platform)
+- .NET 9.0 SDK (preview language features enabled)
+- Visual Studio 2022 with .NET 9.0 preview support
+- JetBrains Rider with .NET 9.0 support (cross-platform)
 - CUDA Toolkit 12.0+ (for NVIDIA GPU support)
 - Intel oneAPI (for Intel-specific accelerators)
 
@@ -174,21 +175,19 @@ Comprehensive examples are available in the `Examples/` directory:
 git clone https://github.com/mivertowski/UniversalCompute.git
 cd UniversalCompute
 dotnet build Src --configuration Release
-dotnet test Src/ILGPU.Tests.CPU --configuration Release
+dotnet test Src/ILGPU.Tests.CPU --configuration Release --framework=net9.0
 ```
 
 ### Native AOT Compilation
 
 ```bash
-dotnet publish Examples/01_GettingStarted --configuration Release --runtime win-x64 --self-contained /p:PublishAot=true
+dotnet publish Examples/01_GettingStarted --configuration Release --runtime win-x64 --self-contained /p:PublishAot=true --framework=net9.0
 ```
 
 ## Compatibility
 
 ### .NET Versions
-- .NET 6.0 (Limited support)
-- .NET 7.0 (Full support)
-- .NET 8.0+ (Full support with AOT)
+- .NET 9.0 (Full support with preview language features and enhanced AOT)
 
 ### Operating Systems
 - Windows 10/11 (x64, ARM64)
@@ -267,4 +266,4 @@ UniversalCompute is built upon the exceptional groundwork laid by the **ILGPU Pr
 
 ---
 
-**Copyright (c) 2024-2025 UniversalCompute Project. All rights reserved.**
+**Copyright (c) 2025 UniversalCompute Project. All rights reserved.**

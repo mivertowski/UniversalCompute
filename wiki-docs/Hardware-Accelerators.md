@@ -12,7 +12,7 @@ UniversalCompute provides unified access to diverse hardware accelerators throug
 - **🔄 Universal Memory Manager**: Cross-accelerator memory sharing and unified allocation strategies  
 - **⚡ Performance Monitoring**: Real-time hardware utilization, power, and thermal tracking
 - **🎯 Hardware Abstraction Layer**: Enhanced device detection and optimization profiles
-- **📦 Native AOT Support**: Hardware-specific compilation and platform-optimized binaries
+- **📦 Native AOT Support**: Hardware-specific compilation with .NET 9.0 preview features and platform-optimized binaries
 - **🔗 Cross-Accelerator Coordination**: Seamless multi-device workflows and data sharing
 
 ### Supported Accelerator Types
@@ -827,12 +827,13 @@ Native Ahead-of-Time compilation with hardware-specific optimizations for deploy
 ```csharp
 using UniversalCompute.AOT;
 
-// Configure AOT compilation with hardware optimizations
+// Configure AOT compilation with .NET 9.0 hardware optimizations
 var aotConfig = new AOTConfiguration()
     .WithTargetHardware(TargetHardware.Auto) // Detects at compile time
     .WithOptimizationLevel(OptimizationLevel.MaxPerformance)
     .WithInstructionSetOptimization(enabled: true)
-    .WithProfileGuidedOptimization(enabled: true);
+    .WithProfileGuidedOptimization(enabled: true)
+    .WithPreviewLanguageFeatures(enabled: true); // .NET 9.0 preview features
 
 // Generate hardware-specific AOT binaries
 var aotCompiler = new HardwareAOTCompiler(aotConfig);
@@ -872,10 +873,11 @@ foreach (var target in targets)
 // Create platform-specific optimized builds
 var platformOptimizer = new PlatformOptimizer();
 
-// Windows with CUDA and Intel extensions
+// Windows with CUDA and Intel extensions (.NET 9.0)
 var windowsBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
 {
     Platform = TargetPlatform.Windows,
+    TargetFramework = "net9.0",
     EnabledAccelerators = new[]
     {
         AcceleratorType.Cuda,
@@ -884,13 +886,15 @@ var windowsBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfigu
     },
     OptimizationFlags = OptimizationFlags.AggressiveInlining | 
                        OptimizationFlags.VectorizeLoops |
-                       OptimizationFlags.UnrollLoops
+                       OptimizationFlags.UnrollLoops |
+                       OptimizationFlags.PreviewLanguageFeatures
 });
 
-// Linux with OpenCL and CPU optimizations
+// Linux with OpenCL and CPU optimizations (.NET 9.0)
 var linuxBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
 {
     Platform = TargetPlatform.Linux,
+    TargetFramework = "net9.0",
     EnabledAccelerators = new[]
     {
         AcceleratorType.OpenCL,
@@ -898,14 +902,16 @@ var linuxBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfigura
         AcceleratorType.Velocity
     },
     CPUOptimizations = CPUOptimizationLevel.Native,
-    EnableAutoVectorization = true
+    EnableAutoVectorization = true,
+    EnablePreviewFeatures = true
 });
 
-// macOS with Apple Neural Engine
+// macOS with Apple Neural Engine (.NET 9.0)
 var macOSBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
 {
     Platform = TargetPlatform.MacOS,
     Architecture = TargetArchitecture.ARM64,
+    TargetFramework = "net9.0",
     EnabledAccelerators = new[]
     {
         AcceleratorType.AppleNeuralEngine,
@@ -913,7 +919,8 @@ var macOSBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfigura
         AcceleratorType.CPU
     },
     AppleSpecificOptimizations = AppleOptimizations.UnifiedMemory |
-                                AppleOptimizations.NeuralEngineAcceleration
+                                AppleOptimizations.NeuralEngineAcceleration,
+    EnablePreviewFeatures = true
 });
 ```
 

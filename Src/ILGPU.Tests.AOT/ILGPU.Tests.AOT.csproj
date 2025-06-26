@@ -15,7 +15,8 @@
     <WarningsAsErrors />
     <WarningsNotAsErrors>CA1416;IL2026;IL2070;IL2075</WarningsNotAsErrors>
     <DefineConstants>$(DefineConstants);NATIVE_AOT;AOT_COMPATIBLE</DefineConstants>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

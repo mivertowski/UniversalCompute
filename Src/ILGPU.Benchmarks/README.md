@@ -145,7 +145,7 @@ Benchmark results are saved in multiple formats:
 ## Hardware Requirements
 
 ### Minimum Requirements
-- .NET 8.0 Runtime
+- .NET 9.0 Runtime with preview features enabled
 - 8GB RAM
 - Multi-core CPU with SIMD support
 
@@ -227,6 +227,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
+        include-prerelease: true
         
     - name: Run Benchmarks
       run: |

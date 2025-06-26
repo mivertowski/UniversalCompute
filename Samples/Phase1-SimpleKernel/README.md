@@ -56,8 +56,9 @@ static void SafeMultiplyKernel(Index1D index, ArrayView<float> input, ArrayView<
 
 ### **Prerequisites**
 ```bash
-# Ensure you have .NET 9.0 installed
+# Ensure you have .NET 9.0 with preview features installed
 dotnet --version
+# Should show 9.0.x or higher
 
 # Build the sample
 dotnet build

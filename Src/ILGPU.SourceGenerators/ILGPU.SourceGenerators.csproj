@@ -4,7 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <IsRoslynComponent>true</IsRoslynComponent>
     <IsPackable>false</IsPackable>
-    <LangVersion>13.0</LangVersion>
+    <LangVersion>preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -20,11 +21,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <IsAotCompatible>True</IsAotCompatible>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup>
     <IsAotCompatible>True</IsAotCompatible>
   </PropertyGroup>
 

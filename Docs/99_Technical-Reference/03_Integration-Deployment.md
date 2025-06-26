@@ -24,7 +24,7 @@
 ```dockerfile
 # Multi-stage Dockerfile for ILGPU applications
 # Stage 1: Build environment
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # Install CUDA toolkit for GPU support (optional)
@@ -53,7 +53,7 @@ FROM build AS publish
 RUN dotnet publish "MyApp.csproj" -c Release -o /app/publish
 
 # Stage 3: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
@@ -457,7 +457,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['6.0.x', '7.0.x', '8.0.x']
+        dotnet-version: ['8.0.x', '9.0.x']
     steps:
     - uses: actions/checkout@v3
     
@@ -592,10 +592,10 @@ stages:
     displayName: 'Run Unit Tests'
     steps:
     - task: UseDotNet@2
-      displayName: 'Use .NET 8 SDK'
+      displayName: 'Use .NET 9 SDK'
       inputs:
         packageType: 'sdk'
-        version: '8.0.x'
+        version: '9.0.x'
     
     - task: DotNetCoreCLI@2
       displayName: 'Restore packages'

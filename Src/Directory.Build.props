@@ -3,10 +3,8 @@
   <PropertyGroup>
     <LibraryTargetFrameworks>net9.0</LibraryTargetFrameworks>
     <LibraryLatestTargetFramework>$(LibraryTargetFrameworks)</LibraryLatestTargetFramework>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <LibraryTargetFrameworks>$(LibraryTargetFrameworks);net8.0;net6.0;net7.0</LibraryTargetFrameworks>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <LangVersion>preview</LangVersion>
+    <EnablePreviewFeatures>true</EnablePreviewFeatures>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,10 +18,6 @@
   <PropertyGroup>
     <LibraryUnitTestTargetFrameworks>net9.0</LibraryUnitTestTargetFrameworks>
     <LibraryLatestUnitTestTargetFramework>$(LibraryUnitTestTargetFrameworks)</LibraryLatestUnitTestTargetFramework>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
-    <LibraryUnitTestTargetFrameworks>$(LibraryUnitTestTargetFrameworks);net8.0;net6.0;net7.0</LibraryUnitTestTargetFrameworks>
-    <CheckEolTargetFramework>false</CheckEolTargetFramework>
   </PropertyGroup>
 
 </Project>
