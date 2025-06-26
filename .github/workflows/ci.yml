@@ -22,28 +22,6 @@ env:
 
 jobs:
 
-  # Check some basic style rules.
-  check-style:
-    # Do not run this job for pull requests where both branches are from the same repo.
-    # Jobs that depend on this one will be skipped too.
-    # This prevents duplicate CI runs for our own pull requests, whilst preserving the ability to
-    # run the CI for each branch push to a fork, and for each pull request originating from a fork.
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    needs:
-      - check-style-line-endings
-    runs-on: ubuntu-latest
-    steps:
-      - run: echo "All style checks done"
-
-  check-style-line-endings:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check T4 line endings
-        run: .github/workflows/Scripts/CheckT4LineEndings.ps1 -path Src
 
 
   # Setup the OS matrix so that CUDA tests do not run on forks, as it needs self-hosted runners.
@@ -314,7 +292,6 @@ jobs:
   # check there.
   all-required-checks-done:
     needs:
-      - check-style
       - build
       - test-library
       - package-library

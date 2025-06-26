@@ -5,11 +5,6 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CudaVersionUpdateTool", "CudaVersionUpdateTool\CudaVersionUpdateTool.csproj", "{A55D7D47-9A1F-4AD4-B28A-044A8C1BBEBE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CheckStyles", "CheckStyles", "{503D5937-64D5-43F3-B5E4-7B85F264090B}"
-	ProjectSection(SolutionItems) = preProject
-		CheckStyles\ILGPU.CheckStyles.targets = CheckStyles\ILGPU.CheckStyles.targets
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GenerateCompatibilitySuppressionFiles", "GenerateCompatibilitySuppressionFiles", "{8C2B2AC9-288D-4FB1-A654-1390125662F5}"
 	ProjectSection(SolutionItems) = preProject
 		GenerateCompatibilitySuppressionFiles\GenerateCompatibilitySuppressionFiles.ps1 = GenerateCompatibilitySuppressionFiles\GenerateCompatibilitySuppressionFiles.ps1
