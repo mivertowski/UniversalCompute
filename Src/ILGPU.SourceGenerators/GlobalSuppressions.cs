@@ -19,3 +19,6 @@ using System.Diagnostics.CodeAnalysis;
 
 // Suppress analyzer release tracking warnings for this development project
 [assembly: SuppressMessage("MicrosoftCodeAnalysisReleaseTracking", "RS2008", Justification = "Development project - not shipping analyzer rules")]
+
+// Suppress nullable context warnings in generated code
+[assembly: SuppressMessage("Compiler", "CS8669", Justification = "Nullable reference types are handled in generated code context")]

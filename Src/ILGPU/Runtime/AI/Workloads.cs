@@ -150,20 +150,20 @@ namespace ILGPU.Runtime.AI
             await primitives.GemmAsync(A, B, C, alpha, beta, cancellationToken);
         }
 
-        private static T GetOne<T>() where T : unmanaged
+        private static TElement GetOne<TElement>() where TElement : unmanaged
         {
-            if (typeof(T) == typeof(float)) return (T)(object)1.0f;
-            if (typeof(T) == typeof(double)) return (T)(object)1.0;
-            if (typeof(T) == typeof(int)) return (T)(object)1;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            if (typeof(TElement) == typeof(float)) return (TElement)(object)1.0f;
+            if (typeof(TElement) == typeof(double)) return (TElement)(object)1.0;
+            if (typeof(TElement) == typeof(int)) return (TElement)(object)1;
+            throw new NotSupportedException($"Type {typeof(TElement)} not supported");
         }
 
-        private static T GetZero<T>() where T : unmanaged
+        private static TElement GetZero<TElement>() where TElement : unmanaged
         {
-            if (typeof(T) == typeof(float)) return (T)(object)0.0f;
-            if (typeof(T) == typeof(double)) return (T)(object)0.0;
-            if (typeof(T) == typeof(int)) return (T)(object)0;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            if (typeof(TElement) == typeof(float)) return (TElement)(object)0.0f;
+            if (typeof(TElement) == typeof(double)) return (TElement)(object)0.0;
+            if (typeof(TElement) == typeof(int)) return (TElement)(object)0;
+            throw new NotSupportedException($"Type {typeof(TElement)} not supported");
         }
     }
 

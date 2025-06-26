@@ -365,13 +365,13 @@ namespace ILGPU.ML
 
         #region Kernels
 
-        private static void TransposeKernel<T>(
+        private static void TransposeKernel<TElement>(
             Index2D index,
-            ArrayView<T> input,
-            ArrayView<T> output,
+            ArrayView<TElement> input,
+            ArrayView<TElement> output,
             int rows,
             int cols)
-            where T : unmanaged
+            where TElement : unmanaged
         {
             if (index.X < cols && index.Y < rows)
             {
@@ -381,45 +381,45 @@ namespace ILGPU.ML
             }
         }
 
-        private static void AddKernel<T>(
+        private static void AddKernel<TElement>(
             Index1D index,
-            ArrayView<T> left,
-            ArrayView<T> right,
-            ArrayView<T> result)
-            where T : unmanaged, INumber<T>
+            ArrayView<TElement> left,
+            ArrayView<TElement> right,
+            ArrayView<TElement> result)
+            where TElement : unmanaged, INumber<TElement>
         {
             if (index < result.Length)
                 result[index] = left[index] + right[index];
         }
 
-        private static void MultiplyKernel<T>(
+        private static void MultiplyKernel<TElement>(
             Index1D index,
-            ArrayView<T> left,
-            ArrayView<T> right,
-            ArrayView<T> result)
-            where T : unmanaged, INumber<T>
+            ArrayView<TElement> left,
+            ArrayView<TElement> right,
+            ArrayView<TElement> result)
+            where TElement : unmanaged, INumber<TElement>
         {
             if (index < result.Length)
                 result[index] = left[index] * right[index];
         }
 
-        private static void ReLUKernel<T>(
+        private static void ReLUKernel<TElement>(
             Index1D index,
-            ArrayView<T> input,
-            ArrayView<T> output)
-            where T : unmanaged, INumber<T>
+            ArrayView<TElement> input,
+            ArrayView<TElement> output)
+            where TElement : unmanaged, INumber<TElement>
         {
             if (index < input.Length)
-                output[index] = T.Max(T.Zero, input[index]);
+                output[index] = TElement.Max(TElement.Zero, input[index]);
         }
 
-        private static void Softmax2DKernel<T>(
+        private static void Softmax2DKernel<TElement>(
             Index1D batchIndex,
-            ArrayView<T> input,
-            ArrayView<T> output,
+            ArrayView<TElement> input,
+            ArrayView<TElement> output,
             int batchSize,
             int featureSize)
-            where T : unmanaged, INumber<T>
+            where TElement : unmanaged, INumber<TElement>
         {
             if (batchIndex >= batchSize) return;
 
@@ -428,10 +428,10 @@ namespace ILGPU.ML
             // Find max for numerical stability
             var maxVal = input[offset];
             for (int i = 1; i < featureSize; i++)
-                maxVal = T.Max(maxVal, input[offset + i]);
+                maxVal = TElement.Max(maxVal, input[offset + i]);
 
             // Compute exp and sum
-            var sum = T.Zero;
+            var sum = TElement.Zero;
             for (int i = 0; i < featureSize; i++)
             {
                 var exp = MathExtensions.Exp(input[offset + i] - maxVal);
@@ -463,17 +463,17 @@ namespace ILGPU.ML
                 a.Shape[0], a.Shape[1], b.Shape[1]);
         }
 
-        private static void MatMulKernel<T>(
+        private static void MatMulKernel<TElement>(
             Index2D index,
-            ArrayView<T> a,
-            ArrayView<T> b,
-            ArrayView<T> result,
+            ArrayView<TElement> a,
+            ArrayView<TElement> b,
+            ArrayView<TElement> result,
             int M, int K, int N)
-            where T : unmanaged, INumber<T>
+            where TElement : unmanaged, INumber<TElement>
         {
             if (index.X >= M || index.Y >= N) return;
 
-            var sum = T.Zero;
+            var sum = TElement.Zero;
             for (int k = 0; k < K; k++)
             {
                 var aVal = a[index.X * K + k];
@@ -546,11 +546,11 @@ namespace ILGPU.ML
         public static Tensor<T> FromArray<T>(Accelerator accelerator, TensorShape shape, T[] data)
             where T : unmanaged, INumber<T> => new Tensor<T>(accelerator, shape, data);
 
-        private static void FillOnesKernel<T>(Index1D index, ArrayView<T> output)
-            where T : unmanaged, INumber<T>
+        private static void FillOnesKernel<TElement>(Index1D index, ArrayView<TElement> output)
+            where TElement : unmanaged, INumber<TElement>
         {
             if (index < output.Length)
-                output[index] = T.One;
+                output[index] = TElement.One;
         }
     }
 }

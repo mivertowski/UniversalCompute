@@ -44,7 +44,7 @@ namespace ILGPU.ML.Integration
         /// <param name="options">Execution provider options.</param>
         public ILGPUUniversalExecutionProvider(
             IReadOnlyDictionary<ComputeDevice, Accelerator> availableAccelerators,
-            ExecutionProviderOptions options = null)
+            ExecutionProviderOptions? options = null)
         {
             options ??= new ExecutionProviderOptions();
 
@@ -135,7 +135,7 @@ namespace ILGPU.ML.Integration
         /// <returns>A compiled execution plan.</returns>
         public async Task<CompiledExecutionPlan> CompileModelAsync(
             string modelPath,
-            ModelCompilationOptions compilationOptions = null)
+            ModelCompilationOptions? compilationOptions = null)
         {
             ThrowIfDisposed();
 

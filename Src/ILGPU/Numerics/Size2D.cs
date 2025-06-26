@@ -61,7 +61,7 @@ namespace ILGPU.Numerics
         /// </summary>
         /// <param name="obj">The object to compare with.</param>
         /// <returns>True if the objects are equal; otherwise, false.</returns>
-        public override bool Equals(object obj) => obj is Size2D other && Equals(other);
+        public override bool Equals(object? obj) => obj is Size2D other && Equals(other);
 
         /// <summary>
         /// Returns the hash code for this instance.
