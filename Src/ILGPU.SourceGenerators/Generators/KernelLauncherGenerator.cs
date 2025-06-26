@@ -112,11 +112,13 @@ namespace ILGPU.SourceGenerators.Generators
                 return;
 
             // Group kernels by containing class
-            var kernelsByClass = validKernels.GroupBy(k => k.MethodSymbol.ContainingType);
+            var kernelsByClass = validKernels.GroupBy(k => k.MethodSymbol.ContainingType, SymbolEqualityComparer.Default);
 
             foreach (var classGroup in kernelsByClass)
             {
-                var containingType = classGroup.Key;
+                if (classGroup.Key is not INamedTypeSymbol containingType)
+                    continue;
+                    
                 var kernelsInClass = classGroup.ToList();
 
                 var sourceCode = GenerateKernelLauncherClass(containingType, kernelsInClass);

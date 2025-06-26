@@ -115,7 +115,7 @@ namespace ILGPU.Algorithms.Tests
             Accelerator.Initialize(stream, buffer.View, value);
 
             stream.Synchronize();
-            var expected = Enumerable.Repeat(value, size).ToArray();
+            var expected = Enumerable.Repeat(value, size).ToArray()!;
             Verify(buffer.View, expected);
         }
     }

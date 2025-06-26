@@ -450,8 +450,8 @@ namespace ILGPU.Algorithms.Tests
             using var optimizer = pso.CreateOptimizer(stream, random, function);
 
             // Load config
-            var lowerRange = Enumerable.Repeat(lower, pso.Dimension).ToArray();
-            var upperRange = Enumerable.Repeat(upper, pso.Dimension).ToArray();
+            var lowerRange = Enumerable.Repeat(lower, pso.Dimension).ToArray()!;
+            var upperRange = Enumerable.Repeat(upper, pso.Dimension).ToArray()!;
             pso.LoadBounds(stream, lowerRange, upperRange);
             pso.LoadParameters(stream, optimizerConfig.Parameters);
 

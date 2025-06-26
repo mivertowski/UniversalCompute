@@ -29,7 +29,7 @@ namespace ILGPU.Apple.NeuralEngine
     /// </summary>
     public sealed class AppleNeuralEngine : IDisposable
     {
-        private readonly MetalDevice _device;
+        private readonly MetalDevice? _device;
         private readonly ANECapabilities _capabilities;
         private readonly IntPtr _aneContext;
         private bool _disposed;
@@ -38,9 +38,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// Initializes a new instance of the AppleNeuralEngine class.
         /// </summary>
         /// <param name="device">The Metal device associated with the ANE.</param>
-        public AppleNeuralEngine(MetalDevice device)
+        public AppleNeuralEngine(MetalDevice? device)
         {
-            _device = device ?? throw new ArgumentNullException(nameof(device));
+            _device = device; // Allow null for dummy/testing scenarios
             _capabilities = ANECapabilities.Query();
             
             if (_capabilities.IsAvailable)
@@ -181,7 +181,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         public async Task<CoreMLModel> LoadModelAsync(
             string modelPath,
-            ANEOptimizationOptions options = null,
+            ANEOptimizationOptions? options = null,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(modelPath))

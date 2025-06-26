@@ -381,3 +381,14 @@ ENHANCEMENT_PLAN.md
 MODERNIZATION_PLAN.md
 SOLUTION_VALUATION.md
 ilgpu_modernization_supplement.md
+build_detailed.txt
+.gitignore
+build_output.txt
+.gitignore
+aot_warnings.txt
+detailed_warnings.txt
+pragma_warnings.txt
+warnings_found.txt
+warnings_output.txt
+aot_warnings_fixed.txt
+sourcegen_warnings_fixed.txt

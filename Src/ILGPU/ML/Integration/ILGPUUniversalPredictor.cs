@@ -180,7 +180,7 @@ namespace ILGPU.ML.Integration
         /// <param name="sampleInputs">Sample inputs for optimization.</param>
         /// <param name="optimizationHints">Hints for optimization strategy.</param>
         /// <returns>A task representing the optimization operation.</returns>
-        public async Task OptimizeAsync(TInput[] sampleInputs, OptimizationHints optimizationHints = null)
+        public async Task OptimizeAsync(TInput[] sampleInputs, OptimizationHints? optimizationHints = null)
         {
             ThrowIfDisposed();
 

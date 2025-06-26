@@ -486,9 +486,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             if (!string.IsNullOrEmpty(flags))
             {
-                if (flags.Contains("Out"))
+                if (flags!.Contains("Out"))
                     return $"out {type}";
-                if (flags.Contains("Ref"))
+                if (flags!.Contains("Ref"))
                     return $"ref {type}";
             }
 
@@ -505,9 +505,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             if (!string.IsNullOrEmpty(dllFlags))
             {
-                if (dllFlags.Contains("In"))
+                if (dllFlags!.Contains("In"))
                     attributes.Add("In");
-                if (dllFlags.Contains("Out"))
+                if (dllFlags!.Contains("Out"))
                     attributes.Add("Out");
             }
 
@@ -515,9 +515,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             if (!string.IsNullOrEmpty(flags))
             {
-                if (flags.Contains("Out"))
+                if (flags!.Contains("Out"))
                     return $"{attributeString}out {type}";
-                if (flags.Contains("Ref"))
+                if (flags!.Contains("Ref"))
                     return $"{attributeString}ref {type}";
             }
 
@@ -532,9 +532,9 @@ namespace ILGPU.SourceGenerators.Generators
             // Match the parameter directions from the abstract method declarations
             if (!string.IsNullOrEmpty(flags))
             {
-                if (flags.Contains("Out"))
+                if (flags!.Contains("Out"))
                     return $"out {type}";
-                if (flags.Contains("Ref"))
+                if (flags!.Contains("Ref"))
                     return $"ref {type}";
             }
 

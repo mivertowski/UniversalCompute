@@ -52,12 +52,12 @@ namespace ILGPU.SourceGenerators.Analysis
             // Analyze parameters for AOT compatibility
             var parameterAnalysis = AnalyzeParameters(methodSymbol.Parameters);
             if (!parameterAnalysis.IsValid)
-                return KernelAnalysisResult.Failed(parameterAnalysis.Error);
+                return KernelAnalysisResult.Failed(parameterAnalysis.Error ?? "Parameter analysis failed");
 
             // Analyze method body for unsupported features
             var bodyAnalysis = AnalyzeMethodBody(methodSyntax);
             if (!bodyAnalysis.IsValid)
-                return KernelAnalysisResult.Failed(bodyAnalysis.Error);
+                return KernelAnalysisResult.Failed(bodyAnalysis.Error ?? "Method body analysis failed");
 
             return KernelAnalysisResult.Success(methodSymbol, parameterAnalysis, bodyAnalysis);
         }
