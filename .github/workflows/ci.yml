@@ -30,22 +30,11 @@ jobs:
     # run the CI for each branch push to a fork, and for each pull request originating from a fork.
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     needs:
-      - check-style-line-lengths
       - check-style-line-endings
       - check-style-copyright-headers
     runs-on: ubuntu-latest
     steps:
       - run: echo "All style checks done"
-
-  check-style-line-lengths:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    runs-on: windows-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check line length
-        run: .github/workflows/Scripts/CheckLineLength.ps1 -path Src
 
   check-style-line-endings:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id

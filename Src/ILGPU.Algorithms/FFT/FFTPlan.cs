@@ -361,10 +361,11 @@ namespace ILGPU.Algorithms.FFT
                 throw new InvalidOperationException("FFT plan is not valid or no suitable accelerator available");
         }
 
-        private void ValidateBuffers2D(Index2D inputExtent, Index2D outputExtent)
+        private void ValidateBuffers2D(LongIndex2D inputExtent, LongIndex2D outputExtent)
         {
-            if (inputExtent != Extent || outputExtent != Extent)
-                throw new ArgumentException($"Buffer extents {inputExtent}, {outputExtent} do not match plan extent {Extent}");
+            var planExtent = new LongIndex2D(Width, Height);
+            if (inputExtent != planExtent || outputExtent != planExtent)
+                throw new ArgumentException($"Buffer extents {inputExtent}, {outputExtent} do not match plan extent {planExtent}");
         }
 
         #endregion

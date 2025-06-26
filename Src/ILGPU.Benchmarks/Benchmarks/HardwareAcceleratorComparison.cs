@@ -17,6 +17,7 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
 using ILGPU.Intel.AMX;
 using ILGPU.Intel.NPU;
 using ILGPU.Apple.NeuralEngine;
@@ -103,7 +104,7 @@ public class HardwareAcceleratorComparison : IDisposable
             // Always add standard accelerators for comparison
             try
             {
-                var cpuDevice = context.GetCPUDevice();
+                var cpuDevice = context.GetCPUDevice(0);
                 if (cpuDevice != null)
                 {
                     var cpuAccelerator = cpuDevice.CreateAccelerator(context);
@@ -265,7 +266,7 @@ public class HardwareAcceleratorComparison : IDisposable
             var kernel = LoadKernelForAccelerator(accelerator);
             
             // Execute kernel
-            kernel(localInput.View, localOutput.View, MatrixSize, BatchSize);
+            kernel((Index1D)localInput.Length, localInput.View, localOutput.View, MatrixSize, BatchSize);
             accelerator.Synchronize();
             
             // Return first result element
@@ -281,7 +282,7 @@ public class HardwareAcceleratorComparison : IDisposable
         }
     }
 
-    private Action<ArrayView<float>, ArrayView<float>, int, int> LoadKernelForAccelerator(Accelerator accelerator)
+    private Action<Index1D, ArrayView<float>, ArrayView<float>, int, int> LoadKernelForAccelerator(Accelerator accelerator)
     {
         // Use specialized kernels for hardware accelerators, generic kernel for others
         return accelerator switch

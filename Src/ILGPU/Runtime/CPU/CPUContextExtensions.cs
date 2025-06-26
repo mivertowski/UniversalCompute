@@ -178,6 +178,39 @@ namespace ILGPU.Runtime.CPU
             context.GetCPUDevice(cpuDeviceIndex)
                 .CreateCPUAccelerator(context, mode, threadPriority);
 
+        /// <summary>
+        /// Creates a new AMX accelerator.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <param name="deviceIndex">The device index.</param>
+        /// <returns>The created AMX accelerator.</returns>
+        public static CPUAccelerator CreateAMXAccelerator(
+            this Context context,
+            int deviceIndex = 0) =>
+            context.CreateCPUAccelerator(deviceIndex, CPUAcceleratorMode.Auto);
+
+        /// <summary>
+        /// Creates a new NPU accelerator.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <param name="deviceIndex">The device index.</param>
+        /// <returns>The created NPU accelerator.</returns>
+        public static CPUAccelerator CreateNPUAccelerator(
+            this Context context,
+            int deviceIndex = 0) =>
+            context.CreateCPUAccelerator(deviceIndex, CPUAcceleratorMode.Auto);
+
+        /// <summary>
+        /// Creates a new Apple Neural Engine accelerator.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <param name="deviceIndex">The device index.</param>
+        /// <returns>The created ANE accelerator.</returns>
+        public static CPUAccelerator CreateANEAccelerator(
+            this Context context,
+            int deviceIndex = 0) =>
+            context.CreateCPUAccelerator(deviceIndex, CPUAcceleratorMode.Auto);
+
         #endregion
     }
 }

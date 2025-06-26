@@ -17,6 +17,7 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
 using ILGPU.Apple.NeuralEngine;
 
 namespace ILGPU.Benchmarks.Benchmarks;
@@ -60,8 +61,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
                 Console.WriteLine("🚀 Detected Apple Neural Engine - using real hardware acceleration!");
                 try
                 {
-                    aneAccelerator = context.CreateANEAccelerator(0) as AppleNeuralEngineAccelerator;
-                    accelerator = aneAccelerator;
+                    accelerator = context.CreateANEAccelerator(0);
+                    aneAccelerator = accelerator as AppleNeuralEngineAccelerator;
                     if (aneAccelerator == null)
                     {
                         Console.WriteLine("⚠️ ANE hardware detected but accelerator creation failed, falling back to simulation");

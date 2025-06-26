@@ -17,6 +17,7 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
 using ILGPU.Benchmarks.Infrastructure;
 using ILGPU.Intel.NPU;
 
@@ -58,7 +59,8 @@ public class IntelNPUBenchmarks : IDisposable
                 Console.WriteLine("🚀 Detected Intel NPU - using real hardware acceleration!");
                 try
                 {
-                    npuAccelerator = context.CreateNPUAccelerator(0) as IntelNPUAccelerator;
+                    ilgpuAccelerator = context.CreateNPUAccelerator(0);
+                    npuAccelerator = ilgpuAccelerator as IntelNPUAccelerator;
                     if (npuAccelerator == null)
                     {
                         Console.WriteLine("⚠️ NPU hardware detected but accelerator creation failed, falling back to simulation");

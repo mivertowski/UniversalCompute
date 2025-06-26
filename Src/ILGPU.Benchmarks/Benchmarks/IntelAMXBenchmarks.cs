@@ -17,6 +17,7 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using ILGPU.Benchmarks.Infrastructure;
@@ -63,8 +64,8 @@ public class IntelAMXBenchmarks : IDisposable
                 Console.WriteLine("🚀 Detected Intel AMX - using real hardware acceleration!");
                 try
                 {
-                    amxAccelerator = context.CreateAMXAccelerator(0) as AMXAccelerator;
-                    accelerator = amxAccelerator;
+                    accelerator = context.CreateAMXAccelerator(0);
+                    amxAccelerator = accelerator as AMXAccelerator;
                     if (amxAccelerator == null)
                     {
                         Console.WriteLine("⚠️ AMX hardware detected but accelerator creation failed, falling back to simulation");
@@ -103,8 +104,8 @@ public class IntelAMXBenchmarks : IDisposable
             if (hasRealAMX)
             {
                 var caps = AMXCapabilities.Query();
-                Console.WriteLine($"💻 AMX Tile Config: {caps.MaxTileRows}x{caps.MaxTileColumns} (Max Size: {caps.MaxTileDataSize})");
-                Console.WriteLine($"🔧 Tile Registers: {caps.NumTileRegisters}, BF16 Support: {caps.SupportsBF16}");
+                Console.WriteLine($"💻 AMX Tile Config: {caps.MaxTileRows}x{caps.MaxTileColumns} (Max Size: {caps.MaxTileBytes})");
+                Console.WriteLine($"🔧 Tile Registers: {caps.MaxTiles}, BF16 Support: {caps.SupportsBF16}");
             }
         }
         catch (Exception ex)

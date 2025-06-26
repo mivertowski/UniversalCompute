@@ -183,7 +183,7 @@ namespace ILGPU.Algorithms.FFT
             for (int i = 0; i < fft.Length; i++)
             {
                 var magnitude = fft[i].Magnitude;
-                psd[i] = magnitude * magnitude;
+                psd[i] = (float)(magnitude * magnitude);
             }
 
             return psd;
