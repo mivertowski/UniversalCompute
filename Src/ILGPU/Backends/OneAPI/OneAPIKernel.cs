@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://github.com/mivertowsi/ILGPU/blob/main/LICENSE
+//     https://github.com/mivertowski/UniversalCompute/blob/master/LICENSE.txt
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,9 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0#if ENABLE_ONEAPI_ACCELERATOR
+// Change License: Apache License, Version 2.0
+
+#if ENABLE_ONEAPI_ACCELERATOR
 namespace ILGPU.Backends.OneAPI
 {
     /// <summary>
@@ -263,28 +265,28 @@ namespace ILGPU.Backends.OneAPI
     /// <summary>
     /// Native OneAPI kernel operations.
     /// </summary>
-    internal static partial class OneAPIKernelNative
+    internal static extern class OneAPIKernelNative
     {
-        [LibraryImport("OpenCL")]
-        internal static partial IntPtr clCreateKernel(
+        [DllImport("OpenCL")]
+        internal static extern IntPtr clCreateKernel(
             IntPtr program,
             [MarshalAs(UnmanagedType.LPStr)] string kernelName,
             out int errCodeRet);
 
-        [LibraryImport("OpenCL")]
-        internal static partial int clReleaseKernel(IntPtr kernel);
+        [DllImport("OpenCL")]
+        internal static extern int clReleaseKernel(IntPtr kernel);
 
-        [LibraryImport("OpenCL")]
-        internal static partial int clReleaseProgram(IntPtr program);
+        [DllImport("OpenCL")]
+        internal static extern int clReleaseProgram(IntPtr program);
 
-        [LibraryImport("OpenCL")]
+        [DllImport("OpenCL")]
         internal static unsafe partial int clSetKernelArg(
             IntPtr kernel,
             uint argIndex,
             nuint argSize,
             void* argValue);
 
-        [LibraryImport("OpenCL")]
+        [DllImport("OpenCL")]
         internal static unsafe partial int clEnqueueNDRangeKernel(
             IntPtr commandQueue,
             IntPtr kernel,
@@ -296,7 +298,7 @@ namespace ILGPU.Backends.OneAPI
             IntPtr* eventWaitList,
             IntPtr @event);
 
-        [LibraryImport("OpenCL")]
+        [DllImport("OpenCL")]
         internal static unsafe partial int clGetKernelWorkGroupInfo(
             IntPtr kernel,
             IntPtr device,

@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://github.com/mivertowsi/ILGPU/blob/main/LICENSE
+//     https://github.com/mivertowski/UniversalCompute/blob/master/LICENSE.txt
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,9 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0using System;
+// Change License: Apache License, Version 2.0
+
+using System;
 using System.Runtime.InteropServices;
 
 namespace ILGPU.Backends.Metal.Native
@@ -38,7 +40,7 @@ namespace ILGPU.Backends.Metal.Native
     /// <summary>
     /// Native Metal API bindings for Apple platforms.
     /// </summary>
-    internal static partial class MetalNative
+    internal static class MetalNative
     {
         #region Constants
 
@@ -52,40 +54,40 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Checks if Metal is supported on this system.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
+        [DllImport(MetalLibrary)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static partial bool MTLCreateSystemDefaultDevice();
+        internal static extern bool MTLCreateSystemDefaultDevice();
 
         /// <summary>
         /// Gets the number of available Metal devices.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial int MTLCopyAllDevices();
+        [DllImport(MetalLibrary)]
+        internal static extern int MTLCopyAllDevices();
 
         /// <summary>
         /// Gets a Metal device by index.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLCopyAllDevicesGetDevice(int index);
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLCopyAllDevicesGetDevice(int index);
 
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceGetName(IntPtr device);
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceGetName(IntPtr device);
 
         /// <summary>
         /// Checks if the device is a discrete GPU.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
+        [DllImport(MetalLibrary)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static partial bool MTLDeviceIsLowPower(IntPtr device);
+        internal static extern bool MTLDeviceIsLowPower(IntPtr device);
 
         /// <summary>
         /// Gets the recommended maximum working set size.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial ulong MTLDeviceRecommendedMaxWorkingSetSize(IntPtr device);
+        [DllImport(MetalLibrary)]
+        internal static extern ulong MTLDeviceRecommendedMaxWorkingSetSize(IntPtr device);
 
         /// <summary>
         /// Gets the recommended maximum working set size.
@@ -95,21 +97,21 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Checks ray tracing support.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
+        [DllImport(MetalLibrary)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static partial bool MTLDeviceSupportsRaytracing(IntPtr device);
+        internal static extern bool MTLDeviceSupportsRaytracing(IntPtr device);
 
         /// <summary>
         /// Gets the GPU family.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial int MTLDeviceSupportsFamily(IntPtr device, int family);
+        [DllImport(MetalLibrary)]
+        internal static extern int MTLDeviceSupportsFamily(IntPtr device, int family);
 
         /// <summary>
         /// Releases a Metal device.
         /// </summary>
-        [LibraryImport(CoreFoundationLibrary)]
-        internal static partial void CFRelease(IntPtr obj);
+        [DllImport(CoreFoundationLibrary)]
+        internal static extern void CFRelease(IntPtr obj);
 
         #endregion
 
@@ -118,26 +120,26 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates a command queue.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceNewCommandQueue(IntPtr device);
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceNewCommandQueue(IntPtr device);
 
         /// <summary>
         /// Creates a command buffer.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLCommandQueueCommandBuffer(IntPtr queue);
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLCommandQueueCommandBuffer(IntPtr queue);
 
         /// <summary>
         /// Commits a command buffer for execution.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial void MTLCommandBufferCommit(IntPtr commandBuffer);
+        [DllImport(MetalLibrary)]
+        internal static extern void MTLCommandBufferCommit(IntPtr commandBuffer);
 
         /// <summary>
         /// Waits for command buffer completion.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial void MTLCommandBufferWaitUntilCompleted(IntPtr commandBuffer);
+        [DllImport(MetalLibrary)]
+        internal static extern void MTLCommandBufferWaitUntilCompleted(IntPtr commandBuffer);
 
         #endregion
 
@@ -146,28 +148,28 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates a Metal buffer.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceNewBuffer(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceNewBuffer(
             IntPtr device, nuint length, int options);
 
         /// <summary>
         /// Creates a Metal buffer with data.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceNewBufferWithBytes(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceNewBufferWithBytes(
             IntPtr device, IntPtr bytes, nuint length, int options);
 
         /// <summary>
         /// Gets buffer contents pointer.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLBufferContents(IntPtr buffer);
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLBufferContents(IntPtr buffer);
 
         /// <summary>
         /// Gets buffer length.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial nuint MTLBufferLength(IntPtr buffer);
+        [DllImport(MetalLibrary)]
+        internal static extern nuint MTLBufferLength(IntPtr buffer);
 
         #endregion
 
@@ -176,29 +178,29 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates a library from compiled data.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceNewLibraryWithData(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceNewLibraryWithData(
             IntPtr device, IntPtr data, nuint length, out IntPtr error);
 
         /// <summary>
         /// Compiles a library from source.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceNewLibraryWithSource(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceNewLibraryWithSource(
             IntPtr device, IntPtr source, IntPtr options, out IntPtr error);
 
         /// <summary>
         /// Creates a function from library.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLLibraryNewFunctionWithName(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLLibraryNewFunctionWithName(
             IntPtr library, IntPtr name);
 
         /// <summary>
         /// Creates a compute pipeline state.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLDeviceNewComputePipelineStateWithFunction(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLDeviceNewComputePipelineStateWithFunction(
             IntPtr device, IntPtr function, out IntPtr error);
 
         #endregion
@@ -208,36 +210,36 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates a compute command encoder.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial IntPtr MTLCommandBufferComputeCommandEncoder(
+        [DllImport(MetalLibrary)]
+        internal static extern IntPtr MTLCommandBufferComputeCommandEncoder(
             IntPtr commandBuffer);
 
         /// <summary>
         /// Sets compute pipeline state.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial void MTLComputeCommandEncoderSetComputePipelineState(
+        [DllImport(MetalLibrary)]
+        internal static extern void MTLComputeCommandEncoderSetComputePipelineState(
             IntPtr encoder, IntPtr pipelineState);
 
         /// <summary>
         /// Sets buffer for compute encoder.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial void MTLComputeCommandEncoderSetBuffer(
+        [DllImport(MetalLibrary)]
+        internal static extern void MTLComputeCommandEncoderSetBuffer(
             IntPtr encoder, IntPtr buffer, nuint offset, nuint index);
 
         /// <summary>
         /// Dispatches compute threads.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial void MTLComputeCommandEncoderDispatchThreadgroups(
+        [DllImport(MetalLibrary)]
+        internal static extern void MTLComputeCommandEncoderDispatchThreadgroups(
             IntPtr encoder, MTLSize threadgroupsPerGrid, MTLSize threadsPerThreadgroup);
 
         /// <summary>
         /// Ends encoding.
         /// </summary>
-        [LibraryImport(MetalLibrary)]
-        internal static partial void MTLComputeCommandEncoderEndEncoding(IntPtr encoder);
+        [DllImport(MetalLibrary)]
+        internal static extern void MTLComputeCommandEncoderEndEncoding(IntPtr encoder);
 
         #endregion
 

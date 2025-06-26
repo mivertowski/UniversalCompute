@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://github.com/mivertowsi/ILGPU/blob/main/LICENSE
+//     https://github.com/mivertowski/UniversalCompute/blob/master/LICENSE.txt
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,9 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0using System;
+// Change License: Apache License, Version 2.0
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,7 +37,7 @@ namespace ILGPU.Backends.OneAPI.Native
     /// <summary>
     /// Native Intel OneAPI/SYCL API bindings.
     /// </summary>
-    internal static partial class OneAPINative
+    internal static class OneAPINative
     {
         #region Constants
 
@@ -50,8 +52,8 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets all available platforms.
         /// </summary>
-        [LibraryImport(OpenCLLibrary)]
-        internal static partial int clGetPlatformIDs(
+        [DllImport(OpenCLLibrary)]
+        internal static extern int clGetPlatformIDs(
             uint numEntries,
             [Out] IntPtr[] platforms,
             out uint numPlatforms);
@@ -59,8 +61,8 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets all devices for a platform.
         /// </summary>
-        [LibraryImport(OpenCLLibrary)]
-        internal static partial int clGetDeviceIDs(
+        [DllImport(OpenCLLibrary)]
+        internal static extern int clGetDeviceIDs(
             IntPtr platform,
             ulong deviceType,
             uint numEntries,
@@ -70,8 +72,8 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets device information.
         /// </summary>
-        [LibraryImport(OpenCLLibrary)]
-        internal static unsafe partial int clGetDeviceInfo(
+        [DllImport(OpenCLLibrary)]
+        internal static unsafe extern int clGetDeviceInfo(
             IntPtr device,
             uint paramName,
             nuint paramValueSize,
@@ -92,8 +94,8 @@ namespace ILGPU.Backends.OneAPI.Native
             // Device handles are reference counted in OpenCL/SYCL
             clReleaseDevice(device);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clReleaseDevice(IntPtr device);
+        [DllImport(OpenCLLibrary)]
+        private static extern int clReleaseDevice(IntPtr device);
 
         #endregion
 
@@ -151,8 +153,8 @@ namespace ILGPU.Backends.OneAPI.Native
         /// </summary>
         internal static void QueueWait(IntPtr queue) => clFinish(queue);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial IntPtr clCreateContext(
+        [DllImport(OpenCLLibrary)]
+        private static extern IntPtr clCreateContext(
             IntPtr properties,
             uint numDevices,
             [In] IntPtr[] devices,
@@ -160,21 +162,21 @@ namespace ILGPU.Backends.OneAPI.Native
             IntPtr userData,
             out int errCodeRet);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clReleaseContext(IntPtr context);
+        [DllImport(OpenCLLibrary)]
+        private static extern int clReleaseContext(IntPtr context);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial IntPtr clCreateCommandQueueWithProperties(
+        [DllImport(OpenCLLibrary)]
+        private static extern IntPtr clCreateCommandQueueWithProperties(
             IntPtr context,
             IntPtr device,
             IntPtr properties,
             out int errCodeRet);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clReleaseCommandQueue(IntPtr commandQueue);
+        [DllImport(OpenCLLibrary)]
+        private static extern int clReleaseCommandQueue(IntPtr commandQueue);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clFinish(IntPtr commandQueue);
+        [DllImport(OpenCLLibrary)]
+        private static extern int clFinish(IntPtr commandQueue);
 
         #endregion
 
@@ -261,16 +263,16 @@ namespace ILGPU.Backends.OneAPI.Native
             }
         }
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial IntPtr clCreateProgramWithSource(
+        [DllImport(OpenCLLibrary)]
+        private static extern IntPtr clCreateProgramWithSource(
             IntPtr context,
             uint count,
             [In] IntPtr[] strings,
             [In] nuint[] lengths,
             out int errCodeRet);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clBuildProgram(
+        [DllImport(OpenCLLibrary)]
+        private static extern int clBuildProgram(
             IntPtr program,
             uint numDevices,
             [In] IntPtr[] deviceList,
@@ -278,11 +280,11 @@ namespace ILGPU.Backends.OneAPI.Native
             IntPtr pfnNotify,
             IntPtr userData);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clReleaseProgram(IntPtr program);
+        [DllImport(OpenCLLibrary)]
+        private static extern int clReleaseProgram(IntPtr program);
 
-        [LibraryImport(OpenCLLibrary)]
-        private static partial int clGetProgramBuildInfo(
+        [DllImport(OpenCLLibrary)]
+        private static extern int clGetProgramBuildInfo(
             IntPtr program,
             IntPtr device,
             uint paramName,

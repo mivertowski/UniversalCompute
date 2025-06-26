@@ -1,22 +1,378 @@
 # Hardware Accelerators
 
-Comprehensive guide to hardware accelerator support in UniversalCompute, covering traditional GPU computing and modern specialized accelerators.
+Comprehensive guide to hardware accelerator support in UniversalCompute, covering traditional GPU computing, modern specialized accelerators, and advanced orchestration features including adaptive scheduling, universal memory management, and cross-accelerator coordination.
 
 ## 🎯 Overview
 
-UniversalCompute provides unified access to diverse hardware accelerators through a single API, enabling developers to harness the full power of modern heterogeneous computing systems.
+UniversalCompute provides unified access to diverse hardware accelerators through a single API with intelligent workload distribution, adaptive scheduling, and universal memory management. The platform automatically optimizes performance across heterogeneous computing systems, enabling developers to harness the full power of modern hardware with minimal complexity.
+
+### New Platform Features
+
+- **🧠 Adaptive Scheduling System**: Intelligent workload distribution with dynamic load balancing
+- **🔄 Universal Memory Manager**: Cross-accelerator memory sharing and unified allocation strategies  
+- **⚡ Performance Monitoring**: Real-time hardware utilization, power, and thermal tracking
+- **🎯 Hardware Abstraction Layer**: Enhanced device detection and optimization profiles
+- **📦 Native AOT Support**: Hardware-specific compilation and platform-optimized binaries
+- **🔗 Cross-Accelerator Coordination**: Seamless multi-device workflows and data sharing
 
 ### Supported Accelerator Types
 
-| Accelerator Type | Description | Use Cases | Performance Range |
-|------------------|-------------|-----------|-------------------|
-| **CPU** | Multi-core processors | General computing, debugging | 10-100 GFLOPS |
-| **GPU (CUDA)** | NVIDIA graphics cards | Parallel computing, AI/ML | 100-1000+ GFLOPS |
-| **GPU (OpenCL)** | Cross-platform GPUs | Portable computing | 50-800 GFLOPS |
-| **Intel AMX** | Advanced Matrix Extensions | Matrix operations, AI | 200-400 GFLOPS |
-| **Intel NPU** | Neural Processing Unit | AI inference | 10-50 TOPS |
-| **Apple Neural Engine** | Apple Silicon AI accelerator | ML inference on Mac | 15-35 TOPS |
-| **Velocity SIMD** | CPU vectorization | High-throughput CPU | 20-80 GFLOPS |
+| Accelerator Type | Description | Use Cases | Performance Range | New Features |
+|------------------|-------------|-----------|-------------------|---------------|
+| **CPU** | Multi-core processors | General computing, debugging | 10-100 GFLOPS | Adaptive threading, thermal monitoring |
+| **GPU (CUDA)** | NVIDIA graphics cards | Parallel computing, AI/ML | 100-1000+ GFLOPS | Tensor core utilization, NVLink coordination |
+| **GPU (OpenCL)** | Cross-platform GPUs | Portable computing | 50-800 GFLOPS | Vendor-specific optimizations, unified memory |
+| **Intel AMX** | Advanced Matrix Extensions | Matrix operations, AI | 200-400 GFLOPS | Tile scheduling, bandwidth optimization |
+| **Intel NPU** | Neural Processing Unit | AI inference | 10-50 TOPS | Workload profiling, power efficiency |
+| **Apple Neural Engine** | Apple Silicon AI accelerator | ML inference on Mac | 15-35 TOPS | Metal integration, unified memory |
+| **Velocity SIMD** | CPU vectorization | High-throughput CPU | 20-80 GFLOPS | Auto-vectorization, cache optimization |
+
+---
+
+## 🧠 Adaptive Scheduling System
+
+The Adaptive Scheduling System intelligently distributes workloads across available accelerators based on real-time performance metrics, hardware capabilities, and workload characteristics.
+
+### Intelligent Workload Distribution
+
+```csharp
+using UniversalCompute.Scheduling;
+
+// Create adaptive scheduler with automatic device discovery
+using var scheduler = new AdaptiveScheduler()
+    .WithLoadBalancing(LoadBalancingStrategy.PerformanceBased)
+    .WithWorkloadProfiling(enabled: true)
+    .WithThermalManagement(enabled: true);
+
+// Configure scheduling policies
+scheduler.AddPolicy(new WorkloadPolicy
+{
+    Type = WorkloadType.MatrixMultiplication,
+    PreferredAccelerators = [AcceleratorType.IntelAMX, AcceleratorType.Cuda],
+    MinMemoryRequirement = MemorySize.FromMB(512),
+    PowerEfficiencyWeight = 0.3f
+});
+
+scheduler.AddPolicy(new WorkloadPolicy
+{
+    Type = WorkloadType.AIInference,
+    PreferredAccelerators = [AcceleratorType.IntelNPU, AcceleratorType.AppleNeuralEngine],
+    LatencyRequirement = TimeSpan.FromMilliseconds(10),
+    PowerEfficiencyWeight = 0.8f
+});
+
+// Execute workload with automatic accelerator selection
+using var workload = new ComputeWorkload<float>("matrix_multiply", dataSize: 1024*1024);
+var result = await scheduler.ExecuteAsync(workload);
+
+Console.WriteLine($"Executed on: {result.SelectedAccelerator.Name}");
+Console.WriteLine($"Execution time: {result.ExecutionTime.TotalMilliseconds:F2} ms");
+Console.WriteLine($"Power consumption: {result.PowerConsumption:F2} W");
+Console.WriteLine($"Load balance score: {result.LoadBalanceScore:F1}/10");
+```
+
+### Dynamic Load Balancing
+
+```csharp
+// Configure real-time load balancing
+var loadBalancer = scheduler.LoadBalancer;
+loadBalancer.MonitoringInterval = TimeSpan.FromMilliseconds(100);
+loadBalancer.RebalanceThreshold = 0.15f; // 15% imbalance triggers rebalancing
+
+// Monitor accelerator utilization
+scheduler.UtilizationChanged += (sender, e) =>
+{
+    Console.WriteLine($"Accelerator: {e.AcceleratorName}");
+    Console.WriteLine($"Utilization: {e.Utilization:P1}");
+    Console.WriteLine($"Queue depth: {e.QueueDepth}");
+    Console.WriteLine($"Temperature: {e.Temperature:F1}°C");
+    
+    if (e.Utilization > 0.90f)
+    {
+        Console.WriteLine("⚠️ High utilization detected - considering load rebalancing");
+    }
+};
+
+// Enable automatic workload migration
+scheduler.EnableWorkloadMigration(new MigrationPolicy
+{
+    MaxMigrationOverhead = TimeSpan.FromMilliseconds(50),
+    UtilizationThreshold = 0.85f,
+    ThermalThreshold = 85.0f // °C
+});
+```
+
+### Performance-Based Accelerator Selection
+
+```csharp
+// Create performance benchmarking suite
+var performanceBenchmark = new AcceleratorPerformanceBenchmark();
+
+// Run comprehensive benchmarks across all accelerators
+var benchmarkResults = await performanceBenchmark.RunBenchmarkSuite(new[]
+{
+    BenchmarkType.MatrixMultiplication,
+    BenchmarkType.VectorOperations, 
+    BenchmarkType.FFT,
+    BenchmarkType.Reduction,
+    BenchmarkType.MemoryBandwidth
+});
+
+// Configure scheduler with benchmark results
+scheduler.SetPerformanceProfile(benchmarkResults);
+
+// The scheduler now automatically selects optimal accelerators based on measured performance
+foreach (var result in benchmarkResults)
+{
+    Console.WriteLine($"Accelerator: {result.AcceleratorName}");
+    Console.WriteLine($"MatMul Performance: {result.MatrixMultiplicationGFLOPS:F1} GFLOPS");
+    Console.WriteLine($"Memory Bandwidth: {result.MemoryBandwidthGBps:F1} GB/s");
+    Console.WriteLine($"Energy Efficiency: {result.GFLOPsPerWatt:F1} GFLOPS/W");
+    Console.WriteLine();
+}
+```
+
+---
+
+## 🔄 Universal Memory Manager
+
+The Universal Memory Manager provides cross-accelerator memory sharing, unified allocation strategies, and automatic memory placement optimization.
+
+### Cross-Accelerator Memory Sharing
+
+```csharp
+using UniversalCompute.Memory.Unified;
+
+// Create universal memory manager
+using var memoryManager = new UniversalMemoryManager()
+    .WithUnifiedAddressing(enabled: true)
+    .WithAutomaticMigration(enabled: true)
+    .WithCoherencyMode(CoherencyMode.Weak); // or Strong for strict consistency
+
+// Register accelerators for unified memory
+memoryManager.RegisterAccelerator(cudaAccelerator);
+memoryManager.RegisterAccelerator(cpuAccelerator);
+memoryManager.RegisterAccelerator(amxAccelerator);
+
+// Allocate unified memory accessible by all accelerators
+using var unifiedBuffer = memoryManager.AllocateUnified<float>(1024 * 1024, 
+    placement: MemoryPlacement.Automatic);
+
+// Data is automatically placed based on usage patterns
+var hostData = new float[1024 * 1024];
+FillTestData(hostData);
+unifiedBuffer.CopyFromCPU(hostData);
+
+// Execute kernels on different accelerators - memory automatically migrates
+var cudaKernel = cudaAccelerator.LoadKernel<Index1D, ArrayView<float>>(ProcessOnGPU);
+var cpuKernel = cpuAccelerator.LoadKernel<Index1D, ArrayView<float>>(ProcessOnCPU);
+
+// Memory automatically migrated to CUDA device
+await cudaKernel(unifiedBuffer.Length, unifiedBuffer.View);
+
+// Memory automatically migrated back to CPU (if needed)
+await cpuKernel(unifiedBuffer.Length, unifiedBuffer.View);
+
+Console.WriteLine($"Memory migrations: {memoryManager.MigrationCount}");
+Console.WriteLine($"Total migration time: {memoryManager.TotalMigrationTime.TotalMilliseconds:F2} ms");
+```
+
+### Memory Bandwidth Optimization
+
+```csharp
+// Configure memory bandwidth optimization
+var bandwidthOptimizer = memoryManager.BandwidthOptimizer;
+bandwidthOptimizer.EnablePrefetching = true;
+bandwidthOptimizer.PrefetchDistance = 2; // Look ahead 2 operations
+bandwidthOptimizer.EnableCompression = true;
+bandwidthOptimizer.CompressionThreshold = MemorySize.FromMB(10);
+
+// Memory access pattern analysis
+memoryManager.EnableAccessPatternAnalysis();
+memoryManager.AccessPatternDetected += (sender, e) =>
+{
+    Console.WriteLine($"Detected pattern: {e.PatternType}");
+    Console.WriteLine($"Stride: {e.Stride} bytes");
+    Console.WriteLine($"Locality: {e.LocalityScore:F2}");
+    
+    // Automatically adjust memory layout for detected patterns
+    if (e.PatternType == AccessPattern.Sequential && e.Stride > 0)
+    {
+        memoryManager.EnablePrefetching(e.Stride);
+    }
+};
+
+// NUMA-aware allocation on multi-socket systems
+if (memoryManager.IsNUMATopologyAvailable)
+{
+    var numaNodes = memoryManager.GetNUMANodes();
+    foreach (var node in numaNodes)
+    {
+        Console.WriteLine($"NUMA Node {node.Id}: {node.MemorySize / (1024*1024)} MB");
+        Console.WriteLine($"  CPU Cores: {string.Join(", ", node.CPUCores)}");
+        Console.WriteLine($"  Local Accelerators: {string.Join(", ", node.LocalAccelerators.Select(a => a.Name))}");
+    }
+    
+    // Allocate memory on specific NUMA node
+    var numaBuffer = memoryManager.AllocateNUMAAware<float>(1024*1024, 
+        preferredNode: numaNodes[0].Id);
+}
+```
+
+### Automatic Memory Placement
+
+```csharp
+// Configure intelligent memory placement
+var placementPolicy = new MemoryPlacementPolicy
+{
+    Strategy = PlacementStrategy.UsageBased,
+    AccessFrequencyWeight = 0.4f,
+    LocalityWeight = 0.3f,
+    BandwidthWeight = 0.3f,
+    MigrationCostThreshold = TimeSpan.FromMicroseconds(100)
+};
+
+memoryManager.SetPlacementPolicy(placementPolicy);
+
+// Monitor memory placement decisions
+memoryManager.PlacementDecisionMade += (sender, e) =>
+{
+    Console.WriteLine($"Memory placement decision:");
+    Console.WriteLine($"  Buffer: {e.BufferId}");
+    Console.WriteLine($"  Size: {e.Size.ToMB():F1} MB");
+    Console.WriteLine($"  Placed on: {e.SelectedDevice.Name}");
+    Console.WriteLine($"  Reason: {e.PlacementReason}");
+    Console.WriteLine($"  Expected benefit: {e.ExpectedPerformanceGain:P1}");
+};
+
+// Create memory with placement hints
+using var hintedBuffer = memoryManager.AllocateWithHints<float>(1024*1024, new MemoryHints
+{
+    AccessPattern = AccessPattern.Random,
+    AccessFrequency = AccessFrequency.High,
+    PreferredDevices = [cudaAccelerator, amxAccelerator],
+    ExpectedLifetime = TimeSpan.FromMinutes(5)
+});
+```
+
+---
+
+## ⚡ Performance Monitoring Integration
+
+Real-time monitoring of hardware utilization, power consumption, thermal state, and performance counters across all accelerators.
+
+### Real-Time Hardware Monitoring
+
+```csharp
+using UniversalCompute.Monitoring;
+
+// Create comprehensive monitoring system
+using var monitor = new HardwareMonitor()
+    .WithPowerMonitoring(enabled: true)
+    .WithThermalMonitoring(enabled: true) 
+    .WithPerformanceCounters(enabled: true)
+    .WithMemoryTracking(enabled: true);
+
+// Register all accelerators for monitoring
+foreach (var accelerator in context.Accelerators)
+{
+    monitor.RegisterAccelerator(accelerator);
+}
+
+// Configure monitoring intervals
+monitor.SetMonitoringInterval(MonitoringMetric.Utilization, TimeSpan.FromMilliseconds(100));
+monitor.SetMonitoringInterval(MonitoringMetric.Temperature, TimeSpan.FromSeconds(1));
+monitor.SetMonitoringInterval(MonitoringMetric.PowerConsumption, TimeSpan.FromMilliseconds(500));
+
+// Start monitoring
+monitor.Start();
+
+// Real-time monitoring events
+monitor.MetricUpdated += (sender, e) =>
+{
+    switch (e.Metric)
+    {
+        case MonitoringMetric.Utilization when e.Value > 0.90:
+            Console.WriteLine($"⚠️ High utilization on {e.AcceleratorName}: {e.Value:P1}");
+            break;
+            
+        case MonitoringMetric.Temperature when e.Value > 80.0:
+            Console.WriteLine($"🌡️ High temperature on {e.AcceleratorName}: {e.Value:F1}°C");
+            break;
+            
+        case MonitoringMetric.PowerConsumption:
+            Console.WriteLine($"⚡ Power consumption {e.AcceleratorName}: {e.Value:F1}W");
+            break;
+    }
+};
+```
+
+### Performance Counter Aggregation
+
+```csharp
+// Configure performance counter collection
+var counterCollector = monitor.PerformanceCounters;
+counterCollector.EnableCounters(new[]
+{
+    PerformanceCounter.InstructionsExecuted,
+    PerformanceCounter.CacheHits,
+    PerformanceCounter.CacheMisses,
+    PerformanceCounter.MemoryBandwidthUtilized,
+    PerformanceCounter.FloatingPointOperations,
+    PerformanceCounter.BranchMispredictions
+});
+
+// Execute workload with performance tracking
+using var session = monitor.StartPerformanceSession("matrix_multiplication");
+
+var kernel = accelerator.LoadKernel<Index2D, ArrayView2D<float>, ArrayView2D<float>, ArrayView2D<float>>(MatrixMultiply);
+kernel(new Index2D(1024, 1024), matrixA.View, matrixB.View, matrixC.View);
+accelerator.Synchronize();
+
+var results = session.GetResults();
+Console.WriteLine($"Performance Results:");
+Console.WriteLine($"  Instructions: {results.InstructionsExecuted:N0}");
+Console.WriteLine($"  Cache hit rate: {results.CacheHitRate:P2}");
+Console.WriteLine($"  Memory bandwidth: {results.MemoryBandwidthUtilized:F1} GB/s");
+Console.WriteLine($"  FLOPS: {results.FloatingPointOperations / results.ElapsedTime.TotalSeconds / 1e9:F1} GFLOPS");
+Console.WriteLine($"  Efficiency: {results.ComputeEfficiency:P1}");
+```
+
+### Thermal Management Integration
+
+```csharp
+// Configure thermal management policies
+var thermalManager = monitor.ThermalManager;
+thermalManager.AddThermalPolicy(new ThermalPolicy
+{
+    AcceleratorType = AcceleratorType.Cuda,
+    TargetTemperature = 75.0f, // °C
+    MaxTemperature = 85.0f,
+    CoolingStrategy = CoolingStrategy.FrequencyScaling | CoolingStrategy.LoadReduction
+});
+
+thermalManager.AddThermalPolicy(new ThermalPolicy
+{
+    AcceleratorType = AcceleratorType.CPU,
+    TargetTemperature = 70.0f,
+    MaxTemperature = 80.0f, 
+    CoolingStrategy = CoolingStrategy.ThermalThrottling
+});
+
+// Monitor thermal events
+thermalManager.ThermalEventOccurred += (sender, e) =>
+{
+    Console.WriteLine($"Thermal event on {e.AcceleratorName}:");
+    Console.WriteLine($"  Event: {e.EventType}");
+    Console.WriteLine($"  Temperature: {e.Temperature:F1}°C");
+    Console.WriteLine($"  Action taken: {e.ActionTaken}");
+    
+    if (e.EventType == ThermalEventType.OverheatingDetected)
+    {
+        Console.WriteLine($"  🔥 Overheating detected! Reducing workload by {e.LoadReductionPercent:P0}");
+    }
+};
+```
 
 ---
 
@@ -30,26 +386,41 @@ CPU accelerators provide reliable, debuggable computation that works on any syst
 using UniversalCompute;
 using UniversalCompute.Runtime.CPU;
 
-// Create CPU context
-using var context = Context.Create().CPU();
+// Create CPU context with adaptive scheduling
+using var context = Context.Create().CPU()
+    .WithAdaptiveScheduling(enabled: true)
+    .WithThermalMonitoring(enabled: true);
 using var cpuAccelerator = context.CreateCPUAccelerator();
 
 Console.WriteLine($"CPU: {cpuAccelerator.Name}");
 Console.WriteLine($"Max threads: {cpuAccelerator.MaxNumThreadsPerGroup}");
 Console.WriteLine($"Cores: {cpuAccelerator.NumMultiProcessors}");
+Console.WriteLine($"Base frequency: {cpuAccelerator.BaseFrequencyMHz} MHz");
+Console.WriteLine($"Boost frequency: {cpuAccelerator.MaxFrequencyMHz} MHz");
+Console.WriteLine($"L3 cache: {cpuAccelerator.L3CacheSizeKB} KB");
+Console.WriteLine($"Thermal design power: {cpuAccelerator.ThermalDesignPowerWatts} W");
 ```
 
 #### CPU Accelerator Modes
 
 ```csharp
 // Auto mode (recommended) - automatically selects optimal threading
-using var autoAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMode.Auto);
+using var autoAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMode.Auto)
+    .WithAdaptiveThreading(enabled: true)
+    .WithWorkStealingScheduler(enabled: true);
 
 // Sequential mode - single-threaded execution (debugging)
 using var seqAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMode.Sequential);
 
-// Parallel mode - explicit multi-threading
-using var parallelAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMode.Parallel);
+// Parallel mode - explicit multi-threading with NUMA awareness
+using var parallelAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMode.Parallel)
+    .WithNUMAAwareness(enabled: true)
+    .WithHyperThreadingOptimization(enabled: true);
+
+// High-performance mode - optimized for compute-intensive workloads
+using var performanceAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMode.HighPerformance)
+    .WithTurboBoost(enabled: true)
+    .WithCacheOptimization(enabled: true);
 ```
 
 ### Velocity SIMD Acceleration
@@ -57,10 +428,12 @@ using var parallelAccelerator = context.CreateCPUAccelerator(0, CPUAcceleratorMo
 Velocity accelerators use CPU SIMD instructions for vectorized operations.
 
 ```csharp
-// Enable Velocity accelerators
+// Enable Velocity accelerators with advanced SIMD features
 using var context = Context.Create()
     .CPU()                    // Standard CPU
     .EnableVelocity()        // SIMD-accelerated CPU
+    .WithAutoVectorization(enabled: true)
+    .WithSIMDInstructionSet(SIMDInstructionSet.AVX512) // or AVX2, SSE4
     .ToContext();
 
 // Get Velocity accelerator
@@ -71,6 +444,10 @@ if (velocityDevice != null)
     
     Console.WriteLine($"Velocity: {velocityAccelerator.Name}");
     Console.WriteLine($"SIMD width: {velocityAccelerator.WarpSize}");
+    Console.WriteLine($"Vector register width: {velocityAccelerator.VectorRegisterWidth} bits");
+    Console.WriteLine($"Supported instruction sets: {string.Join(", ", velocityAccelerator.SupportedInstructionSets)}");
+    Console.WriteLine($"Cache line size: {velocityAccelerator.CacheLineSizeBytes} bytes");
+    Console.WriteLine($"Memory alignment: {velocityAccelerator.OptimalMemoryAlignment} bytes");
 }
 ```
 
@@ -120,7 +497,7 @@ using var cudaAccelerator = context.CreateCudaAccelerator(0);
 #### CUDA-Specific Features
 
 ```csharp
-// Access CUDA-specific properties
+// Access CUDA-specific properties with enhanced features
 var cudaAccel = accelerator as CudaAccelerator;
 if (cudaAccel != null)
 {
@@ -128,23 +505,49 @@ if (cudaAccel != null)
     Console.WriteLine($"Max blocks per SM: {cudaAccel.MaxNumThreadsPerMultiprocessor}");
     Console.WriteLine($"Shared memory per block: {cudaAccel.MaxSharedMemoryPerGroup} bytes");
     
-    // Get detailed device information
+    // Enhanced device information
     var deviceInfo = cudaAccel.GetDeviceInfo();
     Console.WriteLine($"Texture alignment: {deviceInfo.TextureAlignment}");
     Console.WriteLine($"Global memory bandwidth: {deviceInfo.MemoryBandwidth} GB/s");
+    Console.WriteLine($"Tensor core support: {deviceInfo.SupportsTensorCores}");
+    Console.WriteLine($"RT core support: {deviceInfo.SupportsRTCores}");
+    Console.WriteLine($"NVLink support: {deviceInfo.SupportsNVLink}");
+    Console.WriteLine($"Multi-instance GPU: {deviceInfo.SupportsMIG}");
+    Console.WriteLine($"PCIe generation: {deviceInfo.PCIeGeneration}");
+    
+    // Tensor core utilization
+    if (deviceInfo.SupportsTensorCores)
+    {
+        var tensorCoreInfo = cudaAccel.GetTensorCoreInfo();
+        Console.WriteLine($"Tensor core version: {tensorCoreInfo.Version}");
+        Console.WriteLine($"Supported precisions: {string.Join(", ", tensorCoreInfo.SupportedPrecisions)}");
+        Console.WriteLine($"Peak tensor TOPS: {tensorCoreInfo.PeakTensorTOPS:F1}");
+    }
 }
 ```
 
 #### CUDA Memory Management
 
 ```csharp
-// Allocate different types of CUDA memory
+// Allocate different types of CUDA memory with unified memory support
 using var globalMem = cudaAccelerator.Allocate1D<float>(1024 * 1024);      // Global memory
 using var sharedMem = cudaAccelerator.AllocateShared<float>(1024);         // Shared memory
 using var constantMem = cudaAccelerator.AllocateConstant<float>(256);      // Constant memory
+using var textureMem = cudaAccelerator.AllocateTexture<float>(1024, 1024); // Texture memory
 
 // Page-locked memory for faster transfers
 using var pinnedMem = cudaAccelerator.AllocatePageLocked<float>(1024);
+
+// Unified memory (managed by CUDA driver)
+if (deviceInfo.SupportsUnifiedMemory)
+{
+    using var unifiedMem = cudaAccelerator.AllocateUnified<float>(1024 * 1024);
+    Console.WriteLine($"Unified memory allocated: {unifiedMem.Length} elements");
+}
+
+// Memory pools for efficient allocation
+using var memoryPool = cudaAccelerator.CreateMemoryPool(MemorySize.FromMB(256));
+using var pooledMem = memoryPool.Allocate<float>(1024);
 ```
 
 ### OpenCL Support
@@ -176,14 +579,32 @@ using var openCLAccelerator = context.CreateOpenCLAccelerator(0);
 #### OpenCL Device Selection
 
 ```csharp
-// Select specific device types
+// Select specific device types with enhanced filtering
 var gpuDevices = context.GetOpenCLDevices().Where(d => d.DeviceType == OpenCLDeviceType.GPU);
 var cpuDevices = context.GetOpenCLDevices().Where(d => d.DeviceType == OpenCLDeviceType.CPU);
 
-// Select by vendor
-var nvidiaDevices = context.GetOpenCLDevices().Where(d => d.Vendor.Contains("NVIDIA"));
-var amdDevices = context.GetOpenCLDevices().Where(d => d.Vendor.Contains("AMD"));
-var intelDevices = context.GetOpenCLDevices().Where(d => d.Vendor.Contains("Intel"));
+// Select by vendor with performance profiling
+var nvidiaDevices = context.GetOpenCLDevices()
+    .Where(d => d.Vendor.Contains("NVIDIA"))
+    .OrderByDescending(d => d.EstimatedPerformance);
+var amdDevices = context.GetOpenCLDevices()
+    .Where(d => d.Vendor.Contains("AMD"))
+    .OrderByDescending(d => d.ComputeUnits * d.MaxClockFrequencyMHz);
+var intelDevices = context.GetOpenCLDevices()
+    .Where(d => d.Vendor.Contains("Intel"))
+    .OrderByDescending(d => d.GlobalMemorySize);
+
+// Advanced device selection based on capabilities
+var highPerformanceDevices = context.GetOpenCLDevices()
+    .Where(d => d.SupportsDoublePrecision && d.GlobalMemorySize > MemorySize.FromGB(4))
+    .Where(d => d.MaxWorkGroupSize >= 1024)
+    .OrderByDescending(d => d.EstimatedBandwidth);
+
+// Select devices with specific extensions
+var devicesSupportingAtomics = context.GetOpenCLDevices()
+    .Where(d => d.SupportedExtensions.Contains("cl_khr_global_int32_base_atomics"));
+var devicesSupportingImages = context.GetOpenCLDevices()
+    .Where(d => d.SupportsImages && d.MaxImageDimensions.Width >= 8192);
 ```
 
 ---
@@ -197,7 +618,7 @@ High-performance matrix operations using Intel's specialized hardware.
 ```csharp
 using UniversalCompute.Intel.AMX;
 
-// Check AMX availability
+// Check AMX availability with enhanced capabilities detection
 if (AMXCapabilities.IsAMXSupported())
 {
     var capabilities = AMXCapabilities.Query();
@@ -206,7 +627,12 @@ if (AMXCapabilities.IsAMXSupported())
     Console.WriteLine($"Tile Size: {capabilities.MaxTileRows}x{capabilities.MaxTileColumns}");
     Console.WriteLine($"BF16 Support: {capabilities.SupportsBF16}");
     Console.WriteLine($"INT8 Support: {capabilities.SupportsInt8}");
+    Console.WriteLine($"FP16 Support: {capabilities.SupportsFP16}");
     Console.WriteLine($"Estimated Bandwidth: {capabilities.EstimatedBandwidthGBps:F1} GB/s");
+    Console.WriteLine($"Peak TOPS (INT8): {capabilities.PeakTOPSInt8:F1}");
+    Console.WriteLine($"Peak GFLOPS (BF16): {capabilities.PeakGFLOPSBF16:F1}");
+    Console.WriteLine($"Tile configuration modes: {capabilities.TileConfigurationModes.Count}");
+    Console.WriteLine($"Memory hierarchy optimization: {capabilities.SupportsMemoryHierarchyOptimization}");
     
     // Create AMX accelerator
     using var context = Context.Create().CPU();
@@ -263,9 +689,27 @@ static async Task DemoAMXMatrixMultiplication(Accelerator amxAccelerator, AMXCap
     var gflops = (2.0 * matrixSize * matrixSize * matrixSize) / (stopwatch.ElapsedMilliseconds / 1000.0) / 1e9;
     Console.WriteLine($"AMX Matrix Multiplication Performance: {gflops:F2} GFLOPS");
     
-    // Get optimal tile configuration
-    var (tileM, tileN, tileK) = capabilities.GetOptimalTileSize(matrixSize, matrixSize, matrixSize, AMXDataType.Float32);
-    Console.WriteLine($"Optimal tile size: {tileM}x{tileN}x{tileK}");
+    // Get optimal tile configuration with workload analysis
+    var tileConfig = capabilities.GetOptimalTileConfiguration(new MatrixDimensions
+    {
+        M = matrixSize,
+        N = matrixSize, 
+        K = matrixSize,
+        DataType = AMXDataType.Float32,
+        MemoryLayout = MatrixLayout.RowMajor
+    });
+    
+    Console.WriteLine($"Optimal tile configuration:");
+    Console.WriteLine($"  Tile size: {tileConfig.TileM}x{tileConfig.TileN}x{tileConfig.TileK}");
+    Console.WriteLine($"  Tiles per core: {tileConfig.TilesPerCore}");
+    Console.WriteLine($"  Expected efficiency: {tileConfig.ExpectedEfficiency:P1}");
+    Console.WriteLine($"  Memory access pattern: {tileConfig.MemoryAccessPattern}");
+    
+    // Advanced tile scheduling
+    var scheduler = new AMXTileScheduler(capabilities);
+    scheduler.OptimizeFor(OptimizationTarget.Throughput);
+    var scheduledTiles = scheduler.ScheduleTiles(tileConfig, availableCores: Environment.ProcessorCount);
+    Console.WriteLine($"Scheduled {scheduledTiles.Count} tile operations across {Environment.ProcessorCount} cores");
 }
 
 // AMX-optimized kernel using tile operations
@@ -296,15 +740,24 @@ Dedicated AI inference acceleration on Intel Core Ultra processors.
 ```csharp
 using UniversalCompute.Intel.NPU;
 
-// Check NPU availability
+// Check NPU availability with enhanced workload optimization
 if (NPUCapabilities.IsNPUSupported())
 {
     var capabilities = NPUCapabilities.Query();
     Console.WriteLine($"NPU Device: {capabilities.DeviceName}");
+    Console.WriteLine($"Architecture: {capabilities.Architecture}");
+    Console.WriteLine($"Driver version: {capabilities.DriverVersion}");
     Console.WriteLine($"Max Batch Size: {capabilities.MaxBatchSize}");
     Console.WriteLine($"Max Memory: {capabilities.MaxMemorySize / (1024 * 1024)} MB");
     Console.WriteLine($"Peak TOPS: {capabilities.PeakTOPS:F1}");
+    Console.WriteLine($"Peak TOPS (INT8): {capabilities.PeakTOPSInt8:F1}");
+    Console.WriteLine($"Peak TOPS (INT4): {capabilities.PeakTOPSInt4:F1}");
     Console.WriteLine($"Supported Precisions: {string.Join(", ", capabilities.SupportedPrecisions)}");
+    Console.WriteLine($"Supported model formats: {string.Join(", ", capabilities.SupportedModelFormats)}");
+    Console.WriteLine($"Hardware model encryption: {capabilities.SupportsModelEncryption}");
+    Console.WriteLine($"Dynamic batching: {capabilities.SupportsDynamicBatching}");
+    Console.WriteLine($"Model caching: {capabilities.SupportsModelCaching}");
+    Console.WriteLine($"Estimated power efficiency: {capabilities.TOPSPerWatt:F1} TOPS/W");
     
     // Create NPU accelerator
     using var context = Context.Create().CPU();
@@ -372,14 +825,23 @@ Hardware-accelerated AI inference on Apple Silicon Macs.
 ```csharp
 using UniversalCompute.Apple.NeuralEngine;
 
-// Check ANE availability (only on Apple Silicon)
+// Check ANE availability with Metal Performance Shaders integration
 if (ANECapabilities.IsANESupported())
 {
     var capabilities = ANECapabilities.Query();
     Console.WriteLine($"Apple Neural Engine: {capabilities.DeviceName}");
+    Console.WriteLine($"Generation: {capabilities.ANEGeneration}");
+    Console.WriteLine($"Neural engine units: {capabilities.NeuralEngineUnits}");
     Console.WriteLine($"Max Network Size: {capabilities.MaxNetworkSize}");
     Console.WriteLine($"Peak TOPS: {capabilities.PeakTOPS:F1}");
+    Console.WriteLine($"Peak TOPS (FP16): {capabilities.PeakTOPSFP16:F1}");
+    Console.WriteLine($"Peak TOPS (INT8): {capabilities.PeakTOPSInt8:F1}");
     Console.WriteLine($"Supported Precisions: {string.Join(", ", capabilities.SupportedPrecisions)}");
+    Console.WriteLine($"Metal integration: {capabilities.SupportsMetalIntegration}");
+    Console.WriteLine($"Unified memory access: {capabilities.SupportsUnifiedMemory}");
+    Console.WriteLine($"Dynamic model switching: {capabilities.SupportsDynamicModelSwitching}");
+    Console.WriteLine($"Core ML optimization: {capabilities.SupportsCoreMLOptimizations}");
+    Console.WriteLine($"Estimated power consumption: {capabilities.TypicalPowerConsumptionWatts:F1}W");
     
     // Create ANE accelerator
     using var context = Context.Create().CPU();
@@ -453,11 +915,29 @@ static async Task DemoANEInference(Accelerator aneAccelerator)
 ### Automatic Accelerator Selection
 
 ```csharp
-// Let UniversalCompute choose the best accelerator
-using var context = Context.Create().EnableAllAccelerators();
-using var accelerator = context.GetPreferredDevice(preferGPU: true).CreateAccelerator(context);
+// Let UniversalCompute choose the best accelerator with intelligent selection
+using var context = Context.Create()
+    .EnableAllAccelerators()
+    .WithIntelligentDeviceSelection(enabled: true)
+    .WithWorkloadProfiling(enabled: true);
+
+// Advanced accelerator selection with workload hints
+var workloadProfile = new WorkloadProfile
+{
+    Type = WorkloadType.MachineLearning,
+    DataSize = DataSize.Large,
+    ComputeIntensity = ComputeIntensity.High,
+    MemoryAccessPattern = MemoryAccessPattern.Sequential,
+    PowerEfficiencyImportance = PowerEfficiencyImportance.Medium,
+    LatencyRequirement = LatencyRequirement.Low
+};
+
+using var accelerator = context.GetOptimalDevice(workloadProfile).CreateAccelerator(context);
 
 Console.WriteLine($"Selected: {accelerator.Name} ({accelerator.AcceleratorType})");
+Console.WriteLine($"Selection reason: {accelerator.SelectionReason}");
+Console.WriteLine($"Expected performance: {accelerator.ExpectedPerformanceScore:F1}/10");
+Console.WriteLine($"Power efficiency: {accelerator.PowerEfficiencyScore:F1}/10");
 ```
 
 ### Manual Accelerator Selection
@@ -482,7 +962,12 @@ if (gpuDevice != null)
 ### Multi-Accelerator Workflows
 
 ```csharp
-// Use multiple accelerators simultaneously
+// Use multiple accelerators with intelligent workload distribution
+using var acceleratorOrchestrator = new AcceleratorOrchestrator(context)
+    .WithLoadBalancing(LoadBalancingStrategy.PerformanceBased)
+    .WithFailover(enabled: true)
+    .WithCrossAcceleratorMemorySharing(enabled: true);
+
 var allDevices = context.Devices.ToList();
 var accelerators = new List<Accelerator>();
 
@@ -493,8 +978,11 @@ try
         try
         {
             var accelerator = device.CreateAccelerator(context);
+            acceleratorOrchestrator.RegisterAccelerator(accelerator);
             accelerators.Add(accelerator);
             Console.WriteLine($"Initialized: {accelerator.Name}");
+            Console.WriteLine($"  Capability score: {accelerator.CapabilityScore:F1}/10");
+            Console.WriteLine($"  Current utilization: {accelerator.CurrentUtilization:P1}");
         }
         catch (Exception ex)
         {
@@ -502,12 +990,27 @@ try
         }
     }
     
-    // Distribute work across accelerators
-    await DistributeWorkload(accelerators);
+    // Create distributed workload with automatic partitioning
+    var distributedWorkload = new DistributedWorkload<float>("large_matrix_operations")
+    {
+        DataSize = 4096 * 4096,
+        PartitioningStrategy = PartitioningStrategy.DataParallel,
+        SynchronizationMode = SynchronizationMode.BarrierSync
+    };
+    
+    // Execute with automatic load balancing and fault tolerance
+    var results = await acceleratorOrchestrator.ExecuteDistributedAsync(distributedWorkload);
+    
+    Console.WriteLine($"Distributed execution completed:");
+    Console.WriteLine($"  Total time: {results.TotalExecutionTime.TotalMilliseconds:F2} ms");
+    Console.WriteLine($"  Data transferred: {results.TotalDataTransferred.ToMB():F1} MB");
+    Console.WriteLine($"  Load balance efficiency: {results.LoadBalanceEfficiency:P1}");
+    Console.WriteLine($"  Average utilization: {results.AverageUtilization:P1}");
 }
 finally
 {
     // Clean up all accelerators
+    acceleratorOrchestrator.Dispose();
     foreach (var accelerator in accelerators)
     {
         accelerator.Dispose();
@@ -518,20 +1021,51 @@ finally
 ### Performance Monitoring
 
 ```csharp
-// Enable profiling for performance analysis
-accelerator.EnableProfiling();
+// Enable comprehensive profiling and monitoring
+accelerator.EnableProfiling(new ProfilingOptions
+{
+    CollectDetailedMetrics = true,
+    EnablePowerMonitoring = true,
+    EnableThermalMonitoring = true,
+    EnableMemoryProfiling = true,
+    EnableInstructionProfiling = true
+});
 
-// Run workload
+// Run workload with detailed monitoring
 var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>>(MyKernel);
+using var profilingSession = accelerator.StartProfilingSession("kernel_execution");
+
 kernel(1024, buffer.View);
 accelerator.Synchronize();
 
-// Get profiling information
-var profilingInfo = accelerator.GetProfilingInfo();
-Console.WriteLine($"Kernel execution time: {profilingInfo.KernelExecutionTime.TotalMilliseconds} ms");
-Console.WriteLine($"Memory transfer time: {profilingInfo.MemoryTransferTime.TotalMilliseconds} ms");
-Console.WriteLine($"Throughput: {profilingInfo.ThroughputGBps:F2} GB/s");
-Console.WriteLine($"Compute utilization: {profilingInfo.ComputeUtilization:P1}");
+var results = profilingSession.GetDetailedResults();
+
+// Comprehensive profiling information
+Console.WriteLine($"=== Performance Metrics ===");
+Console.WriteLine($"Kernel execution time: {results.KernelExecutionTime.TotalMilliseconds:F3} ms");
+Console.WriteLine($"Memory transfer time: {results.MemoryTransferTime.TotalMilliseconds:F3} ms");
+Console.WriteLine($"Total time: {results.TotalTime.TotalMilliseconds:F3} ms");
+Console.WriteLine($"Throughput: {results.ThroughputGBps:F2} GB/s");
+Console.WriteLine($"Compute utilization: {results.ComputeUtilization:P1}");
+Console.WriteLine($"Memory efficiency: {results.MemoryEfficiency:P1}");
+
+Console.WriteLine($"\n=== Hardware Metrics ===");
+Console.WriteLine($"Power consumption: {results.AveragePowerConsumption:F1}W");
+Console.WriteLine($"Peak temperature: {results.PeakTemperature:F1}°C");
+Console.WriteLine($"Thermal throttling: {(results.ThermalThrottlingDetected ? "Yes" : "No")}");
+
+Console.WriteLine($"\n=== Instruction Analysis ===");
+Console.WriteLine($"Instructions executed: {results.InstructionsExecuted:N0}");
+Console.WriteLine($"Instructions per second: {results.InstructionsPerSecond / 1e9:F1} GIPS");
+Console.WriteLine($"Cache hit rate: {results.CacheHitRate:P2}");
+Console.WriteLine($"Branch prediction accuracy: {results.BranchPredictionAccuracy:P2}");
+
+Console.WriteLine($"\n=== Optimization Suggestions ===");
+foreach (var suggestion in results.OptimizationSuggestions)
+{
+    Console.WriteLine($"• {suggestion.Category}: {suggestion.Description}");
+    Console.WriteLine($"  Expected improvement: {suggestion.ExpectedImprovement:P1}");
+}
 ```
 
 ---
@@ -545,18 +1079,21 @@ public class AcceleratorBenchmark
 {
     public static async Task CompareAccelerators(Context context, int workloadSize = 1_000_000)
     {
-        Console.WriteLine($"🏁 Accelerator Performance Comparison (workload size: {workloadSize:N0})");
-        Console.WriteLine("=" + new string('=', 70));
+        Console.WriteLine($"🏁 Enhanced Accelerator Performance Comparison (workload size: {workloadSize:N0})");
+        Console.WriteLine("=" + new string('=', 90));
         
-        var results = new List<(string Name, double Time, double Throughput)>();
+        var results = new List<BenchmarkResult>();
+        var monitor = new HardwareMonitor();
         
         foreach (var device in context.Devices)
         {
             try
             {
                 using var accelerator = device.CreateAccelerator(context);
-                var (time, throughput) = await BenchmarkAccelerator(accelerator, workloadSize);
-                results.Add((accelerator.Name, time, throughput));
+                monitor.RegisterAccelerator(accelerator);
+                
+                var result = await BenchmarkAcceleratorComprehensive(accelerator, workloadSize, monitor);
+                results.Add(result);
             }
             catch (Exception ex)
             {
@@ -564,23 +1101,30 @@ public class AcceleratorBenchmark
             }
         }
         
-        // Sort by performance
-        results.Sort((a, b) => a.Time.CompareTo(b.Time));
+        // Sort by overall performance score
+        results.Sort((a, b) => b.OverallScore.CompareTo(a.OverallScore));
         
-        // Display results
-        var fastest = results.First().Time;
-        foreach (var (name, time, throughput) in results)
+        // Display comprehensive results
+        Console.WriteLine($"\n📊 Comprehensive Benchmark Results:");
+        Console.WriteLine($"{"Rank",5} | {"Accelerator",20} | {"Time(ms)",8} | {"Throughput",10} | {"Power(W)",8} | {"Temp(°C)",8} | {"Score",8}");
+        Console.WriteLine(new string('-', 80));
+        
+        for (int i = 0; i < results.Count; i++)
         {
-            var speedup = fastest / time;
-            Console.WriteLine($"📊 {name}");
-            Console.WriteLine($"   Time: {time:F2} ms");
-            Console.WriteLine($"   Throughput: {throughput:F2} GB/s");
-            Console.WriteLine($"   Speedup: {speedup:F1}x");
-            Console.WriteLine();
+            var result = results[i];
+            Console.WriteLine($"{i+1,5} | {result.AcceleratorName,-20} | {result.ExecutionTime.TotalMilliseconds,8:F2} | {result.ThroughputGBps,7:F1} GB/s | {result.AveragePower,8:F1} | {result.PeakTemperature,8:F1} | {result.OverallScore,8:F1}");
         }
+        
+        Console.WriteLine($"\n🏆 Performance Analysis:");
+        var best = results.First();
+        Console.WriteLine($"Best overall: {best.AcceleratorName} (Score: {best.OverallScore:F1}/10)");
+        Console.WriteLine($"Fastest execution: {results.OrderBy(r => r.ExecutionTime).First().AcceleratorName}");
+        Console.WriteLine($"Highest throughput: {results.OrderByDescending(r => r.ThroughputGBps).First().AcceleratorName}");
+        Console.WriteLine($"Most power efficient: {results.OrderByDescending(r => r.PowerEfficiency).First().AcceleratorName}");
+        Console.WriteLine($"Coolest running: {results.OrderBy(r => r.PeakTemperature).First().AcceleratorName}");
     }
     
-    private static async Task<(double Time, double Throughput)> BenchmarkAccelerator(Accelerator accelerator, int workloadSize)
+    private static async Task<BenchmarkResult> BenchmarkAcceleratorComprehensive(Accelerator accelerator, int workloadSize, HardwareMonitor monitor)
     {
         // Prepare test data
         using var bufferA = accelerator.Allocate1D<float>(workloadSize);
@@ -622,73 +1166,312 @@ public class AcceleratorBenchmark
         var avgTime = stopwatch.ElapsedMilliseconds / (double)iterations;
         var throughput = (workloadSize * sizeof(float) * 3) / (avgTime / 1000.0) / (1024 * 1024 * 1024);
         
-        return (avgTime, throughput);
+        // Get comprehensive metrics
+        var powerMetrics = monitor.GetPowerMetrics(accelerator);
+        var thermalMetrics = monitor.GetThermalMetrics(accelerator);
+        var performanceMetrics = monitor.GetPerformanceMetrics(accelerator);
+        
+        return new BenchmarkResult
+        {
+            AcceleratorName = accelerator.Name,
+            AcceleratorType = accelerator.AcceleratorType,
+            ExecutionTime = TimeSpan.FromMilliseconds(avgTime),
+            ThroughputGBps = throughput,
+            AveragePower = powerMetrics.AveragePowerConsumption,
+            PeakPower = powerMetrics.PeakPowerConsumption,
+            PeakTemperature = thermalMetrics.PeakTemperature,
+            AverageTemperature = thermalMetrics.AverageTemperature,
+            MemoryUtilization = performanceMetrics.MemoryUtilization,
+            ComputeUtilization = performanceMetrics.ComputeUtilization,
+            PowerEfficiency = throughput / powerMetrics.AveragePowerConsumption,
+            ThermalEfficiency = throughput / thermalMetrics.PeakTemperature,
+            OverallScore = CalculateOverallScore(avgTime, throughput, powerMetrics, thermalMetrics)
+        };
     }
     
     static void BenchmarkKernel(Index1D index, ArrayView<float> a, ArrayView<float> b, ArrayView<float> result)
     {
         result[index] = a[index] * b[index] + Math.Sin(a[index]) * Math.Cos(b[index]);
     }
+    
+    private static float CalculateOverallScore(double timeMs, double throughputGBps, PowerMetrics power, ThermalMetrics thermal)
+    {
+        var performanceScore = Math.Min(10.0f, (float)(throughputGBps * 2)); // Cap at 10
+        var efficiencyScore = Math.Min(10.0f, (float)(throughputGBps / power.AveragePowerConsumption * 5));
+        var thermalScore = Math.Max(0.0f, 10.0f - (float)(thermal.PeakTemperature - 30) / 10);
+        
+        return (performanceScore * 0.5f + efficiencyScore * 0.3f + thermalScore * 0.2f);
+    }
+}
+
+public class BenchmarkResult
+{
+    public string AcceleratorName { get; set; }
+    public AcceleratorType AcceleratorType { get; set; }
+    public TimeSpan ExecutionTime { get; set; }
+    public double ThroughputGBps { get; set; }
+    public float AveragePower { get; set; }
+    public float PeakPower { get; set; }
+    public float PeakTemperature { get; set; }
+    public float AverageTemperature { get; set; }
+    public float MemoryUtilization { get; set; }
+    public float ComputeUtilization { get; set; }
+    public double PowerEfficiency { get; set; }
+    public double ThermalEfficiency { get; set; }
+    public float OverallScore { get; set; }
 }
 ```
 
 ### Usage
 
 ```csharp
-// Run comprehensive accelerator comparison
-using var context = Context.Create().EnableAllAccelerators();
+// Run comprehensive accelerator comparison with advanced features
+using var context = Context.Create()
+    .EnableAllAccelerators()
+    .WithPerformanceMonitoring(enabled: true)
+    .WithAdaptiveScheduling(enabled: true);
+    
+Console.WriteLine("🔍 Discovering and benchmarking all available accelerators...");
 await AcceleratorBenchmark.CompareAccelerators(context);
+
+// Additional specialized benchmarks
+Console.WriteLine("\n🧪 Running specialized workload benchmarks...");
+await RunSpecializedBenchmarks(context);
+
+static async Task RunSpecializedBenchmarks(Context context)
+{
+    // Matrix multiplication benchmark
+    Console.WriteLine("\n📐 Matrix Multiplication Benchmark (FP32):");
+    await MatrixMultiplicationBenchmark.RunBenchmark(context, 2048);
+    
+    // AI inference benchmark
+    Console.WriteLine("\n🧠 AI Inference Benchmark:");
+    await AIInferenceBenchmark.RunBenchmark(context);
+    
+    // FFT benchmark
+    Console.WriteLine("\n🌊 FFT Benchmark:");
+    await FFTBenchmark.RunBenchmark(context, 1024*1024);
+    
+    // Memory bandwidth benchmark
+    Console.WriteLine("\n💾 Memory Bandwidth Benchmark:");
+    await MemoryBandwidthBenchmark.RunBenchmark(context);
+}
 ```
 
 ---
 
 ## 🎯 Best Practices
 
-### Accelerator Selection Guidelines
+### Enhanced Accelerator Selection Guidelines
 
-1. **CPU**: General computing, debugging, small datasets
-2. **GPU (CUDA)**: Large parallel workloads, AI/ML training
-3. **GPU (OpenCL)**: Cross-platform GPU computing
-4. **Intel AMX**: Matrix operations, neural network inference
-5. **Intel NPU**: AI inference with power efficiency
-6. **Apple Neural Engine**: ML inference on Apple Silicon
-7. **Velocity SIMD**: High-throughput CPU vectorization
+#### Primary Use Cases
+1. **CPU**: General computing, debugging, small datasets, control logic
+2. **GPU (CUDA)**: Large parallel workloads, AI/ML training, scientific computing
+3. **GPU (OpenCL)**: Cross-platform GPU computing, vendor-agnostic development
+4. **Intel AMX**: Matrix operations, neural network inference, HPC workloads
+5. **Intel NPU**: AI inference with power efficiency, edge computing
+6. **Apple Neural Engine**: ML inference on Apple Silicon, mobile AI
+7. **Velocity SIMD**: High-throughput CPU vectorization, data processing
 
-### Performance Optimization Tips
+#### Advanced Selection Criteria
+
+**For High-Performance Computing:**
+- CUDA GPUs with Tensor Cores for mixed-precision AI workloads
+- Intel AMX for matrix-heavy computations with BF16/INT8 precision
+- Multi-GPU setups with NVLink for large-scale parallel processing
+
+**For Power-Efficient Computing:**
+- Intel NPU for AI inference with <10W power consumption
+- Apple Neural Engine for efficient ML on battery-powered devices
+- Velocity SIMD for CPU-bound tasks with minimal power overhead
+
+**For Cross-Platform Development:**
+- OpenCL for maximum hardware compatibility
+- CPU fallback for guaranteed execution on any system
+- Universal Memory Manager for seamless multi-device workflows
+
+**For Real-Time Applications:**
+- Dedicated accelerators (NPU, ANE) for consistent low-latency inference
+- GPU with hardware scheduling for deterministic execution times
+- Adaptive scheduling for dynamic workload balancing
+
+### Advanced Performance Optimization Tips
 
 ```csharp
-// 1. Choose appropriate accelerator for workload
-var accelerator = workloadType switch
+// 1. Intelligent accelerator selection with workload profiling
+using var optimizer = new WorkloadOptimizer(context);
+var accelerator = await optimizer.SelectOptimalAccelerator(new WorkloadCharacteristics
 {
-    WorkloadType.MatrixMultiplication => context.CreateAMXAccelerator(),
-    WorkloadType.AIInference => context.CreateNPUAccelerator(),
-    WorkloadType.GeneralParallel => context.GetPreferredDevice(preferGPU: true).CreateAccelerator(context),
-    _ => context.CreateCPUAccelerator()
+    Type = workloadType,
+    DataSize = dataSize,
+    ComputeIntensity = ComputeIntensity.High,
+    MemoryAccessPattern = MemoryAccessPattern.Sequential,
+    LatencyRequirement = LatencyRequirement.Low,
+    PowerConstraint = PowerConstraint.Balanced
+});
+
+// 2. Adaptive batch sizing based on accelerator capabilities
+var optimalBatchSize = accelerator.CalculateOptimalBatchSize(dataType: typeof(float), 
+    operationType: OperationType.MatrixMultiplication);
+Console.WriteLine($"Optimal batch size for {accelerator.Name}: {optimalBatchSize}");
+
+// 3. Dynamic batch sizing and operation fusion
+var batchOptimizer = new BatchOptimizer(accelerator);
+var optimalBatchSize = batchOptimizer.CalculateOptimalBatchSize(dataSize, operationComplexity);
+
+// Fuse multiple operations into single kernel for efficiency
+var fusedKernel = accelerator.LoadFusedKernel<Index1D, ArrayView<float>>([
+    MyKernel1,
+    MyKernel2,
+    MyKernel3
+], fusionStrategy: KernelFusionStrategy.Sequential);
+
+fusedKernel(optimalBatchSize, buffer.View);
+
+// 4. Advanced caching and memory pool management
+var kernelCache = new SmartKernelCache(accelerator)
+    .WithLRUEviction(maxSize: 100)
+    .WithPrecompilation(enabled: true);
+    
+var memoryPool = new AdaptiveMemoryPool<float>(accelerator)
+    .WithGrowthStrategy(GrowthStrategy.Exponential)
+    .WithFragmentationTracking(enabled: true)
+    .WithUsageAnalytics(enabled: true);
+
+// Memory pool automatically adjusts allocation strategies
+memoryPool.AllocationStrategyChanged += (sender, e) =>
+{
+    Console.WriteLine($"Memory pool strategy changed to: {e.NewStrategy}");
+    Console.WriteLine($"Fragmentation level: {e.FragmentationPercentage:P1}");
 };
 
-// 2. Batch operations to amortize overhead
-const int batchSize = 1024;
-var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>>(MyKernel);
-kernel(batchSize, buffer.View);
+// 5. Advanced asynchronous execution with pipeline optimization
+using var executionPipeline = new AcceleratorPipeline(accelerator)
+    .WithAsyncMemoryOperations(enabled: true)
+    .WithKernelOverlap(enabled: true)
+    .WithPrefetching(enabled: true);
 
-// 3. Reuse kernels and memory buffers
-var kernelCache = new Dictionary<string, Action<Index1D, ArrayView<float>>>();
-var memoryPool = new MemoryPool<float>(accelerator);
+// Pipeline automatically overlaps data transfers and computation
+var pipelineStage1 = executionPipeline.AddStage("data_preparation", async () =>
+{
+    await buffer1.CopyFromCPUAsync(data1);
+    await buffer2.CopyFromCPUAsync(data2);
+});
 
-// 4. Use async operations when possible
-var copyTask = buffer.CopyFromCPUAsync(data);
-var kernelTask = Task.Run(() => kernel(size, buffer.View));
-await Task.WhenAll(copyTask, kernelTask);
+var pipelineStage2 = executionPipeline.AddStage("computation", async () =>
+{
+    await kernel1.ExecuteAsync(size, buffer1.View, buffer2.View, resultBuffer.View);
+}, dependsOn: pipelineStage1);
+
+var pipelineStage3 = executionPipeline.AddStage("postprocessing", async () =>
+{
+    await postProcessKernel.ExecuteAsync(size, resultBuffer.View);
+    await resultBuffer.CopyToCPUAsync(resultData);
+}, dependsOn: pipelineStage2);
+
+// Execute entire pipeline with automatic optimization
+var pipelineResult = await executionPipeline.ExecuteAsync();
+Console.WriteLine($"Pipeline efficiency: {pipelineResult.OverlapEfficiency:P1}");
+Console.WriteLine($"Total execution time: {pipelineResult.TotalTime.TotalMilliseconds:F2} ms");
+```
+
+---
+
+## 🔍 Troubleshooting Advanced Features
+
+### Adaptive Scheduling Issues
+
+**Problem**: Scheduler not selecting optimal accelerator
+```csharp
+// Enable detailed scheduling logs
+var scheduler = new AdaptiveScheduler()
+    .WithLogging(LogLevel.Debug)
+    .WithDecisionTracking(enabled: true);
+
+// Query scheduling decisions
+var decisions = scheduler.GetRecentDecisions(TimeSpan.FromMinutes(5));
+foreach (var decision in decisions)
+{
+    Console.WriteLine($"Workload: {decision.WorkloadId}");
+    Console.WriteLine($"Selected: {decision.SelectedAccelerator}");
+    Console.WriteLine($"Reason: {decision.SelectionReason}");
+    Console.WriteLine($"Alternatives considered: {string.Join(", ", decision.AlternativesConsidered)}");
+}
+```
+
+**Solution**: Adjust scheduling weights and policies
+```csharp
+scheduler.UpdateSchedulingWeights(new SchedulingWeights
+{
+    PerformanceWeight = 0.6f,
+    PowerEfficiencyWeight = 0.2f,
+    ThermalWeight = 0.1f,
+    UtilizationWeight = 0.1f
+});
+```
+
+### Universal Memory Manager Issues
+
+**Problem**: Excessive memory migrations
+```csharp
+// Monitor migration patterns
+memoryManager.MigrationOccurred += (sender, e) =>
+{
+    if (e.MigrationCount > 10)
+    {
+        Console.WriteLine($"⚠️ Excessive migrations detected for buffer {e.BufferId}");
+        Console.WriteLine($"Consider pinning to accelerator: {e.MostAccessedAccelerator}");
+    }
+};
+
+// Pin frequently accessed memory
+memoryManager.PinMemoryToAccelerator(buffer, mostUsedAccelerator);
+```
+
+### Performance Monitoring Issues
+
+**Problem**: High monitoring overhead
+```csharp
+// Reduce monitoring frequency for production
+monitor.SetMonitoringInterval(MonitoringMetric.Utilization, TimeSpan.FromSeconds(1));
+monitor.SetMonitoringInterval(MonitoringMetric.Temperature, TimeSpan.FromSeconds(5));
+
+// Use sampling for detailed metrics
+monitor.EnableSamplingMode(samplingRate: 0.1f); // 10% sampling
+```
+
+### Hardware Detection Issues
+
+**Problem**: Accelerator not detected
+```csharp
+// Force hardware re-detection
+context.RefreshHardwareCapabilities();
+
+// Check system requirements
+var requirements = new SystemRequirements();
+var compatibility = requirements.CheckCompatibility();
+foreach (var issue in compatibility.Issues)
+{
+    Console.WriteLine($"⚠️ {issue.Component}: {issue.Description}");
+    if (issue.HasSolution)
+    {
+        Console.WriteLine($"   Solution: {issue.SuggestedSolution}");
+    }
+}
 ```
 
 ---
 
 ## 🔗 Related Topics
 
-- **[Performance Tuning](Performance-Tuning)** - Optimize accelerator performance
-- **[Memory Management](Memory-Management)** - Efficient memory usage patterns
+- **[Performance Tuning](Performance-Tuning)** - Advanced optimization strategies
+- **[Memory Management](Memory-Management)** - Universal memory patterns and optimization
 - **[FFT Operations](FFT-Operations)** - Hardware-accelerated signal processing
+- **[Adaptive Scheduling](Adaptive-Scheduling)** - Intelligent workload distribution
+- **[Cross-Accelerator Coordination](Cross-Accelerator-Coordination)** - Multi-device workflows
+- **[Native AOT Deployment](Native-AOT-Deployment)** - Hardware-optimized binaries
 - **[API Reference](API-Reference)** - Complete hardware accelerator API documentation
+- **[Troubleshooting Guide](Troubleshooting-Guide)** - Common issues and solutions
 
 ---
 

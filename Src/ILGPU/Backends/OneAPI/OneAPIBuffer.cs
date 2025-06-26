@@ -3,7 +3,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     https://github.com/mivertowsi/ILGPU/blob/main/LICENSE
+//     https://github.com/mivertowski/UniversalCompute/blob/master/LICENSE.txt
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,9 @@
 //
 // NOTICE: This software is NOT licensed for commercial or production use.
 // Change Date: 2029-06-24
-// Change License: Apache License, Version 2.0#if ENABLE_ONEAPI_ACCELERATOR
+// Change License: Apache License, Version 2.0
+
+#if ENABLE_ONEAPI_ACCELERATOR
 namespace ILGPU.Backends.OneAPI
 {
     /// <summary>
@@ -324,20 +326,20 @@ namespace ILGPU.Backends.OneAPI
     /// <summary>
     /// Native OneAPI buffer operations.
     /// </summary>
-    internal static partial class OneAPIBufferNative
+    internal static extern class OneAPIBufferNative
     {
-        [LibraryImport("OpenCL")]
-        internal static partial IntPtr clCreateBuffer(
+        [DllImport("OpenCL")]
+        internal static extern IntPtr clCreateBuffer(
             IntPtr context,
             ulong flags,
             nuint size,
             IntPtr hostPtr,
             out int errCodeRet);
 
-        [LibraryImport("OpenCL")]
-        internal static partial int clReleaseMemObject(IntPtr memobj);
+        [DllImport("OpenCL")]
+        internal static extern int clReleaseMemObject(IntPtr memobj);
 
-        [LibraryImport("OpenCL")]
+        [DllImport("OpenCL")]
         internal static unsafe partial int clEnqueueReadBuffer(
             IntPtr commandQueue,
             IntPtr buffer,
@@ -349,7 +351,7 @@ namespace ILGPU.Backends.OneAPI
             IntPtr* eventWaitList,
             IntPtr @event);
 
-        [LibraryImport("OpenCL")]
+        [DllImport("OpenCL")]
         internal static unsafe partial int clEnqueueWriteBuffer(
             IntPtr commandQueue,
             IntPtr buffer,
@@ -361,7 +363,7 @@ namespace ILGPU.Backends.OneAPI
             IntPtr* eventWaitList,
             IntPtr @event);
 
-        [LibraryImport("OpenCL")]
+        [DllImport("OpenCL")]
         internal static unsafe partial int clEnqueueCopyBuffer(
             IntPtr commandQueue,
             IntPtr srcBuffer,
