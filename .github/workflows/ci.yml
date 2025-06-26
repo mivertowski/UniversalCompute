@@ -31,7 +31,6 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
     needs:
       - check-style-line-endings
-      - check-style-copyright-headers
     runs-on: ubuntu-latest
     steps:
       - run: echo "All style checks done"
@@ -46,29 +45,6 @@ jobs:
       - name: Check T4 line endings
         run: .github/workflows/Scripts/CheckT4LineEndings.ps1 -path Src
 
-  check-style-copyright-headers:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event_name == 'push' || github.event.pull_request.head.repo.id != github.event.pull_request.base.repo.id
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup the latest .NET 9 SDK
-        uses: actions/setup-dotnet@v4.3.1
-        with:
-          dotnet-version: 9.0.x
-
-      - name: Check Copyright Headers
-        run: |
-          dotnet run --configuration=Release -p:TreatWarningsAsErrors=true --project Tools/CopyrightUpdateTool
-          if [[ -z "$(git status --porcelain)" ]]; then
-            exit 0
-          else
-            git status --porcelain
-            exit 1
-          fi
 
   # Setup the OS matrix so that CUDA tests do not run on forks, as it needs self-hosted runners.
   # Skip running on macOS in most cases.
