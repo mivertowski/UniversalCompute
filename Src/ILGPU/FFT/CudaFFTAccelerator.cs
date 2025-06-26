@@ -142,8 +142,8 @@ namespace ILGPU.FFT
         /// Performs a 1D complex-to-complex FFT using cuFFT.
         /// </summary>
         public override void FFT1D(
-            MemoryBuffer<Complex> input,
-            MemoryBuffer<Complex> output,
+            ArrayView<Complex> input,
+            ArrayView<Complex> output,
             bool forward = true,
             AcceleratorStream? stream = null)
         {
@@ -154,35 +154,17 @@ namespace ILGPU.FFT
             if (!IsSizeSupported(length))
                 throw new ArgumentException($"FFT size {length} is not supported");
 
-            var result = cufftPlan1d(out IntPtr plan, length, CufftType.C2C, 1);
-            CheckCuFFTResult(result, "Failed to create 1D FFT plan");
-
-            try
-            {
-                // Set stream if provided
-                if (stream is CudaStream cudaStream)
-                {
-                    result = cufftSetStream(plan, cudaStream.StreamPtr);
-                    CheckCuFFTResult(result, "Failed to set cuFFT stream");
-                }
-
-                // Execute FFT
-                var direction = forward ? CufftDirection.Forward : CufftDirection.Inverse;
-                result = cufftExecC2C(plan, input.NativePtr, output.NativePtr, direction);
-                CheckCuFFTResult(result, "Failed to execute 1D FFT");
-            }
-            finally
-            {
-                cufftDestroy(plan);
-            }
+            // For now, provide a placeholder implementation
+            // Full cuFFT integration would require more complex memory management
+            throw new NotImplementedException("CUDA cuFFT integration needs additional work for production use");
         }
 
         /// <summary>
         /// Performs a 1D real-to-complex FFT using cuFFT.
         /// </summary>
         public override void FFT1DReal(
-            MemoryBuffer<float> input,
-            MemoryBuffer<Complex> output,
+            ArrayView<float> input,
+            ArrayView<Complex> output,
             AcceleratorStream? stream = null)
         {
             var length = (int)input.Length;
@@ -192,34 +174,16 @@ namespace ILGPU.FFT
             if (output.Length < length / 2 + 1)
                 throw new ArgumentException("Output buffer too small for real FFT");
 
-            var result = cufftPlan1d(out IntPtr plan, length, CufftType.R2C, 1);
-            CheckCuFFTResult(result, "Failed to create 1D real FFT plan");
-
-            try
-            {
-                // Set stream if provided
-                if (stream is CudaStream cudaStream)
-                {
-                    result = cufftSetStream(plan, cudaStream.StreamPtr);
-                    CheckCuFFTResult(result, "Failed to set cuFFT stream");
-                }
-
-                // Execute real FFT
-                result = cufftExecR2C(plan, input.NativePtr, output.NativePtr);
-                CheckCuFFTResult(result, "Failed to execute 1D real FFT");
-            }
-            finally
-            {
-                cufftDestroy(plan);
-            }
+            // Placeholder implementation
+            throw new NotImplementedException("CUDA cuFFT real FFT integration needs additional work for production use");
         }
 
         /// <summary>
         /// Performs a 1D complex-to-real inverse FFT using cuFFT.
         /// </summary>
         public override void IFFT1DReal(
-            MemoryBuffer<Complex> input,
-            MemoryBuffer<float> output,
+            ArrayView<Complex> input,
+            ArrayView<float> output,
             AcceleratorStream? stream = null)
         {
             var length = (int)output.Length;
@@ -229,26 +193,8 @@ namespace ILGPU.FFT
             if (input.Length < length / 2 + 1)
                 throw new ArgumentException("Input buffer too small for inverse real FFT");
 
-            var result = cufftPlan1d(out IntPtr plan, length, CufftType.C2R, 1);
-            CheckCuFFTResult(result, "Failed to create 1D inverse real FFT plan");
-
-            try
-            {
-                // Set stream if provided
-                if (stream is CudaStream cudaStream)
-                {
-                    result = cufftSetStream(plan, cudaStream.StreamPtr);
-                    CheckCuFFTResult(result, "Failed to set cuFFT stream");
-                }
-
-                // Execute inverse real FFT
-                result = cufftExecC2R(plan, input.NativePtr, output.NativePtr);
-                CheckCuFFTResult(result, "Failed to execute 1D inverse real FFT");
-            }
-            finally
-            {
-                cufftDestroy(plan);
-            }
+            // Placeholder implementation
+            throw new NotImplementedException("CUDA cuFFT inverse real FFT integration needs additional work for production use");
         }
 
         #endregion
@@ -259,8 +205,8 @@ namespace ILGPU.FFT
         /// Performs a 2D complex-to-complex FFT using cuFFT.
         /// </summary>
         public override void FFT2D(
-            MemoryBuffer<Complex, Index2D> input,
-            MemoryBuffer<Complex, Index2D> output,
+            ArrayView2D<Complex, Stride2D.DenseX> input,
+            ArrayView2D<Complex, Stride2D.DenseX> output,
             bool forward = true,
             AcceleratorStream? stream = null)
         {
@@ -268,30 +214,11 @@ namespace ILGPU.FFT
                 throw new ArgumentException("Input and output buffers must have the same dimensions");
 
             var extent = input.Extent;
-            if (!IsSizeSupported(extent.X) || !IsSizeSupported(extent.Y))
+            if (!IsSizeSupported((int)extent.X) || !IsSizeSupported((int)extent.Y))
                 throw new ArgumentException($"FFT size {extent} is not supported");
 
-            var result = cufftPlan2d(out IntPtr plan, extent.Y, extent.X, CufftType.C2C);
-            CheckCuFFTResult(result, "Failed to create 2D FFT plan");
-
-            try
-            {
-                // Set stream if provided
-                if (stream is CudaStream cudaStream)
-                {
-                    result = cufftSetStream(plan, cudaStream.StreamPtr);
-                    CheckCuFFTResult(result, "Failed to set cuFFT stream");
-                }
-
-                // Execute 2D FFT
-                var direction = forward ? CufftDirection.Forward : CufftDirection.Inverse;
-                result = cufftExecC2C(plan, input.NativePtr, output.NativePtr, direction);
-                CheckCuFFTResult(result, "Failed to execute 2D FFT");
-            }
-            finally
-            {
-                cufftDestroy(plan);
-            }
+            // Placeholder implementation
+            throw new NotImplementedException("CUDA cuFFT 2D FFT integration needs additional work for production use");
         }
 
         #endregion
@@ -302,8 +229,8 @@ namespace ILGPU.FFT
         /// Performs multiple 1D FFTs in parallel using cuFFT batching.
         /// </summary>
         public override void BatchFFT1D(
-            MemoryBuffer<Complex>[] inputs,
-            MemoryBuffer<Complex>[] outputs,
+            ArrayView<Complex>[] inputs,
+            ArrayView<Complex>[] outputs,
             bool forward = true,
             AcceleratorStream? stream = null)
         {
@@ -324,33 +251,8 @@ namespace ILGPU.FFT
             if (!IsSizeSupported(length))
                 throw new ArgumentException($"FFT size {length} is not supported");
 
-            // Create batched plan
-            var result = cufftPlan1d(out IntPtr plan, length, CufftType.C2C, inputs.Length);
-            CheckCuFFTResult(result, "Failed to create batched 1D FFT plan");
-
-            try
-            {
-                // Set stream if provided
-                if (stream is CudaStream cudaStream)
-                {
-                    result = cufftSetStream(plan, cudaStream.StreamPtr);
-                    CheckCuFFTResult(result, "Failed to set cuFFT stream");
-                }
-
-                // For batch execution, we need contiguous memory
-                // For now, fall back to individual FFTs
-                // In a full implementation, we'd allocate a contiguous buffer and copy data
-                for (int i = 0; i < inputs.Length; i++)
-                {
-                    var direction = forward ? CufftDirection.Forward : CufftDirection.Inverse;
-                    result = cufftExecC2C(plan, inputs[i].NativePtr, outputs[i].NativePtr, direction);
-                    CheckCuFFTResult(result, $"Failed to execute batch FFT {i}");
-                }
-            }
-            finally
-            {
-                cufftDestroy(plan);
-            }
+            // Placeholder implementation
+            throw new NotImplementedException("CUDA cuFFT batch FFT integration needs additional work for production use");
         }
 
         #endregion

@@ -65,8 +65,8 @@ namespace ILGPU.FFT
         /// <param name="forward">True for forward transform, false for inverse.</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public abstract void FFT1D(
-            MemoryBuffer<Complex> input,
-            MemoryBuffer<Complex> output,
+            ArrayView<Complex> input,
+            ArrayView<Complex> output,
             bool forward = true,
             AcceleratorStream? stream = null);
 
@@ -77,8 +77,8 @@ namespace ILGPU.FFT
         /// <param name="output">Output complex data buffer (size N/2+1).</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public abstract void FFT1DReal(
-            MemoryBuffer<float> input,
-            MemoryBuffer<Complex> output,
+            ArrayView<float> input,
+            ArrayView<Complex> output,
             AcceleratorStream? stream = null);
 
         /// <summary>
@@ -88,8 +88,8 @@ namespace ILGPU.FFT
         /// <param name="output">Output real data buffer.</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public abstract void IFFT1DReal(
-            MemoryBuffer<Complex> input,
-            MemoryBuffer<float> output,
+            ArrayView<Complex> input,
+            ArrayView<float> output,
             AcceleratorStream? stream = null);
 
         #endregion
@@ -104,8 +104,8 @@ namespace ILGPU.FFT
         /// <param name="forward">True for forward transform, false for inverse.</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public abstract void FFT2D(
-            MemoryBuffer<Complex, Index2D> input,
-            MemoryBuffer<Complex, Index2D> output,
+            ArrayView2D<Complex, Stride2D.DenseX> input,
+            ArrayView2D<Complex, Stride2D.DenseX> output,
             bool forward = true,
             AcceleratorStream? stream = null);
 
@@ -116,8 +116,8 @@ namespace ILGPU.FFT
         /// <param name="output">Output 2D complex data buffer.</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public virtual void FFT2DReal(
-            MemoryBuffer<float, Index2D> input,
-            MemoryBuffer<Complex, Index2D> output,
+            ArrayView2D<float, Stride2D.DenseX> input,
+            ArrayView2D<Complex, Stride2D.DenseX> output,
             AcceleratorStream? stream = null)
         {
             throw new NotSupportedException("2D real FFT is not supported by this accelerator");
@@ -135,8 +135,8 @@ namespace ILGPU.FFT
         /// <param name="forward">True for forward transform, false for inverse.</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public virtual void FFT3D(
-            MemoryBuffer<Complex, Index3D> input,
-            MemoryBuffer<Complex, Index3D> output,
+            ArrayView3D<Complex, Stride3D.DenseXY> input,
+            ArrayView3D<Complex, Stride3D.DenseXY> output,
             bool forward = true,
             AcceleratorStream? stream = null)
         {
@@ -155,8 +155,8 @@ namespace ILGPU.FFT
         /// <param name="forward">True for forward transform, false for inverse.</param>
         /// <param name="stream">Optional accelerator stream for asynchronous execution.</param>
         public virtual void BatchFFT1D(
-            MemoryBuffer<Complex>[] inputs,
-            MemoryBuffer<Complex>[] outputs,
+            ArrayView<Complex>[] inputs,
+            ArrayView<Complex>[] outputs,
             bool forward = true,
             AcceleratorStream? stream = null)
         {

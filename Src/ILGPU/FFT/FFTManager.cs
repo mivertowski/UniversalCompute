@@ -8,6 +8,7 @@ using System.Linq;
 using System.Numerics;
 using ILGPU.Runtime;
 using ILGPU.Runtime.Cuda;
+using ILGPU.Runtime.CPU;
 using ILGPU.Intel.IPP;
 
 namespace ILGPU.FFT
@@ -128,8 +129,8 @@ namespace ILGPU.FFT
         /// <param name="stream">Optional accelerator stream.</param>
         /// <returns>The accelerator used for the operation.</returns>
         public FFTAccelerator? FFT1D(
-            MemoryBuffer<Complex> input,
-            MemoryBuffer<Complex> output,
+            ArrayView<Complex> input,
+            ArrayView<Complex> output,
             bool forward = true,
             AcceleratorStream? stream = null)
         {
@@ -149,8 +150,8 @@ namespace ILGPU.FFT
         /// <param name="stream">Optional accelerator stream.</param>
         /// <returns>The accelerator used for the operation.</returns>
         public FFTAccelerator? FFT1DReal(
-            MemoryBuffer<float> input,
-            MemoryBuffer<Complex> output,
+            ArrayView<float> input,
+            ArrayView<Complex> output,
             AcceleratorStream? stream = null)
         {
             var accelerator = GetBestAccelerator((int)input.Length, false, true);
@@ -170,12 +171,12 @@ namespace ILGPU.FFT
         /// <param name="stream">Optional accelerator stream.</param>
         /// <returns>The accelerator used for the operation.</returns>
         public FFTAccelerator? FFT2D(
-            MemoryBuffer<Complex, Index2D> input,
-            MemoryBuffer<Complex, Index2D> output,
+            ArrayView2D<Complex, Stride2D.DenseX> input,
+            ArrayView2D<Complex, Stride2D.DenseX> output,
             bool forward = true,
             AcceleratorStream? stream = null)
         {
-            var size = Math.Max(input.Extent.X, input.Extent.Y);
+            var size = Math.Max((int)input.Extent.X, (int)input.Extent.Y);
             var accelerator = GetBestAccelerator(size, true, true);
             if (accelerator == null)
                 throw new InvalidOperationException("No suitable FFT accelerator available");
@@ -256,13 +257,13 @@ namespace ILGPU.FFT
         /// </summary>
         private void InitializeAccelerators()
         {
-            // Try to create IPP accelerator
+            // Try to create IPP FFT accelerator with CPU accelerator
             try
             {
                 if (IPPCapabilities.DetectIPP())
                 {
-                    var ippAccelerator = new IPPAccelerator(_context);
-                    var ippFFT = new IPPFFTAccelerator(ippAccelerator);
+                    var cpuAccelerator = _context.CreateCPUAccelerator(0, CPUAcceleratorMode.Auto);
+                    var ippFFT = new IPPFFTAccelerator(cpuAccelerator);
                     if (ippFFT.IsAvailable)
                     {
                         _accelerators.Add(ippFFT);
@@ -282,7 +283,7 @@ namespace ILGPU.FFT
                 {
                     try
                     {
-                        using var cudaAccelerator = device.CreateCudaAccelerator(_context);
+                        var cudaAccelerator = device.CreateCudaAccelerator(_context);
                         var cudaFFT = new CudaFFTAccelerator(cudaAccelerator);
                         if (cudaFFT.IsAvailable)
                         {

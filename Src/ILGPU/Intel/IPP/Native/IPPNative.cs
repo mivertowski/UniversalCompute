@@ -11,7 +11,7 @@ namespace ILGPU.Intel.IPP.Native
     /// Native bindings for Intel Integrated Performance Primitives (IPP) FFT functions.
     /// Provides high-performance CPU-based FFT operations optimized for Intel processors.
     /// </summary>
-    internal static class IPPNative
+    public static class IPPNative
     {
         #region Library Constants
 

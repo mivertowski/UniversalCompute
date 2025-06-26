@@ -72,7 +72,7 @@ public class Program
             }
 
             AnsiConsole.Write(
-                new FigletText("ILGPU-AOT")
+                new FigletText("UniversalCompute")
                     .Centered()
                     .Color(Color.Cyan1));
 
@@ -167,7 +167,7 @@ public class Program
     /// </summary>
     private static async Task<int> RunUnattendedBenchmarksAsync(string[] args)
     {
-        Console.WriteLine("Starting ILGPU-AOT Universal Compute Benchmarks in unattended mode...");
+        Console.WriteLine("Starting UniversalCompute Benchmarks in unattended mode...");
         Console.WriteLine($"Output directory: {Path.Combine(Environment.CurrentDirectory, "BenchmarkResults")}");
         Console.WriteLine();
 
@@ -269,7 +269,7 @@ public static class SystemInfo
         }
         catch (Exception ex)
         {
-            table.AddRow("ILGPU-AOT Status", $"[red]Error: {ex.Message}[/]");
+            table.AddRow("UniversalCompute Status", $"[red]Error: {ex.Message}[/]");
         }
 
         AnsiConsole.Write(table);

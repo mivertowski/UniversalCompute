@@ -139,7 +139,7 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input complex data buffer.</param>
         /// <param name="output">Output complex data buffer.</param>
         /// <param name="stream">Optional accelerator stream.</param>
-        public void Forward(MemoryBuffer<Complex> input, MemoryBuffer<Complex> output, AcceleratorStream? stream = null)
+        public void Forward(ArrayView<Complex> input, ArrayView<Complex> output, AcceleratorStream? stream = null)
         {
             ValidatePlan();
             ValidateBuffers1D(input.Length, output.Length, false);
@@ -152,7 +152,7 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input complex data buffer.</param>
         /// <param name="output">Output complex data buffer.</param>
         /// <param name="stream">Optional accelerator stream.</param>
-        public void Inverse(MemoryBuffer<Complex> input, MemoryBuffer<Complex> output, AcceleratorStream? stream = null)
+        public void Inverse(ArrayView<Complex> input, ArrayView<Complex> output, AcceleratorStream? stream = null)
         {
             ValidatePlan();
             ValidateBuffers1D(input.Length, output.Length, false);
@@ -165,7 +165,7 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input real data buffer.</param>
         /// <param name="output">Output complex data buffer.</param>
         /// <param name="stream">Optional accelerator stream.</param>
-        public void ForwardReal(MemoryBuffer<float> input, MemoryBuffer<Complex> output, AcceleratorStream? stream = null)
+        public void ForwardReal(ArrayView<float> input, ArrayView<Complex> output, AcceleratorStream? stream = null)
         {
             if (!IsReal)
                 throw new InvalidOperationException("This plan is not configured for real FFTs");
@@ -181,7 +181,7 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input complex data buffer.</param>
         /// <param name="output">Output real data buffer.</param>
         /// <param name="stream">Optional accelerator stream.</param>
-        public void InverseReal(MemoryBuffer<Complex> input, MemoryBuffer<float> output, AcceleratorStream? stream = null)
+        public void InverseReal(ArrayView<Complex> input, ArrayView<float> output, AcceleratorStream? stream = null)
         {
             if (!IsReal)
                 throw new InvalidOperationException("This plan is not configured for real FFTs");
@@ -313,7 +313,7 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input 2D complex data buffer.</param>
         /// <param name="output">Output 2D complex data buffer.</param>
         /// <param name="stream">Optional accelerator stream.</param>
-        public void Forward(MemoryBuffer<Complex, Index2D> input, MemoryBuffer<Complex, Index2D> output, AcceleratorStream? stream = null)
+        public void Forward(ArrayView2D<Complex, Stride2D.DenseX> input, ArrayView2D<Complex, Stride2D.DenseX> output, AcceleratorStream? stream = null)
         {
             ValidatePlan();
             ValidateBuffers2D(input.Extent, output.Extent);
@@ -326,7 +326,7 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input 2D complex data buffer.</param>
         /// <param name="output">Output 2D complex data buffer.</param>
         /// <param name="stream">Optional accelerator stream.</param>
-        public void Inverse(MemoryBuffer<Complex, Index2D> input, MemoryBuffer<Complex, Index2D> output, AcceleratorStream? stream = null)
+        public void Inverse(ArrayView2D<Complex, Stride2D.DenseX> input, ArrayView2D<Complex, Stride2D.DenseX> output, AcceleratorStream? stream = null)
         {
             ValidatePlan();
             ValidateBuffers2D(input.Extent, output.Extent);

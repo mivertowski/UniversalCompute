@@ -40,7 +40,7 @@
 
   <PropertyGroup>
     <OutputPath>../../Bin/$(Configuration)/</OutputPath>
-    <DocumentationFile>../../Bin/$(Configuration)/$(TargetFramework)/ILGPU.xml</DocumentationFile>
+    <DocumentationFile>../../Bin/$(Configuration)/$(TargetFramework)/UniversalCompute.xml</DocumentationFile>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
@@ -55,10 +55,19 @@
     <PackageValidationBaselineVersion>$(LibraryPackageValidationBaselineVersion)</PackageValidationBaselineVersion>
     <SignAssembly>False</SignAssembly>
     <GeneratePackageOnBuild Condition="'$(PublishAot)' != 'true'">True</GeneratePackageOnBuild>
-    <PackageId>ILGPU-AOT-UC</PackageId>
-    <Title>ILGPU-AOT-UniversalCompute</Title>
+    <PackageId>UniversalCompute</PackageId>
+    <Title>UniversalCompute</Title>
+    <PackageVersion>1.0.0-alpha1</PackageVersion>
     <Authors>Michael Ivertowski</Authors>
     <Company>Ernst &amp; Young Ltd. Switzerland</Company>
+    <Product>UniversalCompute</Product>
+    <Description>Universal compute framework for diverse native AOT hardware accelerator usage</Description>
+    <Copyright>Copyright (c) 2024-2025 Michael Ivertowski, Ernst &amp; Young Ltd. Switzerland. All rights reserved.</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/mivertowski/UniversalCompute.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>gpu;cpu;accelerator;neural-engine;npu;amx;fft;compute;native-aot;performance;hpc;ai;ml;tensor;universal</PackageTags>
+    <PackageReleaseNotes>Alpha release of UniversalCompute framework featuring native AOT support, hardware accelerator abstraction, FFT integration, and multi-platform compatibility for CPU, GPU, NPU, and specialized accelerators.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
