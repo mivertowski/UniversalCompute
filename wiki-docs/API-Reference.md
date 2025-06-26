@@ -41,7 +41,7 @@ Advanced unified memory management across accelerators with optimization strateg
 Performance monitoring, profiling, and measurement capabilities.
 
 ### `UniversalCompute.AOT`
-Native Ahead-of-Time compilation support for cross-platform deployment.
+Native Ahead-of-Time compilation support for .NET 9.0 with preview features and cross-platform deployment.
 
 ---
 

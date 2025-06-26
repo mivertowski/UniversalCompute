@@ -1,12 +1,12 @@
 # Examples Gallery
 
-Comprehensive collection of UniversalCompute examples, from basic concepts to advanced use cases.
+Comprehensive collection of UniversalCompute examples for .NET 9.0 with preview language features, from basic concepts to advanced use cases.
 
-## 🎯 Getting Started Examples
+## 🎯 Getting Started Examples (.NET 9.0)
 
 ### Basic Vector Operations
 
-Simple vector addition demonstrating core concepts.
+Simple vector addition demonstrating core .NET 9.0 concepts with preview language features.
 
 ```csharp
 using UniversalCompute;
@@ -124,7 +124,7 @@ class MatrixMultiplyExample
 }
 ```
 
-## 🔬 Scientific Computing Examples
+## 🔬 Scientific Computing Examples (.NET 9.0 Optimized)
 
 ### FFT Signal Processing
 
@@ -279,7 +279,7 @@ class MonteCarloExample
 }
 ```
 
-## 🧠 Machine Learning Examples
+## 🧠 Machine Learning Examples (.NET 9.0 Enhanced)
 
 ### Neural Network Forward Pass
 
@@ -428,7 +428,7 @@ public static class RandomExtensions
 }
 ```
 
-## 🎮 Graphics and Image Processing
+## 🎮 Graphics and Image Processing (.NET 9.0)
 
 ### Image Convolution
 
@@ -537,7 +537,7 @@ class ImageConvolutionExample
 }
 ```
 
-## 🔬 Advanced Examples
+## 🔬 Advanced Examples (.NET 9.0 Performance)
 
 ### Multi-GPU Workload Distribution
 
@@ -674,7 +674,7 @@ class MultiGPUExample
 }
 ```
 
-## 📊 Performance Examples
+## 📊 Performance Examples (.NET 9.0 Benchmarks)
 
 ### Memory Bandwidth Test
 
@@ -778,7 +778,7 @@ class MemoryBandwidthTest
 }
 ```
 
-## 🎯 Real-World Applications
+## 🎯 Real-World Applications (.NET 9.0)
 
 ### Financial Risk Calculation
 

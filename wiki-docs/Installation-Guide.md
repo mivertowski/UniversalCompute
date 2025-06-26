@@ -8,7 +8,7 @@ This guide will help you install and set up UniversalCompute in your .NET projec
 
 | Component | Minimum | Recommended |
 |-----------|---------|------------|
-| **.NET Version** | .NET 9.0 (preview language features enabled) | .NET 9.0 (preview language features enabled) |
+| **.NET Version** | .NET 9.0 with preview features | .NET 9.0 with preview features |
 | **Operating System** | Windows 10, Linux (Ubuntu 20.04+), macOS 11.0+ | Latest versions |
 | **Architecture** | x64 | x64 or ARM64 |
 | **Memory** | 4GB RAM | 16GB+ RAM |
@@ -60,8 +60,8 @@ cd UniversalCompute
 # Build the solution
 dotnet build Src --configuration=Release
 
-# Run tests (optional)
-dotnet test Src/ILGPU.Tests.CPU --configuration=Release --framework=net9.0
+# Run tests with .NET 9.0 preview features (optional)
+dotnet test Src/ILGPU.Tests.CPU --configuration=Release --framework=net9.0 -p:EnablePreviewFeatures=true
 
 # Create local NuGet package
 dotnet pack Src/ILGPU --configuration=Release --output ./packages
@@ -186,12 +186,12 @@ catch
 
 ## 🔧 IDE Configuration
 
-### Visual Studio 2022
+### Visual Studio 2022 (Version 17.12 or later)
 
 1. **Install required workloads:**
    - .NET desktop development
    - .NET Multi-platform App UI development (for cross-platform)
-   - .NET 9.0 preview support
+   - .NET 9.0 SDK with preview features support
 
 2. **Enable unsafe code globally:**
    - Project Properties → Build → General → Unsafe code ✓
@@ -202,11 +202,11 @@ catch
 4. **Enable preview language features:**
    - Project Properties → Build → Advanced → Language version → Preview
 
-### JetBrains Rider
+### JetBrains Rider (2024.3 or later)
 
 1. **Configure build settings:**
    - File → Settings → Build, Execution, Deployment → Toolset and Build
-   - Ensure .NET 9.0 SDK with preview features is selected
+   - Ensure .NET 9.0 SDK with preview features is selected and enabled
 
 2. **Enable unsafe code:**
    - Project settings → Build → Allow unsafe code ✓
@@ -217,9 +217,9 @@ catch
 ### Visual Studio Code
 
 1. **Install extensions:**
-   - C# for Visual Studio Code
+   - C# for Visual Studio Code (v2.55.29 or later)
    - .NET Install Tool for Extension Authors
-   - .NET 9.0 preview support
+   - C# Dev Kit (for .NET 9.0 preview support)
 
 2. **Configure launch.json:**
 ```json
@@ -245,7 +245,7 @@ catch
 ### Common Issues
 
 #### Issue: "Could not load file or assembly"
-**Solution:** Ensure all dependencies are installed and the correct .NET 9.0 runtime with preview features is available.
+**Solution:** Ensure all dependencies are installed and the correct .NET 9.0 runtime with preview language features is available. Verify that preview features are enabled in your project configuration.
 
 #### Issue: "No suitable accelerator found"
 **Solution:** 
@@ -255,9 +255,10 @@ catch
 
 #### Issue: Native AOT compilation fails
 **Solution:**
-1. Ensure `PublishAot` is properly configured for .NET 9.0
-2. Check for incompatible dependencies with preview features
-3. Use `--self-contained` flag with `--framework=net9.0` during publish
+1. Ensure `PublishAot` is properly configured for .NET 9.0 with preview features enabled
+2. Check for incompatible dependencies - some packages may not support .NET 9.0 preview features
+3. Use `--self-contained` flag with `--framework=net9.0` and enable preview language features
+4. Add `<EnablePreviewFeatures>true</EnablePreviewFeatures>` to your project file
 
 #### Issue: Performance lower than expected
 **Solution:**

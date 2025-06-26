@@ -12,7 +12,7 @@ UniversalCompute provides unified access to diverse hardware accelerators throug
 - **🔄 Universal Memory Manager**: Cross-accelerator memory sharing and unified allocation strategies  
 - **⚡ Performance Monitoring**: Real-time hardware utilization, power, and thermal tracking
 - **🎯 Hardware Abstraction Layer**: Enhanced device detection and optimization profiles
-- **📦 Native AOT Support**: Hardware-specific compilation with .NET 9.0 preview features and platform-optimized binaries
+- **📦 Native AOT Support**: Hardware-specific compilation with .NET 9.0 exclusive usage, preview language features, and platform-optimized binaries
 - **🔗 Cross-Accelerator Coordination**: Seamless multi-device workflows and data sharing
 
 ### Supported Accelerator Types
@@ -25,7 +25,7 @@ UniversalCompute provides unified access to diverse hardware accelerators throug
 | **Intel AMX** | Advanced Matrix Extensions | Matrix operations, AI | 200-400 GFLOPS | Tile scheduling, bandwidth optimization |
 | **Intel NPU** | Neural Processing Unit | AI inference | 10-50 TOPS | Workload profiling, power efficiency |
 | **Apple Neural Engine** | Apple Silicon AI accelerator | ML inference on Mac | 15-35 TOPS | Metal integration, unified memory |
-| **Velocity SIMD** | CPU vectorization | High-throughput CPU | 20-80 GFLOPS | Auto-vectorization, cache optimization |
+| **Velocity SIMD** | CPU vectorization | High-throughput CPU | 20-80 GFLOPS | Auto-vectorization, .NET 9.0 SIMD enhancements |
 
 ---
 
@@ -867,17 +867,17 @@ foreach (var target in targets)
 }
 ```
 
-### Platform-Optimized Binaries
+### Platform-Optimized Binaries for .NET 9.0
 
 ```csharp
-// Create platform-specific optimized builds
+// Create platform-specific optimized builds for .NET 9.0 exclusive usage
 var platformOptimizer = new PlatformOptimizer();
 
-// Windows with CUDA and Intel extensions (.NET 9.0)
+// Windows with CUDA and Intel extensions (.NET 9.0 exclusive)
 var windowsBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfiguration
 {
     Platform = TargetPlatform.Windows,
-    TargetFramework = "net9.0",
+    TargetFramework = "net9.0", // .NET 9.0 exclusive
     EnabledAccelerators = new[]
     {
         AcceleratorType.Cuda,
@@ -887,7 +887,8 @@ var windowsBuild = await platformOptimizer.CreateOptimizedBuild(new BuildConfigu
     OptimizationFlags = OptimizationFlags.AggressiveInlining | 
                        OptimizationFlags.VectorizeLoops |
                        OptimizationFlags.UnrollLoops |
-                       OptimizationFlags.PreviewLanguageFeatures
+                       OptimizationFlags.PreviewLanguageFeatures |
+                       OptimizationFlags.Net90Optimizations // .NET 9.0 specific optimizations
 });
 
 // Linux with OpenCL and CPU optimizations (.NET 9.0)

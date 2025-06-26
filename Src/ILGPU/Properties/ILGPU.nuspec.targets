@@ -54,7 +54,7 @@
         https://learn.microsoft.com/en-us/nuget/guides/analyzers-conventions
     -->
     <ItemGroup>
-        <None Include="..\ILGPU.Analyzers\bin\$(Configuration)\net9.0\ILGPU.Analyzers.dll"
+        <None Include="..\ILGPU.Analyzers\bin\$(Configuration)\netstandard2.0\ILGPU.Analyzers.dll"
               Pack="true"
               PackagePath="analyzers/dotnet/cs"
               Visible="false" />
