@@ -72,12 +72,12 @@ public class Program
             }
 
             AnsiConsole.Write(
-                new FigletText("ILGPU Phase 6")
+                new FigletText("ILGPU-AOT")
                     .Centered()
                     .Color(Color.Cyan1));
 
             AnsiConsole.Write(
-                new Panel(new Text("Tensor Core Integration & .NET SIMD Unification Benchmarks", new Style(Color.Yellow)))
+                new Panel(new Text("Universal Compute Benchmarks", new Style(Color.Yellow)))
                     .Border(BoxBorder.Rounded)
                     .BorderColor(Color.Cyan1)
                     .Padding(1, 0));
@@ -167,7 +167,7 @@ public class Program
     /// </summary>
     private static async Task<int> RunUnattendedBenchmarksAsync(string[] args)
     {
-        Console.WriteLine("Starting ILGPU Phase 6 Benchmarks in unattended mode...");
+        Console.WriteLine("Starting ILGPU-AOT Universal Compute Benchmarks in unattended mode...");
         Console.WriteLine($"Output directory: {Path.Combine(Environment.CurrentDirectory, "BenchmarkResults")}");
         Console.WriteLine();
 
@@ -269,7 +269,7 @@ public static class SystemInfo
         }
         catch (Exception ex)
         {
-            table.AddRow("ILGPU Status", $"[red]Error: {ex.Message}[/]");
+            table.AddRow("ILGPU-AOT Status", $"[red]Error: {ex.Message}[/]");
         }
 
         AnsiConsole.Write(table);

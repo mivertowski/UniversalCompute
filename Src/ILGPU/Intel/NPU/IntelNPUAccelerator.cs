@@ -15,9 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Backends;
 using ILGPU.Intel.NPU.Native;
-using ILGPU.Numerics;
-using ILGPU.Numerics.AI;
 using ILGPU.Runtime;
 using System;
 using System.Threading;
@@ -26,20 +25,15 @@ using System.Threading.Tasks;
 namespace ILGPU.Intel.NPU
 {
     /// <summary>
-    /// Basic accelerator interface for NPU operations.
-    /// </summary>
-    public interface IAccelerator : IDisposable
-    {
-        Device Device { get; }
-        bool IsAvailable { get; }
-    }
-
-    /// <summary>
     /// Intel Neural Processing Unit (NPU) accelerator for AI workloads.
     /// </summary>
-    public sealed class IntelNPUAccelerator : IAccelerator
+    public sealed class IntelNPUAccelerator : Accelerator
     {
         #region Instance
+
+        private readonly NPUCapabilities _capabilities;
+        private readonly NPUGeneration _generation;
+        private bool _disposed;
 
         /// <summary>
         /// Gets whether Intel NPU is supported on this system.
@@ -49,12 +43,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU capabilities of this device.
         /// </summary>
-        public NPUCapabilities Capabilities { get; }
-
-        /// <summary>
-        /// Gets the underlying CPU device.
-        /// </summary>
-        public Device Device { get; }
+        public NPUCapabilities Capabilities => _capabilities;
 
         /// <summary>
         /// Gets whether this accelerator is available.
@@ -64,24 +53,38 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU generation (e.g., NPU2, NPU3, NPU4).
         /// </summary>
-        public NPUGeneration Generation { get; }
+        public NPUGeneration Generation => _generation;
 
-        internal IntelNPUAccelerator(Device device)
+        /// <summary>
+        /// Initializes a new instance of the IntelNPUAccelerator class.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <param name="device">The NPU device.</param>
+        public IntelNPUAccelerator(Context context, IntelNPUDevice device)
+            : base(context, device)
         {
-            Device = device ?? throw new ArgumentNullException(nameof(device));
             SupportsNPU = NPUCapabilities.DetectNPU();
             
             if (SupportsNPU)
             {
-                Capabilities = NPUCapabilities.Query();
-                Generation = Capabilities.Generation;
+                _capabilities = NPUCapabilities.Query();
+                _generation = _capabilities.Generation;
                 NPUNative.InitializeNPU();
             }
             else
             {
-                Capabilities = new NPUCapabilities();
-                Generation = NPUGeneration.None;
+                _capabilities = new NPUCapabilities();
+                _generation = NPUGeneration.None;
             }
+
+            Name = device.Name;
+            MaxGridSize = device.MaxGridSize;
+            MaxGroupSize = device.MaxGroupSize;
+            WarpSize = device.WarpSize;
+            NumMultiprocessors = device.NumMultiprocessors;
+            MaxSharedMemoryPerMultiprocessor = device.MaxSharedMemoryPerGroup;
+            MaxConstantMemory = device.MaxConstantMemory;
+            MaxMemoryBandwidth = (long)(_capabilities.MemoryBandwidth * 1024 * 1024 * 1024);
         }
 
         #endregion
@@ -292,6 +295,129 @@ namespace ILGPU.Intel.NPU
 
         #endregion
 
+        #region Accelerator Implementation
+
+        /// <summary>
+        /// Gets the memory information for this accelerator.
+        /// </summary>
+        public override MemoryInfo MemoryInfo => new MemoryInfo(
+            GC.GetTotalMemory(false), // Available memory (shared with system)
+            GC.GetTotalMemory(false)  // Total memory
+        );
+
+        protected override AcceleratorStream CreateStreamInternal() => new NPUStream(this);
+
+        protected override void SynchronizeInternal()
+        {
+            // NPU operations are handled asynchronously
+            System.Threading.Thread.MemoryBarrier();
+        }
+
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
+        {
+            return new NPUBuffer(this, length, elementSize);
+        }
+
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
+        {
+            return new NPUKernel(this, compiledKernel);
+        }
+
+        protected override Kernel LoadAutoGroupedKernelInternal(
+            CompiledKernel compiledKernel,
+            out KernelInfo? kernelInfo)
+        {
+            kernelInfo = new KernelInfo(0, 0, MaxGroupSize.X);
+            return LoadKernelInternal(compiledKernel);
+        }
+
+        protected override Kernel LoadImplicitlyGroupedKernelInternal(
+            CompiledKernel compiledKernel,
+            int customGroupSize,
+            out KernelInfo? kernelInfo)
+        {
+            kernelInfo = new KernelInfo(0, 0, customGroupSize);
+            return LoadKernelInternal(compiledKernel);
+        }
+
+        protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
+            Kernel kernel,
+            int groupSize,
+            int dynamicSharedMemorySizeInBytes)
+        {
+            return Math.Max(1, NumMultiprocessors / groupSize);
+        }
+
+        protected override int EstimateGroupSizeInternal(
+            Kernel kernel,
+            Func<int, int> computeSharedMemorySize,
+            int maxGroupSize,
+            out int minGridSize)
+        {
+            minGridSize = 1;
+            return Math.Min(maxGroupSize, WarpSize);
+        }
+
+        protected override int EstimateGroupSizeInternal(
+            Kernel kernel,
+            int dynamicSharedMemorySizeInBytes,
+            int maxGroupSize,
+            out int minGridSize)
+        {
+            minGridSize = 1;
+            return Math.Min(maxGroupSize, WarpSize);
+        }
+
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) => false;
+
+        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
+        {
+            throw new NotSupportedException("NPU does not support peer access");
+        }
+
+        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator)
+        {
+            throw new NotSupportedException("NPU does not support peer access");
+        }
+
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
+        {
+            return new PageLockScope<T>(this, pinned, numElements);
+        }
+
+        protected override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
+        {
+            throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
+        }
+
+        protected override void OnBind()
+        {
+            // Initialize NPU when bound
+        }
+
+        protected override void OnUnbind()
+        {
+            // Cleanup NPU when unbound
+            if (SupportsNPU)
+            {
+                NPUNative.ReleaseNPU();
+            }
+        }
+
+        protected override void DisposeAccelerator_SyncRoot(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing && SupportsNPU)
+                {
+                    NPUNative.ReleaseNPU();
+                }
+                _disposed = true;
+            }
+        }
+
+        #endregion
+
         #region Model Loading
 
         /// <summary>
@@ -492,26 +618,22 @@ namespace ILGPU.Intel.NPU
 
         private IModelLoader CreateModelLoader(ModelFormat format) => format switch
         {
-            ModelFormat.ONNX => new ONNXModelLoader(),
-            ModelFormat.OpenVINO => new OpenVINOModelLoader(),
-            ModelFormat.TensorFlow => new TensorFlowModelLoader(),
-            ModelFormat.PyTorch => new PyTorchModelLoader(),
+            ModelFormat.ONNX => throw new NotImplementedException("ONNX model loader not implemented"),
+            ModelFormat.OpenVINO => throw new NotImplementedException("OpenVINO model loader not implemented"),
+            ModelFormat.TensorFlow => throw new NotImplementedException("TensorFlow model loader not implemented"),
+            ModelFormat.PyTorch => throw new NotImplementedException("PyTorch model loader not implemented"),
             _ => throw new NotSupportedException($"Model format {format} not supported")
         };
 
         #endregion
+    }
 
-        #region Disposal
-
-        public void Dispose()
-        {
-            if (SupportsNPU)
-            {
-                NPUNative.ReleaseNPU();
-            }
-        }
-
-        #endregion
+    /// <summary>
+    /// Interface for model loaders.
+    /// </summary>
+    internal interface IModelLoader
+    {
+        // Placeholder interface for model loading functionality
     }
 
     /// <summary>
@@ -564,5 +686,210 @@ namespace ILGPU.Intel.NPU
         /// PyTorch model format.
         /// </summary>
         PyTorch
+    }
+
+    /// <summary>
+    /// NPU stream implementation.
+    /// </summary>
+    public sealed class NPUStream : AcceleratorStream
+    {
+        private readonly IntelNPUAccelerator _accelerator;
+
+        /// <summary>
+        /// Initializes a new instance of the NPUStream class.
+        /// </summary>
+        /// <param name="accelerator">The NPU accelerator.</param>
+        public NPUStream(IntelNPUAccelerator accelerator)
+            : base(accelerator)
+        {
+            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+        }
+
+        /// <summary>
+        /// Synchronizes the stream.
+        /// </summary>
+        public override void Synchronize()
+        {
+            System.Threading.Thread.MemoryBarrier();
+        }
+
+        /// <summary>
+        /// Synchronizes the stream asynchronously.
+        /// </summary>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <returns>A task representing the synchronization.</returns>
+        public override async Task SynchronizeAsync(CancellationToken cancellationToken = default)
+        {
+            await Task.Run(Synchronize, cancellationToken);
+        }
+
+        /// <summary>
+        /// Disposes the NPU stream.
+        /// </summary>
+        /// <param name="disposing">Whether disposing is in progress.</param>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            // No resources to dispose for NPU streams
+        }
+    }
+
+    /// <summary>
+    /// NPU buffer implementation.
+    /// </summary>
+    public sealed class NPUBuffer : MemoryBuffer
+    {
+        private readonly IntPtr _nativePtr;
+        private readonly long _lengthInBytes;
+        private bool _disposed;
+
+        /// <summary>
+        /// Initializes a new instance of the NPUBuffer class.
+        /// </summary>
+        /// <param name="accelerator">The NPU accelerator.</param>
+        /// <param name="length">The number of elements.</param>
+        /// <param name="elementSize">The size of each element in bytes.</param>
+        public NPUBuffer(IntelNPUAccelerator accelerator, long length, int elementSize)
+            : base(accelerator, length, elementSize)
+        {
+            _lengthInBytes = length * elementSize;
+            _nativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((int)_lengthInBytes);
+        }
+
+        /// <summary>
+        /// Gets a pointer to the buffer data.
+        /// </summary>
+        /// <returns>A pointer to the buffer data.</returns>
+        public override unsafe void* NativePtr => (void*)_nativePtr;
+
+        /// <summary>
+        /// Copies data from CPU memory to this buffer.
+        /// </summary>
+        public override unsafe void CopyFromCPU(
+            IntPtr source,
+            long sourceOffset,
+            long targetOffset,
+            long length)
+        {
+            var sourcePtr = (byte*)source + sourceOffset;
+            var targetPtr = (byte*)_nativePtr + targetOffset;
+            
+            Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetOffset, length);
+        }
+
+        /// <summary>
+        /// Copies data from this buffer to CPU memory.
+        /// </summary>
+        public override unsafe void CopyToCPU(
+            IntPtr target,
+            long sourceOffset,
+            long targetOffset,
+            long length)
+        {
+            var sourcePtr = (byte*)_nativePtr + sourceOffset;
+            var targetPtr = (byte*)target + targetOffset;
+            
+            Buffer.MemoryCopy(sourcePtr, targetPtr, length, length);
+        }
+
+        /// <summary>
+        /// Copies data from another buffer to this buffer.
+        /// </summary>
+        public override unsafe void CopyFrom(
+            MemoryBuffer source,
+            long sourceOffset,
+            long targetOffset,
+            long length)
+        {
+            if (source is NPUBuffer npuSource)
+            {
+                var sourcePtr = (byte*)npuSource._nativePtr + sourceOffset;
+                var targetPtr = (byte*)_nativePtr + targetOffset;
+                
+                Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetOffset, length);
+            }
+            else
+            {
+                base.CopyFrom(source, sourceOffset, targetOffset, length);
+            }
+        }
+
+        /// <summary>
+        /// Copies data from this buffer to another buffer.
+        /// </summary>
+        public override unsafe void CopyTo(
+            MemoryBuffer target,
+            long sourceOffset,
+            long targetOffset,
+            long length)
+        {
+            if (target is NPUBuffer npuTarget)
+            {
+                var sourcePtr = (byte*)_nativePtr + sourceOffset;
+                var targetPtr = (byte*)npuTarget._nativePtr + targetOffset;
+                
+                Buffer.MemoryCopy(sourcePtr, targetPtr, length, length);
+            }
+            else
+            {
+                base.CopyTo(target, sourceOffset, targetOffset, length);
+            }
+        }
+
+        /// <summary>
+        /// Disposes the NPU buffer.
+        /// </summary>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (_nativePtr != IntPtr.Zero)
+                {
+                    System.Runtime.InteropServices.Marshal.FreeHGlobal(_nativePtr);
+                }
+                _disposed = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// NPU kernel implementation.
+    /// </summary>
+    public sealed class NPUKernel : Kernel
+    {
+        private readonly IntelNPUAccelerator _accelerator;
+        private readonly CompiledKernel _compiledKernel;
+
+        /// <summary>
+        /// Initializes a new instance of the NPUKernel class.
+        /// </summary>
+        /// <param name="accelerator">The NPU accelerator.</param>
+        /// <param name="compiledKernel">The compiled kernel.</param>
+        public NPUKernel(IntelNPUAccelerator accelerator, CompiledKernel compiledKernel)
+            : base(accelerator, compiledKernel)
+        {
+            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
+        }
+
+        /// <summary>
+        /// Launches the kernel with the specified configuration.
+        /// </summary>
+        protected override void LaunchInternal(
+            AcceleratorStream stream,
+            KernelConfig extent,
+            RuntimeKernelConfig runtimeKernelConfig)
+        {
+            // NPU kernel execution would be implemented here
+            // For now, this is a placeholder
+            throw new NotImplementedException("NPU kernel execution not fully implemented");
+        }
+
+        /// <summary>
+        /// Disposes the NPU kernel.
+        /// </summary>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            // No special cleanup needed for NPU kernels
+        }
     }
 }

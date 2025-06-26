@@ -15,8 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-#if ENABLE_AMX_ACCELERATOR
-
 using ILGPU.Runtime;
 using System;
 using System.Runtime.InteropServices;
@@ -264,4 +262,3 @@ namespace ILGPU.Intel.AMX
         }
     }
 }
-#endif // ENABLE_AMX_ACCELERATOR

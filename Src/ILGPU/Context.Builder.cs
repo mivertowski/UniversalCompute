@@ -9,9 +9,12 @@
 // Source License. See LICENSE.txt for details.
 // ---------------------------------------------------------------------------------------
 
+using ILGPU.Apple.NeuralEngine;
 using ILGPU.Backends.OpenCL;
 using ILGPU.Backends.PTX;
 using ILGPU.Backends.Velocity;
+using ILGPU.Intel.AMX;
+using ILGPU.Intel.NPU;
 using ILGPU.IR.Intrinsics;
 using ILGPU.Resources;
 using ILGPU.Runtime;
@@ -90,7 +93,7 @@ namespace ILGPU
             /// that there is only one CPU accelerator by default.
             /// </remarks>
             /// <returns>The current builder instance.</returns>
-            public Builder AllAccelerators() => this.DefaultCPU().OpenCL().Cuda();
+            public Builder AllAccelerators() => this.DefaultCPU().OpenCL().Cuda().AMX().IntelNPU().AppleNeuralEngine();
 
             /// <summary>
             /// Enables all accelerators that fulfill the given predicate.

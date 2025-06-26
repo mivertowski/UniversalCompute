@@ -115,6 +115,27 @@ namespace ILGPU.Runtime
             new(configuration, AcceleratorType.Velocity);
 
         /// <summary>
+        /// Creates a device ID for an Intel AMX device.
+        /// </summary>
+        /// <returns>A unified device ID.</returns>
+        public static DeviceId FromAMX() =>
+            new(0, AcceleratorType.IntelAMX);
+
+        /// <summary>
+        /// Creates a device ID for an Apple Neural Engine device.
+        /// </summary>
+        /// <returns>A unified device ID.</returns>
+        public static DeviceId FromANE() =>
+            new(0, AcceleratorType.AppleNeuralEngine);
+
+        /// <summary>
+        /// Creates a device ID for an Intel NPU device.
+        /// </summary>
+        /// <returns>A unified device ID.</returns>
+        public static DeviceId FromNPU() =>
+            new(0, AcceleratorType.IntelNPU);
+
+        /// <summary>
         /// Gets a value indicating whether this device ID represents a CUDA device.
         /// </summary>
         public bool IsCuda => AcceleratorType == AcceleratorType.Cuda;
@@ -133,6 +154,21 @@ namespace ILGPU.Runtime
         /// Gets a value indicating whether this device ID represents a Velocity device.
         /// </summary>
         public bool IsVelocity => AcceleratorType == AcceleratorType.Velocity;
+
+        /// <summary>
+        /// Gets a value indicating whether this device ID represents an Intel AMX device.
+        /// </summary>
+        public bool IsIntelAMX => AcceleratorType == AcceleratorType.IntelAMX;
+
+        /// <summary>
+        /// Gets a value indicating whether this device ID represents an Apple Neural Engine device.
+        /// </summary>
+        public bool IsAppleNeuralEngine => AcceleratorType == AcceleratorType.AppleNeuralEngine;
+
+        /// <summary>
+        /// Gets a value indicating whether this device ID represents an Intel NPU device.
+        /// </summary>
+        public bool IsIntelNPU => AcceleratorType == AcceleratorType.IntelNPU;
 
         /// <summary>
         /// Gets the CUDA device ID if this is a CUDA device.

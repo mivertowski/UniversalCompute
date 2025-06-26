@@ -15,8 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-#if ENABLE_AMX_ACCELERATOR
-
 using ILGPU.Backends;
 using ILGPU.Intel.AMX.Native;
 using ILGPU.Runtime;
@@ -28,9 +26,8 @@ namespace ILGPU.Intel.AMX
 {
     /// <summary>
     /// Intel Advanced Matrix Extensions (AMX) accelerator for tile-based matrix operations.
-    /// TODO: AMX implementation needs deeper integration with ILGPU base classes - disabled for Phase 7 initial compilation.
     /// </summary>
-    internal sealed class AMXAccelerator : Accelerator
+    public sealed class AMXAccelerator : Accelerator
     {
         private readonly AMXCapabilities _amxCapabilities;
         private readonly AMXTileConfiguration _tileConfig;
@@ -387,5 +384,3 @@ namespace ILGPU.Intel.AMX
         }
     }
 }
-
-#endif // ENABLE_AMX_ACCELERATOR
