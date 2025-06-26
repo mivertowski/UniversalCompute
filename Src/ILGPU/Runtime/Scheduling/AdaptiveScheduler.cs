@@ -127,7 +127,7 @@ namespace ILGPU.Runtime.Scheduling
                 // Update performance statistics
                 _profiler.EndExecution(executionId);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _profiler.EndExecution(executionId);
                 throw;

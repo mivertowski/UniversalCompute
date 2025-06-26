@@ -167,7 +167,7 @@ namespace ILGPU.Backends.IL
         {
             if (target.IsStatic)
             {
-                sourceBuilder.Append($"{GetTypeString(target.DeclaringType)}.{target.Name}(");
+                sourceBuilder.Append($"{GetTypeString(target.DeclaringType!)}.{target.Name}(");
             }
             else
             {
@@ -182,7 +182,7 @@ namespace ILGPU.Backends.IL
         /// <summary cref="IILEmitter.EmitNewObject(ConstructorInfo)"/>
         public void EmitNewObject(ConstructorInfo info)
         {
-            sourceBuilder.Append($"new {GetTypeString(info.DeclaringType)}(");
+            sourceBuilder.Append($"new {GetTypeString(info.DeclaringType!)}(");
             // Parameters would be added by the calling code
             sourceBuilder.Append(")");
         }
@@ -209,7 +209,7 @@ namespace ILGPU.Backends.IL
         public void Emit(OpCode opCode)
         {
             // Convert OpCodes to equivalent C# expressions
-            switch (opCode.Name.ToLowerInvariant())
+            switch (opCode.Name?.ToLowerInvariant())
             {
                 case "add":
                     sourceBuilder.Append(" + ");
@@ -261,7 +261,7 @@ namespace ILGPU.Backends.IL
         {
             var compileTimeLabel = labels[label.Index];
             
-            switch (opCode.Name.ToLowerInvariant())
+            switch (opCode.Name?.ToLowerInvariant())
             {
                 case "br":
                     EmitLine($"goto {compileTimeLabel.Name};");
@@ -281,7 +281,7 @@ namespace ILGPU.Backends.IL
         /// <summary cref="IILEmitter.Emit(OpCode, Type)"/>
         public void Emit(OpCode opCode, Type type)
         {
-            switch (opCode.Name.ToLowerInvariant())
+            switch (opCode.Name?.ToLowerInvariant())
             {
                 case "castclass":
                     sourceBuilder.Append($"({GetTypeString(type)})");
@@ -307,7 +307,7 @@ namespace ILGPU.Backends.IL
         /// <summary cref="IILEmitter.Emit(OpCode, FieldInfo)"/>
         public void Emit(OpCode opCode, FieldInfo field)
         {
-            switch (opCode.Name.ToLowerInvariant())
+            switch (opCode.Name?.ToLowerInvariant())
             {
                 case "ldfld":
                     sourceBuilder.Append($".{field.Name}");

@@ -225,7 +225,7 @@ namespace ILGPU.Core
             
             if (method != null)
             {
-                return (ITensorCore<T>)method.Invoke(null, [mlTensor, accelerator]);
+                return (ITensorCore<T>)method.Invoke(null, [mlTensor, accelerator])!;
             }
             
             throw new ArgumentException($"Cannot convert ML.Tensor<{typeof(T)}> - type must implement INumber<T>");

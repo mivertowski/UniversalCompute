@@ -450,7 +450,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets or sets the target accelerator.
         /// </summary>
-        public Accelerator TargetAccelerator { get; set; }
+        public required Accelerator TargetAccelerator { get; set; }
 
         /// <summary>
         /// Gets or sets the required bytes.
@@ -471,12 +471,12 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets or sets the source accelerator.
         /// </summary>
-        public Accelerator SourceAccelerator { get; set; }
+        public required Accelerator SourceAccelerator { get; set; }
 
         /// <summary>
         /// Gets or sets the target accelerator.
         /// </summary>
-        public Accelerator TargetAccelerator { get; set; }
+        public required Accelerator TargetAccelerator { get; set; }
 
         /// <summary>
         /// Gets or sets the suggested bytes to transfer.

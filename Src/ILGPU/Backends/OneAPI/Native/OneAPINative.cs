@@ -55,7 +55,7 @@ namespace ILGPU.Backends.OneAPI.Native
         [DllImport(OpenCLLibrary)]
         internal static extern int clGetPlatformIDs(
             uint numEntries,
-            [Out] IntPtr[] platforms,
+            [Out] IntPtr[]? platforms,
             out uint numPlatforms);
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace ILGPU.Backends.OneAPI.Native
             IntPtr platform,
             ulong deviceType,
             uint numEntries,
-            [Out] IntPtr[] devices,
+            [Out] IntPtr[]? devices,
             out uint numDevices);
 
         /// <summary>
