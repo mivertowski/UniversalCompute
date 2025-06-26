@@ -1,6 +1,6 @@
 # ILGPU Hardware Accelerator Requirements
 
-This document outlines the hardware, software, and driver requirements for ILGPU's AI hardware accelerators.
+This document outlines the hardware, software, and driver requirements for UniversalCompute's AI hardware accelerators.
 
 ## Intel Advanced Matrix Extensions (AMX)
 
