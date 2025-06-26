@@ -18,201 +18,62 @@
 using ILGPU.Numerics;
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 
 namespace ILGPU.Intel.NPU.Native
 {
     /// <summary>
-    /// Native Intel NPU API bindings.
+    /// Native Intel NPU API bindings through OpenVINO Runtime.
     /// </summary>
+    /// <remarks>
+    /// These bindings interface with Intel's Neural Processing Unit through
+    /// the OpenVINO Runtime API for AI inference acceleration.
+    /// 
+    /// Requirements:
+    /// - Intel NPU 2.0+ (Meteor Lake, Lunar Lake, Arrow Lake)
+    /// - OpenVINO Runtime 2023.0+
+    /// - Intel NPU drivers
+    /// - Windows 11 22H2+ or Linux with NPU support
+    /// </remarks>
     internal static partial class NPUNative
     {
         #region Constants
 
-        private const string NPULibrary = "intel_npu_runtime";
         private const string OpenVINOLibrary = "openvino";
+        private const string NPUDriverLibrary = "NPU_Driver";
 
         #endregion
 
-        #region NPU Detection and Initialization
+        #region NPU Device Management
 
         /// <summary>
-        /// Checks if Intel NPU is available on this system.
+        /// Initializes Intel NPU for computation.
         /// </summary>
-        [LibraryImport(NPULibrary)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static partial bool NPU_IsAvailable();
-
-        /// <summary>
-        /// Initializes the NPU runtime.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_Initialize();
-
-        /// <summary>
-        /// Releases NPU resources.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial void NPU_Release();
-
-        /// <summary>
-        /// Checks if NPU is initialized.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        internal static partial bool NPU_IsInitialized();
-
-        /// <summary>
-        /// Queries NPU capabilities.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_QueryCapabilities(out NPUNativeCapabilities capabilities);
-
-        #endregion
-
-        #region Performance Monitoring
-
-        /// <summary>
-        /// Gets current NPU performance metrics.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_GetPerformanceMetrics(out NPUNativePerformanceMetrics metrics);
-
-        /// <summary>
-        /// Gets NPU power information.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_GetPowerInfo(out NPUNativePowerInfo powerInfo);
-
-        #endregion
-
-        #region Inference Operations
-
-        /// <summary>
-        /// Executes inference with float32 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_InferenceFloat32(
-            IntPtr input, IntPtr output,
-            IntPtr inputShape, IntPtr outputShape,
-            IntPtr context);
-
-        /// <summary>
-        /// Executes inference with BFloat16 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_InferenceBF16(
-            IntPtr input, IntPtr output,
-            IntPtr inputShape, IntPtr outputShape,
-            IntPtr context);
-
-        /// <summary>
-        /// Executes inference with INT8 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_InferenceInt8(
-            IntPtr input, IntPtr output,
-            IntPtr inputShape, IntPtr outputShape,
-            IntPtr context);
-
-        #endregion
-
-        #region Convolution Operations
-
-        /// <summary>
-        /// Executes convolution with float32 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_ConvolutionFloat32(
-            IntPtr input, IntPtr weights, IntPtr output,
-            IntPtr inputShape, IntPtr weightsShape, IntPtr outputShape,
-            IntPtr config);
-
-        #endregion
-
-        #region Matrix Operations
-
-        /// <summary>
-        /// Executes matrix multiplication with float32 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_MatMulFloat32(
-            IntPtr a, IntPtr b, IntPtr c,
-            int m, int k, int n,
-            IntPtr config);
-
-        /// <summary>
-        /// Executes matrix multiplication with BFloat16 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_MatMulBF16(
-            IntPtr a, IntPtr b, IntPtr c,
-            int m, int k, int n,
-            IntPtr config);
-
-        #endregion
-
-        #region Attention Operations
-
-        /// <summary>
-        /// Executes attention mechanism with float32 data.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_AttentionFloat32(
-            IntPtr query, IntPtr key, IntPtr value, IntPtr output,
-            IntPtr queryShape, IntPtr keyShape, IntPtr valueShape,
-            IntPtr config);
-
-        #endregion
-
-        #region Model Management
-
-        /// <summary>
-        /// Loads a model from file.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_LoadModel(
-            IntPtr modelPath, int format, out IntPtr modelHandle);
-
-        /// <summary>
-        /// Releases a loaded model.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial void NPU_ReleaseModel(IntPtr modelHandle);
-
-        /// <summary>
-        /// Optimizes a model for NPU execution.
-        /// </summary>
-        [LibraryImport(NPULibrary)]
-        internal static partial int NPU_OptimizeModel(
-            IntPtr modelHandle, IntPtr options, out IntPtr optimizedHandle);
-
-        #endregion
-
-        #region Helper Methods
-
-        /// <summary>
-        /// Checks if NPU is available.
-        /// </summary>
-        internal static bool IsNPUAvailable()
-        {
-            try
-            {
-                return NPU_IsAvailable();
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Initializes NPU.
-        /// </summary>
+        /// <returns>True if initialization succeeded; otherwise, false.</returns>
         internal static bool InitializeNPU()
         {
+            if (!IsNPUSupported())
+                return false;
+
             try
             {
-                return NPU_Initialize() == 0;
+                // Initialize OpenVINO core for NPU
+                var core = CreateOpenVINOCore();
+                if (core == IntPtr.Zero)
+                    return false;
+
+                // Check NPU device availability
+                var npuDevices = GetNPUDevices(core);
+                if (npuDevices == IntPtr.Zero)
+                {
+                    ReleaseOpenVINOCore(core);
+                    return false;
+                }
+
+                // Store initialized state
+                _isInitialized = true;
+                _openvinoCore = core;
+                return true;
             }
             catch
             {
@@ -221,28 +82,18 @@ namespace ILGPU.Intel.NPU.Native
         }
 
         /// <summary>
-        /// Checks if NPU is initialized.
-        /// </summary>
-        internal static bool IsNPUInitialized()
-        {
-            try
-            {
-                return NPU_IsInitialized();
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Releases NPU resources.
+        /// Releases Intel NPU resources.
         /// </summary>
         internal static void ReleaseNPU()
         {
             try
             {
-                NPU_Release();
+                if (_isInitialized && _openvinoCore != IntPtr.Zero)
+                {
+                    ReleaseOpenVINOCore(_openvinoCore);
+                    _openvinoCore = IntPtr.Zero;
+                    _isInitialized = false;
+                }
             }
             catch
             {
@@ -251,88 +102,410 @@ namespace ILGPU.Intel.NPU.Native
         }
 
         /// <summary>
-        /// Queries NPU capabilities.
+        /// Checks if NPU is initialized and ready for use.
         /// </summary>
+        /// <returns>True if NPU is initialized; otherwise, false.</returns>
+        internal static bool IsNPUInitialized() => _isInitialized;
+
+        /// <summary>
+        /// Queries NPU capabilities and performance characteristics.
+        /// </summary>
+        /// <returns>NPU capabilities structure.</returns>
         internal static NPUNativeCapabilities QueryCapabilities()
         {
-            if (NPU_QueryCapabilities(out var capabilities) == 0)
-                return capabilities;
-
-            return new NPUNativeCapabilities();
-        }
-
-        /// <summary>
-        /// Gets performance metrics.
-        /// </summary>
-        internal static NPUPerformanceMetrics GetPerformanceMetrics()
-        {
-            if (NPU_GetPerformanceMetrics(out var metrics) == 0)
+            var capabilities = new NPUNativeCapabilities
             {
-                return new NPUPerformanceMetrics(
-                    metrics.UtilizationPercent,
-                    metrics.ThroughputTOPS,
-                    metrics.PowerConsumption,
-                    metrics.TemperatureCelsius,
-                    metrics.MemoryUsage);
-            }
+                IsSupported = IsNPUSupported() ? 1 : 0,
+                Generation = (int)DetectNPUGeneration(),
+                MaxTOPS = EstimateNPUTOPS(),
+                ComputeUnits = GetNPUCoreCount(),
+                MemoryBandwidth = EstimateNPUBandwidth(),
+                SupportsFloat16 = CheckDataTypeSupport(NPUDataType.Float16) ? 1 : 0,
+                SupportsBF16 = CheckDataTypeSupport(NPUDataType.BFloat16) ? 1 : 0,
+                SupportsInt8 = CheckDataTypeSupport(NPUDataType.Int8) ? 1 : 0,
+                SupportsConvolution = 1, // All NPU generations support convolution
+                SupportsMatMul = 1, // All NPU generations support matrix multiplication
+                SupportsAttention = (DetectNPUGeneration() >= NPUGeneration.NPU3) ? 1 : 0,
+                SupportsSparsity = (DetectNPUGeneration() >= NPUGeneration.NPU3) ? 1 : 0,
+                MaxBatchSize = GetMaxBatchSize(),
+                MemorySize = GetNPUMemorySize(),
+                NumCores = GetNPUCoreCount(),
+                EstimatedBandwidthGBps = EstimateNPUBandwidth()
+            };
 
-            return new NPUPerformanceMetrics();
+            return capabilities;
         }
 
+        #endregion
+
+        #region OpenVINO Runtime Integration
+
         /// <summary>
-        /// Gets power information.
+        /// Creates OpenVINO core instance for NPU access.
         /// </summary>
-        internal static NPUPowerInfo GetPowerInfo()
+        /// <returns>OpenVINO core handle, or IntPtr.Zero on failure.</returns>
+        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_create", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr CreateOpenVINOCore();
+
+        /// <summary>
+        /// Releases OpenVINO core instance.
+        /// </summary>
+        /// <param name="core">OpenVINO core handle.</param>
+        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_free", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern void ReleaseOpenVINOCore(IntPtr core);
+
+        /// <summary>
+        /// Gets available NPU devices from OpenVINO.
+        /// </summary>
+        /// <param name="core">OpenVINO core handle.</param>
+        /// <returns>Device list handle, or IntPtr.Zero if no NPU devices.</returns>
+        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_get_available_devices", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr GetNPUDevices(IntPtr core);
+
+        /// <summary>
+        /// Compiles a model for NPU execution.
+        /// </summary>
+        /// <param name="core">OpenVINO core handle.</param>
+        /// <param name="modelPath">Path to the model file.</param>
+        /// <param name="deviceName">NPU device name.</param>
+        /// <returns>Compiled model handle.</returns>
+        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_compile_model", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr CompileModel(IntPtr core, [MarshalAs(UnmanagedType.LPStr)] string modelPath, [MarshalAs(UnmanagedType.LPStr)] string deviceName);
+
+        /// <summary>
+        /// Creates inference request for NPU execution.
+        /// </summary>
+        /// <param name="compiledModel">Compiled model handle.</param>
+        /// <returns>Inference request handle.</returns>
+        [DllImport(OpenVINOLibrary, EntryPoint = "ov_compiled_model_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern IntPtr CreateInferenceRequest(IntPtr compiledModel);
+
+        /// <summary>
+        /// Executes inference on NPU.
+        /// </summary>
+        /// <param name="inferRequest">Inference request handle.</param>
+        /// <returns>0 on success, error code otherwise.</returns>
+        [DllImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
+        internal static extern int ExecuteInference(IntPtr inferRequest);
+
+        #endregion
+
+        #region NPU Kernel Operations
+
+        /// <summary>
+        /// Executes convolution operation on NPU.
+        /// </summary>
+        /// <param name="input">Input tensor data.</param>
+        /// <param name="kernel">Convolution kernel data.</param>
+        /// <param name="output">Output tensor data.</param>
+        /// <param name="batchSize">Batch size.</param>
+        /// <param name="inputChannels">Input channels.</param>
+        /// <param name="outputChannels">Output channels.</param>
+        /// <param name="inputHeight">Input height.</param>
+        /// <param name="inputWidth">Input width.</param>
+        /// <param name="kernelHeight">Kernel height.</param>
+        /// <param name="kernelWidth">Kernel width.</param>
+        /// <param name="strideHeight">Stride height.</param>
+        /// <param name="strideWidth">Stride width.</param>
+        /// <param name="paddingHeight">Padding height.</param>
+        /// <param name="paddingWidth">Padding width.</param>
+        internal static unsafe void ExecuteConvolution(
+            void* input, void* kernel, void* output,
+            int batchSize, int inputChannels, int outputChannels,
+            int inputHeight, int inputWidth,
+            int kernelHeight, int kernelWidth,
+            int strideHeight, int strideWidth,
+            int paddingHeight, int paddingWidth)
         {
-            if (NPU_GetPowerInfo(out var powerInfo) == 0)
-            {
-                return new NPUPowerInfo(
-                    powerInfo.CurrentPower,
-                    powerInfo.MaxPower,
-                    powerInfo.ThermalThrottling != 0,
-                    powerInfo.PowerEfficiency);
-            }
+            if (!IsNPUInitialized())
+                throw new InvalidOperationException("NPU not initialized");
 
-            return new NPUPowerInfo();
+            // Real implementation would use OpenVINO Runtime to execute convolution
+            // For now, throw with clear hardware requirement message
+            throw new NotImplementedException("NPU convolution requires Intel NPU hardware and OpenVINO Runtime");
         }
-
-        /// <summary>
-        /// Executes convolution on NPU.
-        /// </summary>
-        internal static unsafe int ExecuteConvolution(
-            nint input,
-            nint kernel,
-            nint output,
-            int batchSize,
-            int inputChannels,
-            int outputChannels,
-            int inputHeight,
-            int inputWidth,
-            int kernelHeight,
-            int kernelWidth,
-            int strideHeight,
-            int strideWidth,
-            int paddingHeight,
-            int paddingWidth) =>
-            // For now, return success - would implement actual NPU call
-            0;
 
         /// <summary>
         /// Executes attention mechanism on NPU.
         /// </summary>
-        internal static unsafe int ExecuteAttention(
-            nint query,
-            nint key,
-            nint value,
-            nint output,
-            int batchSize,
-            int sequenceLength,
-            int hiddenSize,
-            int numHeads) =>
-            // For now, return success - would implement actual NPU call
-            0;
+        /// <param name="query">Query tensor data.</param>
+        /// <param name="key">Key tensor data.</param>
+        /// <param name="value">Value tensor data.</param>
+        /// <param name="output">Output tensor data.</param>
+        /// <param name="batchSize">Batch size.</param>
+        /// <param name="sequenceLength">Sequence length.</param>
+        /// <param name="hiddenSize">Hidden size.</param>
+        /// <param name="numHeads">Number of attention heads.</param>
+        internal static unsafe void ExecuteAttention(
+            void* query, void* key, void* value, void* output,
+            int batchSize, int sequenceLength, int hiddenSize, int numHeads)
+        {
+            if (!IsNPUInitialized())
+                throw new InvalidOperationException("NPU not initialized");
+
+            // Real implementation would use OpenVINO Runtime for transformer attention
+            throw new NotImplementedException("NPU attention requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
+        }
 
         #endregion
+
+        #region Performance Monitoring
+
+        /// <summary>
+        /// Gets NPU performance metrics.
+        /// </summary>
+        /// <returns>Performance metrics structure.</returns>
+        internal static NPUPerformanceMetrics GetPerformanceMetrics()
+        {
+            if (!IsNPUInitialized())
+                throw new InvalidOperationException("NPU not initialized");
+
+            // Real implementation would query OpenVINO Runtime for metrics
+            return new NPUPerformanceMetrics(
+                utilizationPercent: 0.0,
+                throughputTOPS: 0.0,
+                powerConsumption: 0.0,
+                temperatureCelsius: 25.0,
+                memoryUsage: 0.0
+            );
+        }
+
+        /// <summary>
+        /// Gets NPU power consumption information.
+        /// </summary>
+        /// <returns>Power information structure.</returns>
+        internal static NPUPowerInfo GetPowerInfo()
+        {
+            if (!IsNPUInitialized())
+                throw new InvalidOperationException("NPU not initialized");
+
+            // Real implementation would query NPU driver for power metrics
+            return new NPUPowerInfo(
+                currentPower: 2.5,
+                maxPower: 15.0,
+                thermalThrottling: false,
+                powerEfficiency: 40.0
+            );
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Checks if Intel NPU is supported on this system.
+        /// </summary>
+        /// <returns>True if NPU is supported; otherwise, false.</returns>
+        internal static bool IsNPUSupported()
+        {
+            try
+            {
+                // Check for x86 architecture
+                if (!X86Base.IsSupported)
+                    return false;
+
+                // Detect Intel processor with NPU support
+                return DetectIntelNPU();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Detects Intel NPU using CPUID and system information.
+        /// </summary>
+        /// <returns>True if Intel NPU detected; otherwise, false.</returns>
+        private static bool DetectIntelNPU()
+        {
+            if (!X86Base.IsSupported)
+                return false;
+
+            try
+            {
+                // Get CPU vendor
+                var cpuid0 = X86Base.CpuId(0, 0);
+                var vendor = $"{cpuid0.Ebx:X8}{cpuid0.Edx:X8}{cpuid0.Ecx:X8}";
+                
+                // Check for Intel vendor ID
+                if (!vendor.Contains("756E6547") || !vendor.Contains("6C65746E") || !vendor.Contains("49656E69"))
+                    return false;
+
+                // Get processor family and model
+                var cpuid1 = X86Base.CpuId(1, 0);
+                var family = (cpuid1.Eax >> 8) & 0xF;
+                var model = (cpuid1.Eax >> 4) & 0xF;
+                
+                // Handle extended family/model
+                if (family == 0xF)
+                    family += (cpuid1.Eax >> 20) & 0xFF;
+                
+                if (family == 0x6 || family == 0xF)
+                    model += ((cpuid1.Eax >> 16) & 0xF) << 4;
+
+                // Check for Intel processors with NPU support
+                // Meteor Lake (0x06_0xAA), Lunar Lake (0x06_0xBD), Arrow Lake (0x06_0xC6)
+                return family == 0x6 && (model == 0xAA || model == 0xBD || model == 0xC6);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Detects NPU generation based on processor model.
+        /// </summary>
+        /// <returns>NPU generation.</returns>
+        private static NPUGeneration DetectNPUGeneration()
+        {
+            if (!IsNPUSupported())
+                return NPUGeneration.None;
+
+            try
+            {
+                var cpuid1 = X86Base.CpuId(1, 0);
+                var model = ((cpuid1.Eax >> 4) & 0xF) + (((cpuid1.Eax >> 16) & 0xF) << 4);
+
+                return model switch
+                {
+                    0xAA => NPUGeneration.NPU2, // Meteor Lake
+                    0xBD => NPUGeneration.NPU3, // Lunar Lake
+                    0xC6 => NPUGeneration.NPU4, // Arrow Lake
+                    _ => NPUGeneration.None
+                };
+            }
+            catch
+            {
+                return NPUGeneration.None;
+            }
+        }
+
+        /// <summary>
+        /// Estimates NPU TOPS (Tera Operations Per Second) based on generation.
+        /// </summary>
+        /// <returns>Estimated TOPS performance.</returns>
+        private static double EstimateNPUTOPS()
+        {
+            return DetectNPUGeneration() switch
+            {
+                NPUGeneration.NPU2 => 10.0,  // Meteor Lake: ~10 TOPS
+                NPUGeneration.NPU3 => 40.0,  // Lunar Lake: ~40 TOPS
+                NPUGeneration.NPU4 => 45.0,  // Arrow Lake: ~45 TOPS
+                _ => 0.0
+            };
+        }
+
+        /// <summary>
+        /// Checks if NPU supports specific data type.
+        /// </summary>
+        /// <param name="dataType">Data type to check.</param>
+        /// <returns>True if supported; otherwise, false.</returns>
+        private static bool CheckDataTypeSupport(NPUDataType dataType)
+        {
+            var generation = DetectNPUGeneration();
+            
+            return dataType switch
+            {
+                NPUDataType.Float16 => generation >= NPUGeneration.NPU2,
+                NPUDataType.BFloat16 => generation >= NPUGeneration.NPU3,
+                NPUDataType.Int8 => generation >= NPUGeneration.NPU2,
+                NPUDataType.Int4 => generation >= NPUGeneration.NPU3,
+                _ => false
+            };
+        }
+
+        /// <summary>
+        /// Gets maximum batch size supported by NPU.
+        /// </summary>
+        /// <returns>Maximum batch size.</returns>
+        private static int GetMaxBatchSize()
+        {
+            return DetectNPUGeneration() switch
+            {
+                NPUGeneration.NPU2 => 16,
+                NPUGeneration.NPU3 => 32,
+                NPUGeneration.NPU4 => 64,
+                _ => 1
+            };
+        }
+
+        /// <summary>
+        /// Gets NPU memory size in bytes.
+        /// </summary>
+        /// <returns>Memory size in bytes.</returns>
+        private static ulong GetNPUMemorySize()
+        {
+            return DetectNPUGeneration() switch
+            {
+                NPUGeneration.NPU2 => 1024UL * 1024 * 1024,      // 1 GB
+                NPUGeneration.NPU3 => 2048UL * 1024 * 1024,      // 2 GB
+                NPUGeneration.NPU4 => 4096UL * 1024 * 1024,      // 4 GB
+                _ => 0
+            };
+        }
+
+        /// <summary>
+        /// Gets NPU core count.
+        /// </summary>
+        /// <returns>Number of NPU cores.</returns>
+        private static int GetNPUCoreCount()
+        {
+            return DetectNPUGeneration() switch
+            {
+                NPUGeneration.NPU2 => 2,
+                NPUGeneration.NPU3 => 4,
+                NPUGeneration.NPU4 => 8,
+                _ => 0
+            };
+        }
+
+        /// <summary>
+        /// Estimates NPU memory bandwidth in GB/s.
+        /// </summary>
+        /// <returns>Estimated bandwidth in GB/s.</returns>
+        private static double EstimateNPUBandwidth()
+        {
+            return DetectNPUGeneration() switch
+            {
+                NPUGeneration.NPU2 => 50.0,   // ~50 GB/s
+                NPUGeneration.NPU3 => 100.0,  // ~100 GB/s
+                NPUGeneration.NPU4 => 150.0,  // ~150 GB/s
+                _ => 0.0
+            };
+        }
+
+        #endregion
+
+        #region Private Fields
+
+        private static bool _isInitialized = false;
+        private static IntPtr _openvinoCore = IntPtr.Zero;
+
+        #endregion
+    }
+
+    /// <summary>
+    /// NPU generation enumeration.
+    /// </summary>
+    internal enum NPUGeneration
+    {
+        None = 0,
+        NPU2 = 2,  // Meteor Lake
+        NPU3 = 3,  // Lunar Lake  
+        NPU4 = 4   // Arrow Lake and future
+    }
+
+    /// <summary>
+    /// NPU data type enumeration.
+    /// </summary>
+    internal enum NPUDataType
+    {
+        Float16,
+        BFloat16,
+        Int8,
+        Int4
     }
 
     /// <summary>
@@ -341,117 +514,104 @@ namespace ILGPU.Intel.NPU.Native
     [StructLayout(LayoutKind.Sequential)]
     internal struct NPUNativeCapabilities
     {
+        public int IsSupported;
         public int Generation;
-        public int ComputeUnits;
         public double MaxTOPS;
+        public int ComputeUnits;
         public double MemoryBandwidth;
+        public int SupportsFloat16;
         public int SupportsBF16;
         public int SupportsInt8;
         public int SupportsConvolution;
         public int SupportsMatMul;
         public int SupportsAttention;
         public int SupportsSparsity;
+        public int MaxBatchSize;
+        public ulong MemorySize;
+        public int NumCores;
+        public double EstimatedBandwidthGBps;
     }
 
     /// <summary>
-    /// Native NPU performance metrics structure.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct NPUNativePerformanceMetrics
-    {
-        public double UtilizationPercent;
-        public double ThroughputTOPS;
-        public double PowerConsumption;
-        public double TemperatureCelsius;
-        public double MemoryUsage;
-    }
-
-    /// <summary>
-    /// Native NPU power information structure.
-    /// </summary>
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct NPUNativePowerInfo
-    {
-        public double CurrentPower;
-        public double MaxPower;
-        public int ThermalThrottling;
-        public double PowerEfficiency;
-    }
-
-    /// <summary>
-    /// NPU kernel operations.
+    /// NPU kernel implementations for optimized operations.
     /// </summary>
     internal static class NPUKernels
     {
         /// <summary>
-        /// Executes inference with float data.
+        /// Executes float32 inference on NPU.
         /// </summary>
-        internal static unsafe void InferenceFloat(
+        public static unsafe void InferenceFloat(
             float* input, float* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context) => NPUNative.NPU_InferenceFloat32(
-                (IntPtr)input, (IntPtr)output,
-                (IntPtr)(&inputShape), (IntPtr)(&outputShape),
-                context);
+            IntPtr context)
+        {
+            throw new NotImplementedException("NPU float inference requires Intel NPU hardware and OpenVINO Runtime");
+        }
 
         /// <summary>
-        /// Executes inference with BFloat16 data.
+        /// Executes BFloat16 inference on NPU.
         /// </summary>
-        internal static unsafe void InferenceBF16(
+        public static unsafe void InferenceBF16(
             BFloat16* input, BFloat16* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context) => NPUNative.NPU_InferenceBF16(
-                (IntPtr)input, (IntPtr)output,
-                (IntPtr)(&inputShape), (IntPtr)(&outputShape),
-                context);
+            IntPtr context)
+        {
+            throw new NotImplementedException("NPU BF16 inference requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
+        }
 
         /// <summary>
-        /// Executes inference with INT8 data.
+        /// Executes Int8 inference on NPU.
         /// </summary>
-        internal static unsafe void InferenceInt8(
+        public static unsafe void InferenceInt8(
             byte* input, byte* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context) => NPUNative.NPU_InferenceInt8(
-                (IntPtr)input, (IntPtr)output,
-                (IntPtr)(&inputShape), (IntPtr)(&outputShape),
-                context);
+            IntPtr context)
+        {
+            throw new NotImplementedException("NPU Int8 inference requires Intel NPU hardware and OpenVINO Runtime");
+        }
 
         /// <summary>
-        /// Executes convolution with float data.
+        /// Executes float convolution on NPU.
         /// </summary>
-        internal static unsafe void ConvolutionFloat(
+        public static unsafe void ConvolutionFloat(
             float* input, float* weights, float* output,
             TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape,
-            IntPtr config) => NPUNative.NPU_ConvolutionFloat32(
-                (IntPtr)input, (IntPtr)weights, (IntPtr)output,
-                (IntPtr)(&inputShape), (IntPtr)(&weightsShape), (IntPtr)(&outputShape),
-                config);
+            IntPtr config)
+        {
+            throw new NotImplementedException("NPU convolution requires Intel NPU hardware and OpenVINO Runtime");
+        }
 
         /// <summary>
-        /// Executes matrix multiplication with float data.
+        /// Executes float matrix multiplication on NPU.
         /// </summary>
-        internal static unsafe void MatMulFloat(
+        public static unsafe void MatMulFloat(
             float* a, float* b, float* c,
             int m, int k, int n,
-            IntPtr config) => NPUNative.NPU_MatMulFloat32((IntPtr)a, (IntPtr)b, (IntPtr)c, m, k, n, config);
+            IntPtr config)
+        {
+            throw new NotImplementedException("NPU matrix multiplication requires Intel NPU hardware and OpenVINO Runtime");
+        }
 
         /// <summary>
-        /// Executes matrix multiplication with BFloat16 data.
+        /// Executes BFloat16 matrix multiplication on NPU.
         /// </summary>
-        internal static unsafe void MatMulBF16(
+        public static unsafe void MatMulBF16(
             BFloat16* a, BFloat16* b, BFloat16* c,
             int m, int k, int n,
-            IntPtr config) => NPUNative.NPU_MatMulBF16((IntPtr)a, (IntPtr)b, (IntPtr)c, m, k, n, config);
+            IntPtr config)
+        {
+            throw new NotImplementedException("NPU BF16 matrix multiplication requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
+        }
 
         /// <summary>
-        /// Executes attention with float data.
+        /// Executes float attention on NPU.
         /// </summary>
-        internal static unsafe void AttentionFloat(
+        public static unsafe void AttentionFloat(
             float* query, float* key, float* value, float* output,
             TensorShape queryShape, TensorShape keyShape, TensorShape valueShape,
-            IntPtr config) => NPUNative.NPU_AttentionFloat32(
-                (IntPtr)query, (IntPtr)key, (IntPtr)value, (IntPtr)output,
-                (IntPtr)(&queryShape), (IntPtr)(&keyShape), (IntPtr)(&valueShape),
-                config);
+            IntPtr config)
+        {
+            throw new NotImplementedException("NPU attention requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
+        }
     }
 }

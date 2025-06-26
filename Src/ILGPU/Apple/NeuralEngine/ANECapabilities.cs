@@ -243,6 +243,16 @@ namespace ILGPU.Apple.NeuralEngine
         None = 0,
 
         /// <summary>
+        /// Not supported on this platform.
+        /// </summary>
+        NotSupported = -1,
+
+        /// <summary>
+        /// Unknown Neural Engine generation.
+        /// </summary>
+        Unknown = -2,
+
+        /// <summary>
         /// First generation ANE (A11, A12).
         /// </summary>
         ANE1 = 1,

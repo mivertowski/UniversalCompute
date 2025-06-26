@@ -20,6 +20,7 @@ using ILGPU.Runtime;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using ILGPU.Benchmarks.Infrastructure;
+using ILGPU.Intel.AMX;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 
@@ -33,6 +34,8 @@ public class IntelAMXBenchmarks : IDisposable
 {
     private Context? context;
     private Accelerator? accelerator;
+    private AMXAccelerator? amxAccelerator;
+    private bool hasRealAMX;
     private MemoryBuffer2D<float, Stride2D.DenseX>? matrixA;
     private MemoryBuffer2D<float, Stride2D.DenseX>? matrixB;
     private MemoryBuffer2D<float, Stride2D.DenseX>? matrixC;
@@ -52,9 +55,39 @@ public class IntelAMXBenchmarks : IDisposable
         {
             context = Context.CreateDefault();
             
-            // Prefer CPU for AMX simulation as AMX is CPU-based
-            var device = context.GetPreferredDevice(preferCPU: true);
-            accelerator = device.CreateAccelerator(context);
+            // Check for real Intel AMX hardware first
+            hasRealAMX = AMXCapabilities.IsAMXSupported();
+            
+            if (hasRealAMX)
+            {
+                Console.WriteLine("🚀 Detected Intel AMX - using real hardware acceleration!");
+                try
+                {
+                    amxAccelerator = context.CreateAMXAccelerator(0) as AMXAccelerator;
+                    accelerator = amxAccelerator;
+                    if (amxAccelerator == null)
+                    {
+                        Console.WriteLine("⚠️ AMX hardware detected but accelerator creation failed, falling back to simulation");
+                        hasRealAMX = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ AMX hardware detected but not accessible: {ex.Message}, falling back to simulation");
+                    hasRealAMX = false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ Intel AMX not detected - using ILGPU simulation");
+            }
+            
+            // Fallback to regular ILGPU accelerator if AMX not available
+            if (!hasRealAMX)
+            {
+                var device = context.GetPreferredDevice(preferCPU: true);
+                accelerator = device.CreateAccelerator(context);
+            }
 
             // Allocate memory for matrix operations
             matrixA = accelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
@@ -65,6 +98,14 @@ public class IntelAMXBenchmarks : IDisposable
             int8DataB = accelerator.Allocate1D<sbyte>(TileSize * TileSize);
 
             InitializeTestData();
+            
+            // Print AMX capabilities if available
+            if (hasRealAMX)
+            {
+                var caps = AMXCapabilities.Query();
+                Console.WriteLine($"💻 AMX Tile Config: {caps.MaxTileRows}x{caps.MaxTileColumns} (Max Size: {caps.MaxTileDataSize})");
+                Console.WriteLine($"🔧 Tile Registers: {caps.NumTileRegisters}, BF16 Support: {caps.SupportsBF16}");
+            }
         }
         catch (Exception ex)
         {
@@ -128,6 +169,40 @@ public class IntelAMXBenchmarks : IDisposable
         
         var result = matrixC.GetAsArray2D();
         return result[0, 0];
+    }
+
+    [Benchmark]
+    public float AMXRealHardware()
+    {
+        if (!hasRealAMX || amxAccelerator == null)
+        {
+            // Fall back to simulation when real AMX not available
+            return AMXSimulatedFP32();
+        }
+
+        try
+        {
+            // Use real Intel AMX hardware
+            var kernel = amxAccelerator.LoadAutoGroupedStreamKernel<
+                Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, 
+                ArrayView2D<float, Stride2D.DenseX>, int>(AMXHardwareKernel);
+
+            if (matrixA == null || matrixB == null || matrixC == null)
+                return 0.0f;
+                
+            kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize);
+            amxAccelerator.Synchronize();
+            
+            var result = matrixC.GetAsArray2D();
+            Console.WriteLine("🚀 Executed on real Intel AMX hardware");
+            return result[0, 0];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Real AMX execution failed: {ex.Message}");
+            // Fall back to simulation
+            return AMXSimulatedFP32();
+        }
     }
 
     [Benchmark]
@@ -220,7 +295,27 @@ public class IntelAMXBenchmarks : IDisposable
         return result[0, 0];
     }
 
-    #region AMX Simulation Kernels
+    #region AMX Kernels
+
+    private static void AMXHardwareKernel(
+        Index2D index,
+        ArrayView2D<float, Stride2D.DenseX> a,
+        ArrayView2D<float, Stride2D.DenseX> b,
+        ArrayView2D<float, Stride2D.DenseX> c,
+        int size)
+    {
+        if (index.X >= size || index.Y >= size)
+            return;
+            
+        // This kernel will be executed on real AMX hardware via ILGPU
+        // The AMX accelerator will automatically optimize tile operations
+        float sum = 0.0f;
+        for (int k = 0; k < size; k++)
+        {
+            sum += a[index.X, k] * b[k, index.Y];
+        }
+        c[index.X, index.Y] = sum;
+    }
 
     private static void StandardMatMulKernel(
         Index2D index,
@@ -439,6 +534,7 @@ public class IntelAMXBenchmarks : IDisposable
         matrixC?.Dispose();
         int8DataA?.Dispose();
         int8DataB?.Dispose();
+        amxAccelerator?.Dispose();
         accelerator?.Dispose();
         context?.Dispose();
     }

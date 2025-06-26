@@ -36,15 +36,13 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Detects and enumerates all available Intel NPU devices.
         /// </summary>
-        /// <param name="registry">The accelerator registry.</param>
-        public static void RegisterDevices(AcceleratorRegistry registry)
+        /// <param name="registry">The device registry.</param>
+        public static void RegisterDevices(DeviceRegistry registry)
         {
             if (!NPUCapabilities.DetectNPU())
                 return;
 
-            registry.Register(
-                Default,
-                device => NPUCapabilities.DetectNPU());
+            registry.Register(Default);
         }
 
         #endregion
@@ -61,7 +59,7 @@ namespace ILGPU.Intel.NPU
 
             var capabilities = NPUCapabilities.Query();
             
-            Name = $"Intel NPU {capabilities.Generation} ({capabilities.MaxTops:F1} TOPS)";
+            Name = $"Intel NPU {capabilities.Generation} ({capabilities.MaxTOPS:F1} TOPS)";
             MemorySize = GC.GetTotalMemory(false); // Use system memory for now
             MaxGridSize = new Index3D(65535, 65535, 65535);
             MaxGroupSize = new Index3D(1024, 1024, 1024);
@@ -71,7 +69,7 @@ namespace ILGPU.Intel.NPU
             WarpSize = 32; // NPU execution unit size
             NumMultiprocessors = capabilities.ComputeUnits;
             MaxNumThreadsPerMultiprocessor = 1024;
-            NumThreads = NumMultiprocessors * MaxNumThreadsPerMultiprocessor;
+            // NumThreads is calculated automatically from NumMultiprocessors * MaxNumThreadsPerMultiprocessor
             Capabilities = new NPUCapabilityContext(capabilities);
         }
 
@@ -126,16 +124,5 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         public NPUCapabilities NPUCapabilities { get; }
 
-        /// <inheritdoc/>
-        public override bool HasAnyVectorType(BasicValueType basicValueType) => true;
-
-        /// <inheritdoc/>
-        public override bool HasAnyVectorType<T>() => true;
-
-        /// <inheritdoc/>
-        public override int GetVectorLength<T>() => 
-            typeof(T) == typeof(float) ? 8 : 
-            typeof(T) == typeof(ushort) ? 16 : 
-            typeof(T) == typeof(byte) ? 32 : 4;
     }
 }

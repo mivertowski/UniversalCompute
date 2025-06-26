@@ -36,8 +36,8 @@ namespace ILGPU.Intel.AMX
         /// <summary>
         /// Detects and enumerates all available AMX devices.
         /// </summary>
-        /// <param name="registry">The accelerator registry.</param>
-        public static void RegisterDevices(AcceleratorRegistry registry)
+        /// <param name="registry">The device registry.</param>
+        public static void RegisterDevices(DeviceRegistry registry)
         {
             if (!AMXCapabilities.IsAMXSupported())
                 return;
@@ -71,7 +71,7 @@ namespace ILGPU.Intel.AMX
             WarpSize = 16; // AMX operates on 16x64 byte tiles
             NumMultiprocessors = Environment.ProcessorCount;
             MaxNumThreadsPerMultiprocessor = 1024;
-            NumThreads = NumMultiprocessors * MaxNumThreadsPerMultiprocessor;
+            // NumThreads is calculated automatically by MaxNumThreads property
             Capabilities = new AMXCapabilityContext(capabilities);
         }
 
@@ -126,16 +126,7 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         public AMXCapabilities AMXCapabilities { get; }
 
-        /// <inheritdoc/>
-        public override bool HasAnyVectorType(BasicValueType basicValueType) => true;
-
-        /// <inheritdoc/>
-        public override bool HasAnyVectorType<T>() => true;
-
-        /// <inheritdoc/>
-        public override int GetVectorLength<T>() => 
-            typeof(T) == typeof(float) ? 16 : 
-            typeof(T) == typeof(ushort) ? 32 : 
-            typeof(T) == typeof(sbyte) ? 64 : 8;
+        // AMX has tile-based matrix operation capabilities
+        // These capabilities are determined by the actual hardware
     }
 }

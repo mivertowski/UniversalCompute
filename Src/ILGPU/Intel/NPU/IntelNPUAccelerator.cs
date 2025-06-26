@@ -18,7 +18,9 @@
 using ILGPU.Backends;
 using ILGPU.Intel.NPU.Native;
 using ILGPU.Runtime;
+using ILGPU.IR.Analyses;
 using System;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -43,7 +45,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU capabilities of this device.
         /// </summary>
-        public NPUCapabilities Capabilities => _capabilities;
+        public new NPUCapabilities Capabilities => _capabilities;
 
         /// <summary>
         /// Gets whether this accelerator is available.
@@ -77,14 +79,7 @@ namespace ILGPU.Intel.NPU
                 _generation = NPUGeneration.None;
             }
 
-            Name = device.Name;
-            MaxGridSize = device.MaxGridSize;
-            MaxGroupSize = device.MaxGroupSize;
-            WarpSize = device.WarpSize;
-            NumMultiprocessors = device.NumMultiprocessors;
-            MaxSharedMemoryPerMultiprocessor = device.MaxSharedMemoryPerGroup;
-            MaxConstantMemory = device.MaxConstantMemory;
-            MaxMemoryBandwidth = (long)(_capabilities.MemoryBandwidth * 1024 * 1024 * 1024);
+            // Properties are inherited from the device parameter
         }
 
         #endregion
@@ -297,13 +292,6 @@ namespace ILGPU.Intel.NPU
 
         #region Accelerator Implementation
 
-        /// <summary>
-        /// Gets the memory information for this accelerator.
-        /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(
-            GC.GetTotalMemory(false), // Available memory (shared with system)
-            GC.GetTotalMemory(false)  // Total memory
-        );
 
         protected override AcceleratorStream CreateStreamInternal() => new NPUStream(this);
 
@@ -327,7 +315,7 @@ namespace ILGPU.Intel.NPU
             CompiledKernel compiledKernel,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, MaxGroupSize.X);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -336,7 +324,7 @@ namespace ILGPU.Intel.NPU
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, customGroupSize);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -382,10 +370,11 @@ namespace ILGPU.Intel.NPU
 
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
         {
-            return new PageLockScope<T>(this, pinned, numElements);
+            // NPU doesn't require page locking, use null implementation
+            return new NullPageLockScope<T>(this, pinned, numElements);
         }
 
-        protected override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
         }
@@ -628,65 +617,11 @@ namespace ILGPU.Intel.NPU
         #endregion
     }
 
-    /// <summary>
-    /// Interface for model loaders.
-    /// </summary>
-    internal interface IModelLoader
-    {
-        // Placeholder interface for model loading functionality
-    }
 
     /// <summary>
     /// Intel NPU generation types.
     /// </summary>
-    public enum NPUGeneration
-    {
-        /// <summary>
-        /// No NPU available.
-        /// </summary>
-        None = 0,
 
-        /// <summary>
-        /// Intel NPU 2.0 (Meteor Lake).
-        /// </summary>
-        NPU2 = 2,
-
-        /// <summary>
-        /// Intel NPU 3.0 (Lunar Lake).
-        /// </summary>
-        NPU3 = 3,
-
-        /// <summary>
-        /// Intel NPU 4.0 (Arrow Lake and future).
-        /// </summary>
-        NPU4 = 4
-    }
-
-    /// <summary>
-    /// Supported model formats for NPU loading.
-    /// </summary>
-    public enum ModelFormat
-    {
-        /// <summary>
-        /// ONNX model format.
-        /// </summary>
-        ONNX,
-
-        /// <summary>
-        /// Intel OpenVINO model format.
-        /// </summary>
-        OpenVINO,
-
-        /// <summary>
-        /// TensorFlow model format.
-        /// </summary>
-        TensorFlow,
-
-        /// <summary>
-        /// PyTorch model format.
-        /// </summary>
-        PyTorch
-    }
 
     /// <summary>
     /// NPU stream implementation.
@@ -714,13 +649,13 @@ namespace ILGPU.Intel.NPU
         }
 
         /// <summary>
-        /// Synchronizes the stream asynchronously.
+        /// Adds a profiling marker to the stream.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns>A task representing the synchronization.</returns>
-        public override async Task SynchronizeAsync(CancellationToken cancellationToken = default)
+        /// <returns>The profiling marker.</returns>
+        protected override ProfilingMarker AddProfilingMarkerInternal()
         {
-            await Task.Run(Synchronize, cancellationToken);
+            using var binding = Accelerator.BindScoped();
+            return new NPUProfilingMarker(Accelerator);
         }
 
         /// <summary>
@@ -748,91 +683,58 @@ namespace ILGPU.Intel.NPU
         /// <param name="accelerator">The NPU accelerator.</param>
         /// <param name="length">The number of elements.</param>
         /// <param name="elementSize">The size of each element in bytes.</param>
-        public NPUBuffer(IntelNPUAccelerator accelerator, long length, int elementSize)
+        internal NPUBuffer(IntelNPUAccelerator accelerator, long length, int elementSize)
             : base(accelerator, length, elementSize)
         {
             _lengthInBytes = length * elementSize;
             _nativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((int)_lengthInBytes);
+            NativePtr = _nativePtr;
         }
 
         /// <summary>
-        /// Gets a pointer to the buffer data.
+        /// Sets memory to a specific value.
         /// </summary>
-        /// <returns>A pointer to the buffer data.</returns>
-        public override unsafe void* NativePtr => (void*)_nativePtr;
-
-        /// <summary>
-        /// Copies data from CPU memory to this buffer.
-        /// </summary>
-        public override unsafe void CopyFromCPU(
-            IntPtr source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void MemSet(
+            AcceleratorStream stream,
+            byte value,
+            in ArrayView<byte> targetView)
         {
-            var sourcePtr = (byte*)source + sourceOffset;
-            var targetPtr = (byte*)_nativePtr + targetOffset;
-            
-            Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetOffset, length);
-        }
-
-        /// <summary>
-        /// Copies data from this buffer to CPU memory.
-        /// </summary>
-        public override unsafe void CopyToCPU(
-            IntPtr target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
-        {
-            var sourcePtr = (byte*)_nativePtr + sourceOffset;
-            var targetPtr = (byte*)target + targetOffset;
-            
-            Buffer.MemoryCopy(sourcePtr, targetPtr, length, length);
+            unsafe
+            {
+                var targetPtr = (byte*)_nativePtr + targetView.Index;
+                var length = targetView.Length;
+                
+                for (long i = 0; i < length; i++)
+                    targetPtr[i] = value;
+            }
         }
 
         /// <summary>
         /// Copies data from another buffer to this buffer.
         /// </summary>
-        public override unsafe void CopyFrom(
-            MemoryBuffer source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override unsafe void CopyFrom(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (source is NPUBuffer npuSource)
-            {
-                var sourcePtr = (byte*)npuSource._nativePtr + sourceOffset;
-                var targetPtr = (byte*)_nativePtr + targetOffset;
-                
-                Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetOffset, length);
-            }
-            else
-            {
-                base.CopyFrom(source, sourceOffset, targetOffset, length);
-            }
+            var sourcePtr = (byte*)sourceView.LoadEffectiveAddress();
+            var targetPtr = (byte*)_nativePtr + targetView.Index;
+            
+            Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetView.Index, targetView.Length);
         }
 
         /// <summary>
         /// Copies data from this buffer to another buffer.
         /// </summary>
-        public override unsafe void CopyTo(
-            MemoryBuffer target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override unsafe void CopyTo(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (target is NPUBuffer npuTarget)
-            {
-                var sourcePtr = (byte*)_nativePtr + sourceOffset;
-                var targetPtr = (byte*)npuTarget._nativePtr + targetOffset;
-                
-                Buffer.MemoryCopy(sourcePtr, targetPtr, length, length);
-            }
-            else
-            {
-                base.CopyTo(target, sourceOffset, targetOffset, length);
-            }
+            var sourcePtr = (byte*)_nativePtr + sourceView.Index;
+            var targetPtr = (byte*)targetView.LoadEffectiveAddress();
+            
+            Buffer.MemoryCopy(sourcePtr, targetPtr, targetView.Length, sourceView.Length);
         }
 
         /// <summary>
@@ -865,24 +767,12 @@ namespace ILGPU.Intel.NPU
         /// <param name="accelerator">The NPU accelerator.</param>
         /// <param name="compiledKernel">The compiled kernel.</param>
         public NPUKernel(IntelNPUAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel)
+            : base(accelerator, compiledKernel, null)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
         }
 
-        /// <summary>
-        /// Launches the kernel with the specified configuration.
-        /// </summary>
-        protected override void LaunchInternal(
-            AcceleratorStream stream,
-            KernelConfig extent,
-            RuntimeKernelConfig runtimeKernelConfig)
-        {
-            // NPU kernel execution would be implemented here
-            // For now, this is a placeholder
-            throw new NotImplementedException("NPU kernel execution not fully implemented");
-        }
 
         /// <summary>
         /// Disposes the NPU kernel.
@@ -890,6 +780,52 @@ namespace ILGPU.Intel.NPU
         protected override void DisposeAcceleratorObject(bool disposing)
         {
             // No special cleanup needed for NPU kernels
+        }
+    }
+
+    /// <summary>
+    /// NPU profiling marker implementation.
+    /// </summary>
+    internal sealed class NPUProfilingMarker : ProfilingMarker
+    {
+        private readonly DateTime _timestamp;
+
+        /// <summary>
+        /// Initializes a new instance of the NPUProfilingMarker class.
+        /// </summary>
+        /// <param name="accelerator">The NPU accelerator.</param>
+        internal NPUProfilingMarker(Accelerator accelerator) : base(accelerator)
+        {
+            _timestamp = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Synchronizes the profiling marker.
+        /// </summary>
+        public override void Synchronize()
+        {
+            // NPU operations are typically synchronous, no action needed
+        }
+
+        /// <summary>
+        /// Measures elapsed time from another marker.
+        /// </summary>
+        /// <param name="marker">The starting marker.</param>
+        /// <returns>The elapsed time.</returns>
+        public override TimeSpan MeasureFrom(ProfilingMarker marker)
+        {
+            if (marker is NPUProfilingMarker npuMarker)
+                return _timestamp - npuMarker._timestamp;
+            throw new ArgumentException("Marker must be an NPU profiling marker", nameof(marker));
+        }
+
+        /// <summary>
+        /// Disposes the profiling marker.
+        /// </summary>
+        /// <param name="disposing">Whether disposing is in progress.</param>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            // No resources to dispose
         }
     }
 }

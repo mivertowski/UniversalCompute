@@ -23,6 +23,14 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <LangVersion>11.0</LangVersion>
   </PropertyGroup>
+
+  <!-- Native AOT Support -->
+  <PropertyGroup Condition="'$(PublishAot)' == 'true'">
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <LangVersion>12.0</LangVersion>
   </PropertyGroup>
@@ -46,7 +54,7 @@
     <EnablePackageValidation>false</EnablePackageValidation>
     <PackageValidationBaselineVersion>$(LibraryPackageValidationBaselineVersion)</PackageValidationBaselineVersion>
     <SignAssembly>False</SignAssembly>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild Condition="'$(PublishAot)' != 'true'">True</GeneratePackageOnBuild>
     <PackageId>ILGPU-AOT-UC</PackageId>
     <Title>ILGPU-AOT-UniversalCompute</Title>
     <Authors>Michael Ivertowski</Authors>

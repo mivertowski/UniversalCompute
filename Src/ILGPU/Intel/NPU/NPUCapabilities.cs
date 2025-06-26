@@ -106,7 +106,7 @@ namespace ILGPU.Intel.NPU
         {
             try
             {
-                return NPUNative.IsNPUAvailable();
+                return NPUNative.IsNPUSupported();
             }
             catch
             {
@@ -281,5 +281,67 @@ namespace ILGPU.Intel.NPU
         /// Gets the current power efficiency in TOPS/Watt.
         /// </summary>
         public double PowerEfficiency { get; } = powerEfficiency;
+    }
+
+    /// <summary>
+    /// Intel NPU generations.
+    /// </summary>
+    public enum NPUGeneration
+    {
+        /// <summary>
+        /// No NPU available.
+        /// </summary>
+        None = 0,
+
+        /// <summary>
+        /// Not supported on this platform.
+        /// </summary>
+        NotSupported = -1,
+
+        /// <summary>
+        /// Unknown NPU generation.
+        /// </summary>
+        Unknown = -2,
+
+        /// <summary>
+        /// Second generation NPU (Meteor Lake - Core Ultra).
+        /// </summary>
+        NPU2 = 2,
+
+        /// <summary>
+        /// Third generation NPU (Lunar Lake).
+        /// </summary>
+        NPU3 = 3,
+
+        /// <summary>
+        /// Fourth generation NPU (Arrow Lake and future).
+        /// </summary>
+        NPU4 = 4
+    }
+
+    /// <summary>
+    /// Model formats supported by Intel NPU.
+    /// </summary>
+    public enum ModelFormat
+    {
+        /// <summary>
+        /// ONNX model format.
+        /// </summary>
+        ONNX,
+
+        /// <summary>
+        /// Intel OpenVINO model format.
+        /// </summary>
+        OpenVINO,
+
+        /// <summary>
+        /// TensorFlow model format.
+        /// </summary>
+        TensorFlow,
+
+        /// <summary>
+        /// PyTorch model format.
+        /// </summary>
+        PyTorch
     }
 }

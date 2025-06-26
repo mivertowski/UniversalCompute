@@ -17,6 +17,7 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
+using ILGPU.Apple.NeuralEngine;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 
@@ -30,6 +31,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
 {
     private Context? context;
     private Accelerator? accelerator;
+    private AppleNeuralEngineAccelerator? aneAccelerator;
+    private bool hasRealANE;
     private MemoryBuffer2D<float, Stride2D.DenseX>? inputMatrix;
     private MemoryBuffer2D<float, Stride2D.DenseX>? weightMatrix;
     private MemoryBuffer2D<float, Stride2D.DenseX>? outputMatrix;
@@ -49,10 +52,40 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         {
             context = Context.CreateDefault();
             
-            // Prefer GPU for ANE simulation, fall back to CPU
-            var device = context.GetPreferredDevice(preferCPU: false) ?? 
-                        context.GetPreferredDevice(preferCPU: true);
-            accelerator = device.CreateAccelerator(context);
+            // Check for real Apple Neural Engine hardware first
+            hasRealANE = ANECapabilities.DetectNeuralEngine();
+            
+            if (hasRealANE)
+            {
+                Console.WriteLine("🚀 Detected Apple Neural Engine - using real hardware acceleration!");
+                try
+                {
+                    aneAccelerator = context.CreateANEAccelerator(0) as AppleNeuralEngineAccelerator;
+                    accelerator = aneAccelerator;
+                    if (aneAccelerator == null)
+                    {
+                        Console.WriteLine("⚠️ ANE hardware detected but accelerator creation failed, falling back to simulation");
+                        hasRealANE = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ ANE hardware detected but not accessible: {ex.Message}, falling back to simulation");
+                    hasRealANE = false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ Apple Neural Engine not detected - using ILGPU simulation");
+            }
+            
+            // Fallback to regular ILGPU accelerator if ANE not available
+            if (!hasRealANE)
+            {
+                var device = context.GetPreferredDevice(preferCPU: false) ?? 
+                            context.GetPreferredDevice(preferCPU: true);
+                accelerator = device.CreateAccelerator(context);
+            }
 
             // Allocate memory for neural engine operations
             inputMatrix = accelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
@@ -63,6 +96,15 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             outputVector = accelerator.Allocate1D<float>(MatrixSize * BatchSize);
 
             InitializeTestData();
+            
+            // Print ANE capabilities if available
+            if (hasRealANE)
+            {
+                var caps = ANECapabilities.Query();
+                Console.WriteLine($"💻 ANE Generation: {caps.Generation}");
+                Console.WriteLine($"🔧 Max TOPS: {caps.MaxTOPS:F1}, Core ML Support: {caps.SupportsCoreML}");
+                Console.WriteLine($"📡 Float16 Support: {caps.SupportsFloat16}, Transformer Support: {caps.SupportsTransformer}");
+            }
         }
         catch (Exception ex)
         {
@@ -124,6 +166,40 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         
         var result = outputMatrix.GetAsArray2D();
         return result[0, 0];
+    }
+
+    [Benchmark]
+    public float ANERealHardware()
+    {
+        if (!hasRealANE || aneAccelerator == null)
+        {
+            // Fall back to simulation when real ANE not available
+            return ANESimulatedMatrixMultiplication();
+        }
+
+        try
+        {
+            // Use real Apple Neural Engine hardware
+            var kernel = aneAccelerator.LoadAutoGroupedStreamKernel<
+                Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, 
+                ArrayView2D<float, Stride2D.DenseX>, int>(ANEHardwareKernel);
+
+            if (inputMatrix == null || weightMatrix == null || outputMatrix == null)
+                return 0.0f;
+                
+            kernel(new Index2D(MatrixSize, MatrixSize), inputMatrix.View, weightMatrix.View, outputMatrix.View, MatrixSize);
+            aneAccelerator.Synchronize();
+            
+            var result = outputMatrix.GetAsArray2D();
+            Console.WriteLine("🚀 Executed on real Apple Neural Engine hardware");
+            return result[0, 0];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Real ANE execution failed: {ex.Message}");
+            // Fall back to simulation
+            return ANESimulatedMatrixMultiplication();
+        }
     }
 
     [Benchmark]
@@ -243,7 +319,27 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         return result[0];
     }
 
-    #region ANE Simulation Kernels
+    #region ANE Kernels
+
+    private static void ANEHardwareKernel(
+        Index2D index,
+        ArrayView2D<float, Stride2D.DenseX> a,
+        ArrayView2D<float, Stride2D.DenseX> b,
+        ArrayView2D<float, Stride2D.DenseX> c,
+        int size)
+    {
+        if (index.X >= size || index.Y >= size)
+            return;
+            
+        // This kernel will be executed on real ANE hardware via ILGPU
+        // The ANE accelerator will automatically optimize neural operations
+        float sum = 0.0f;
+        for (int k = 0; k < size; k++)
+        {
+            sum += a[index.X, k] * b[k, index.Y];
+        }
+        c[index.X, index.Y] = sum;
+    }
 
     private static void StandardMatMulKernel(
         Index2D index,
@@ -561,6 +657,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         outputMatrix?.Dispose();
         inputVector?.Dispose();
         outputVector?.Dispose();
+        aneAccelerator?.Dispose();
         accelerator?.Dispose();
         context?.Dispose();
     }

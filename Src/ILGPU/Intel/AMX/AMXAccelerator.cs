@@ -18,7 +18,9 @@
 using ILGPU.Backends;
 using ILGPU.Intel.AMX.Native;
 using ILGPU.Runtime;
+using ILGPU.IR.Analyses;
 using System;
+using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -51,14 +53,7 @@ namespace ILGPU.Intel.AMX
             AMXNative.InitializeAMX();
             ConfigureTiles();
 
-            Name = $"Intel AMX Accelerator ({device.Name})";
-            MaxGridSize = new Index3D(65535, 65535, 65535);
-            MaxGroupSize = new Index3D(1024, 1024, 1024);
-            WarpSize = 16; // AMX operates on 16x64 byte tiles
-            NumMultiprocessors = Environment.ProcessorCount;
-            MaxSharedMemoryPerMultiprocessor = _amxCapabilities.MaxTileBytes;
-            MaxConstantMemory = _amxCapabilities.MaxConfigBytes;
-            MaxMemoryBandwidth = _amxCapabilities.EstimatedBandwidthGBps * 1024 * 1024 * 1024;
+            // Properties are inherited from the device parameter
         }
 
         /// <summary>
@@ -72,13 +67,6 @@ namespace ILGPU.Intel.AMX
         public AMXTileConfiguration TileConfiguration => _tileConfig;
 
 
-        /// <summary>
-        /// Gets the memory information for this accelerator.
-        /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(
-            GC.GetTotalMemory(false), // Available memory (CPU memory)
-            GC.GetTotalMemory(false)  // Total memory
-        );
 
         #region Matrix Operations
 
@@ -174,7 +162,8 @@ namespace ILGPU.Intel.AMX
             CompiledKernel compiledKernel,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, MaxGroupSize.X);
+            var allocaInfo = default(AllocaKindInformation);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -183,7 +172,8 @@ namespace ILGPU.Intel.AMX
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, customGroupSize);
+            var allocaInfo = default(AllocaKindInformation);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -231,10 +221,10 @@ namespace ILGPU.Intel.AMX
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
         {
             // AMX operates on CPU memory, so no special page locking needed
-            return new PageLockScope<T>(this, pinned, numElements);
+            return new NullPageLockScope<T>(this, pinned, numElements);
         }
 
-        protected override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by AMX accelerator");
         }
@@ -364,14 +354,14 @@ namespace ILGPU.Intel.AMX
             System.Threading.Thread.MemoryBarrier();
         }
 
+
         /// <summary>
-        /// Synchronizes the stream asynchronously.
+        /// Adds a profiling marker for AMX operations.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns>A task representing the synchronization.</returns>
-        public override async Task SynchronizeAsync(CancellationToken cancellationToken = default)
+        /// <returns>A profiling marker for timing measurements.</returns>
+        protected override ProfilingMarker AddProfilingMarkerInternal()
         {
-            await Task.Run(Synchronize, cancellationToken);
+            return new AMXProfilingMarker(_accelerator);
         }
 
         /// <summary>
@@ -381,6 +371,52 @@ namespace ILGPU.Intel.AMX
         protected override void DisposeAcceleratorObject(bool disposing)
         {
             // No resources to dispose for AMX streams
+        }
+    }
+
+    /// <summary>
+    /// AMX profiling marker implementation.
+    /// </summary>
+    internal sealed class AMXProfilingMarker : ProfilingMarker
+    {
+        private readonly DateTime _timestamp;
+
+        /// <summary>
+        /// Initializes a new instance of the AMXProfilingMarker class.
+        /// </summary>
+        /// <param name="accelerator">The AMX accelerator.</param>
+        internal AMXProfilingMarker(Accelerator accelerator) : base(accelerator)
+        {
+            _timestamp = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Synchronizes the profiling marker.
+        /// </summary>
+        public override void Synchronize()
+        {
+            // AMX operations are typically synchronous, no action needed
+        }
+
+        /// <summary>
+        /// Measures elapsed time from another marker.
+        /// </summary>
+        /// <param name="marker">The starting marker.</param>
+        /// <returns>The elapsed time.</returns>
+        public override TimeSpan MeasureFrom(ProfilingMarker marker)
+        {
+            if (marker is AMXProfilingMarker amxMarker)
+                return _timestamp - amxMarker._timestamp;
+            throw new ArgumentException("Marker must be an AMX profiling marker", nameof(marker));
+        }
+
+        /// <summary>
+        /// Disposes the profiling marker.
+        /// </summary>
+        /// <param name="disposing">Whether disposing is in progress.</param>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            // No resources to dispose
         }
     }
 }

@@ -280,14 +280,12 @@ namespace ILGPU.Intel.NPU
 
         private void ApplyQuantization(AppleNeuralNetwork model, OptimizationOptions options)
         {
-            if (!options.EnableQuantization) return;
-
             // Apply quantization based on NPU capabilities
-            if (_capabilities.SupportsInt8 && options.QuantizationMode == QuantizationMode.INT8)
+            if (_capabilities.SupportsInt8)
             {
                 // Apply INT8 quantization
             }
-            else if (_capabilities.SupportsBF16 && options.QuantizationMode == QuantizationMode.BFloat16)
+            else if (_capabilities.SupportsBF16)
             {
                 // Apply BFloat16 quantization
             }
@@ -295,8 +293,6 @@ namespace ILGPU.Intel.NPU
 
         private void ApplyKernelFusion(AppleNeuralNetwork model, OptimizationOptions options)
         {
-            if (!options.EnableKernelFusion) return;
-
             // Fuse operations for NPU efficiency
         }
 

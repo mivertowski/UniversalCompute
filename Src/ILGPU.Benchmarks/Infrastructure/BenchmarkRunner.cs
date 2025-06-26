@@ -225,21 +225,25 @@ public class BenchmarkRunner
             {
                 var task = ctx.AddTask("[magenta]Running specialized hardware benchmarks...[/]", maxValue: 100);
 
+                task.Description = "[magenta]Hardware Accelerator Comparison (ILGPU)[/]";
+                BenchmarkDotNet.Running.BenchmarkRunner.Run<HardwareAcceleratorComparison>(config.StandardConfig);
+                task.Increment(20);
+
                 task.Description = "[magenta]Intel NPU Operations[/]";
                 BenchmarkDotNet.Running.BenchmarkRunner.Run<IntelNPUBenchmarks>(config.StandardConfig);
-                task.Increment(25);
+                task.Increment(20);
 
                 task.Description = "[magenta]Intel AMX Matrix Operations[/]";
                 BenchmarkDotNet.Running.BenchmarkRunner.Run<IntelAMXBenchmarks>(config.StandardConfig);
-                task.Increment(25);
+                task.Increment(20);
 
                 task.Description = "[magenta]Apple Neural Engine Operations[/]";
                 BenchmarkDotNet.Running.BenchmarkRunner.Run<AppleNeuralEngineBenchmarks>(config.StandardConfig);
-                task.Increment(25);
+                task.Increment(20);
 
                 task.Description = "[magenta]GPU-Only Performance[/]";
                 BenchmarkDotNet.Running.BenchmarkRunner.Run<GpuOnlyBenchmarks>(config.StandardConfig);
-                task.Increment(25);
+                task.Increment(20);
 
                 task.Description = "[magenta]Specialized hardware benchmarks completed![/]";
                 await Task.Delay(500);

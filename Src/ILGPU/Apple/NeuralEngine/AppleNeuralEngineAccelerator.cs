@@ -17,7 +17,9 @@
 
 using ILGPU.Backends;
 using ILGPU.Runtime;
+using ILGPU.IR.Analyses;
 using System;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace ILGPU.Apple.NeuralEngine
@@ -44,14 +46,7 @@ namespace ILGPU.Apple.NeuralEngine
             _neuralEngine = new AppleNeuralEngine(null);
             _capabilities = _neuralEngine.Capabilities;
             
-            Name = device.Name;
-            MaxGridSize = device.MaxGridSize;
-            MaxGroupSize = device.MaxGroupSize;
-            WarpSize = device.WarpSize;
-            NumMultiprocessors = device.NumMultiprocessors;
-            MaxSharedMemoryPerMultiprocessor = device.MaxSharedMemoryPerGroup;
-            MaxConstantMemory = device.MaxConstantMemory;
-            MaxMemoryBandwidth = 1024L * 1024 * 1024 * 200; // 200 GB/s estimate
+            // Properties are inherited from the device parameter
         }
 
         /// <summary>
@@ -59,13 +54,6 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         public ANECapabilities ANECapabilities => _capabilities;
 
-        /// <summary>
-        /// Gets the memory information for this accelerator.
-        /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(
-            GC.GetTotalMemory(false), // Available memory (shared with system)
-            GC.GetTotalMemory(false)  // Total memory
-        );
 
         #region Accelerator Implementation
 
@@ -91,7 +79,8 @@ namespace ILGPU.Apple.NeuralEngine
             CompiledKernel compiledKernel,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, MaxGroupSize.X);
+            var allocaInfo = default(AllocaKindInformation);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -100,7 +89,8 @@ namespace ILGPU.Apple.NeuralEngine
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, customGroupSize);
+            var allocaInfo = default(AllocaKindInformation);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -146,10 +136,10 @@ namespace ILGPU.Apple.NeuralEngine
 
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
         {
-            return new PageLockScope<T>(this, pinned, numElements);
+            return new NullPageLockScope<T>(this, pinned, numElements);
         }
 
-        protected override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by ANE accelerator");
         }
@@ -204,14 +194,14 @@ namespace ILGPU.Apple.NeuralEngine
             System.Threading.Thread.MemoryBarrier();
         }
 
+
         /// <summary>
-        /// Synchronizes the stream asynchronously.
+        /// Adds a profiling marker for ANE operations.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token.</param>
-        /// <returns>A task representing the synchronization.</returns>
-        public override async Task SynchronizeAsync(System.Threading.CancellationToken cancellationToken = default)
+        /// <returns>A profiling marker for timing measurements.</returns>
+        protected override ProfilingMarker AddProfilingMarkerInternal()
         {
-            await Task.Run(Synchronize, cancellationToken);
+            return new ANEProfilingMarker(_accelerator);
         }
 
         /// <summary>
@@ -239,91 +229,59 @@ namespace ILGPU.Apple.NeuralEngine
         /// <param name="accelerator">The ANE accelerator.</param>
         /// <param name="length">The number of elements.</param>
         /// <param name="elementSize">The size of each element in bytes.</param>
-        public ANEBuffer(AppleNeuralEngineAccelerator accelerator, long length, int elementSize)
+        internal ANEBuffer(AppleNeuralEngineAccelerator accelerator, long length, int elementSize)
             : base(accelerator, length, elementSize)
         {
             _lengthInBytes = length * elementSize;
             _nativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((int)_lengthInBytes);
+            NativePtr = _nativePtr;
         }
 
-        /// <summary>
-        /// Gets a pointer to the buffer data.
-        /// </summary>
-        /// <returns>A pointer to the buffer data.</returns>
-        public override unsafe void* NativePtr => (void*)_nativePtr;
 
         /// <summary>
-        /// Copies data from CPU memory to this buffer.
+        /// Sets memory to a specific value.
         /// </summary>
-        public override unsafe void CopyFromCPU(
-            IntPtr source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void MemSet(
+            AcceleratorStream stream,
+            byte value,
+            in ArrayView<byte> targetView)
         {
-            var sourcePtr = (byte*)source + sourceOffset;
-            var targetPtr = (byte*)_nativePtr + targetOffset;
-            
-            Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetOffset, length);
-        }
-
-        /// <summary>
-        /// Copies data from this buffer to CPU memory.
-        /// </summary>
-        public override unsafe void CopyToCPU(
-            IntPtr target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
-        {
-            var sourcePtr = (byte*)_nativePtr + sourceOffset;
-            var targetPtr = (byte*)target + targetOffset;
-            
-            Buffer.MemoryCopy(sourcePtr, targetPtr, length, length);
+            unsafe
+            {
+                var targetPtr = (byte*)_nativePtr + targetView.Index;
+                var length = targetView.Length;
+                
+                for (long i = 0; i < length; i++)
+                    targetPtr[i] = value;
+            }
         }
 
         /// <summary>
         /// Copies data from another buffer to this buffer.
         /// </summary>
-        public override unsafe void CopyFrom(
-            MemoryBuffer source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override unsafe void CopyFrom(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (source is ANEBuffer aneSource)
-            {
-                var sourcePtr = (byte*)aneSource._nativePtr + sourceOffset;
-                var targetPtr = (byte*)_nativePtr + targetOffset;
-                
-                Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetOffset, length);
-            }
-            else
-            {
-                base.CopyFrom(source, sourceOffset, targetOffset, length);
-            }
+            var sourcePtr = (byte*)sourceView.LoadEffectiveAddress();
+            var targetPtr = (byte*)_nativePtr + targetView.Index;
+            
+            Buffer.MemoryCopy(sourcePtr, targetPtr, _lengthInBytes - targetView.Index, targetView.Length);
         }
 
         /// <summary>
         /// Copies data from this buffer to another buffer.
         /// </summary>
-        public override unsafe void CopyTo(
-            MemoryBuffer target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override unsafe void CopyTo(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (target is ANEBuffer aneTarget)
-            {
-                var sourcePtr = (byte*)_nativePtr + sourceOffset;
-                var targetPtr = (byte*)aneTarget._nativePtr + targetOffset;
-                
-                Buffer.MemoryCopy(sourcePtr, targetPtr, length, length);
-            }
-            else
-            {
-                base.CopyTo(target, sourceOffset, targetOffset, length);
-            }
+            var sourcePtr = (byte*)_nativePtr + sourceView.Index;
+            var targetPtr = (byte*)targetView.LoadEffectiveAddress();
+            
+            Buffer.MemoryCopy(sourcePtr, targetPtr, targetView.Length, sourceView.Length);
         }
 
         /// <summary>
@@ -356,24 +314,12 @@ namespace ILGPU.Apple.NeuralEngine
         /// <param name="accelerator">The ANE accelerator.</param>
         /// <param name="compiledKernel">The compiled kernel.</param>
         public ANEKernel(AppleNeuralEngineAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel)
+            : base(accelerator, compiledKernel, null)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
         }
 
-        /// <summary>
-        /// Launches the kernel with the specified configuration.
-        /// </summary>
-        protected override void LaunchInternal(
-            AcceleratorStream stream,
-            KernelConfig extent,
-            RuntimeKernelConfig runtimeKernelConfig)
-        {
-            // ANE kernel execution would be implemented here
-            // For now, this is a placeholder
-            throw new NotImplementedException("ANE kernel execution not fully implemented");
-        }
 
         /// <summary>
         /// Disposes the ANE kernel.
@@ -381,6 +327,52 @@ namespace ILGPU.Apple.NeuralEngine
         protected override void DisposeAcceleratorObject(bool disposing)
         {
             // No special cleanup needed for ANE kernels
+        }
+    }
+
+    /// <summary>
+    /// ANE profiling marker implementation.
+    /// </summary>
+    internal sealed class ANEProfilingMarker : ProfilingMarker
+    {
+        private readonly DateTime _timestamp;
+
+        /// <summary>
+        /// Initializes a new instance of the ANEProfilingMarker class.
+        /// </summary>
+        /// <param name="accelerator">The ANE accelerator.</param>
+        internal ANEProfilingMarker(Accelerator accelerator) : base(accelerator)
+        {
+            _timestamp = DateTime.UtcNow;
+        }
+
+        /// <summary>
+        /// Synchronizes the profiling marker.
+        /// </summary>
+        public override void Synchronize()
+        {
+            // ANE operations are typically synchronous, no action needed
+        }
+
+        /// <summary>
+        /// Measures elapsed time from another marker.
+        /// </summary>
+        /// <param name="marker">The starting marker.</param>
+        /// <returns>The elapsed time.</returns>
+        public override TimeSpan MeasureFrom(ProfilingMarker marker)
+        {
+            if (marker is ANEProfilingMarker aneMarker)
+                return _timestamp - aneMarker._timestamp;
+            throw new ArgumentException("Marker must be an ANE profiling marker", nameof(marker));
+        }
+
+        /// <summary>
+        /// Disposes the profiling marker.
+        /// </summary>
+        /// <param name="disposing">Whether disposing is in progress.</param>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            // No resources to dispose
         }
     }
 }
