@@ -79,8 +79,8 @@ namespace ILGPU.Frontend
             {
                 convertFlags = ConvertFlags.SourceUnsigned;
             }
-            right = CreateConversion(right, left.Type, convertFlags);
-            left = CreateConversion(left, right.Type, convertFlags);
+            right = CreateConversion(right, left.Type!, convertFlags);
+            left = CreateConversion(left, right.Type!, convertFlags);
             Location.Assert(left.BasicValueType == right.BasicValueType);
             return Builder.CreateCompare(
                 Location,

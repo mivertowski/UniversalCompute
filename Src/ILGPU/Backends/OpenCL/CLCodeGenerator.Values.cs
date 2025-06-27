@@ -684,7 +684,7 @@ namespace ILGPU.Backends.OpenCL
                 statement.OpenParen();
             }
 
-            statement.AppendCast(dynamicView.ArrayLength.Type);
+            statement.AppendCast(dynamicView.ArrayLength.Type!);
             statement.AppendCommand(lengthVariableName);
 
             if (!isFunction)

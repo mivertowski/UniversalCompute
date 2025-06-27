@@ -158,7 +158,7 @@ namespace ILGPU.Frontend.Intrinsic
             // Valid all argument types
             foreach (var arg in arguments)
             {
-                if (arg.Type.IsPointerType || arg.BasicValueType != BasicValueType.None)
+                if (arg.Type!.IsPointerType || arg.BasicValueType != BasicValueType.None)
                     continue;
                 throw location.GetNotSupportedException(
                     ErrorMessages.NotSupportedWriteFormatArgumentType,

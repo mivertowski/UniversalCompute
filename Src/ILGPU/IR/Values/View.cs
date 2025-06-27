@@ -73,7 +73,7 @@ namespace ILGPU.IR.Values
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer)
         {
-            var type = Pointer.Type.As<PointerType>(Location);
+            var type = Pointer.Type!.As<PointerType>(Location);
             return initializer.Context.CreateViewType(
                 type.ElementType,
                 type.AddressSpace);

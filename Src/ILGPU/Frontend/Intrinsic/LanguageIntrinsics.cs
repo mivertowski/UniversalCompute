@@ -165,7 +165,7 @@ namespace ILGPU.Frontend.Intrinsic
                 throw location.GetNotSupportedException(
                     ErrorMessages.NotSupportedInlinePTXFormatArgumentType,
                     ptxExpression,
-                    arg.Type.ToString());
+                    arg.Type!.ToString());
             }
 
             // Create the language statement

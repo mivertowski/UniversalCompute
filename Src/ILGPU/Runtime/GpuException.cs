@@ -276,7 +276,7 @@ namespace ILGPU.Runtime
             KernelName = kernelName ?? "Unknown";
             LaunchConfig = launchConfig;
             Context["KernelName"] = KernelName;
-            Context["LaunchConfig"] = launchConfig.ToString();
+            Context["LaunchConfig"] = launchConfig.ToString()!;
         }
 
         /// <summary>

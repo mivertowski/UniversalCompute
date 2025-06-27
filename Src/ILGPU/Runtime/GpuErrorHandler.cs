@@ -243,7 +243,7 @@ namespace ILGPU.Runtime
             Exception? innerException = null)
         {
             var deviceInfo = accelerator != null ? DeviceErrorInfo.FromAccelerator(accelerator) : DeviceErrorInfo.Unknown;
-            return new GpuException(message, errorCode, deviceInfo, innerException);
+            return new GpuException(message, errorCode, deviceInfo, innerException!);
         }
 
         /// <summary>

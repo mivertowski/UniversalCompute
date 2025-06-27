@@ -140,7 +140,7 @@ namespace ILGPU.Runtime.LINQ
                             System.Linq.Expressions.Expression.Invoke(
                                 System.Linq.Expressions.Expression.Constant(predicate),
                                 parameter),
-                            parameter)))) as IGPUQueryable<T>;
+                            parameter)))) as IGPUQueryable<T> ?? throw new InvalidOperationException("Failed to create GPU queryable");
         }
 
         /// <summary>

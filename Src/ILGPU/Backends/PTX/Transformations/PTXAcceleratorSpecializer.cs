@@ -189,7 +189,7 @@ namespace ILGPU.Backends.PTX.Transformations
             // Create local alloca to store all data
             var alloca = builder.CreateAlloca(
                 location,
-                argumentStructure.Type,
+                argumentStructure.Type!,
                 MemoryAddressSpace.Local);
 
             // Store structure into chunk of local memory

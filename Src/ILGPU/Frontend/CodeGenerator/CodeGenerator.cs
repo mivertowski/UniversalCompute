@@ -503,7 +503,7 @@ namespace ILGPU.Frontend
             TypeNode type,
             ConvertFlags flags)
         {
-            if (type == null || !address.Type.IsPointerType)
+            if (type == null || !address.Type!.IsPointerType)
             {
                 throw CompilationStackLocation.Append(Location)
                     .GetInvalidOperationException();
@@ -525,7 +525,7 @@ namespace ILGPU.Frontend
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void CreateStore(Value address, Value value)
         {
-            if (!address.Type.IsPointerType)
+            if (!address.Type!.IsPointerType)
             {
                 throw CompilationStackLocation.Append(Location)
                     .GetInvalidOperationException();
@@ -533,7 +533,7 @@ namespace ILGPU.Frontend
 
             address = CreateConversion(
                 address,
-                Builder.CreatePointerType(value.Type, MemoryAddressSpace.Generic),
+                Builder.CreatePointerType(value.Type!, MemoryAddressSpace.Generic),
                 ConvertFlags.None);
             Builder.CreateStore(Location, address, value);
         }

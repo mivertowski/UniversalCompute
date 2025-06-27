@@ -115,10 +115,10 @@ namespace ILGPU.IR.Rewriting
             }
             else
             {
-                var structureType = (StructureType)source.Type;
+                var structureType = (StructureType)source.Type!;
                 return AssembleStructure(
                     context,
-                    structureType,
+                    structureType!,
                     source,
                     (ctx, _, access) =>
                     {
