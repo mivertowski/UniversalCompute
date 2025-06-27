@@ -485,7 +485,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets or sets the reason for the suggestion.
         /// </summary>
-        public string Reason { get; set; }
+        public required string Reason { get; set; }
     }
 
     /// <summary>
