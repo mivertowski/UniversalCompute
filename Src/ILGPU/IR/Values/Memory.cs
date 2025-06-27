@@ -289,7 +289,7 @@ namespace ILGPU.IR.Values
         /// Returns the source address space this load reads from.
         /// </summary>
         public MemoryAddressSpace SourceAddressSpace =>
-            Source.Type.As<AddressSpaceType>(this).AddressSpace;
+            Source.Type!.As<AddressSpaceType>(this).AddressSpace;
 
         #endregion
 
@@ -365,7 +365,7 @@ namespace ILGPU.IR.Values
         /// Returns the target address space this store writes to.
         /// </summary>
         public MemoryAddressSpace TargetAddressSpace =>
-            Target.Type.As<AddressSpaceType>(this).AddressSpace;
+            Target.Type!.As<AddressSpaceType>(this).AddressSpace;
 
         /// <summary>
         /// Returns the value to store.

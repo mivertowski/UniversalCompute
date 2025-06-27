@@ -648,17 +648,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the model ID.
         /// </summary>
-        public string ModelId { get; set; }
+        public required string ModelId { get; set; }
 
         /// <summary>
         /// Gets or sets the compiled bytecode.
         /// </summary>
-        public byte[] CompiledBytecode { get; set; }
+        public required byte[] CompiledBytecode { get; set; }
 
         /// <summary>
         /// Gets or sets the target device.
         /// </summary>
-        public string TargetDevice { get; set; }
+        public required string TargetDevice { get; set; }
 
         /// <summary>
         /// Gets or sets compilation metadata.
@@ -668,7 +668,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the compute graph.
         /// </summary>
-        public ComputeGraph ComputeGraph { get; set; }
+        public required ComputeGraph ComputeGraph { get; set; }
 
         /// <summary>
         /// Gets or sets the input names.
@@ -690,12 +690,15 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the CompiledModel class.
         /// </summary>
+        [SetsRequiredMembers]
         public CompiledModel(string modelPath, ComputeGraph graph, List<string> inputNames, List<string> outputNames)
         {
             ModelId = modelPath;
             ComputeGraph = graph;
             InputNames = inputNames;
             OutputNames = outputNames;
+            CompiledBytecode = [];
+            TargetDevice = "GPU";
         }
 
         /// <summary>
@@ -712,7 +715,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the plan ID.
         /// </summary>
-        public string PlanId { get; set; }
+        public required string PlanId { get; set; }
 
         /// <summary>
         /// Gets or sets the execution steps.
@@ -739,6 +742,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the CompiledExecutionPlan class.
         /// </summary>
+        [SetsRequiredMembers]
         public CompiledExecutionPlan(ExecutionPlan executionPlan, Dictionary<ComputeNode, CompiledKernel> compiledKernels, List<string> inputNames, List<string> outputNames)
         {
             PlanId = Guid.NewGuid().ToString();
@@ -755,17 +759,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the step name.
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the operation type.
         /// </summary>
-        public string OperationType { get; set; }
+        public required string OperationType { get; set; }
 
         /// <summary>
         /// Gets or sets the target device.
         /// </summary>
-        public string TargetDevice { get; set; }
+        public required string TargetDevice { get; set; }
     }
 
     /// <summary>

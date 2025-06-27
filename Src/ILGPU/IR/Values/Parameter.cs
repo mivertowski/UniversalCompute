@@ -110,7 +110,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ToArgString"/>
         protected override string ToArgString() =>
-            Type.ToString() + " @ " + Method.ToReferenceString();
+            Type!.ToString() + " @ " + Method.ToReferenceString();
 
         /// <summary>
         /// Return the parameter string.
