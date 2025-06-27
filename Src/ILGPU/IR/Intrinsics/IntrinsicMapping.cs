@@ -85,7 +85,7 @@ namespace ILGPU.IR.Intrinsics
 
             /// <summary cref="IGenericArgumentResolver.ResolveGenericArguments"/>
             public Type[] ResolveGenericArguments() =>
-                [Value.Type.LoadManagedType()];
+                [Value.Type!.LoadManagedType()];
         }
 
         /// <summary>

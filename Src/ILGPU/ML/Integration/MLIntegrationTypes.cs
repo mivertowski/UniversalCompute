@@ -777,12 +777,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the compiled code.
         /// </summary>
-        public byte[] CompiledCode { get; set; }
+        public required byte[] CompiledCode { get; set; }
 
         /// <summary>
         /// Gets or sets the entry point.
         /// </summary>
-        public string EntryPoint { get; set; }
+        public required string EntryPoint { get; set; }
 
         /// <summary>
         /// Gets or sets kernel parameters.

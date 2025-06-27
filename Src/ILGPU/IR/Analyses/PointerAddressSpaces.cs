@@ -487,7 +487,7 @@ namespace ILGPU.IR.Analyses
         /// Creates initial analysis data.
         /// </summary>
         protected override AnalysisValue<AddressSpaceInfo> CreateData(Value node) =>
-            CreateValue(GetInitialInfo(node), node.Type);
+            CreateValue(GetInitialInfo(node), node.Type!);
 
         /// <summary>
         /// Returns the unified address-space flags.

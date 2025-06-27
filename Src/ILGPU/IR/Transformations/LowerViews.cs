@@ -89,11 +89,11 @@ namespace ILGPU.IR.Transformations
                 leaConverter);
             rewriter.Add(
                 (converter, value) => value.IsViewOperation &&
-                    Register(converter, value, value.Source.Type),
+                    Register(converter, value, value.Source.Type!),
                 alignToConverter);
             rewriter.Add(
                 (converter, value) => value.IsViewOperation &&
-                    Register(converter, value, value.Source.Type),
+                    Register(converter, value, value.Source.Type!),
                 asAlignedConverter);
         }
 

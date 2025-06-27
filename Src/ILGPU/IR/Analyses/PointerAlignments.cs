@@ -282,7 +282,7 @@ namespace ILGPU.IR.Analyses
                 node is Alloca alloca
                     ? allocaAlignments.ComputeAllocaAlignment(alloca)
                     : GetInitialAlignment(node),
-                node.Type);
+                node.Type!);
 
         /// <summary>
         /// Returns the minimum of the first and the second value.
@@ -322,7 +322,7 @@ namespace ILGPU.IR.Analyses
             // constant could not be properly resolved at compile time
             return CreateValue(
                 Math.Max(baseAlignment, newAlignment),
-                align.Type);
+                align.Type!);
         }
 
         /// <summary>
@@ -344,7 +344,7 @@ namespace ILGPU.IR.Analyses
             // is required to check for non-properly aligned fields.
             return CreateValue(
                 Math.Min(baseAlignment, fieldAlignment),
-                lfa.Type);
+                lfa.Type!);
         }
 
         /// <summary>

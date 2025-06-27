@@ -349,7 +349,7 @@ namespace ILGPU.IR.Construction
                         // Setup debug information for the current value
                         var phiBuilder = newBlock.CreatePhi(
                             value.Location,
-                            phiValue.Type);
+                            phiValue.Type!);
 
                         phiMapping.Add((phiValue, phiBuilder));
                         Map(phiValue, phiBuilder.PhiValue);

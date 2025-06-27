@@ -783,9 +783,9 @@ namespace ILGPU.IR.Values
                 get => builder[access.Index];
                 set
                 {
-                    Location.Assert(!value.Type.IsStructureType);
+                    Location.Assert(!value.Type!.IsStructureType);
                     Location.Assert(
-                        value.Type == Parent[access.Index] ||
+                        value.Type! == Parent[access.Index] ||
                         value.ResolveAs<UndefinedValue>() != null);
 
                     builder[access.Index] = value;
@@ -810,7 +810,7 @@ namespace ILGPU.IR.Values
             {
                 Location.AssertNotNull(value);
                 Location.Assert(
-                    !value.Type.IsStructureType &&
+                    !value.Type!.IsStructureType &&
                     Count + 1 <= Parent.NumFields);
                 Location.Assert(
                     value.Type == Parent[Count] ||
@@ -924,7 +924,7 @@ namespace ILGPU.IR.Values
             public void Add(Value value)
             {
                 Location.AssertNotNull(value);
-                Location.Assert(!value.Type.IsStructureType);
+                Location.Assert(!value.Type!.IsStructureType);
 
                 builder.Add(value);
             }
@@ -945,7 +945,7 @@ namespace ILGPU.IR.Values
                 // Create a new structure type that corresponds to all value types
                 var typeBuilder = IRBuilder.CreateStructureType(Count);
                 foreach (var value in builder)
-                    typeBuilder.Add(value.Type);
+                    typeBuilder.Add(value.Type!);
                 builder.MoveTo(ref values);
                 return typeBuilder.Seal().As<StructureType>(Location);
             }
@@ -1213,7 +1213,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            ObjectValue.Type;
+            ObjectValue.Type!;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(
