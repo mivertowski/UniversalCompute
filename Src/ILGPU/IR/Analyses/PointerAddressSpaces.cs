@@ -384,7 +384,7 @@ namespace ILGPU.IR.Analyses
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private AddressSpaceInfo GetInitialAddressSpace(Value value) =>
                 value is Parameter parameter &&
-                parameter.Type.HasFlags(TypeFlags.AddressSpaceDependent)
+                parameter.Type!.HasFlags(TypeFlags.AddressSpaceDependent)
                 ? AddressSpace
                 : default(AddressSpaceInfo);
 
@@ -393,7 +393,7 @@ namespace ILGPU.IR.Analyses
             /// in the case of a parameter.
             /// </summary>
             public readonly AnalysisValue<AddressSpaceInfo> this[Value value] =>
-                AnalysisValue.Create(GetInitialAddressSpace(value), value.Type);
+                AnalysisValue.Create(GetInitialAddressSpace(value), value.Type!);
         }
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace ILGPU.IR.Analyses
             /// parameter.
             /// </summary>
             public readonly AnalysisValue<AddressSpaceInfo> this[Value value] =>
-                AddressSpaceInfo.AnalysisValueFromType(value.Type);
+                AddressSpaceInfo.AnalysisValueFromType(value.Type!);
         }
 
         #endregion

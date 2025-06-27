@@ -106,7 +106,7 @@ namespace ILGPU.IR.Construction
             {
                 throw location.GetNotSupportedException(
                     ErrorMessages.NotSupportedConversion,
-                    node.Type,
+                    node.Type!,
                     targetType);
             }
 
@@ -379,7 +379,7 @@ namespace ILGPU.IR.Construction
                     default:
                         throw location.GetNotSupportedException(
                             ErrorMessages.NotSupportedConversion,
-                            value.Type,
+                            value.Type!,
                             targetType);
                 }
             }

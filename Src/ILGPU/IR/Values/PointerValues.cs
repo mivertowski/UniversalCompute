@@ -183,12 +183,12 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns true if the current access works on a view.
         /// </summary>
-        public bool IsViewAccess => Source.Type.IsViewType;
+        public bool IsViewAccess => Source.Type!.IsViewType;
 
         /// <summary>
         /// Returns true if the current access works on a pointer.
         /// </summary>
-        public bool IsPointerAccess => Source.Type.IsPointerType;
+        public bool IsPointerAccess => Source.Type!.IsPointerType;
 
         /// <summary>
         /// Returns true if this access targets the first element.
@@ -206,7 +206,7 @@ namespace ILGPU.IR.Values
             Location.AssertNotNull(sourceType);
 
             return sourceType is PointerType
-                ? Source.Type
+                ? Source.Type!
                 : initializer.Context.CreatePointerType(
                     sourceType.ElementType,
                     sourceType.AddressSpace);
@@ -270,7 +270,7 @@ namespace ILGPU.IR.Values
             internal Builder(IRBuilder irBuilder, Location location, Value arrayValue)
             {
                 // Allocate number of dimensions + 1, to store the array value
-                var arrayType = arrayValue.Type.As<ArrayType>(location);
+                var arrayType = arrayValue.Type!.As<ArrayType>(location);
                 builder = ValueList.Create(arrayType.NumDimensions + 1);
                 builder.Add(arrayValue);
 
@@ -301,7 +301,7 @@ namespace ILGPU.IR.Values
             /// Returns the array type.
             /// </summary>
             public readonly ArrayType ArrayType =>
-                ArrayValue.Type.As<ArrayType>(Location);
+                ArrayValue.Type!.As<ArrayType>(Location);
 
             /// <summary>
             /// The number of dimensions.

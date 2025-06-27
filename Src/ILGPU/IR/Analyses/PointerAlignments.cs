@@ -375,7 +375,7 @@ namespace ILGPU.IR.Analyses
             // is required to check for non-properly aligned accesses.
             return CreateValue(
                 Math.Min(baseAlignment, typeAlignment),
-                lea.Type);
+                lea.Type!);
         }
 
         /// <summary>

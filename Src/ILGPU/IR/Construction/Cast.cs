@@ -137,7 +137,7 @@ namespace ILGPU.IR.Construction
             Value node,
             TypeNode targetElementType)
         {
-            var type = node.Type.As<ViewType>(location);
+            var type = node.Type!.As<ViewType>(location);
 
             return type.ElementType == targetElementType
                 ? (ValueReference)node
@@ -168,7 +168,7 @@ namespace ILGPU.IR.Construction
             Location location,
             Value node)
         {
-            var primitiveType = node.Type.As<PrimitiveType>(location);
+            var primitiveType = node.Type!.As<PrimitiveType>(location);
             if (node is PrimitiveValue primitive)
             {
                 return primitiveType.BasicValueType switch
@@ -214,7 +214,7 @@ namespace ILGPU.IR.Construction
             Location location,
             Value node)
         {
-            var primitiveType = node.Type.As<PrimitiveType>(location);
+            var primitiveType = node.Type!.As<PrimitiveType>(location);
             if (node is PrimitiveValue primitive)
             {
                 return primitiveType.BasicValueType switch

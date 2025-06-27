@@ -49,12 +49,12 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns true if the current operation works on a view.
         /// </summary>
-        public bool IsViewOperation => Source.Type.IsViewType;
+        public bool IsViewOperation => Source.Type!.IsViewType;
 
         /// <summary>
         /// Returns true if the current operation works on a pointer.
         /// </summary>
-        public bool IsPointerOperation => Source.Type.IsPointerType;
+        public bool IsPointerOperation => Source.Type!.IsPointerType;
 
         #endregion
 
@@ -128,7 +128,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// The structure type.
         /// </summary>
-        public StructureType StructureType => Type.As<StructureType>(this);
+        public StructureType StructureType => Type!.As<StructureType>(this);
 
         /// <summary cref="Value.ValueKind"/>
         public override ValueKind ValueKind => ValueKind.AlignTo;
@@ -146,8 +146,8 @@ namespace ILGPU.IR.Values
                 // The return type will be a structure type on an unaligned prefix part
                 // and an aligned main view part
                 var builder = context.CreateStructureType(2);
-                builder.Add(Source.Type);
-                builder.Add(Source.Type);
+                builder.Add(Source.Type!);
+                builder.Add(Source.Type!);
                 return builder.Seal();
             }
             else
