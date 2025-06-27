@@ -136,7 +136,7 @@ namespace ILGPU.Runtime
                     // Append parameter in all cases to ensure compatibility
                     // with the current argument mapper implementations
                     // TODO: remove these parameters and adapt all argument mappers
-                    var newParam = methodBuilder.AddParameter(param.Type, param.Name);
+                    var newParam = methodBuilder.AddParameter(param.Type!, param.Name);
 
                     // Check for a specialized parameter
                     if (specialParamIdx < specializedParameters.Length &&

@@ -297,7 +297,7 @@ namespace ILGPU.Backends.OpenCL
                     statement.AppendTarget(
                         GetSharedMemoryAllocationVariable(dynamicAllocaInfo),
                         newTarget: false);
-                    statement.AppendCast(dynamicAllocaInfo.Alloca.Type);
+                    statement.AppendCast(dynamicAllocaInfo.Alloca.Type!);
                     statement.AppendCommand(DynamicSharedMemoryParamName);
                 }
                 using (var statement = new StatementEmitter(this))
@@ -349,12 +349,12 @@ namespace ILGPU.Backends.OpenCL
                     "There must be at least one view entry");
 
                 // We require a custom mapping step
-                var targetVariable = AllocateType(param.Type);
+                var targetVariable = AllocateType(param.Type!);
                 Declare(targetVariable);
                 Bind(param, targetVariable);
 
                 // The current type must be a structure type
-                var structureType = param.Type.As<StructureType>(param.Location);
+                var structureType = param.Type!.As<StructureType>(param.Location);
 
                 // Map each field
                 for (

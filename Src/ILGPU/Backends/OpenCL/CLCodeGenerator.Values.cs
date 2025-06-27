@@ -464,7 +464,7 @@ namespace ILGPU.Backends.OpenCL
 
             // Adjust the given pointer
             using var command = BeginStatement(target);
-            command.AppendCast(value.Type);
+            command.AppendCast(value.Type!);
             command.AppendCommand('(');
             command.AppendCast(arithmeticBasicValueType);
             command.AppendArgument(source);
@@ -498,7 +498,7 @@ namespace ILGPU.Backends.OpenCL
         /// <summary cref="IBackendCodeGenerator.GenerateCode(NullValue)"/>
         public void GenerateCode(NullValue value)
         {
-            if (value.Type.IsVoidType)
+            if (value.Type!.IsVoidType)
                 return;
             var target = Allocate(value);
             if (value.Type is StructureType structureType)

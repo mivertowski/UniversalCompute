@@ -24,6 +24,8 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+#nullable enable
+
 namespace ILGPU
 {
 <#  foreach (var def in IndexDefinitions) { #>

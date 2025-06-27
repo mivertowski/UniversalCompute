@@ -508,7 +508,7 @@ VariableAllocator.Variable variable,
                                 phiValue,
                                 out var intermediateVariable))
                             {
-                                intermediateVariable = AllocateType(phiValue.Type);
+                                intermediateVariable = AllocateType(phiValue.Type!);
                                 intermediatePhiVariables.Add(
                                     phiValue,
                                     intermediateVariable);

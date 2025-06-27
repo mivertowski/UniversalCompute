@@ -409,13 +409,13 @@ namespace ILGPU.Backends.Velocity
         public void GenerateCode(NullValue value)
         {
             // Check whether we have already loaded a null value
-            if (!nullLocals.TryGetValue(value.Type, out var local))
+            if (!nullLocals.TryGetValue(value.Type!, out var local))
             {
                 // If not... load the value
                 var tempLocal = Emitter.DeclareLocal(
-                    GetVectorizedType(value.Type));
+                    GetVectorizedType(value.Type!));
                 Emitter.LoadNull(tempLocal);
-                nullLocals.Add(value.Type, tempLocal);
+                nullLocals.Add(value.Type!, tempLocal);
             }
             Alias(value, local);
         }
@@ -424,7 +424,7 @@ namespace ILGPU.Backends.Velocity
         public void GenerateCode(StructureValue value)
         {
             // Generate a local variable that contains the type
-            var managedType = GetVectorizedType(value.Type);
+            var managedType = GetVectorizedType(value.Type!);
             var local = Emitter.DeclareLocal(managedType);
 
             // Insert all fields
@@ -454,7 +454,7 @@ namespace ILGPU.Backends.Velocity
             else
             {
                 // The result is a new structure value
-                var newObjectType = GetVectorizedType(value.Type);
+                var newObjectType = GetVectorizedType(value.Type!);
                 var local = Emitter.DeclareLocal(newObjectType);
                 // Extract all fields from the structure
                 int span = value.FieldSpan.Span;

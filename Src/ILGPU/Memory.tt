@@ -27,6 +27,8 @@ using ILGPU.Runtime;
 using ILGPU.Util;
 using System.Diagnostics;
 
+#nullable enable
+
 namespace ILGPU
 {
 <#  foreach (var (className, docuName) in classes) { #>

@@ -21,6 +21,8 @@ using ILGPU.Util;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
+#nullable enable
+
 namespace ILGPU
 {
 <#  foreach (var def in IndexDimensions) { #>

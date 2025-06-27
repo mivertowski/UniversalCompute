@@ -24,6 +24,8 @@ var ternaryOps = GetTernaryMathOps(rootPath);
 #>
 using ILGPU.IR.Values;
 
+#nullable enable
+
 namespace ILGPU.IR.Values
 {
     /// <summary>
