@@ -96,6 +96,7 @@ namespace ILGPU.Runtime.LINQ
             if (selector == null)
                 throw new ArgumentNullException(nameof(selector));
 
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(TSource), "x");
             return source.Provider.CreateQuery<TResult>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
@@ -106,8 +107,8 @@ namespace ILGPU.Runtime.LINQ
                         System.Linq.Expressions.Expression.Lambda(
                             System.Linq.Expressions.Expression.Invoke(
                                 System.Linq.Expressions.Expression.Constant(selector),
-                                System.Linq.Expressions.Expression.Parameter(typeof(TSource), "x")),
-                            System.Linq.Expressions.Expression.Parameter(typeof(TSource), "x"))))) as IGPUQueryable<TResult>!;
+                                parameter),
+                            parameter)))) as IGPUQueryable<TResult>;
         }
 
         /// <summary>
@@ -127,6 +128,7 @@ namespace ILGPU.Runtime.LINQ
             if (predicate == null)
                 throw new ArgumentNullException(nameof(predicate));
 
+            var parameter = System.Linq.Expressions.Expression.Parameter(typeof(T), "x");
             return source.Provider.CreateQuery<T>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
@@ -137,8 +139,8 @@ namespace ILGPU.Runtime.LINQ
                         System.Linq.Expressions.Expression.Lambda(
                             System.Linq.Expressions.Expression.Invoke(
                                 System.Linq.Expressions.Expression.Constant(predicate),
-                                System.Linq.Expressions.Expression.Parameter(typeof(T), "x")),
-                            System.Linq.Expressions.Expression.Parameter(typeof(T), "x"))))) as IGPUQueryable<T>!;
+                                parameter),
+                            parameter)))) as IGPUQueryable<T>;
         }
 
         /// <summary>
