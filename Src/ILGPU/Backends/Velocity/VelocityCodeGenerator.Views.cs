@@ -73,7 +73,7 @@ namespace ILGPU.Backends.Velocity
                 Specializer.Convert32To64(Emitter, VelocityWarpOperationMode.I);
 
             // Load the source type information and the element size to multiply
-            var sourceType = value.Source.Type.As<AddressSpaceType>(value);
+            var sourceType = value.Source.Type!.As<AddressSpaceType>(value);
             Emitter.EmitConstant((long)sourceType.ElementType.Size);
             Specializer.ConvertScalarTo64(Emitter, VelocityWarpOperationMode.U);
 

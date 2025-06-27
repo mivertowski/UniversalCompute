@@ -207,7 +207,7 @@ namespace ILGPU.Backends
                 return variable;
             variable = value is PrimitiveValue primitiveValue
                 ? new ConstantVariable(idCounter++, primitiveValue)
-                : AllocateType(value.Type);
+                : AllocateType(value.Type!);
             variableLookup.Add(value, variable);
             return variable;
         }

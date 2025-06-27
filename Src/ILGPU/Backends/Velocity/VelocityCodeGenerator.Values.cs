@@ -487,7 +487,7 @@ namespace ILGPU.Backends.Velocity
             var local = Emitter.DeclareLocal(type);
             Emitter.Emit(LocalOperation.Store, local);
 
-            var structureType = value.ObjectValue.Type.As<StructureType>(value);
+            var structureType = value.ObjectValue.Type!.As<StructureType>(value);
             for (int i = 0, e = value.FieldSpan.Span; i < e; ++i)
             {
                 // Load the base address

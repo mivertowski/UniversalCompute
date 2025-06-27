@@ -163,7 +163,7 @@ namespace ILGPU.Backends.Velocity
                     Emitter.LoadField(vectorizedType, fieldAccess.Index);
 
                     // Store the field into memory
-                    GenerateNonStructureStore(fieldType);
+                    GenerateNonStructureStore(fieldType!);
                 }
             }
             else
@@ -172,7 +172,7 @@ namespace ILGPU.Backends.Velocity
                 Emitter.Emit(LocalOperation.Load, target);
                 Emitter.Emit(LocalOperation.Load, value);
 
-                GenerateNonStructureStore(type);
+                GenerateNonStructureStore(type!);
             }
         }
     }

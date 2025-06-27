@@ -184,7 +184,7 @@ namespace ILGPU.Backends.OpenCL
                 builder.AppendLine(";");
                 if (allocaInfo.IsDynamicArray)
                 {
-                    builder.Append(TypeGenerator[allocaInfo.Alloca.ArrayLength.Type]);
+                    builder.Append(TypeGenerator[allocaInfo.Alloca.ArrayLength.Type!]);
                     builder.Append(' ');
                     builder.Append(GetSharedMemoryAllocationLengthName(allocaInfo));
                     builder.AppendLine(";");
@@ -305,7 +305,7 @@ namespace ILGPU.Backends.OpenCL
                     statement.AppendTarget(
                         GetSharedMemoryAllocationLengthVariable(dynamicAllocaInfo),
                         newTarget: false);
-                    statement.AppendCast(dynamicAllocaInfo.Alloca.ArrayLength.Type);
+                    statement.AppendCast(dynamicAllocaInfo.Alloca.ArrayLength.Type!);
                     statement.AppendCommand(DynamicSharedMemoryLengthParamName);
                 }
             }

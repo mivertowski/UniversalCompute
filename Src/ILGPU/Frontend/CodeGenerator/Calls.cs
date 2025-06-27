@@ -57,7 +57,7 @@ namespace ILGPU.Frontend
             }
 
             // Setup result
-            if (result.IsValid && !result.Type.IsVoidType)
+            if (result.IsValid && !result.Type!.IsVoidType)
             {
                 var flags = method.GetReturnType().IsUnsignedInt()
                     ? ConvertFlags.SourceUnsigned
