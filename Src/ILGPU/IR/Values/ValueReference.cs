@@ -118,7 +118,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns the associated type of the latest node.
         /// </summary>
-        public TypeNode Type => Resolve().Type;
+        public TypeNode? Type => Resolve().Type;
 
         /// <summary>
         /// Returns the associated basic value type.

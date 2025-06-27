@@ -768,7 +768,7 @@ RegisterAllocator<PTXRegisterKind>.HardwareRegister addressRegister) : IIOEmitte
             // Check whether we are loading an FP16 value. In this case, we have to
             // move the resulting constant into a register since the PTX compiler
             // expects a converted FP16 value in the scope of a register.
-            var description = ResolveRegisterDescription(value.Type);
+            var description = ResolveRegisterDescription(value.Type!);
             var register = new ConstantRegister(description, value);
             if (value.BasicValueType == BasicValueType.Float16)
                 Bind(value, EnsureHardwareRegister(register));

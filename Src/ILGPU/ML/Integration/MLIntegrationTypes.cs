@@ -176,7 +176,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the device name.
         /// </summary>
-        public string DeviceName { get; set; }
+        public required string DeviceName { get; set; }
 
         /// <summary>
         /// Gets or sets the device type.
@@ -889,7 +889,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the device name.
         /// </summary>
-        public string DeviceName { get; set; }
+        public required string DeviceName { get; set; }
 
         /// <summary>
         /// Gets or sets the execution time.
@@ -1040,12 +1040,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the model path.
         /// </summary>
-        public string ModelPath { get; set; }
+        public required string ModelPath { get; set; }
 
         /// <summary>
         /// Gets or sets the model bytes.
         /// </summary>
-        public byte[] ModelBytes { get; set; }
+        public required byte[] ModelBytes { get; set; }
 
         /// <summary>
         /// Gets or sets the input names.

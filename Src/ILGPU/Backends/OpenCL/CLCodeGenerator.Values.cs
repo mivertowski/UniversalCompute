@@ -669,7 +669,7 @@ namespace ILGPU.Backends.OpenCL
             // and divide by the size in bytes of the array element.
             var target = Allocate(value);
             using var statement = BeginStatement(target);
-            statement.AppendCast(value.Type);
+            statement.AppendCast(value.Type!);
             var operation = CLInstructions.GetArithmeticOperation(
                 BinaryArithmeticKind.Div,
                 value.BasicValueType.IsFloat(),

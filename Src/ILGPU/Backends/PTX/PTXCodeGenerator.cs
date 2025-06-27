@@ -557,7 +557,7 @@ RegisterAllocator<PTXRegisterKind>.Register register,
                 // Check for an intermediate phi value
                 if (bindings.IsIntermediate(phiValue))
                 {
-                    var intermediateRegister = AllocateType(phiValue.Type);
+                    var intermediateRegister = AllocateType(phiValue.Type!);
                     intermediatePhiRegisters.Add(phiValue, intermediateRegister);
 
                     // Move this phi value into a temporary register for reuse
@@ -688,7 +688,7 @@ RegisterAllocator<PTXRegisterKind>.Register register,
 
                 targetBuilder.Append('\t');
                 var paramName = GetParameterName(param);
-                AppendParamDeclaration(targetBuilder, param.Type, paramName);
+                AppendParamDeclaration(targetBuilder, param.Type!, paramName);
 
                 parameters.Add(new MappedParameter(
                     register,
