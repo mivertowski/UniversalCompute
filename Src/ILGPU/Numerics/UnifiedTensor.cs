@@ -509,9 +509,9 @@ namespace ILGPU.Numerics
                 if (gpuDataValid && gpuBuffer != null)
                 {
                     // Transfer from GPU to CPU
-                    var tempArray = new T[cpuMemory.Memory.Length];
+                    var tempArray = new T[cpuMemory!.Memory.Length];
                     gpuBuffer.View.CopyToCPU(tempArray);
-                    tempArray.AsSpan().CopyTo(cpuMemory.Memory.Span);
+                    tempArray.AsSpan().CopyTo(cpuMemory!.Memory.Span);
                 }
                 else if (unifiedBuffer != null)
                 {
