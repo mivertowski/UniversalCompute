@@ -30,8 +30,8 @@ namespace ILGPU.IR.Construction
             Value viewOrPointer,
             Value alignmentInBytes)
         {
-            location.Assert(viewOrPointer.Type.IsViewOrPointerType);
-            location.Assert(alignmentInBytes.Type.BasicValueType.IsInt());
+            location.Assert(viewOrPointer.Type!.IsViewOrPointerType);
+            location.Assert(alignmentInBytes.Type!.BasicValueType.IsInt());
 
             return Append(new AlignTo(
                 GetInitializer(location),
@@ -52,8 +52,8 @@ namespace ILGPU.IR.Construction
             Value viewOrPointer,
             Value alignmentInBytes)
         {
-            location.Assert(viewOrPointer.Type.IsViewOrPointerType);
-            location.Assert(alignmentInBytes.Type.BasicValueType.IsInt());
+            location.Assert(viewOrPointer.Type!.IsViewOrPointerType);
+            location.Assert(alignmentInBytes.Type!.BasicValueType.IsInt());
 
             return Append(new AsAligned(
                 GetInitializer(location),

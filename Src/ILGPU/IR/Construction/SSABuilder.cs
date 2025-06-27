@@ -329,7 +329,7 @@ namespace ILGPU.IR.Construction
                     // Let the phi point to the beginning of the current block
                     var phiBuilder = Builder.CreatePhi(
                         Builder.BasicBlock.Location,
-                        peekedValue.Type);
+                        peekedValue.Type!);
                     value = phiBuilder.PhiValue;
 
                     var incompletePhi = new IncompletePhi(var, phiBuilder);

@@ -772,7 +772,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the kernel name.
         /// </summary>
-        public string KernelName { get; set; }
+        public required string KernelName { get; set; }
 
         /// <summary>
         /// Gets or sets the compiled code.
@@ -820,7 +820,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the parameter type.
         /// </summary>
-        public string Type { get; set; }
+        public required string Type { get; set; }
 
         /// <summary>
         /// Gets or sets whether it's an input parameter.
