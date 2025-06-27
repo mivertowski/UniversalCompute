@@ -30,7 +30,6 @@ namespace ILGPU.Apple.NeuralEngine
     public sealed class AppleNeuralEngine : IDisposable
     {
         private readonly MetalDevice? _device;
-        private readonly ANECapabilities _capabilities;
         private readonly IntPtr _aneContext;
         private bool _disposed;
 
@@ -41,9 +40,9 @@ namespace ILGPU.Apple.NeuralEngine
         public AppleNeuralEngine(MetalDevice? device)
         {
             _device = device; // Allow null for dummy/testing scenarios
-            _capabilities = ANECapabilities.Query();
+            Capabilities = ANECapabilities.Query();
             
-            if (_capabilities.IsAvailable)
+            if (Capabilities.IsAvailable)
             {
                 _aneContext = ANENative.CreateContext();
                 if (_aneContext == IntPtr.Zero)
@@ -58,12 +57,12 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the Neural Engine capabilities.
         /// </summary>
-        public ANECapabilities Capabilities => _capabilities;
+        public ANECapabilities Capabilities { get; }
 
         /// <summary>
         /// Gets whether the Neural Engine is available.
         /// </summary>
-        public bool IsAvailable => _capabilities.IsAvailable;
+        public bool IsAvailable => Capabilities.IsAvailable;
 
         #region Neural Network Operations
 
@@ -91,7 +90,7 @@ namespace ILGPU.Apple.NeuralEngine
 
                 ExecuteNeuralOperation(operation, input, result);
                 return result;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -117,7 +116,7 @@ namespace ILGPU.Apple.NeuralEngine
 
                 ExecuteCoreMLInference(model, input, result);
                 return result;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -131,7 +130,7 @@ namespace ILGPU.Apple.NeuralEngine
             CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
-            if (!_capabilities.SupportsConvolution)
+            if (!Capabilities.SupportsConvolution)
                 throw new NotSupportedException("Convolution not supported on this Neural Engine generation");
 
             return await Task.Run(() =>
@@ -143,7 +142,7 @@ namespace ILGPU.Apple.NeuralEngine
 
                 ExecuteANEConvolution(input, weights, bias, result, parameters);
                 return result;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -157,7 +156,7 @@ namespace ILGPU.Apple.NeuralEngine
             CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
-            if (!_capabilities.SupportsAttention)
+            if (!Capabilities.SupportsAttention)
                 throw new NotSupportedException("Attention operations not supported on this Neural Engine generation");
 
             return await Task.Run(() =>
@@ -169,7 +168,7 @@ namespace ILGPU.Apple.NeuralEngine
 
                 ExecuteANEAttention(query, key, value, result, parameters);
                 return result;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -191,7 +190,7 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var model = new CoreMLModel(modelPath, _capabilities);
+                var model = new CoreMLModel(modelPath, Capabilities);
                 
                 if (options != null)
                 {
@@ -199,7 +198,7 @@ namespace ILGPU.Apple.NeuralEngine
                 }
 
                 return model;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -219,9 +218,9 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var compiler = new ANEModelCompiler(_capabilities);
+                var compiler = new ANEModelCompiler(Capabilities);
                 return compiler.CompileForNeuralEngine(network, options);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -439,9 +438,6 @@ namespace ILGPU.Apple.NeuralEngine
         public override TensorShape InputShape { get; }
         public AttentionParameters Parameters { get; }
 
-        public override TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
-            return inputShape; // Attention preserves input shape
-        }
+        public override TensorShape CalculateOutputShape(TensorShape inputShape) => inputShape; // Attention preserves input shape
     }
 }

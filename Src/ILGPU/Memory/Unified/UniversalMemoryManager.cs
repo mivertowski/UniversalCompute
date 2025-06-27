@@ -232,7 +232,7 @@ namespace ILGPU.Memory.Unified
                 .Select(manager => manager.OptimizeAsync())
                 .ToArray();
 
-            await Task.WhenAll(optimizationTasks);
+            await Task.WhenAll(optimizationTasks).ConfigureAwait(false);
         }
 
         private void ThrowIfDisposed()

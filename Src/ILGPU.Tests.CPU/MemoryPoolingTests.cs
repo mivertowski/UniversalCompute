@@ -205,7 +205,7 @@ namespace ILGPU.Tests.CPU
         {
             using var pool = new AdaptiveMemoryPool<int>(accelerator);
 
-            var buffer = await pool.RentAsync(1000);
+            var buffer = await pool.RentAsync(1000).ConfigureAwait(false);
             Assert.NotNull(buffer);
             Assert.True(buffer.Length >= 1000);
 

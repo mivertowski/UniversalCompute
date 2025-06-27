@@ -22,17 +22,11 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Represents the current accelerator.
         /// </summary>
-        [ThreadStatic]
-        private static Accelerator? currentAccelerator;
-
         /// <summary>
         /// Returns the current group runtime context.
         /// </summary>
-        public static Accelerator? Current
-        {
-            get => currentAccelerator;
-            private set => currentAccelerator = value;
-        }
+        [field: ThreadStatic]
+        public static Accelerator? Current { get; private set; }
 
         #endregion
 

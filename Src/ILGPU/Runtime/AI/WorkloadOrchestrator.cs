@@ -33,7 +33,6 @@ namespace ILGPU.Runtime.AI
         private readonly Context _context;
         private readonly List<AcceleratorProfile> _acceleratorProfiles;
         private readonly WorkloadScheduler _scheduler;
-        private readonly PerformanceTracker _performanceTracker;
         private bool _disposed;
 
         /// <summary>
@@ -46,7 +45,7 @@ namespace ILGPU.Runtime.AI
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _acceleratorProfiles = [];
             _scheduler = new WorkloadScheduler();
-            _performanceTracker = new PerformanceTracker();
+            PerformanceTracker = new PerformanceTracker();
 
             InitializeAcceleratorProfiles(accelerators);
         }
@@ -59,7 +58,7 @@ namespace ILGPU.Runtime.AI
         /// <summary>
         /// Gets the performance tracker.
         /// </summary>
-        public PerformanceTracker PerformanceTracker => _performanceTracker;
+        public PerformanceTracker PerformanceTracker { get; }
 
         /// <summary>
         /// Executes a workload across optimal accelerators.
@@ -75,12 +74,12 @@ namespace ILGPU.Runtime.AI
                 throw new ArgumentNullException(nameof(workload));
 
             // Analyze workload and determine optimal execution strategy
-            var strategy = await _scheduler.AnalyzeWorkloadAsync(workload, _acceleratorProfiles);
+            var strategy = await _scheduler.AnalyzeWorkloadAsync(workload, _acceleratorProfiles).ConfigureAwait(false);
             
             // Execute workload using the determined strategy
-            var executionContext = new WorkloadExecutionContext(strategy, _performanceTracker);
+            var executionContext = new WorkloadExecutionContext(strategy, PerformanceTracker);
             
-            await ExecuteStrategyAsync(workload, executionContext, cancellationToken);
+            await ExecuteStrategyAsync(workload, executionContext, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -113,10 +112,10 @@ namespace ILGPU.Runtime.AI
                 c = TensorFactory.Create<T>(resultShape, ComputeLocation.Gpu);
             }
             
-            await primitives.GemmAsync(a, b, c, GetOne<T>(), GetZero<T>(), cancellationToken);
+            await primitives.GemmAsync(a, b, c, GetOne<T>(), GetZero<T>(), cancellationToken).ConfigureAwait(false);
             
             // Track performance
-            _performanceTracker.RecordOperation(profile.Accelerator.AcceleratorType, 
+            PerformanceTracker.RecordOperation(profile.Accelerator.AcceleratorType, 
                 PrimitiveType.MatrixMultiplication, a.Shape.Length);
             
             return c;
@@ -149,10 +148,10 @@ namespace ILGPU.Runtime.AI
             
             // Execute convolution
             var primitives = PerformancePrimitivesFactory.Create(profile.Accelerator);
-            await primitives.Conv2DAsync(input, kernel, output, parameters, cancellationToken);
+            await primitives.Conv2DAsync(input, kernel, output, parameters, cancellationToken).ConfigureAwait(false);
             
             // Track performance
-            _performanceTracker.RecordOperation(profile.Accelerator.AcceleratorType,
+            PerformanceTracker.RecordOperation(profile.Accelerator.AcceleratorType,
                 PrimitiveType.Convolution, input.Shape.Length);
             
             return output;
@@ -172,18 +171,18 @@ namespace ILGPU.Runtime.AI
                 throw new ArgumentNullException(nameof(workload));
 
             // Partition workload across available accelerators
-            var partitions = await _scheduler.PartitionWorkloadAsync(workload, _acceleratorProfiles);
+            var partitions = await _scheduler.PartitionWorkloadAsync(workload, _acceleratorProfiles).ConfigureAwait(false);
             
             // Execute partitions in parallel
             var tasks = partitions.Select(partition => 
                 ExecutePartitionAsync(partition, cancellationToken));
             
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
             
             // Aggregate results if needed
             if (workload.RequiresAggregation)
             {
-                await workload.AggregateResultsAsync(partitions);
+                await workload.AggregateResultsAsync(partitions).ConfigureAwait(false);
             }
         }
 
@@ -258,17 +257,17 @@ namespace ILGPU.Runtime.AI
             
             try
             {
-                await workload.ExecuteAsync(context, cancellationToken);
+                await workload.ExecuteAsync(context, cancellationToken).ConfigureAwait(false);
                 
                 // Record successful execution
                 var duration = DateTime.UtcNow - startTime;
-                _performanceTracker.RecordExecution(workload.WorkloadType, duration, true);
+                PerformanceTracker.RecordExecution(workload.WorkloadType, duration, true);
             }
             catch (Exception ex)
             {
                 // Record failed execution
                 var duration = DateTime.UtcNow - startTime;
-                _performanceTracker.RecordExecution(workload.WorkloadType, duration, false);
+                PerformanceTracker.RecordExecution(workload.WorkloadType, duration, false);
                 throw;
             }
         }
@@ -277,8 +276,8 @@ namespace ILGPU.Runtime.AI
             WorkloadPartition partition,
             CancellationToken cancellationToken)
         {
-            var context = new WorkloadExecutionContext(partition.Strategy, _performanceTracker);
-            await partition.Workload.ExecuteAsync(context, cancellationToken);
+            var context = new WorkloadExecutionContext(partition.Strategy, PerformanceTracker);
+            await partition.Workload.ExecuteAsync(context, cancellationToken).ConfigureAwait(false);
         }
 
         private static TensorShape CalculateConvolutionOutputShape(
@@ -320,7 +319,7 @@ namespace ILGPU.Runtime.AI
         {
             if (!_disposed)
             {
-                _performanceTracker?.Dispose();
+                PerformanceTracker?.Dispose();
                 _disposed = true;
             }
         }

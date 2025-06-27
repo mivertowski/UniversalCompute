@@ -135,10 +135,7 @@ namespace ILGPU.FFT
         public virtual void FFT2DReal(
             ArrayView2D<float, Stride2D.DenseX> input,
             ArrayView2D<Complex, Stride2D.DenseX> output,
-            AcceleratorStream? stream = null)
-        {
-            throw new NotSupportedException("2D real FFT is not supported by this accelerator");
-        }
+            AcceleratorStream? stream = null) => throw new NotSupportedException("2D real FFT is not supported by this accelerator");
 
         #endregion
 
@@ -155,10 +152,7 @@ namespace ILGPU.FFT
             ArrayView3D<Complex, Stride3D.DenseXY> input,
             ArrayView3D<Complex, Stride3D.DenseXY> output,
             bool forward = true,
-            AcceleratorStream? stream = null)
-        {
-            throw new NotSupportedException("3D FFT is not supported by this accelerator");
-        }
+            AcceleratorStream? stream = null) => throw new NotSupportedException("3D FFT is not supported by this accelerator");
 
         #endregion
 
@@ -195,20 +189,14 @@ namespace ILGPU.FFT
         /// </summary>
         /// <param name="length">Desired length.</param>
         /// <returns>Optimal FFT size (typically next power of 2).</returns>
-        public virtual int GetOptimalFFTSize(int length)
-        {
-            return NextPowerOf2(length);
-        }
+        public virtual int GetOptimalFFTSize(int length) => NextPowerOf2(length);
 
         /// <summary>
         /// Checks if the given FFT size is supported.
         /// </summary>
         /// <param name="length">FFT length to check.</param>
         /// <returns>True if the size is supported.</returns>
-        public virtual bool IsSizeSupported(int length)
-        {
-            return IsPowerOf2(length) && length >= 2 && length <= (1 << 30);
-        }
+        public virtual bool IsSizeSupported(int length) => IsPowerOf2(length) && length >= 2 && length <= (1 << 30);
 
         /// <summary>
         /// Estimates the performance for a given FFT size.
@@ -244,10 +232,7 @@ namespace ILGPU.FFT
         /// </summary>
         /// <param name="value">Value to check.</param>
         /// <returns>True if the value is a power of 2.</returns>
-        protected static bool IsPowerOf2(int value)
-        {
-            return value > 0 && (value & (value - 1)) == 0;
-        }
+        protected static bool IsPowerOf2(int value) => value > 0 && (value & (value - 1)) == 0;
 
         #endregion
 

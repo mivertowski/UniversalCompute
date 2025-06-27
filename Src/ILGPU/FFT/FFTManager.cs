@@ -41,7 +41,7 @@ namespace ILGPU.FFT
         private readonly Context _context;
         private readonly List<FFTAccelerator> _accelerators;
         private readonly Dictionary<AcceleratorType, FFTAccelerator> _acceleratorMap;
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <summary>
         /// Constructs a new FFT manager.
@@ -50,8 +50,8 @@ namespace ILGPU.FFT
         public FFTManager(Context context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
-            _accelerators = new List<FFTAccelerator>();
-            _acceleratorMap = new Dictionary<AcceleratorType, FFTAccelerator>();
+            _accelerators = [];
+            _acceleratorMap = [];
             
             InitializeAccelerators();
         }
@@ -110,10 +110,7 @@ namespace ILGPU.FFT
         /// </summary>
         /// <param name="type">The accelerator type.</param>
         /// <returns>The FFT accelerator, or null if not available.</returns>
-        public FFTAccelerator? GetAccelerator(FFTAcceleratorType type)
-        {
-            return _accelerators.FirstOrDefault(acc => acc.AcceleratorType == type && acc.IsAvailable);
-        }
+        public FFTAccelerator? GetAccelerator(FFTAcceleratorType type) => _accelerators.FirstOrDefault(acc => acc.AcceleratorType == type && acc.IsAvailable);
 
         /// <summary>
         /// Gets an FFT accelerator for the specified ILGPU accelerator.
@@ -280,7 +277,7 @@ namespace ILGPU.FFT
                 if (IPPCapabilities.DetectIPP())
                 {
                     var cpuAccelerator = _context.CreateCPUAccelerator(0, CPUAcceleratorMode.Auto);
-                    var ippFFT = new IPPFFTAccelerator(cpuAccelerator);
+                    using var ippFFT = new IPPFFTAccelerator(cpuAccelerator);
                     if (ippFFT.IsAvailable)
                     {
                         _accelerators.Add(ippFFT);
@@ -301,7 +298,7 @@ namespace ILGPU.FFT
                     try
                     {
                         var cudaAccelerator = device.CreateCudaAccelerator(_context);
-                        var cudaFFT = new CudaFFTAccelerator(cudaAccelerator);
+                        using var cudaFFT = new CudaFFTAccelerator(cudaAccelerator);
                         if (cudaFFT.IsAvailable)
                         {
                             _accelerators.Add(cudaFFT);

@@ -34,7 +34,7 @@ namespace ILGPU.Benchmarks.Benchmarks;
 public class HardwareAcceleratorComparison : IDisposable
 {
     private Context? context;
-    private List<(string Name, Accelerator Accelerator)> availableAccelerators = new();
+    private List<(string Name, Accelerator Accelerator)> availableAccelerators = [];
     private MemoryBuffer1D<float, Stride1D.Dense>? inputBuffer;
     private MemoryBuffer1D<float, Stride1D.Dense>? outputBuffer;
 

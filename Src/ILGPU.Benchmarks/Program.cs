@@ -202,8 +202,9 @@ public class Program
         }
     }
 
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
+    private static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
                 services.AddLogging(builder =>
@@ -217,6 +218,7 @@ public class Program
                 services.AddSingleton<UnattendedBenchmarkRunner>();
                 services.AddSingleton<BenchmarkConfig>();
             });
+    }
 }
 
 /// <summary>

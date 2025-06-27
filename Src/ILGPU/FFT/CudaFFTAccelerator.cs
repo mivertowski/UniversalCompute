@@ -106,7 +106,7 @@ namespace ILGPU.FFT
         #region Instance
 
         private readonly CudaAccelerator _cudaAccelerator;
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <summary>
         /// Constructs a new CUDA FFT accelerator.

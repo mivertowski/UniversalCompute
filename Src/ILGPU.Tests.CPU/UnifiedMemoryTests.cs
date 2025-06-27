@@ -145,7 +145,7 @@ namespace ILGPU.Tests.CPU
             await buffer.TransformAsync((index, view) =>
             {
                 view[index] = view[index] * view[index];
-            }, stream);
+            }, stream).ConfigureAwait(false);
             
             // Verify transformation
             var result = buffer.GetAsArray1D();
@@ -248,7 +248,7 @@ namespace ILGPU.Tests.CPU
             }
             
             // Perform async addition
-            await AsyncUnifiedMemoryOperations.AddAsync(left, right, result, accelerator);
+            await AsyncUnifiedMemoryOperations.AddAsync(left, right, result, accelerator).ConfigureAwait(false);
             
             // Verify result
             var resultData = result.GetAsArray1D();

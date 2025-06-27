@@ -28,22 +28,22 @@ namespace ILGPU.Runtime.CPU
         /// <summary>
         /// Represents the current context.
         /// </summary>
-        [ThreadStatic]
-        private static CPURuntimeWarpContext? currentContext;
-
         /// <summary>
         /// Returns the current warp runtime context.
         /// </summary>
+        [field: ThreadStatic]
         public static CPURuntimeWarpContext Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 Trace.Assert(
-                    currentContext != null,
+                    field != null,
                     ErrorMessages.InvalidKernelOperation);
-                return currentContext.AsNotNull();
+                return field.AsNotNull();
             }
+
+            private set;
         }
 
         #endregion
@@ -279,7 +279,7 @@ namespace ILGPU.Runtime.CPU
         /// <summary>
         /// Makes the current context the active one for this thread.
         /// </summary>
-        internal void MakeCurrent() => currentContext = this;
+        internal void MakeCurrent() => Current = this;
 
         #endregion
     }

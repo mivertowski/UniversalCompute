@@ -250,10 +250,10 @@ namespace ILGPU.Tests.CPU
             var tempFile = System.IO.Path.GetTempFileName();
             try
             {
-                await profiler.ExportAsync(tempFile, ProfileExportFormat.Json);
+                await profiler.ExportAsync(tempFile, ProfileExportFormat.Json).ConfigureAwait(false);
                 Assert.True(System.IO.File.Exists(tempFile));
                 
-                var content = await System.IO.File.ReadAllTextAsync(tempFile);
+                var content = await System.IO.File.ReadAllTextAsync(tempFile).ConfigureAwait(false);
                 Assert.Contains("Export Test", content);
                 Assert.Contains("TestEvent", content);
             }
@@ -277,10 +277,10 @@ namespace ILGPU.Tests.CPU
             var tempFile = System.IO.Path.GetTempFileName();
             try
             {
-                await profiler.ExportAsync(tempFile, ProfileExportFormat.Csv);
+                await profiler.ExportAsync(tempFile, ProfileExportFormat.Csv).ConfigureAwait(false);
                 Assert.True(System.IO.File.Exists(tempFile));
                 
-                var content = await System.IO.File.ReadAllTextAsync(tempFile);
+                var content = await System.IO.File.ReadAllTextAsync(tempFile).ConfigureAwait(false);
                 Assert.Contains("SessionId,KernelName", content);
                 Assert.Contains("TestKernel", content);
             }

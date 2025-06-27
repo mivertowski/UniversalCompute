@@ -32,7 +32,6 @@ namespace ILGPU.Runtime.Scheduling
         private readonly IReadOnlyDictionary<ComputeDevice, Accelerator> _devices;
         private readonly PerformanceProfiler _profiler;
         private readonly LoadBalancer _loadBalancer;
-        private readonly SchedulingPolicy _policy;
         private readonly Dictionary<ComputeDevice, DevicePerformance> _devicePerformance;
         private bool _disposed;
 
@@ -46,7 +45,7 @@ namespace ILGPU.Runtime.Scheduling
             SchedulingPolicy policy = SchedulingPolicy.PerformanceOptimized)
         {
             _devices = devices ?? throw new ArgumentNullException(nameof(devices));
-            _policy = policy;
+            Policy = policy;
             _profiler = new PerformanceProfiler();
             _loadBalancer = new LoadBalancer();
             _devicePerformance = [];
@@ -63,7 +62,7 @@ namespace ILGPU.Runtime.Scheduling
         /// <summary>
         /// Gets the current scheduling policy.
         /// </summary>
-        public SchedulingPolicy Policy => _policy;
+        public SchedulingPolicy Policy { get; }
 
         /// <summary>
         /// Gets performance statistics for all devices.
@@ -89,7 +88,7 @@ namespace ILGPU.Runtime.Scheduling
             var workloadAnalysis = AnalyzeWorkload(graph);
 
             // Create device assignments
-            var assignments = await CreateDeviceAssignmentsAsync(graph, workloadAnalysis);
+            var assignments = await CreateDeviceAssignmentsAsync(graph, workloadAnalysis).ConfigureAwait(false);
 
             // Generate execution schedule
             var schedule = GenerateExecutionSchedule(graph, assignments);
@@ -119,10 +118,10 @@ namespace ILGPU.Runtime.Scheduling
             try
             {
                 // Execute memory transfers first
-                await ExecuteMemoryTransfersAsync(plan.MemoryPlan);
+                await ExecuteMemoryTransfersAsync(plan.MemoryPlan).ConfigureAwait(false);
 
                 // Execute compute operations according to schedule
-                await ExecuteComputeOperationsAsync(plan.Schedule);
+                await ExecuteComputeOperationsAsync(plan.Schedule).ConfigureAwait(false);
 
                 // Update performance statistics
                 _profiler.EndExecution(executionId);
@@ -220,7 +219,7 @@ namespace ILGPU.Runtime.Scheduling
             var assignments = new Dictionary<ComputeNode, ComputeDevice>();
 
             // Apply scheduling policy
-            switch (_policy)
+            switch (Policy)
             {
                 case SchedulingPolicy.PerformanceOptimized:
                     assignments = CreatePerformanceOptimizedAssignments(graph, analysis);
@@ -231,7 +230,7 @@ namespace ILGPU.Runtime.Scheduling
                     break;
                     
                 case SchedulingPolicy.LoadBalanced:
-                    assignments = await CreateLoadBalancedAssignmentsAsync(graph, analysis);
+                    assignments = await CreateLoadBalancedAssignmentsAsync(graph, analysis).ConfigureAwait(false);
                     break;
                     
                 case SchedulingPolicy.LatencyOptimized:
@@ -483,7 +482,7 @@ namespace ILGPU.Runtime.Scheduling
                 .OrderByDescending(g => g.Key)
                 .SelectMany(g => g.Select(ExecuteMemoryTransferAsync));
 
-            await Task.WhenAll(transferTasks);
+            await Task.WhenAll(transferTasks).ConfigureAwait(false);
         }
 
         private async Task ExecuteComputeOperationsAsync(ExecutionSchedule schedule)
@@ -491,19 +490,19 @@ namespace ILGPU.Runtime.Scheduling
             foreach (var level in schedule.Levels)
             {
                 var levelTasks = level.Nodes.Select(ExecuteNodeAsync);
-                await Task.WhenAll(levelTasks);
+                await Task.WhenAll(levelTasks).ConfigureAwait(false);
             }
         }
 
         private async Task ExecuteMemoryTransferAsync(MemoryTransfer transfer) =>
             // Implementation would perform actual memory transfer
             // between the specified devices
-            await Task.Delay(1); // Placeholder
+            await Task.Delay(1).ConfigureAwait(false); // Placeholder
 
         private async Task ExecuteNodeAsync(ScheduledNode node) =>
             // Implementation would execute the compute node
             // on the assigned device
-            await Task.Delay((int)node.EstimatedTimeMs); // Placeholder
+            await Task.Delay((int)node.EstimatedTimeMs).ConfigureAwait(false); // Placeholder
 
         private double EstimateExecutionTime(ComputeNode node, ComputeDevice device)
         {
@@ -530,7 +529,7 @@ namespace ILGPU.Runtime.Scheduling
             
             // Update scheduling policy based on workload analysis
             // This would adjust internal scheduling parameters
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <summary>

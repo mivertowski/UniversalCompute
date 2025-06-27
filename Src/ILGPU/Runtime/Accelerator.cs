@@ -924,7 +924,7 @@ namespace ILGPU.Runtime
 
                 // Unbind the current accelerator and reset it to no accelerator
                 OnUnbind();
-                currentAccelerator = null;
+                Current = null;
 
                 // Clear the native pointer
                 NativePtr = IntPtr.Zero;

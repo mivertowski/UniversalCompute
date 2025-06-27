@@ -299,10 +299,10 @@ namespace ILGPU.Tests.CPU
             using var cache = new KernelCacheManager(options);
             
             // Test async preload (should complete without error)
-            await cache.PreloadAsync();
+            await cache.PreloadAsync().ConfigureAwait(false);
             
             // Test async persist (should complete without error)
-            await cache.PersistAsync();
+            await cache.PersistAsync().ConfigureAwait(false);
         }
 
         #endregion

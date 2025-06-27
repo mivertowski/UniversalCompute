@@ -37,7 +37,6 @@ namespace ILGPU.ML.Integration
         where TOutput : class
     {
         private readonly HybridComputeOrchestrator _orchestrator;
-        private readonly IMLModel<TInput, TOutput> _model;
         private readonly AdaptiveScheduler _scheduler;
         private readonly PredictionContext _context;
         private bool _disposed;
@@ -49,7 +48,7 @@ namespace ILGPU.ML.Integration
         /// <param name="context">The prediction context with accelerator information.</param>
         public ILGPUUniversalPredictor(IMLModel<TInput, TOutput> model, PredictionContext context)
         {
-            _model = model ?? throw new ArgumentNullException(nameof(model));
+            Model = model ?? throw new ArgumentNullException(nameof(model));
             _context = context ?? throw new ArgumentNullException(nameof(context));
             
             _scheduler = new AdaptiveScheduler(
@@ -62,7 +61,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets the model information.
         /// </summary>
-        public IMLModel<TInput, TOutput> Model => _model;
+        public IMLModel<TInput, TOutput> Model { get; }
 
         /// <summary>
         /// Gets performance statistics from recent predictions.
@@ -92,13 +91,13 @@ namespace ILGPU.ML.Integration
                 throw new ArgumentNullException(nameof(input));
 
             // Convert input to tensor format
-            var inputTensor = await ConvertToTensorAsync(input);
+            var inputTensor = await ConvertToTensorAsync(input).ConfigureAwait(false);
 
             // Create compute graph for the model
-            var computeGraph = await _model.CreateComputeGraphAsync(inputTensor);
+            var computeGraph = await Model.CreateComputeGraphAsync(inputTensor).ConfigureAwait(false);
 
             // Execute with optimal scheduling using the model
-            var result = await _orchestrator.ExecuteAsync(_model, input);
+            var result = await _orchestrator.ExecuteAsync(Model, input).ConfigureAwait(false);
 
             // Return the result directly
             return result;
@@ -119,13 +118,13 @@ namespace ILGPU.ML.Integration
                 return Array.Empty<TOutput>();
 
             // Convert inputs to tensor batch
-            var inputTensors = await ConvertToTensorBatchAsync(inputs);
+            var inputTensors = await ConvertToTensorBatchAsync(inputs).ConfigureAwait(false);
 
             // Create batched compute graph
-            var computeGraph = await _model.CreateBatchedComputeGraphAsync(inputTensors);
+            var computeGraph = await Model.CreateBatchedComputeGraphAsync(inputTensors).ConfigureAwait(false);
 
             // Execute with batch optimization
-            var results = await _orchestrator.ExecuteBatchAsync(_model, inputs);
+            var results = await _orchestrator.ExecuteBatchAsync(Model, inputs).ConfigureAwait(false);
 
             // Return the results directly
             return results;
@@ -145,13 +144,13 @@ namespace ILGPU.ML.Integration
 
             var batch = new List<TInput>();
 
-            await foreach (var input in inputStream)
+            await foreach (var input in inputStream.ConfigureAwait(false))
             {
                 batch.Add(input);
 
                 if (batch.Count >= batchSize)
                 {
-                    var results = await PredictBatchAsync(batch.ToArray());
+                    var results = await PredictBatchAsync(batch.ToArray()).ConfigureAwait(false);
                     
                     foreach (var result in results)
                     {
@@ -165,7 +164,7 @@ namespace ILGPU.ML.Integration
             // Process remaining items
             if (batch.Count > 0)
             {
-                var results = await PredictBatchAsync(batch.ToArray());
+                var results = await PredictBatchAsync(batch.ToArray()).ConfigureAwait(false);
                 
                 foreach (var result in results)
                 {
@@ -185,13 +184,13 @@ namespace ILGPU.ML.Integration
             ThrowIfDisposed();
 
             // Profile different device configurations with sample data
-            var profileResults = await ProfileDevicesAsync(sampleInputs);
+            var profileResults = await ProfileDevicesAsync(sampleInputs).ConfigureAwait(false);
 
             // Update scheduling strategy based on profiling results
-            await _orchestrator.OptimizeSchedulingAsync();
+            await _orchestrator.OptimizeSchedulingAsync().ConfigureAwait(false);
 
             // Optimize memory layout and transfer patterns
-            await _orchestrator.OptimizeMemoryAsync();
+            await _orchestrator.OptimizeMemoryAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -207,7 +206,7 @@ namespace ILGPU.ML.Integration
         private async Task<ITensor<float>> ConvertToTensorAsync(TInput input) =>
             // Implementation would depend on the specific input type
             // This is a simplified version that assumes conversion is possible
-            await _context.TensorFactory.CreateFromInputAsync(input);
+            await _context.TensorFactory.CreateFromInputAsync(input).ConfigureAwait(false);
 
         private async Task<ITensor<float>[]> ConvertToTensorBatchAsync(TInput[] inputs)
         {
@@ -215,7 +214,7 @@ namespace ILGPU.ML.Integration
             
             for (int i = 0; i < inputs.Length; i++)
             {
-                tensors[i] = await ConvertToTensorAsync(inputs[i]);
+                tensors[i] = await ConvertToTensorAsync(inputs[i]).ConfigureAwait(false);
             }
 
             return tensors;
@@ -223,7 +222,7 @@ namespace ILGPU.ML.Integration
 
         private async Task<TOutput> ConvertFromTensorAsync(ITensor<float> tensor) =>
             // Implementation would depend on the specific output type
-            await _context.TensorFactory.CreateOutputFromTensorAsync<TOutput>(tensor);
+            await _context.TensorFactory.CreateOutputFromTensorAsync<TOutput>(tensor).ConfigureAwait(false);
 
         private async Task<TOutput[]> ConvertFromTensorBatchAsync(ITensor<float>[] tensors)
         {
@@ -231,7 +230,7 @@ namespace ILGPU.ML.Integration
             
             for (int i = 0; i < tensors.Length; i++)
             {
-                outputs[i] = await ConvertFromTensorAsync(tensors[i]);
+                outputs[i] = await ConvertFromTensorAsync(tensors[i]).ConfigureAwait(false);
             }
 
             return outputs;
@@ -245,7 +244,7 @@ namespace ILGPU.ML.Integration
             {
                 try
                 {
-                    var profileResult = await ProfileDeviceAsync(device, sampleInputs);
+                    var profileResult = await ProfileDeviceAsync(device, sampleInputs).ConfigureAwait(false);
                     results[device] = profileResult;
                 }
                 catch (Exception ex)
@@ -268,7 +267,7 @@ namespace ILGPU.ML.Integration
             {
                 foreach (var input in sampleInputs.Take(Math.Min(sampleInputs.Length, 4)))
                 {
-                    await PredictAsync(input);
+                    await PredictAsync(input).ConfigureAwait(false);
                 }
             }
 
@@ -282,7 +281,7 @@ namespace ILGPU.ML.Integration
                 
                 foreach (var input in sampleInputs.Take(Math.Min(sampleInputs.Length, 4)))
                 {
-                    await PredictAsync(input);
+                    await PredictAsync(input).ConfigureAwait(false);
                 }
                 
                 var runEnd = DateTime.UtcNow;

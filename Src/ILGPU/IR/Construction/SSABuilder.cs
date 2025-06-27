@@ -154,11 +154,6 @@ namespace ILGPU.IR.Construction
             private int markerValue;
 
             /// <summary>
-            /// Represents the current block builder.
-            /// </summary>
-            private BasicBlock.Builder? blockBuilder;
-
-            /// <summary>
             /// Value cache for SSA GetValue and SetValue functionality.
             /// </summary>
             private readonly Dictionary<TVariable, Value> values =
@@ -203,8 +198,8 @@ namespace ILGPU.IR.Construction
             {
                 get
                 {
-                    blockBuilder ??= Parent.MethodBuilder[Block];
-                    return blockBuilder;
+                    field ??= Parent.MethodBuilder[Block];
+                    return field;
                 }
             }
 

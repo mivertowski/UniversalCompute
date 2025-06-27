@@ -67,10 +67,6 @@ namespace ILGPU.Runtime.LINQ
     {
         #region Instance
 
-        private readonly Accelerator accelerator;
-        private readonly MemoryBuffer1D<T, Stride1D.Dense> buffer;
-        private readonly Expression expression;
-        private readonly IQueryProvider provider;
         private bool disposed;
 
         /// <summary>
@@ -82,10 +78,10 @@ namespace ILGPU.Runtime.LINQ
             Accelerator accelerator,
             MemoryBuffer1D<T, Stride1D.Dense> buffer)
         {
-            this.accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            this.buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
-            provider = new GPUQueryProvider(accelerator);
-            expression = Expression.Constant(this);
+            this.Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            this.Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+            Provider = new GPUQueryProvider(accelerator);
+            Expression = Expression.Constant(this);
         }
 
         /// <summary>
@@ -101,10 +97,10 @@ namespace ILGPU.Runtime.LINQ
             Accelerator accelerator,
             MemoryBuffer1D<T, Stride1D.Dense> buffer)
         {
-            this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            this.expression = expression ?? throw new ArgumentNullException(nameof(expression));
-            this.accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            this.buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+            this.Provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            this.Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            this.Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
         }
 
         #endregion
@@ -114,12 +110,12 @@ namespace ILGPU.Runtime.LINQ
         /// <summary>
         /// Gets the accelerator associated with this queryable.
         /// </summary>
-        public Accelerator Accelerator => accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <summary>
         /// Gets the underlying memory buffer.
         /// </summary>
-        public MemoryBuffer1D<T, Stride1D.Dense> Buffer => buffer;
+        public MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; }
 
         /// <summary>
         /// Gets the element type.
@@ -129,12 +125,12 @@ namespace ILGPU.Runtime.LINQ
         /// <summary>
         /// Gets the expression tree.
         /// </summary>
-        public Expression Expression => expression;
+        public Expression Expression { get; }
 
         /// <summary>
         /// Gets the query provider.
         /// </summary>
-        public IQueryProvider Provider => provider;
+        public IQueryProvider Provider { get; }
 
         #endregion
 
@@ -162,8 +158,8 @@ namespace ILGPU.Runtime.LINQ
                 throw new ObjectDisposedException(nameof(GPUQueryable<T>));
 
             // Execute the expression tree and return results
-            var executor = new GPUQueryExecutor(accelerator);
-            return executor.Execute<T>(expression);
+            var executor = new GPUQueryExecutor(Accelerator);
+            return executor.Execute<T>(Expression);
         }
 
         /// <summary>
@@ -183,8 +179,8 @@ namespace ILGPU.Runtime.LINQ
             if (outputBuffer == null)
                 throw new ArgumentNullException(nameof(outputBuffer));
 
-            var executor = new GPUQueryExecutor(accelerator);
-            executor.ExecuteTo(expression, outputBuffer);
+            var executor = new GPUQueryExecutor(Accelerator);
+            executor.ExecuteTo(Expression, outputBuffer);
         }
 
         /// <summary>
@@ -194,7 +190,7 @@ namespace ILGPU.Runtime.LINQ
         {
             if (!disposed)
             {
-                buffer?.Dispose();
+                Buffer?.Dispose();
                 disposed = true;
             }
         }

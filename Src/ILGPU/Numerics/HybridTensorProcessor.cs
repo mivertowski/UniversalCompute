@@ -298,11 +298,11 @@ namespace ILGPU.Numerics.Hybrid
 
             return chosenStrategy switch
             {
-                HybridStrategy.CpuSimd => await ExecuteCpuSimdAsync(input, operation, ct),
-                HybridStrategy.GpuTensorCore => await ExecuteGpuTensorCoreAsync(input, operation, ct),
-                HybridStrategy.GpuGeneral => await ExecuteGpuGeneralAsync(input, operation, ct),
-                HybridStrategy.Hybrid => await ExecuteHybridAsync(input, operation, ct),
-                HybridStrategy.Pipeline => await ExecutePipelineAsync(input, new[] { operation }, ct),
+                HybridStrategy.CpuSimd => await ExecuteCpuSimdAsync(input, operation, ct).ConfigureAwait(false),
+                HybridStrategy.GpuTensorCore => await ExecuteGpuTensorCoreAsync(input, operation, ct).ConfigureAwait(false),
+                HybridStrategy.GpuGeneral => await ExecuteGpuGeneralAsync(input, operation, ct).ConfigureAwait(false),
+                HybridStrategy.Hybrid => await ExecuteHybridAsync(input, operation, ct).ConfigureAwait(false),
+                HybridStrategy.Pipeline => await ExecutePipelineAsync(input, new[] { operation }, ct).ConfigureAwait(false),
                 _ => throw new ArgumentException($"Unsupported strategy: {strategy}")
             };
         }
@@ -319,7 +319,7 @@ namespace ILGPU.Numerics.Hybrid
             foreach (var operation in operations)
             {
                 ct.ThrowIfCancellationRequested();
-                current = await ProcessAsync(current, operation, HybridStrategy.Auto, ct);
+                current = await ProcessAsync(current, operation, HybridStrategy.Auto, ct).ConfigureAwait(false);
             }
             return current;
         }
@@ -396,7 +396,7 @@ namespace ILGPU.Numerics.Hybrid
                                                                                          }
 
                                                                                          return result;
-                                                                                     }, ct);
+                                                                                     }, ct).ConfigureAwait(false);
 
         private async Task<ITensor<T>> ExecuteGpuTensorCoreAsync<T>(
             ITensor<T> input,
@@ -410,7 +410,7 @@ namespace ILGPU.Numerics.Hybrid
             var startTime = DateTime.UtcNow;
 
             // Execute operation using GPU tensor cores
-            var result = await Task.Run(() => ExecuteGpuTensorCoreOperation(input, operation, gpuAccelerator), ct);
+            var result = await Task.Run(() => ExecuteGpuTensorCoreOperation(input, operation, gpuAccelerator), ct).ConfigureAwait(false);
 
             lock (statsLock)
             {
@@ -434,7 +434,7 @@ namespace ILGPU.Numerics.Hybrid
             var startTime = DateTime.UtcNow;
 
             // Execute operation using GPU general compute
-            var result = await Task.Run(() => ExecuteGpuGeneralOperation(input, operation, gpuAccelerator), ct);
+            var result = await Task.Run(() => ExecuteGpuGeneralOperation(input, operation, gpuAccelerator), ct).ConfigureAwait(false);
 
             lock (statsLock)
             {
@@ -456,7 +456,7 @@ namespace ILGPU.Numerics.Hybrid
 
             // For demonstration, we'll just use one of them
             // In a real implementation, we'd split the data and merge results
-            return await cpuTask;
+            return await cpuTask.ConfigureAwait(false);
         }
 
         private ITensor<T> ExecuteCpuOperation<T>(ITensor<T> input, TensorOperation operation)

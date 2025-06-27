@@ -90,19 +90,19 @@ namespace ILGPU.ML.Integration
             ThrowIfDisposed();
 
             // Get or compile the model
-            var compiledModel = await GetOrCompileModelAsync(modelPath);
+            var compiledModel = await GetOrCompileModelAsync(modelPath).ConfigureAwait(false);
 
             // Convert inputs to universal tensor format
-            var inputTensors = await ConvertInputsToTensorsAsync(inputs);
+            var inputTensors = await ConvertInputsToTensorsAsync(inputs).ConfigureAwait(false);
 
             // Create execution plan with optimal scheduling
-            var executionPlan = await _scheduler.CreateExecutionPlanAsync(compiledModel.ComputeGraph);
+            var executionPlan = await _scheduler.CreateExecutionPlanAsync(compiledModel.ComputeGraph).ConfigureAwait(false);
 
             // Execute with universal compute engine
-            var outputTensors = await _computeEngine.ExecuteAsync(executionPlan, inputTensors);
+            var outputTensors = await _computeEngine.ExecuteAsync(executionPlan, inputTensors).ConfigureAwait(false);
 
             // Convert outputs back to ONNX format
-            return await ConvertTensorsToOutputsAsync(outputTensors, outputNames);
+            return await ConvertTensorsToOutputsAsync(outputTensors, outputNames).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -118,13 +118,13 @@ namespace ILGPU.ML.Integration
             ThrowIfDisposed();
 
             // Convert inputs to universal tensor format
-            var inputTensors = await ConvertInputsToTensorsAsync(inputs);
+            var inputTensors = await ConvertInputsToTensorsAsync(inputs).ConfigureAwait(false);
 
             // Execute with pre-compiled plan
-            var outputTensors = await _computeEngine.ExecuteCompiledAsync(executionPlan, inputTensors);
+            var outputTensors = await _computeEngine.ExecuteCompiledAsync(executionPlan, inputTensors).ConfigureAwait(false);
 
             // Convert outputs back to ONNX format
-            return await ConvertTensorsToOutputsAsync(outputTensors, executionPlan.OutputNames);
+            return await ConvertTensorsToOutputsAsync(outputTensors, executionPlan.OutputNames).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -142,19 +142,19 @@ namespace ILGPU.ML.Integration
             compilationOptions ??= new ModelCompilationOptions();
 
             // Load and parse ONNX model
-            var onnxModel = await LoadONNXModelAsync(modelPath);
+            var onnxModel = await LoadONNXModelAsync(modelPath).ConfigureAwait(false);
 
             // Convert ONNX graph to ILGPU compute graph
-            var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel);
+            var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel).ConfigureAwait(false);
 
             // Optimize the compute graph
-            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, compilationOptions);
+            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, compilationOptions).ConfigureAwait(false);
 
             // Create execution plan
-            var executionPlan = await _scheduler.CreateExecutionPlanAsync(optimizedGraph);
+            var executionPlan = await _scheduler.CreateExecutionPlanAsync(optimizedGraph).ConfigureAwait(false);
 
             // Compile kernels for target devices
-            var compiledKernels = await CompileKernelsAsync(executionPlan);
+            var compiledKernels = await CompileKernelsAsync(executionPlan).ConfigureAwait(false);
 
             return new CompiledExecutionPlan(
                 executionPlan,
@@ -181,7 +181,7 @@ namespace ILGPU.ML.Integration
             {
                 try
                 {
-                    var deviceResult = await ProfileOnDeviceAsync(modelPath, sampleInputs, device);
+                    var deviceResult = await ProfileOnDeviceAsync(modelPath, sampleInputs, device).ConfigureAwait(false);
                     results[device] = deviceResult;
                 }
                 catch (Exception ex)
@@ -206,10 +206,10 @@ namespace ILGPU.ML.Integration
             var workloadAnalysis = AnalyzeWorkloadSamples(workloadSamples);
 
             // Update scheduling strategy
-            await _scheduler.UpdatePolicyAsync(workloadAnalysis);
+            await _scheduler.UpdatePolicyAsync(workloadAnalysis).ConfigureAwait(false);
 
             // Optimize memory management
-            await _computeEngine.OptimizeMemoryAsync(workloadAnalysis);
+            await _computeEngine.OptimizeMemoryAsync(workloadAnalysis).ConfigureAwait(false);
 
             // Clear model cache to force recompilation with new optimizations
             ClearModelCache();
@@ -224,8 +224,8 @@ namespace ILGPU.ML.Integration
         {
             ThrowIfDisposed();
 
-            var model = await LoadONNXModelAsync(modelPath);
-            var computeGraph = await ConvertONNXToComputeGraphAsync(model);
+            var model = await LoadONNXModelAsync(modelPath).ConfigureAwait(false);
+            var computeGraph = await ConvertONNXToComputeGraphAsync(model).ConfigureAwait(false);
             
             var analysis = _modelOptimizer.AnalyzeModel(computeGraph);
             var deviceRecommendations = _scheduler.GetDeviceRecommendations(analysis);
@@ -244,9 +244,9 @@ namespace ILGPU.ML.Integration
                 return cachedModel;
             }
 
-            var onnxModel = await LoadONNXModelAsync(modelPath);
-            var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel);
-            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, new ModelCompilationOptions());
+            var onnxModel = await LoadONNXModelAsync(modelPath).ConfigureAwait(false);
+            var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel).ConfigureAwait(false);
+            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, new ModelCompilationOptions()).ConfigureAwait(false);
 
             var compiledModel = new CompiledModel(modelPath, optimizedGraph, onnxModel.InputNames, onnxModel.OutputNames);
             _modelCache[modelPath] = compiledModel;
@@ -257,12 +257,12 @@ namespace ILGPU.ML.Integration
         private async Task<ONNXModel> LoadONNXModelAsync(string modelPath) =>
             // Implementation would load and parse ONNX model file
             // This is a simplified placeholder
-            await Task.FromResult(new ONNXModel(modelPath));
+            await Task.FromResult(new ONNXModel(modelPath)).ConfigureAwait(false);
 
         private async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel) =>
             // Implementation would convert ONNX operators to ILGPU compute operations
             // This involves mapping ONNX ops to universal kernels
-            await Task.FromResult(new ComputeGraph());
+            await Task.FromResult(new ComputeGraph()).ConfigureAwait(false);
 
         private async Task<Dictionary<string, ITensor<float>>> ConvertInputsToTensorsAsync(
             IReadOnlyCollection<NamedOnnxValue> inputs)
@@ -271,7 +271,7 @@ namespace ILGPU.ML.Integration
 
             foreach (var input in inputs)
             {
-                var tensor = await ConvertOnnxValueToTensorAsync(input);
+                var tensor = await ConvertOnnxValueToTensorAsync(input).ConfigureAwait(false);
                 tensorInputs[input.Name] = tensor;
             }
 
@@ -280,7 +280,7 @@ namespace ILGPU.ML.Integration
 
         private async Task<ITensor<float>> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue) =>
             // Implementation would convert ONNX tensor format to ILGPU tensor format
-            await Task.FromResult<ITensor<float>>(null);
+            await Task.FromResult<ITensor<float>>(null).ConfigureAwait(false);
 
         private async Task<NamedOnnxValue[]> ConvertTensorsToOutputsAsync(
             Dictionary<string, ITensor<float>> tensors,
@@ -292,7 +292,7 @@ namespace ILGPU.ML.Integration
             {
                 if (tensors.TryGetValue(outputName, out var tensor))
                 {
-                    var onnxValue = await ConvertTensorToOnnxValueAsync(outputName, tensor);
+                    var onnxValue = await ConvertTensorToOnnxValueAsync(outputName, tensor).ConfigureAwait(false);
                     outputs.Add(onnxValue);
                 }
             }
@@ -302,7 +302,7 @@ namespace ILGPU.ML.Integration
 
         private async Task<NamedOnnxValue> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>
             // Implementation would convert ILGPU tensor back to ONNX format
-            await Task.FromResult<NamedOnnxValue>(null);
+            await Task.FromResult<NamedOnnxValue>(null).ConfigureAwait(false);
 
         private async Task<Dictionary<ComputeNode, CompiledKernel>> CompileKernelsAsync(ExecutionPlan plan)
         {
@@ -310,7 +310,7 @@ namespace ILGPU.ML.Integration
 
             foreach (var node in plan.Graph.Nodes)
             {
-                var kernel = await CompileNodeKernelAsync(node, plan.Assignments[node]);
+                var kernel = await CompileNodeKernelAsync(node, plan.Assignments[node]).ConfigureAwait(false);
                 compiledKernels[node] = kernel;
             }
 
@@ -319,7 +319,7 @@ namespace ILGPU.ML.Integration
 
         private async Task<CompiledKernel> CompileNodeKernelAsync(ComputeNode node, ComputeDevice device) =>
             // Implementation would compile the node's operation to device-specific code
-            await Task.FromResult(new CompiledKernel(node, device));
+            await Task.FromResult(new CompiledKernel(node, device)).ConfigureAwait(false);
 
         private async Task<DeviceProfilingResult> ProfileOnDeviceAsync(
             string modelPath,
@@ -331,7 +331,7 @@ namespace ILGPU.ML.Integration
             
             for (int i = 0; i < 10; i++)
             {
-                await RunAsync(modelPath, sampleInputs, new[] { "output" });
+                await RunAsync(modelPath, sampleInputs, new[] { "output" }).ConfigureAwait(false);
             }
 
             var endTime = DateTime.UtcNow;

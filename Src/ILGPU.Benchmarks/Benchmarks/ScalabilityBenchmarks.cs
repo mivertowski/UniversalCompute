@@ -31,7 +31,7 @@ public class ScalabilityBenchmarks : IDisposable
 {
     private Context? context;
     private Accelerator? accelerator;
-    private Dictionary<int, float[]> testDataSets = new();
+    private Dictionary<int, float[]> testDataSets = [];
 
     [Params(1024, 4096, 16384, 65536, 262144, 1048576)] // 1K to 1M elements
     public int ProblemSize { get; set; }

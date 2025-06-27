@@ -113,7 +113,7 @@ namespace ILGPU.Intel.NPU
             var output = TensorFactory.Create<T>(OutputShape, ComputeLocation.Npu);
             
             // Execute NPU convolution kernel
-            await npu.ExecuteConvolutionKernelAsync(Input, Kernel, output, Parameters, cancellationToken);
+            await npu.ExecuteConvolutionKernelAsync(Input, Kernel, output, Parameters, cancellationToken).ConfigureAwait(false);
             
             return output;
         }
@@ -179,7 +179,7 @@ namespace ILGPU.Intel.NPU
             var output = TensorFactory.Create<T>(OutputShape, ComputeLocation.Npu);
             
             // Execute NPU attention kernel
-            await npu.ExecuteAttentionKernelAsync(Query, Key, Value, output, Parameters, cancellationToken);
+            await npu.ExecuteAttentionKernelAsync(Query, Key, Value, output, Parameters, cancellationToken).ConfigureAwait(false);
             
             return output;
         }

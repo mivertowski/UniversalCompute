@@ -34,7 +34,6 @@ namespace ILGPU.Runtime.MultiGPU
 
         private readonly List<GPUInfo> availableGPUs;
         private readonly ConcurrentQueue<MultiGPUWorkItem> workQueue;
-        private readonly MultiGPUOptions options;
         private readonly Timer? loadBalancingTimer;
         private readonly ConcurrentDictionary<int, double> loadStats;
         private readonly object lockObject = new();
@@ -58,7 +57,7 @@ namespace ILGPU.Runtime.MultiGPU
             if (accelerators == null)
                 throw new ArgumentNullException(nameof(accelerators));
 
-            this.options = options ?? new MultiGPUOptions();
+            this.Options = options ?? new MultiGPUOptions();
             workQueue = new ConcurrentQueue<MultiGPUWorkItem>();
             loadStats = new ConcurrentDictionary<int, double>();
 
@@ -67,7 +66,7 @@ namespace ILGPU.Runtime.MultiGPU
             int index = 0;
             foreach (var accelerator in accelerators)
             {
-                if (this.options.MaxGPUs.HasValue && index >= this.options.MaxGPUs.Value)
+                if (this.Options.MaxGPUs.HasValue && index >= this.Options.MaxGPUs.Value)
                     break;
 
                 var performanceScore = CalculatePerformanceScore(accelerator);
@@ -78,13 +77,13 @@ namespace ILGPU.Runtime.MultiGPU
             }
 
             // Start load balancing timer if enabled
-            if (this.options.EnableLoadBalancing && availableGPUs.Count > 1)
+            if (this.Options.EnableLoadBalancing && availableGPUs.Count > 1)
             {
                 loadBalancingTimer = new Timer(
                     LoadBalancingCallback,
                     null,
-                    TimeSpan.FromMilliseconds(this.options.LoadBalancingInterval),
-                    TimeSpan.FromMilliseconds(this.options.LoadBalancingInterval));
+                    TimeSpan.FromMilliseconds(this.Options.LoadBalancingInterval),
+                    TimeSpan.FromMilliseconds(this.Options.LoadBalancingInterval));
             }
         }
 
@@ -105,7 +104,7 @@ namespace ILGPU.Runtime.MultiGPU
         /// <summary>
         /// Gets the orchestration options.
         /// </summary>
-        public MultiGPUOptions Options => options;
+        public MultiGPUOptions Options { get; }
 
         #endregion
 
@@ -196,7 +195,7 @@ namespace ILGPU.Runtime.MultiGPU
                             }
 
                             // Synchronize if required
-                            if (options.SynchronizationMode == SynchronizationMode.PerKernel)
+                            if (Options.SynchronizationMode == SynchronizationMode.PerKernel)
                             {
                                 gpu.Accelerator.Synchronize();
                             }
@@ -208,7 +207,7 @@ namespace ILGPU.Runtime.MultiGPU
                         }
 
                         // Batch synchronization
-                        if (options.SynchronizationMode == SynchronizationMode.PerBatch)
+                        if (Options.SynchronizationMode == SynchronizationMode.PerBatch)
                         {
                             gpu.Accelerator.Synchronize();
                         }
@@ -219,8 +218,8 @@ namespace ILGPU.Runtime.MultiGPU
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
                 // Final synchronization if needed
-                if (options.SynchronizationMode == SynchronizationMode.PerBatch ||
-                    options.SynchronizationMode == SynchronizationMode.PerKernel)
+                if (Options.SynchronizationMode == SynchronizationMode.PerBatch ||
+                    Options.SynchronizationMode == SynchronizationMode.PerKernel)
                 {
                     await SynchronizeAsync(cancellationToken).ConfigureAwait(false);
                 }
@@ -506,7 +505,7 @@ namespace ILGPU.Runtime.MultiGPU
                 assignments[gpu] = [];
             }
 
-            switch (options.DistributionStrategy)
+            switch (Options.DistributionStrategy)
             {
                 case WorkDistributionStrategy.RoundRobin:
                     DistributeRoundRobin(workItems, gpus, assignments);
@@ -604,7 +603,7 @@ namespace ILGPU.Runtime.MultiGPU
             if (candidates.Count == 0)
                 return null;
 
-            return options.DistributionStrategy switch
+            return Options.DistributionStrategy switch
             {
                 WorkDistributionStrategy.PerformanceBased => candidates.OrderByDescending(g => g.PerformanceScore).First(),
                 WorkDistributionStrategy.LoadBased => candidates.OrderBy(g => g.CurrentLoad).First(),

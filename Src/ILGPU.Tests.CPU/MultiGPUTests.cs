@@ -174,7 +174,7 @@ namespace ILGPU.Tests.CPU
             using var orchestrator = new MultiGPUOrchestrator(accelerators);
 
             var workItem = new TestWorkItem("test1");
-            var result = await orchestrator.ExecuteSingleAsync(workItem);
+            var result = await orchestrator.ExecuteSingleAsync(workItem).ConfigureAwait(false);
 
             Assert.NotNull(result);
             Assert.Contains("Completed on GPU 0", result.ToString());
@@ -191,7 +191,7 @@ namespace ILGPU.Tests.CPU
             orchestrator.AddWorkItem(new TestWorkItem("work2"));
             orchestrator.AddWorkItem(new TestWorkItem("work3"));
 
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(1, result.ParticipatingGPUs);
@@ -210,7 +210,7 @@ namespace ILGPU.Tests.CPU
             orchestrator.AddWorkItem(new HighPriorityWorkItem("high1")); // Priority 10
             orchestrator.AddWorkItem(new TestWorkItem("low2", 50) { }); // Default priority 0
 
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(1, result.ParticipatingGPUs);
@@ -227,7 +227,7 @@ namespace ILGPU.Tests.CPU
             // This might fail if GPU doesn't have enough memory, which is expected
             try
             {
-                var result = await orchestrator.ExecuteSingleAsync(workItem);
+                var result = await orchestrator.ExecuteSingleAsync(workItem).ConfigureAwait(false);
                 Assert.NotNull(result);
             }
             catch (InvalidOperationException ex)
@@ -257,7 +257,7 @@ namespace ILGPU.Tests.CPU
                 orchestrator.AddWorkItem(new TestWorkItem($"work{i}"));
             }
 
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(1, result.ParticipatingGPUs);
@@ -280,7 +280,7 @@ namespace ILGPU.Tests.CPU
                 orchestrator.AddWorkItem(new TestWorkItem($"work{i}"));
             }
 
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(1, result.ParticipatingGPUs);
@@ -303,7 +303,7 @@ namespace ILGPU.Tests.CPU
                 orchestrator.AddWorkItem(new TestWorkItem($"work{i}"));
             }
 
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(1, result.ParticipatingGPUs);
@@ -337,7 +337,7 @@ namespace ILGPU.Tests.CPU
                 using var orchestrator = new MultiGPUOrchestrator(accelerators, options);
 
                 orchestrator.AddWorkItem(new TestWorkItem("sync_test"));
-                var result = await orchestrator.ExecuteAsync();
+                var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
                 Assert.True(result.IsSuccess);
             }
@@ -350,7 +350,7 @@ namespace ILGPU.Tests.CPU
             using var orchestrator = new MultiGPUOrchestrator(accelerators);
 
             // Test explicit synchronization
-            await orchestrator.SynchronizeAsync();
+            await orchestrator.SynchronizeAsync().ConfigureAwait(false);
             
             // Should complete without errors
             Assert.True(true);
@@ -375,7 +375,7 @@ namespace ILGPU.Tests.CPU
                 {
                     await Task.Delay(10, cancellationToken).ConfigureAwait(false); // Simulate processing
                     return chunk.Select(x => x * 2).ToArray();
-                });
+                }).ConfigureAwait(false);
 
             Assert.Equal(inputData.Length, result.Length);
             for (int i = 0; i < inputData.Length; i++)
@@ -413,7 +413,7 @@ namespace ILGPU.Tests.CPU
                     gpu.Accelerator.Synchronize();
                     
                     return resultBuffer.GetAsArray1D();
-                });
+                }).ConfigureAwait(false);
 
             Assert.Equal(size, result.Length);
             
@@ -441,7 +441,7 @@ namespace ILGPU.Tests.CPU
 
             // Execute some work
             orchestrator.AddWorkItem(new TestWorkItem("load_test"));
-            await orchestrator.ExecuteAsync();
+            await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             // Load should have been updated during execution
             var finalStats = orchestrator.GetLoadStatistics();
@@ -459,7 +459,7 @@ namespace ILGPU.Tests.CPU
             {
                 orchestrator.AddWorkItem(new TestWorkItem($"metrics_test_{i}"));
             }
-            await orchestrator.ExecuteAsync();
+            await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             var metrics = orchestrator.GetPerformanceMetrics();
 
@@ -482,7 +482,7 @@ namespace ILGPU.Tests.CPU
             using var orchestrator = new MultiGPUOrchestrator(accelerators, options);
 
             // Execute load balancing
-            await orchestrator.BalanceLoadAsync();
+            await orchestrator.BalanceLoadAsync().ConfigureAwait(false);
             
             // Should complete without errors
             Assert.True(true);
@@ -502,7 +502,7 @@ namespace ILGPU.Tests.CPU
             orchestrator.SetGPUEnabled(0, false);
 
             orchestrator.AddWorkItem(new TestWorkItem("no_gpu_test"));
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.False(result.IsSuccess);
             Assert.NotNull(result.Error);
@@ -523,7 +523,7 @@ namespace ILGPU.Tests.CPU
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
             {
                 await orchestrator.ExecuteAsync(cts.Token).ConfigureAwait(false);
-            });
+            }).ConfigureAwait(false);
         }
 
         [Fact]
@@ -542,7 +542,7 @@ namespace ILGPU.Tests.CPU
             var workItem = new FaultyWorkItem("exception_test");
             
             orchestrator.AddWorkItem(workItem);
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             // Should still succeed overall, but individual item should fail
             Assert.True(result.IsSuccess);
@@ -573,7 +573,7 @@ namespace ILGPU.Tests.CPU
             }
 
             // All tasks should complete successfully
-            await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
             Assert.True(true);
         }
 
@@ -591,7 +591,7 @@ namespace ILGPU.Tests.CPU
                 orchestrator.AddWorkItem(new TestWorkItem($"stress_{i}", 10)); // Short tasks
             }
 
-            var result = await orchestrator.ExecuteAsync();
+            var result = await orchestrator.ExecuteAsync().ConfigureAwait(false);
 
             Assert.True(result.IsSuccess);
             Assert.Equal(1, result.ParticipatingGPUs);

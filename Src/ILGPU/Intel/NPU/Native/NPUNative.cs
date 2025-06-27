@@ -386,16 +386,13 @@ namespace ILGPU.Intel.NPU.Native
         /// Estimates NPU TOPS (Tera Operations Per Second) based on generation.
         /// </summary>
         /// <returns>Estimated TOPS performance.</returns>
-        private static double EstimateNPUTOPS()
+        private static double EstimateNPUTOPS() => DetectNPUGeneration() switch
         {
-            return DetectNPUGeneration() switch
-            {
-                NPUGeneration.NPU2 => 10.0,  // Meteor Lake: ~10 TOPS
-                NPUGeneration.NPU3 => 40.0,  // Lunar Lake: ~40 TOPS
-                NPUGeneration.NPU4 => 45.0,  // Arrow Lake: ~45 TOPS
-                _ => 0.0
-            };
-        }
+            NPUGeneration.NPU2 => 10.0,  // Meteor Lake: ~10 TOPS
+            NPUGeneration.NPU3 => 40.0,  // Lunar Lake: ~40 TOPS
+            NPUGeneration.NPU4 => 45.0,  // Arrow Lake: ~45 TOPS
+            _ => 0.0
+        };
 
         /// <summary>
         /// Checks if NPU supports specific data type.
@@ -420,67 +417,55 @@ namespace ILGPU.Intel.NPU.Native
         /// Gets maximum batch size supported by NPU.
         /// </summary>
         /// <returns>Maximum batch size.</returns>
-        private static int GetMaxBatchSize()
+        private static int GetMaxBatchSize() => DetectNPUGeneration() switch
         {
-            return DetectNPUGeneration() switch
-            {
-                NPUGeneration.NPU2 => 16,
-                NPUGeneration.NPU3 => 32,
-                NPUGeneration.NPU4 => 64,
-                _ => 1
-            };
-        }
+            NPUGeneration.NPU2 => 16,
+            NPUGeneration.NPU3 => 32,
+            NPUGeneration.NPU4 => 64,
+            _ => 1
+        };
 
         /// <summary>
         /// Gets NPU memory size in bytes.
         /// </summary>
         /// <returns>Memory size in bytes.</returns>
-        private static ulong GetNPUMemorySize()
+        private static ulong GetNPUMemorySize() => DetectNPUGeneration() switch
         {
-            return DetectNPUGeneration() switch
-            {
-                NPUGeneration.NPU2 => 1024UL * 1024 * 1024,      // 1 GB
-                NPUGeneration.NPU3 => 2048UL * 1024 * 1024,      // 2 GB
-                NPUGeneration.NPU4 => 4096UL * 1024 * 1024,      // 4 GB
-                _ => 0
-            };
-        }
+            NPUGeneration.NPU2 => 1024UL * 1024 * 1024,      // 1 GB
+            NPUGeneration.NPU3 => 2048UL * 1024 * 1024,      // 2 GB
+            NPUGeneration.NPU4 => 4096UL * 1024 * 1024,      // 4 GB
+            _ => 0
+        };
 
         /// <summary>
         /// Gets NPU core count.
         /// </summary>
         /// <returns>Number of NPU cores.</returns>
-        private static int GetNPUCoreCount()
+        private static int GetNPUCoreCount() => DetectNPUGeneration() switch
         {
-            return DetectNPUGeneration() switch
-            {
-                NPUGeneration.NPU2 => 2,
-                NPUGeneration.NPU3 => 4,
-                NPUGeneration.NPU4 => 8,
-                _ => 0
-            };
-        }
+            NPUGeneration.NPU2 => 2,
+            NPUGeneration.NPU3 => 4,
+            NPUGeneration.NPU4 => 8,
+            _ => 0
+        };
 
         /// <summary>
         /// Estimates NPU memory bandwidth in GB/s.
         /// </summary>
         /// <returns>Estimated bandwidth in GB/s.</returns>
-        private static double EstimateNPUBandwidth()
+        private static double EstimateNPUBandwidth() => DetectNPUGeneration() switch
         {
-            return DetectNPUGeneration() switch
-            {
-                NPUGeneration.NPU2 => 50.0,   // ~50 GB/s
-                NPUGeneration.NPU3 => 100.0,  // ~100 GB/s
-                NPUGeneration.NPU4 => 150.0,  // ~150 GB/s
-                _ => 0.0
-            };
-        }
+            NPUGeneration.NPU2 => 50.0,   // ~50 GB/s
+            NPUGeneration.NPU3 => 100.0,  // ~100 GB/s
+            NPUGeneration.NPU4 => 150.0,  // ~150 GB/s
+            _ => 0.0
+        };
 
         #endregion
 
         #region Private Fields
 
-        private static bool _isInitialized = false;
+        private static bool _isInitialized;
         private static IntPtr _openvinoCore = IntPtr.Zero;
 
         #endregion
@@ -543,10 +528,7 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void InferenceFloat(
             float* input, float* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
-            throw new NotImplementedException("NPU float inference requires Intel NPU hardware and OpenVINO Runtime");
-        }
+            IntPtr context) => throw new NotImplementedException("NPU float inference requires Intel NPU hardware and OpenVINO Runtime");
 
         /// <summary>
         /// Executes BFloat16 inference on NPU.
@@ -554,10 +536,7 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void InferenceBF16(
             BFloat16* input, BFloat16* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
-            throw new NotImplementedException("NPU BF16 inference requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
-        }
+            IntPtr context) => throw new NotImplementedException("NPU BF16 inference requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
 
         /// <summary>
         /// Executes Int8 inference on NPU.
@@ -565,10 +544,7 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void InferenceInt8(
             byte* input, byte* output,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
-            throw new NotImplementedException("NPU Int8 inference requires Intel NPU hardware and OpenVINO Runtime");
-        }
+            IntPtr context) => throw new NotImplementedException("NPU Int8 inference requires Intel NPU hardware and OpenVINO Runtime");
 
         /// <summary>
         /// Executes float convolution on NPU.
@@ -576,10 +552,7 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void ConvolutionFloat(
             float* input, float* weights, float* output,
             TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape,
-            IntPtr config)
-        {
-            throw new NotImplementedException("NPU convolution requires Intel NPU hardware and OpenVINO Runtime");
-        }
+            IntPtr config) => throw new NotImplementedException("NPU convolution requires Intel NPU hardware and OpenVINO Runtime");
 
         /// <summary>
         /// Executes float matrix multiplication on NPU.
@@ -587,10 +560,7 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void MatMulFloat(
             float* a, float* b, float* c,
             int m, int k, int n,
-            IntPtr config)
-        {
-            throw new NotImplementedException("NPU matrix multiplication requires Intel NPU hardware and OpenVINO Runtime");
-        }
+            IntPtr config) => throw new NotImplementedException("NPU matrix multiplication requires Intel NPU hardware and OpenVINO Runtime");
 
         /// <summary>
         /// Executes BFloat16 matrix multiplication on NPU.
@@ -598,10 +568,7 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void MatMulBF16(
             BFloat16* a, BFloat16* b, BFloat16* c,
             int m, int k, int n,
-            IntPtr config)
-        {
-            throw new NotImplementedException("NPU BF16 matrix multiplication requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
-        }
+            IntPtr config) => throw new NotImplementedException("NPU BF16 matrix multiplication requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
 
         /// <summary>
         /// Executes float attention on NPU.
@@ -609,9 +576,6 @@ namespace ILGPU.Intel.NPU.Native
         public static unsafe void AttentionFloat(
             float* query, float* key, float* value, float* output,
             TensorShape queryShape, TensorShape keyShape, TensorShape valueShape,
-            IntPtr config)
-        {
-            throw new NotImplementedException("NPU attention requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
-        }
+            IntPtr config) => throw new NotImplementedException("NPU attention requires Intel NPU 3.0+ hardware and OpenVINO Runtime");
     }
 }

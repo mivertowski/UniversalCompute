@@ -176,7 +176,7 @@ namespace ILGPU.Backends.IL
             }
             
             // Parameters would be added by the calling code
-            sourceBuilder.Append(")");
+            sourceBuilder.Append(')');
         }
 
         /// <summary cref="IILEmitter.EmitNewObject(ConstructorInfo)"/>
@@ -184,7 +184,7 @@ namespace ILGPU.Backends.IL
         {
             sourceBuilder.Append($"new {GetTypeString(info.DeclaringType!)}(");
             // Parameters would be added by the calling code
-            sourceBuilder.Append(")");
+            sourceBuilder.Append(')');
         }
 
         /// <summary cref="IILEmitter.EmitAlloca(int)"/>
@@ -194,7 +194,7 @@ namespace ILGPU.Backends.IL
         public void EmitConstant(string constant) => sourceBuilder.Append($"\"{EscapeString(constant)}\"");
 
         /// <summary cref="IILEmitter.EmitConstant(int)"/>
-        public void EmitConstant(int constant) => sourceBuilder.Append(constant.ToString());
+        public void EmitConstant(int constant) => sourceBuilder.Append(constant);
 
         /// <summary cref="IILEmitter.EmitConstant(long)"/>
         public void EmitConstant(long constant) => sourceBuilder.Append($"{constant}L");
@@ -236,7 +236,7 @@ namespace ILGPU.Backends.IL
                     sourceBuilder.Append(" ^ ");
                     break;
                 case "not":
-                    sourceBuilder.Append("~");
+                    sourceBuilder.Append('~');
                     break;
                 case "dup":
                     // Duplication would need special handling in context

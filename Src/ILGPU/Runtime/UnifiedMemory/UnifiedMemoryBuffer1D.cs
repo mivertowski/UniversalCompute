@@ -29,8 +29,6 @@ namespace ILGPU.Runtime.UnifiedMemory
     {
         #region Instance
 
-        private readonly UnifiedMemoryAccessMode accessMode;
-        private readonly bool isUnifiedMemorySupported;
         private readonly object syncLock = new();
 
         /// <summary>
@@ -45,8 +43,8 @@ namespace ILGPU.Runtime.UnifiedMemory
             UnifiedMemoryAccessMode accessMode)
             : base(accelerator, accelerator.Allocate1D<T>(length).View)
         {
-            this.accessMode = accessMode;
-            isUnifiedMemorySupported = accelerator.Device.SupportsUnifiedMemory;
+            this.AccessMode = accessMode;
+            IsUnifiedMemorySupported = accelerator.Device.SupportsUnifiedMemory;
         }
 
         #endregion
@@ -56,12 +54,12 @@ namespace ILGPU.Runtime.UnifiedMemory
         /// <summary>
         /// Gets the unified memory access mode.
         /// </summary>
-        public UnifiedMemoryAccessMode AccessMode => accessMode;
+        public UnifiedMemoryAccessMode AccessMode { get; }
 
         /// <summary>
         /// Gets a value indicating whether unified memory is actually supported.
         /// </summary>
-        public bool IsUnifiedMemorySupported => isUnifiedMemorySupported;
+        public bool IsUnifiedMemorySupported { get; }
 
         /// <summary>
         /// Gets a CPU-accessible span of the buffer data.
@@ -76,7 +74,7 @@ namespace ILGPU.Runtime.UnifiedMemory
                 lock (syncLock)
                 {
                     // Ensure data is accessible from CPU
-                    if (isUnifiedMemorySupported && Accelerator is CudaAccelerator)
+                    if (IsUnifiedMemorySupported && Accelerator is CudaAccelerator)
                     {
                         // For CUDA unified memory, data is automatically accessible
                         return new Span<T>(NativePtr.ToPointer(), (int)Length);
@@ -107,7 +105,7 @@ namespace ILGPU.Runtime.UnifiedMemory
                 throw new ArgumentNullException(nameof(stream));
 
             // Only supported for CUDA unified memory
-            if (isUnifiedMemorySupported && Accelerator is CudaAccelerator cudaAccelerator)
+            if (IsUnifiedMemorySupported && Accelerator is CudaAccelerator cudaAccelerator)
             {
                 // This would require CUDA API extensions
                 // For now, just synchronize
@@ -122,7 +120,7 @@ namespace ILGPU.Runtime.UnifiedMemory
         public void Advise(UnifiedMemoryAdvice advice)
         {
             // Only supported for CUDA unified memory
-            if (isUnifiedMemorySupported && Accelerator is CudaAccelerator)
+            if (IsUnifiedMemorySupported && Accelerator is CudaAccelerator)
             {
                 // This would require CUDA API extensions
                 // For now, this is a no-op

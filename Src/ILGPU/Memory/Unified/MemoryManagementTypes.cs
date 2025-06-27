@@ -32,7 +32,6 @@ namespace ILGPU.Memory.Unified
     /// </remarks>
     public class AcceleratorMemoryManager(Accelerator accelerator) : IDisposable
     {
-        private readonly Accelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
         private readonly Dictionary<IntPtr, MemoryAllocation> _allocations = [];
         private long _totalAllocatedBytes;
         private readonly object _syncLock = new();
@@ -40,7 +39,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets the associated accelerator.
         /// </summary>
-        public Accelerator Accelerator => _accelerator;
+        public Accelerator Accelerator { get; } = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Gets the total allocated memory in bytes.
@@ -53,7 +52,7 @@ namespace ILGPU.Memory.Unified
         public MemoryBuffer1D<T, Stride1D.Dense> Allocate<T>(long length)
             where T : unmanaged
         {
-            var buffer = _accelerator.Allocate1D<T>(length);
+            var buffer = Accelerator.Allocate1D<T>(length);
             
             lock (_syncLock)
             {
@@ -131,7 +130,7 @@ namespace ILGPU.Memory.Unified
         {
             // Perform optimization operations
             Cleanup();
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
         }
 
         /// <summary>
@@ -434,7 +433,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets optimization recommendations for memory usage.
         /// </summary>
-        public async Task<List<MemoryTransferSuggestion>> GetRecommendations() => await SuggestTransfersAsync();
+        public async Task<List<MemoryTransferSuggestion>> GetRecommendations() => await SuggestTransfersAsync().ConfigureAwait(false);
 
         /// <summary>
         /// Disposes the memory placement optimizer.

@@ -140,8 +140,6 @@ namespace ILGPU.Runtime.KernelCache
         private readonly TDelegate action;
         private readonly IKernelCache cache;
         private readonly KernelSpecialization? specialization;
-        private readonly string cacheKey;
-        private readonly string version;
         private TDelegate? cachedKernel;
         private bool disposed;
 
@@ -168,8 +166,8 @@ namespace ILGPU.Runtime.KernelCache
             this.specialization = specialization;
 
             // Create cache key and version
-            cacheKey = CreateCacheKey();
-            version = CreateVersion();
+            CacheKey = CreateCacheKey();
+            Version = CreateVersion();
         }
 
         #endregion
@@ -196,12 +194,12 @@ namespace ILGPU.Runtime.KernelCache
         /// <summary>
         /// Gets the cache key for this kernel.
         /// </summary>
-        public string CacheKey => cacheKey;
+        public string CacheKey { get; }
 
         /// <summary>
         /// Gets the version string for this kernel.
         /// </summary>
-        public string Version => version;
+        public string Version { get; }
 
         #endregion
 
@@ -238,12 +236,12 @@ namespace ILGPU.Runtime.KernelCache
             if (disposed)
                 throw new ObjectDisposedException(nameof(CachedKernel<TDelegate>));
 
-            var isInCache = cache.ContainsKey(cacheKey);
+            var isInCache = cache.ContainsKey(CacheKey);
             var kernelLoaded = cachedKernel != null;
             
             return new CachedKernelInfo(
-                cacheKey,
-                version,
+                CacheKey,
+                Version,
                 isInCache,
                 kernelLoaded,
                 action.Method.Name,
@@ -261,7 +259,7 @@ namespace ILGPU.Runtime.KernelCache
         private TDelegate LoadKernel()
         {
             // Try to get from cache first
-            if (cache.TryGet(cacheKey, version, out var cacheEntry))
+            if (cache.TryGet(CacheKey, Version, out var cacheEntry))
             {
                 if (cacheEntry!.Kernel is TDelegate kernel)
                 {
@@ -292,7 +290,7 @@ namespace ILGPU.Runtime.KernelCache
                         ["CompilationTime"] = DateTime.UtcNow
                     };
 
-                    cache.Put(cacheKey, newKernel, version, kernelMetadata);
+                    cache.Put(CacheKey, newKernel, Version, kernelMetadata);
                     
                     cachedKernel = newKernel;
                     return newKernel;

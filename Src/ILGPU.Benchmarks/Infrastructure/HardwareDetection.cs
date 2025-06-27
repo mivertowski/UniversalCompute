@@ -44,7 +44,7 @@ public record HardwareInfo
     public HardwareCapabilities Capabilities { get; init; } = HardwareCapabilities.None;
     public string ProcessorName { get; init; } = string.Empty;
     public string[] AvailableDevices { get; init; } = Array.Empty<string>();
-    public Dictionary<string, object> Properties { get; init; } = new();
+    public Dictionary<string, object> Properties { get; init; } = [];
 }
 
 /// <summary>

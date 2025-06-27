@@ -60,10 +60,7 @@ namespace ILGPU.Apple.NeuralEngine
     /// </summary>
     public static class TensorFactory
     {
-        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged
-        {
-            return new SimpleTensor<T>(shape);
-        }
+        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged => new SimpleTensor<T>(shape);
     }
 
     /// <summary>
@@ -170,7 +167,7 @@ namespace ILGPU.Apple.NeuralEngine
     /// </summary>
     public class ANECompilationOptions
     {
-        public bool EnableSparsity { get; set; } = false;
+        public bool EnableSparsity { get; set; }
         public bool OptimizeForMemory { get; set; } = true;
     }
 
@@ -205,11 +202,9 @@ namespace ILGPU.Apple.NeuralEngine
             NativeHandle = IntPtr.Zero; // Would be initialized with real Core ML model
         }
 
-        public TensorShape GetOutputShape(TensorShape inputShape)
-        {
+        public TensorShape GetOutputShape(TensorShape inputShape) =>
             // For now, assume same shape (would analyze model in real implementation)
-            return inputShape;
-        }
+            inputShape;
 
         public void OptimizeForNeuralEngine(ANEOptimizationOptions options)
         {
@@ -229,11 +224,9 @@ namespace ILGPU.Apple.NeuralEngine
             _capabilities = capabilities;
         }
 
-        public CoreMLModel CompileForNeuralEngine(NeuralNetwork network, ANECompilationOptions options)
-        {
+        public CoreMLModel CompileForNeuralEngine(NeuralNetwork network, ANECompilationOptions options) =>
             // Would compile neural network to Core ML model optimized for ANE
-            return new CoreMLModel($"compiled_{network.Name}.mlmodel", _capabilities);
-        }
+            new CoreMLModel($"compiled_{network.Name}.mlmodel", _capabilities);
     }
 
 }

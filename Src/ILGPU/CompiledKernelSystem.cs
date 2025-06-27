@@ -88,7 +88,6 @@ namespace ILGPU
         public readonly struct MethodBuilder
         {
             private readonly StringBuilder sourceBuilder;
-            private readonly CompileTimeILEmitter emitter;
 
             /// <summary>
             /// Constructs a new compile-time method builder.
@@ -102,7 +101,7 @@ namespace ILGPU
                 Type[] parameterTypes)
             {
                 sourceBuilder = new StringBuilder();
-                emitter = new CompileTimeILEmitter(sourceBuilder);
+                ILEmitter = new CompileTimeILEmitter(sourceBuilder);
                 
                 MethodName = methodName;
                 ReturnType = returnType;
@@ -130,7 +129,7 @@ namespace ILGPU
             /// <summary>
             /// Returns the compile-time IL emitter.
             /// </summary>
-            public CompileTimeILEmitter ILEmitter => emitter;
+            public CompileTimeILEmitter ILEmitter { get; }
 
             /// <summary>
             /// Generates the method signature.
@@ -158,7 +157,7 @@ namespace ILGPU
             /// <returns>The generated method source code.</returns>
             public string Finish()
             {
-                emitter.Finish();
+                ILEmitter.Finish();
                 sourceBuilder.AppendLine("        }");
                 return sourceBuilder.ToString();
             }

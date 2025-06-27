@@ -290,11 +290,9 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public static unsafe void ExecuteConvolution(
             float* input, float* result,
             TensorShape inputShape, TensorShape outputShape,
-            object parameters, IntPtr context)
-        {
+            object parameters, IntPtr context) =>
             // Real implementation would use Core ML/Accelerate framework
             throw new NotImplementedException("ANE convolution requires Apple Silicon hardware");
-        }
 
         /// <summary>
         /// Executes matrix multiplication on ANE.
@@ -302,11 +300,9 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public static unsafe void ExecuteMatMul(
             float* input, float* result,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
+            IntPtr context) =>
             // Real implementation would use Core ML/Accelerate framework
             throw new NotImplementedException("ANE matrix multiplication requires Apple Silicon hardware");
-        }
 
         /// <summary>
         /// Executes attention mechanism on ANE.
@@ -314,11 +310,9 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public static unsafe void ExecuteAttention(
             float* input, float* result,
             TensorShape inputShape, TensorShape outputShape,
-            object parameters, IntPtr context)
-        {
+            object parameters, IntPtr context) =>
             // Real implementation would use Core ML/Accelerate framework
             throw new NotImplementedException("ANE attention requires Apple Silicon hardware");
-        }
 
         /// <summary>
         /// Executes Core ML inference on ANE.
@@ -326,11 +320,9 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public static unsafe void ExecuteCoreMLInference(
             float* input, float* result,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr modelHandle, IntPtr context)
-        {
+            IntPtr modelHandle, IntPtr context) =>
             // Real implementation would use Core ML framework
             throw new NotImplementedException("ANE Core ML inference requires Apple Silicon hardware");
-        }
 
         /// <summary>
         /// Executes convolution with bias on ANE.
@@ -338,11 +330,9 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public static unsafe void ExecuteConvolutionWithBias(
             float* input, float* weights, float* bias, float* result,
             TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape,
-            ANEConvolutionParameters parameters, IntPtr context)
-        {
+            ANEConvolutionParameters parameters, IntPtr context) =>
             // Real implementation would use Core ML/Accelerate framework
             throw new NotImplementedException("ANE convolution with bias requires Apple Silicon hardware");
-        }
 
         /// <summary>
         /// Executes multi-head attention on ANE.
@@ -350,10 +340,8 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public static unsafe void ExecuteMultiHeadAttention(
             float* query, float* key, float* value, float* result,
             TensorShape queryShape, TensorShape keyShape, TensorShape valueShape,
-            ANEAttentionParameters parameters, IntPtr context)
-        {
+            ANEAttentionParameters parameters, IntPtr context) =>
             // Real implementation would use Core ML/Accelerate framework
             throw new NotImplementedException("ANE multi-head attention requires Apple Silicon hardware");
-        }
     }
 }

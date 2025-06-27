@@ -305,13 +305,12 @@ namespace ILGPU.Runtime
     /// <param name="indentLevel">The indentation level.</param>
     public readonly struct SourceEmitter(StringBuilder sourceBuilder, int indentLevel = 3) : ISourceEmitter
     {
-        private readonly StringBuilder sourceBuilder = sourceBuilder;
         private readonly int indentLevel = indentLevel;
 
         /// <summary>
         /// Returns the underlying source builder.
         /// </summary>
-        public StringBuilder SourceBuilder => sourceBuilder;
+        public StringBuilder SourceBuilder { get; } = sourceBuilder;
 
         /// <summary>
         /// Emits a statement with proper indentation.
@@ -319,7 +318,7 @@ namespace ILGPU.Runtime
         public void EmitStatement(string statement)
         {
             var indent = new string(' ', indentLevel * 4);
-            sourceBuilder.AppendLine($"{indent}{statement}");
+            SourceBuilder.AppendLine($"{indent}{statement}");
         }
     }
 }

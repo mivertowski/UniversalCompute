@@ -36,7 +36,7 @@ namespace ILGPU.FFT
 
         private readonly CPUAccelerator _cpuAccelerator;
         private readonly IPPInfo _capabilities;
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <summary>
         /// Constructs a new IPP FFT accelerator.
@@ -213,19 +213,14 @@ namespace ILGPU.FFT
         /// <summary>
         /// Checks if the given FFT size is supported by IPP.
         /// </summary>
-        public override bool IsSizeSupported(int length)
-        {
+        public override bool IsSizeSupported(int length) =>
             // IPP FFT requires power-of-2 sizes
-            return IsPowerOf2(length) && length >= 2 && length <= (1 << 26);
-        }
+            IsPowerOf2(length) && length >= 2 && length <= (1 << 26);
 
         /// <summary>
         /// Gets the optimal FFT size for IPP (next power of 2).
         /// </summary>
-        public override int GetOptimalFFTSize(int length)
-        {
-            return NextPowerOf2(length);
-        }
+        public override int GetOptimalFFTSize(int length) => NextPowerOf2(length);
 
         #endregion
 

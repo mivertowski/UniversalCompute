@@ -34,7 +34,6 @@ namespace ILGPU.Core
     public sealed class UnifiedTensor<T>(Accelerator accelerator, TensorShape shape) : ITensorCore<T> where T : unmanaged
     {
         private readonly MemoryBuffer1D<T, Stride1D.Dense> buffer = accelerator.Allocate1D<T>(shape.ElementCount);
-        private readonly TensorShape shape = shape;
         private bool disposed;
 
         /// <summary>
@@ -66,10 +65,10 @@ namespace ILGPU.Core
         #region ITensorCore<T> Implementation
 
         /// <inheritdoc/>
-        public TensorShape Shape => shape;
+        public TensorShape Shape { get; } = shape;
 
         /// <inheritdoc/>
-        public long ElementCount => shape.ElementCount;
+        public long ElementCount => Shape.ElementCount;
 
         /// <inheritdoc/>
         public Accelerator Accelerator { get; } = accelerator;

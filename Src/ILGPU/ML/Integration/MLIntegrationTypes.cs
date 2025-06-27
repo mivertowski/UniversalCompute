@@ -313,7 +313,7 @@ namespace ILGPU.ML.Integration
             ComputeSchedulingPolicy policy = ComputeSchedulingPolicy.Automatic)
         {
             var selectedAccelerator = SelectAccelerator(policy);
-            return await computation(selectedAccelerator);
+            return await computation(selectedAccelerator).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -332,7 +332,7 @@ namespace ILGPU.ML.Integration
                 tasks.Add(computation(acc, i));
             }
 
-            return await Task.WhenAll(tasks);
+            return await Task.WhenAll(tasks).ConfigureAwait(false);
         }
 
         private Accelerator SelectAccelerator(ComputeSchedulingPolicy policy) =>
@@ -357,28 +357,28 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public async Task<TOutput> ExecuteAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput input)
             where TInput : class
-            where TOutput : class => await model.PredictAsync(input);
+            where TOutput : class => await model.PredictAsync(input).ConfigureAwait(false);
 
         /// <summary>
         /// Executes batch computation with ML model.
         /// </summary>
         public async Task<TOutput[]> ExecuteBatchAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput[] inputs)
             where TInput : class
-            where TOutput : class => await model.PredictBatchAsync(inputs);
+            where TOutput : class => await model.PredictBatchAsync(inputs).ConfigureAwait(false);
 
         /// <summary>
         /// Optimizes scheduling for better performance.
         /// </summary>
         public async Task OptimizeSchedulingAsync() =>
             // Placeholder implementation
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         /// <summary>
         /// Optimizes memory usage across accelerators.
         /// </summary>
         public async Task OptimizeMemoryAsync() =>
             // Placeholder implementation
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         /// <summary>
         /// Analyzes performance across accelerators.
@@ -974,7 +974,7 @@ namespace ILGPU.ML.Integration
                 throw new InvalidOperationException($"Backend '{backendName}' not found");
             }
 
-            return await backend.ExecuteAsync(computation);
+            return await backend.ExecuteAsync(computation).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -982,14 +982,14 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public async Task<Dictionary<string, ITensor<float>>> ExecuteAsync(ExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
             // Placeholder implementation
-            await Task.FromResult(new Dictionary<string, ITensor<float>>());
+            await Task.FromResult(new Dictionary<string, ITensor<float>>()).ConfigureAwait(false);
 
         /// <summary>
         /// Executes a pre-compiled execution plan.
         /// </summary>
         public async Task<Dictionary<string, ITensor<float>>> ExecuteCompiledAsync(CompiledExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
             // Placeholder implementation
-            await Task.FromResult(new Dictionary<string, ITensor<float>>());
+            await Task.FromResult(new Dictionary<string, ITensor<float>>()).ConfigureAwait(false);
 
         /// <summary>
         /// Gets execution provider statistics.
@@ -1008,7 +1008,7 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public async Task OptimizeMemoryAsync(WorkloadAnalysis analysis) =>
             // Placeholder implementation
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         /// <summary>
         /// Disposes the universal compute engine.

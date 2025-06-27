@@ -30,7 +30,6 @@ namespace ILGPU.Runtime
 
         private readonly object _usageInfoLock = new();
         private MemoryUsageInfo _usageInfo;
-        private MemoryBufferStatus _status;
 
         /// <summary>
         /// Initializes this array view buffer.
@@ -54,7 +53,7 @@ namespace ILGPU.Runtime
                 PeakMemoryUsage = length * elementSize,
                 IsPinned = false
             };
-            _status = MemoryBufferStatus.Allocated;
+            Status = MemoryBufferStatus.Allocated;
         }
 
         /// <summary>
@@ -110,7 +109,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets the current status of this buffer.
         /// </summary>
-        public MemoryBufferStatus Status => _status;
+        public MemoryBufferStatus Status { get; private set; }
 
         #endregion
 
@@ -280,7 +279,7 @@ namespace ILGPU.Runtime
             if (destination.LengthInBytes < LengthInBytes)
                 throw new ArgumentException("Destination buffer is too small", nameof(destination));
 
-            _status = MemoryBufferStatus.Transferring;
+            Status = MemoryBufferStatus.Transferring;
             
             return Task.Run(() =>
             {
@@ -289,15 +288,15 @@ namespace ILGPU.Runtime
                     var stream = Accelerator.DefaultStream;
                     var sourceView = AsRawArrayView();
                     var targetView = destination.AsRawArrayView();
-                    
+
                     CopyTo(stream, sourceView, targetView);
                     stream.Synchronize();
-                    
+
                     UpdateUsageInfo(LengthInBytes);
                 }
                 finally
                 {
-                    _status = MemoryBufferStatus.Allocated;
+                    Status = MemoryBufferStatus.Allocated;
                 }
             }, cancellationToken);
         }
@@ -313,7 +312,7 @@ namespace ILGPU.Runtime
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
-            _status = MemoryBufferStatus.Transferring;
+            Status = MemoryBufferStatus.Transferring;
             
             return Task.Run(() =>
             {
@@ -327,7 +326,7 @@ namespace ILGPU.Runtime
                 }
                 finally
                 {
-                    _status = MemoryBufferStatus.Allocated;
+                    Status = MemoryBufferStatus.Allocated;
                 }
             }, cancellationToken);
         }
@@ -340,7 +339,7 @@ namespace ILGPU.Runtime
         /// <returns>A task representing the asynchronous set operation.</returns>
         public virtual Task MemSetAsync(byte value, CancellationToken cancellationToken = default)
         {
-            _status = MemoryBufferStatus.Transferring;
+            Status = MemoryBufferStatus.Transferring;
             
             return Task.Run(() =>
             {
@@ -349,12 +348,12 @@ namespace ILGPU.Runtime
                     var stream = Accelerator.DefaultStream;
                     MemSet(stream, value, 0, LengthInBytes);
                     stream.Synchronize();
-                    
+
                     UpdateUsageInfo(LengthInBytes);
                 }
                 finally
                 {
-                    _status = MemoryBufferStatus.Allocated;
+                    Status = MemoryBufferStatus.Allocated;
                 }
             }, cancellationToken);
         }

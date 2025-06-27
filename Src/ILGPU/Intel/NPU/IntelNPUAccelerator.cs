@@ -33,8 +33,6 @@ namespace ILGPU.Intel.NPU
     {
         #region Instance
 
-        private readonly NPUCapabilities _capabilities;
-        private readonly NPUGeneration _generation;
         private bool _disposed;
 
         /// <summary>
@@ -45,7 +43,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU capabilities of this device.
         /// </summary>
-        public new NPUCapabilities Capabilities => _capabilities;
+        public new NPUCapabilities Capabilities { get; }
 
         /// <summary>
         /// Gets whether this accelerator is available.
@@ -55,7 +53,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU generation (e.g., NPU2, NPU3, NPU4).
         /// </summary>
-        public NPUGeneration Generation => _generation;
+        public NPUGeneration Generation { get; }
 
         /// <summary>
         /// Initializes a new instance of the IntelNPUAccelerator class.
@@ -69,14 +67,14 @@ namespace ILGPU.Intel.NPU
             
             if (SupportsNPU)
             {
-                _capabilities = NPUCapabilities.Query();
-                _generation = _capabilities.Generation;
+                Capabilities = NPUCapabilities.Query();
+                Generation = Capabilities.Generation;
                 NPUNative.InitializeNPU();
             }
             else
             {
-                _capabilities = new NPUCapabilities();
-                _generation = NPUGeneration.None;
+                Capabilities = new NPUCapabilities();
+                Generation = NPUGeneration.None;
             }
 
             // Properties are inherited from the device parameter
@@ -109,14 +107,14 @@ namespace ILGPU.Intel.NPU
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Create NPU-compatible neural network representation
-                var appleNetwork = new ILGPU.Apple.NeuralEngine.NeuralNetwork("NPU_Converted", []);
+                var appleNetwork = new Apple.NeuralEngine.NeuralNetwork("NPU_Converted", []);
                 using var npuContext = new NPUInferenceContext(appleNetwork, Capabilities);
                 
                 // Execute inference on NPU
                 var result = ExecuteNPUInference(input, npuContext);
                 
                 return result;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -137,7 +135,7 @@ namespace ILGPU.Intel.NPU
 
                 using var convConfig = new NPUConvolutionConfig(parameters, Capabilities);
                 return ExecuteNPUConvolution(input, weights, convConfig);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -158,7 +156,7 @@ namespace ILGPU.Intel.NPU
 
                 using var matmulConfig = CreateOptimalMatMulConfig(a.Shape, b.Shape);
                 return ExecuteNPUMatMul(a, b, matmulConfig);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -180,7 +178,7 @@ namespace ILGPU.Intel.NPU
 
                 using var attentionConfig = new NPUAttentionConfig(parameters, Capabilities);
                 return ExecuteNPUAttention(query, key, value, attentionConfig);
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -199,7 +197,7 @@ namespace ILGPU.Intel.NPU
             if (operation == null)
                 throw new ArgumentNullException(nameof(operation));
 
-            return await operation.ExecuteAsync(this, cancellationToken);
+            return await operation.ExecuteAsync(this, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -244,7 +242,7 @@ namespace ILGPU.Intel.NPU
                         parameters.Padding.Height, // paddingHeight
                         parameters.Padding.Width); // paddingWidth
                 }
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -285,7 +283,7 @@ namespace ILGPU.Intel.NPU
                         query.Shape[2], // hiddenSize
                         parameters.NumHeads); // numHeads
                 }
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -295,21 +293,13 @@ namespace ILGPU.Intel.NPU
 
         protected override AcceleratorStream CreateStreamInternal() => new NPUStream(this);
 
-        protected override void SynchronizeInternal()
-        {
+        protected override void SynchronizeInternal() =>
             // NPU operations are handled asynchronously
             System.Threading.Thread.MemoryBarrier();
-        }
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new NPUBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new NPUBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
-            return new NPUKernel(this, compiledKernel);
-        }
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new NPUKernel(this, compiledKernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
@@ -331,10 +321,7 @@ namespace ILGPU.Intel.NPU
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
-            return Math.Max(1, NumMultiprocessors / groupSize);
-        }
+            int dynamicSharedMemorySizeInBytes) => Math.Max(1, NumMultiprocessors / groupSize);
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -358,26 +345,15 @@ namespace ILGPU.Intel.NPU
 
         protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) => false;
 
-        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("NPU does not support peer access");
-        }
+        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("NPU does not support peer access");
 
-        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("NPU does not support peer access");
-        }
+        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("NPU does not support peer access");
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) =>
             // NPU doesn't require page locking, use null implementation
-            return new NullPageLockScope<T>(this, pinned, numElements);
-        }
+            new NullPageLockScope<T>(this, pinned, numElements);
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
-        }
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
 
         protected override void OnBind()
         {
@@ -426,7 +402,7 @@ namespace ILGPU.Intel.NPU
 
                 // Return basic neural network model
                 return new NeuralNetwork("NPU_Model");
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -446,7 +422,7 @@ namespace ILGPU.Intel.NPU
 
                 // Apply NPU-specific optimizations
                 return model;
-            }, cancellationToken);
+            }, cancellationToken).ConfigureAwait(false);
         }
 
         #endregion
@@ -643,10 +619,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Synchronizes the stream.
         /// </summary>
-        public override void Synchronize()
-        {
-            System.Threading.Thread.MemoryBarrier();
-        }
+        public override void Synchronize() => System.Threading.Thread.MemoryBarrier();
 
         /// <summary>
         /// Adds a profiling marker to the stream.

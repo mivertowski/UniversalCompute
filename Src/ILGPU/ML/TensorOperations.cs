@@ -125,7 +125,6 @@ namespace ILGPU.ML
     /// <typeparam name="T">The element type.</typeparam>
     public class Tensor<T> : IDisposable where T : unmanaged, INumber<T>
     {
-        private readonly MemoryBuffer1D<T, Stride1D.Dense> buffer;
         private bool disposed;
 
         /// <summary>
@@ -138,7 +137,7 @@ namespace ILGPU.ML
 
             Shape = shape;
             Accelerator = accelerator;
-            buffer = accelerator.Allocate1D<T>(shape.Size);
+            Buffer = accelerator.Allocate1D<T>(shape.Size);
         }
 
         /// <summary>
@@ -150,7 +149,7 @@ namespace ILGPU.ML
             if (data.Length != shape.Size)
                 throw new ArgumentException("Data length doesn't match tensor shape");
 
-            buffer.View.CopyFromCPU(data.ToArray());
+            Buffer.View.CopyFromCPU(data.ToArray());
         }
 
         /// <summary>
@@ -166,12 +165,12 @@ namespace ILGPU.ML
         /// <summary>
         /// Gets the underlying memory buffer.
         /// </summary>
-        public ArrayView<T> View => buffer.View;
+        public ArrayView<T> View => Buffer.View;
 
         /// <summary>
         /// Gets the device memory buffer.
         /// </summary>
-        internal MemoryBuffer1D<T, Stride1D.Dense> Buffer => buffer;
+        internal MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; }
 
         /// <summary>
         /// Copies data from CPU to this tensor.
@@ -180,7 +179,7 @@ namespace ILGPU.ML
         {
             if (data.Length != Shape.Size)
                 throw new ArgumentException("Data length doesn't match tensor size");
-            buffer.View.CopyFromCPU(data.ToArray());
+            Buffer.View.CopyFromCPU(data.ToArray());
         }
 
         /// <summary>
@@ -191,7 +190,7 @@ namespace ILGPU.ML
             if (data.Length != Shape.Size)
                 throw new ArgumentException("Data length doesn't match tensor size");
             var tempArray = new T[data.Length];
-            buffer.View.CopyToCPU(tempArray);
+            Buffer.View.CopyToCPU(tempArray);
             tempArray.AsSpan().CopyTo(data);
         }
 
@@ -201,7 +200,7 @@ namespace ILGPU.ML
         public T[] ToArray()
         {
             var result = new T[Shape.Size];
-            buffer.View.CopyToCPU(result);
+            Buffer.View.CopyToCPU(result);
             return result;
         }
 
@@ -493,7 +492,7 @@ namespace ILGPU.ML
         {
             if (!disposed)
             {
-                buffer?.Dispose();
+                Buffer?.Dispose();
                 disposed = true;
             }
         }

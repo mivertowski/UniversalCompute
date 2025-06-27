@@ -255,12 +255,6 @@ namespace ILGPU.IR
         private ValueParent? parent;
 
         /// <summary>
-        /// The current node type.
-        /// </summary>
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private TypeNode? type;
-
-        /// <summary>
         /// The list of all values.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -319,7 +313,7 @@ namespace ILGPU.IR
             : base(initializer.Location)
         {
             parent = initializer.Parent;
-            type = staticType;
+            Type = staticType;
             values = ValueList.Empty;
             uses = UseList.Empty;
 
@@ -362,20 +356,23 @@ namespace ILGPU.IR
         /// <summary>
         /// Returns the associated type.
         /// </summary>
+        [field: DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public TypeNode Type
         {
             get
             {
-                if (type == null)
+                if (field == null)
                 {
                     this.Assert(!HasStaticType);
-                    type = ComputeType(new ValueInitializer(
+                    field = ComputeType(new ValueInitializer(
                         Method.BaseContext,
                         parent,
                         Location));
                 }
-                return type;
+                return field;
             }
+
+            private set;
         }
 
         /// <summary>
@@ -516,7 +513,7 @@ namespace ILGPU.IR
         public void InvalidateType()
         {
             if (!HasStaticType)
-                type = null;
+                Type = null;
         }
 
         /// <summary>

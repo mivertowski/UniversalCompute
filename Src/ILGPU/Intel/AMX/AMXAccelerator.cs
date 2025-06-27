@@ -31,8 +31,6 @@ namespace ILGPU.Intel.AMX
     /// </summary>
     public sealed class AMXAccelerator : Accelerator
     {
-        private readonly AMXCapabilities _amxCapabilities;
-        private readonly AMXTileConfiguration _tileConfig;
         private bool _disposed;
 
         /// <summary>
@@ -46,8 +44,8 @@ namespace ILGPU.Intel.AMX
             if (!AMXCapabilities.IsAMXSupported())
                 throw new NotSupportedException("Intel AMX not supported on this processor");
 
-            _amxCapabilities = AMXCapabilities.Query();
-            _tileConfig = AMXTileConfiguration.CreateDefault(_amxCapabilities);
+            AMXCapabilities = AMXCapabilities.Query();
+            TileConfiguration = AMXTileConfiguration.CreateDefault(AMXCapabilities);
 
             // Initialize AMX state
             AMXNative.InitializeAMX();
@@ -59,12 +57,12 @@ namespace ILGPU.Intel.AMX
         /// <summary>
         /// Gets the AMX capabilities.
         /// </summary>
-        public AMXCapabilities AMXCapabilities => _amxCapabilities;
+        public AMXCapabilities AMXCapabilities { get; }
 
         /// <summary>
         /// Gets the current tile configuration.
         /// </summary>
-        public AMXTileConfiguration TileConfiguration => _tileConfig;
+        public AMXTileConfiguration TileConfiguration { get; }
 
 
 
@@ -84,12 +82,12 @@ namespace ILGPU.Intel.AMX
             ThrowIfDisposed();
             
             // Ensure AMX is configured for FP32 operations
-            if (_tileConfig.DataType != AMXDataType.Float32)
+            if (TileConfiguration.DataType != AMXDataType.Float32)
             {
                 ConfigureTilesForDataType(AMXDataType.Float32);
             }
 
-            AMXOperations.MatrixMultiplyFP32(a, b, c, m, n, k, _tileConfig);
+            AMXOperations.MatrixMultiplyFP32(a, b, c, m, n, k, TileConfiguration);
         }
 
         /// <summary>
@@ -106,12 +104,12 @@ namespace ILGPU.Intel.AMX
             ThrowIfDisposed();
             
             // Configure AMX for BF16 operations
-            if (_tileConfig.DataType != AMXDataType.BFloat16)
+            if (TileConfiguration.DataType != AMXDataType.BFloat16)
             {
                 ConfigureTilesForDataType(AMXDataType.BFloat16);
             }
 
-            AMXOperations.MatrixMultiplyBF16(a, b, c, m, n, k, _tileConfig);
+            AMXOperations.MatrixMultiplyBF16(a, b, c, m, n, k, TileConfiguration);
         }
 
         /// <summary>
@@ -128,12 +126,12 @@ namespace ILGPU.Intel.AMX
             ThrowIfDisposed();
             
             // Configure AMX for INT8 operations
-            if (_tileConfig.DataType != AMXDataType.Int8)
+            if (TileConfiguration.DataType != AMXDataType.Int8)
             {
                 ConfigureTilesForDataType(AMXDataType.Int8);
             }
 
-            AMXOperations.MatrixMultiplyINT8(a, b, c, m, n, k, _tileConfig);
+            AMXOperations.MatrixMultiplyINT8(a, b, c, m, n, k, TileConfiguration);
         }
 
         #endregion
@@ -142,21 +140,13 @@ namespace ILGPU.Intel.AMX
 
         protected override AcceleratorStream CreateStreamInternal() => new AMXStream(this);
 
-        protected override void SynchronizeInternal()
-        {
+        protected override void SynchronizeInternal() =>
             // AMX operations are synchronous by nature
             System.Threading.Thread.MemoryBarrier();
-        }
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new AMXBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new AMXBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
-            return new AMXKernel(this, compiledKernel);
-        }
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new AMXKernel(this, compiledKernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
@@ -180,11 +170,9 @@ namespace ILGPU.Intel.AMX
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // AMX doesn't have the concept of active groups like GPU accelerators
-            return Math.Max(1, NumMultiprocessors / groupSize);
-        }
+            Math.Max(1, NumMultiprocessors / groupSize);
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -208,38 +196,23 @@ namespace ILGPU.Intel.AMX
 
         protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) => false;
 
-        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("AMX does not support peer access");
-        }
+        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("AMX does not support peer access");
 
-        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("AMX does not support peer access");
-        }
+        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("AMX does not support peer access");
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) =>
             // AMX operates on CPU memory, so no special page locking needed
-            return new NullPageLockScope<T>(this, pinned, numElements);
-        }
+            new NullPageLockScope<T>(this, pinned, numElements);
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by AMX accelerator");
-        }
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by AMX accelerator");
 
-        protected override void OnBind()
-        {
+        protected override void OnBind() =>
             // Configure AMX when bound
             ConfigureTiles();
-        }
 
-        protected override void OnUnbind()
-        {
+        protected override void OnUnbind() =>
             // Release AMX configuration when unbound
             AMXNative.ReleaseAMX();
-        }
 
         protected override void DisposeAccelerator_SyncRoot(bool disposing)
         {
@@ -268,7 +241,7 @@ namespace ILGPU.Intel.AMX
         {
             ThrowIfDisposed();
             
-            if (tileId < 0 || tileId >= _amxCapabilities.MaxTiles)
+            if (tileId < 0 || tileId >= AMXCapabilities.MaxTiles)
                 throw new ArgumentOutOfRangeException(nameof(tileId), "Invalid tile ID");
 
             AMXNative.LoadTile(tileId, data, stride);
@@ -284,7 +257,7 @@ namespace ILGPU.Intel.AMX
         {
             ThrowIfDisposed();
             
-            if (tileId < 0 || tileId >= _amxCapabilities.MaxTiles)
+            if (tileId < 0 || tileId >= AMXCapabilities.MaxTiles)
                 throw new ArgumentOutOfRangeException(nameof(tileId), "Invalid tile ID");
 
             AMXNative.StoreTile(tileId, data, stride);
@@ -298,7 +271,7 @@ namespace ILGPU.Intel.AMX
         {
             ThrowIfDisposed();
             
-            if (tileId < 0 || tileId >= _amxCapabilities.MaxTiles)
+            if (tileId < 0 || tileId >= AMXCapabilities.MaxTiles)
                 throw new ArgumentOutOfRangeException(nameof(tileId), "Invalid tile ID");
 
             AMXNative.ZeroTile(tileId);
@@ -308,14 +281,11 @@ namespace ILGPU.Intel.AMX
 
         #region Private Implementation
 
-        private void ConfigureTiles()
-        {
-            AMXNative.ConfigureTiles(_tileConfig);
-        }
+        private void ConfigureTiles() => AMXNative.ConfigureTiles(TileConfiguration);
 
         private void ConfigureTilesForDataType(AMXDataType dataType)
         {
-            var newConfig = _tileConfig.WithDataType(dataType);
+            var newConfig = TileConfiguration.WithDataType(dataType);
             AMXNative.ConfigureTiles(newConfig);
         }
 
@@ -348,21 +318,16 @@ namespace ILGPU.Intel.AMX
         /// <summary>
         /// Synchronizes the stream.
         /// </summary>
-        public override void Synchronize()
-        {
+        public override void Synchronize() =>
             // AMX operations are inherently synchronous
             System.Threading.Thread.MemoryBarrier();
-        }
 
 
         /// <summary>
         /// Adds a profiling marker for AMX operations.
         /// </summary>
         /// <returns>A profiling marker for timing measurements.</returns>
-        protected override ProfilingMarker AddProfilingMarkerInternal()
-        {
-            return new AMXProfilingMarker(_accelerator);
-        }
+        protected override ProfilingMarker AddProfilingMarkerInternal() => new AMXProfilingMarker(_accelerator);
 
         /// <summary>
         /// Disposes the AMX stream.

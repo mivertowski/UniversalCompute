@@ -62,10 +62,7 @@ namespace ILGPU.Intel.NPU
     /// </summary>
     public static class TensorFactory
     {
-        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged
-        {
-            return new SimpleTensor<T>(shape);
-        }
+        public static ITensor<T> Create<T>(TensorShape shape, ComputeLocation location) where T : unmanaged => new SimpleTensor<T>(shape);
     }
 
     /// <summary>
@@ -156,7 +153,7 @@ namespace ILGPU.Intel.NPU
     {
         public bool EnableQuantization { get; set; } = true;
         public bool OptimizeForLatency { get; set; } = true;
-        public bool EnablePruning { get; set; } = false;
+        public bool EnablePruning { get; set; }
     }
 
 

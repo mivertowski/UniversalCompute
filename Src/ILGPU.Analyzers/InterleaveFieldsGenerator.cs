@@ -143,7 +143,7 @@ namespace ILGPU.Analyzers
             Action<Diagnostic> reportDiagnostic,
             out List<SyntaxNode> parentNodes)
         {
-            parentNodes = new List<SyntaxNode>();
+            parentNodes = [];
 
             var parentNode = structNode.Parent;
             while (parentNode != null)

@@ -106,7 +106,7 @@ public class UnattendedBenchmarkRunner
                     SuiteName = name,
                     Description = description,
                     ExecutionTime = DateTime.UtcNow,
-                    Results = new List<BenchmarkResult>(),
+                    Results = [],
                     Success = false,
                     ErrorMessage = ex.Message
                 });
@@ -574,7 +574,7 @@ public class BenchmarkSuiteResult
     public string SuiteName { get; set; } = "";
     public string Description { get; set; } = "";
     public DateTime ExecutionTime { get; set; }
-    public List<BenchmarkResult> Results { get; set; } = new();
+    public List<BenchmarkResult> Results { get; set; } = [];
     public bool Success { get; set; }
     public string? ErrorMessage { get; set; }
 }

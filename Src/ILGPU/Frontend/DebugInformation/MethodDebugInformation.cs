@@ -88,12 +88,6 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// All associated sequence points.
         /// </summary>
-        private ImmutableArray<SequencePoint> sequencePoints;
-
-        /// <summary>
-        /// All associated method scopes.
-        /// </summary>
-        private ImmutableArray<MethodScope> methodScopes;
 
         /// <summary>
         /// The internal synchronization object.
@@ -119,8 +113,8 @@ namespace ILGPU.Frontend.DebugInformation
             AssemblyDebugInformation = assemblyDebugInformation;
             Handle = handle;
 
-            sequencePoints = default;
-            methodScopes = default;
+            SequencePoints = default;
+            MethodScopes = default;
         }
 
         #endregion
@@ -151,9 +145,9 @@ namespace ILGPU.Frontend.DebugInformation
             {
                 lock (syncLock)
                 {
-                    return !sequencePoints.IsDefault
-                        ? sequencePoints
-                        : (sequencePoints = LoadSequencePoints(
+                    return !field.IsDefault
+                        ? field
+                        : (field = LoadSequencePoints(
                             AssemblyDebugInformation,
                             Handle));
                 }
@@ -169,9 +163,9 @@ namespace ILGPU.Frontend.DebugInformation
             {
                 lock (syncLock)
                 {
-                    return !methodScopes.IsDefault
-                        ? methodScopes
-                        : (methodScopes = LoadScopes(
+                    return !field.IsDefault
+                        ? field
+                        : (field = LoadScopes(
                             AssemblyDebugInformation,
                             Handle));
                 }

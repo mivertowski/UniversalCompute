@@ -65,7 +65,6 @@ namespace ILGPU.Runtime.Profiling
         
         private volatile bool isProfilingEnabled = enabledByDefault;
         private volatile bool disposed;
-        private string currentSessionId = "";
         private string currentSessionName = "";
         private DateTime currentSessionStart;
         private long totalExecutions;
@@ -75,7 +74,7 @@ namespace ILGPU.Runtime.Profiling
         public bool IsProfilingEnabled => isProfilingEnabled;
 
         /// <inheritdoc/>
-        public string CurrentSessionId => currentSessionId;
+        public string CurrentSessionId { get; private set; } = "";
 
         /// <inheritdoc/>
         public string StartSession(string sessionName, string? sessionId = null)
@@ -86,12 +85,12 @@ namespace ILGPU.Runtime.Profiling
             lock (sessionLock)
             {
                 // End current session if active
-                if (isProfilingEnabled && !string.IsNullOrEmpty(currentSessionId))
+                if (isProfilingEnabled && !string.IsNullOrEmpty(CurrentSessionId))
                 {
                     EndSession();
                 }
 
-                currentSessionId = sessionId ?? Guid.NewGuid().ToString();
+                CurrentSessionId = sessionId ?? Guid.NewGuid().ToString();
                 currentSessionName = sessionName ?? "Unnamed Session";
                 currentSessionStart = DateTime.UtcNow;
                 
@@ -104,7 +103,7 @@ namespace ILGPU.Runtime.Profiling
                 
                 isProfilingEnabled = true;
                 
-                return currentSessionId;
+                return CurrentSessionId;
             }
         }
 
@@ -116,7 +115,7 @@ namespace ILGPU.Runtime.Profiling
 
             lock (sessionLock)
             {
-                if (!isProfilingEnabled || string.IsNullOrEmpty(currentSessionId))
+                if (!isProfilingEnabled || string.IsNullOrEmpty(CurrentSessionId))
                     throw new InvalidOperationException("No active profiling session");
 
                 var endTime = DateTime.UtcNow;
@@ -129,7 +128,7 @@ namespace ILGPU.Runtime.Profiling
 
                 // Reset session state
                 isProfilingEnabled = false;
-                currentSessionId = "";
+                CurrentSessionId = "";
                 currentSessionName = "";
 
                 return report;
@@ -272,7 +271,7 @@ namespace ILGPU.Runtime.Profiling
 
             try
             {
-                if (isProfilingEnabled && !string.IsNullOrEmpty(currentSessionId))
+                if (isProfilingEnabled && !string.IsNullOrEmpty(CurrentSessionId))
                 {
                     EndSession();
                 }
@@ -327,7 +326,7 @@ namespace ILGPU.Runtime.Profiling
 
             return new ProfileSessionReport
             {
-                SessionId = currentSessionId,
+                SessionId = CurrentSessionId,
                 SessionName = currentSessionName,
                 StartTime = currentSessionStart,
                 EndTime = endTime,

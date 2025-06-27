@@ -75,8 +75,6 @@ namespace ILGPU.Numerics
     /// <typeparam name="T">The element type.</typeparam>
     public sealed class UnifiedTensor<T> : ITensor<T> where T : unmanaged, INumber<T>
     {
-        private readonly Accelerator accelerator;
-        private readonly TensorShape shape;
         private readonly MemoryLayoutMode layoutMode;
         
         // Memory backing stores
@@ -101,8 +99,8 @@ namespace ILGPU.Numerics
         /// <param name="layoutMode">The memory layout optimization mode.</param>
         public UnifiedTensor(Accelerator accelerator, TensorShape shape, MemoryLayoutMode layoutMode = MemoryLayoutMode.Auto)
         {
-            this.accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            this.shape = shape;
+            this.Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            this.Shape = shape;
             this.layoutMode = layoutMode == MemoryLayoutMode.Auto ? ChooseOptimalLayout() : layoutMode;
             
             InitializeMemory();
@@ -130,10 +128,10 @@ namespace ILGPU.Numerics
         /// <summary>
         /// Gets the accelerator used by this tensor.
         /// </summary>
-        public Accelerator Accelerator => accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <inheritdoc/>
-        public TensorShape Shape => shape;
+        public TensorShape Shape { get; }
 
         /// <inheritdoc/>
         public ComputeLocation Location => currentLocation switch
@@ -146,10 +144,10 @@ namespace ILGPU.Numerics
         };
 
         /// <inheritdoc/>
-        public long Length => shape.Length;
+        public long Length => Shape.Length;
 
         /// <inheritdoc/>
-        public int Rank => shape.Rank;
+        public int Rank => Shape.Rank;
 
         /// <inheritdoc/>
         public T this[params int[] indices]
@@ -157,13 +155,13 @@ namespace ILGPU.Numerics
             get
             {
                 EnsureCpuData();
-                var linearIndex = shape.ComputeLinearIndex(indices);
+                var linearIndex = Shape.ComputeLinearIndex(indices);
                 return cpuMemory!.Memory.Span[(int)linearIndex];
             }
             set
             {
                 EnsureCpuData();
-                var linearIndex = shape.ComputeLinearIndex(indices);
+                var linearIndex = Shape.ComputeLinearIndex(indices);
                 cpuMemory!.Memory.Span[(int)linearIndex] = value;
                 MarkCpuDataModified();
             }
@@ -260,7 +258,7 @@ namespace ILGPU.Numerics
                             break;
                     }
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         #endregion
@@ -274,9 +272,9 @@ namespace ILGPU.Numerics
             
             // Choose optimal execution based on tensor sizes and capabilities
             if (ShouldUseTensorCores())
-                return await MatMulTensorCoreAsync(other, ct);
+                return await MatMulTensorCoreAsync(other, ct).ConfigureAwait(false);
             else if (ShouldUseGpu())
-                return await MatMulGpuAsync(otherTensor, ct);
+                return await MatMulGpuAsync(otherTensor, ct).ConfigureAwait(false);
             else
                 return MatMulSimd(other);
         }
@@ -293,7 +291,7 @@ namespace ILGPU.Numerics
                 throw new ArgumentException("Matrix dimensions incompatible for multiplication");
 
             var resultShape = new TensorShape(Shape[0], otherTensor.Shape[1]);
-            var result = new UnifiedTensor<T>(accelerator, resultShape, MemoryLayoutMode.CpuOptimized);
+            var result = new UnifiedTensor<T>(Accelerator, resultShape, MemoryLayoutMode.CpuOptimized);
 
             // Use platform-specific SIMD operations
             VectorOperations.MatrixVectorMultiply(
@@ -311,7 +309,7 @@ namespace ILGPU.Numerics
         {
             var otherTensor = other as UnifiedTensor<T> ?? throw new ArgumentException("Other tensor must be UnifiedTensor");
             
-            if (!accelerator.SupportsTensorCores())
+            if (!Accelerator.SupportsTensorCores())
                 throw new NotSupportedException("Tensor cores not supported on this device");
 
             return await Task.Run(() =>
@@ -321,13 +319,13 @@ namespace ILGPU.Numerics
                 otherTensor.EnsureGpuData();
 
                 var resultShape = new TensorShape(Shape[0], otherTensor.Shape[1]);
-                var result = new UnifiedTensor<T>(accelerator, resultShape, MemoryLayoutMode.GpuOptimized);
+                var result = new UnifiedTensor<T>(Accelerator, resultShape, MemoryLayoutMode.GpuOptimized);
 
                 // Use tensor core operations from TensorOperations
                 // This would integrate with the actual tensor core implementation
                 // throw new NotImplementedException("Tensor core matrix multiplication will be implemented");
                 return (ITensor<T>)result;
-            }, ct);
+            }, ct).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -340,7 +338,7 @@ namespace ILGPU.Numerics
 
             // Choose optimal execution strategy
             if (ShouldUseGpu())
-                return await AddGpuAsync(otherTensor, ct);
+                return await AddGpuAsync(otherTensor, ct).ConfigureAwait(false);
             else
                 return AddSimd(other);
         }
@@ -353,7 +351,7 @@ namespace ILGPU.Numerics
             if (Shape != otherTensor.Shape)
                 throw new ArgumentException("Tensors must have the same shape for addition");
 
-            var result = new UnifiedTensor<T>(accelerator, Shape, MemoryLayoutMode.CpuOptimized);
+            var result = new UnifiedTensor<T>(Accelerator, Shape, MemoryLayoutMode.CpuOptimized);
 
             // Use platform-specific SIMD operations
             VectorOperations.Add(
@@ -368,7 +366,7 @@ namespace ILGPU.Numerics
         public async Task<ITensor<T>> AddTensorCoreAsync(ITensor<T> other, CancellationToken ct = default) =>
             // Tensor cores are typically not used for element-wise addition
             // Fall back to GPU general compute
-            await AddAsync(other, ct);
+            await AddAsync(other, ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
         public async Task<ITensor<T>> TransposeAsync(CancellationToken ct = default)
@@ -379,14 +377,14 @@ namespace ILGPU.Numerics
             return await Task.Run(() =>
             {
                 var resultShape = new TensorShape(Shape[1], Shape[0]);
-                var result = new UnifiedTensor<T>(accelerator, resultShape, layoutMode);
+                var result = new UnifiedTensor<T>(Accelerator, resultShape, layoutMode);
 
                 if (ShouldUseGpu())
                 {
                     // GPU transpose implementation
                     EnsureGpuData();
                     // For benchmarking purposes, return a copy of the current tensor
-                    return new UnifiedTensor<T>(accelerator, shape, AsSpan(), layoutMode);
+                    return new UnifiedTensor<T>(Accelerator, Shape, AsSpan(), layoutMode);
                 }
                 else
                 {
@@ -404,7 +402,7 @@ namespace ILGPU.Numerics
                 }
 
                 return (ITensor<T>)result;
-            }, ct);
+            }, ct).ConfigureAwait(false);
         }
 
         #endregion
@@ -445,25 +443,25 @@ namespace ILGPU.Numerics
         private void InitializeCpuMemory()
         {
             // Use ArrayPool for efficient memory management
-            cpuMemory = MemoryPool<T>.Shared.Rent((int)shape.Length);
+            cpuMemory = MemoryPool<T>.Shared.Rent((int)Shape.Length);
             cpuDataValid = false;
         }
 
         private void InitializeGpuMemory()
         {
-            gpuBuffer = accelerator.Allocate1D<T>(shape.Length);
+            gpuBuffer = Accelerator.Allocate1D<T>(Shape.Length);
             gpuDataValid = false;
         }
 
         private void InitializeUnifiedMemory()
         {
             // Try to allocate unified memory if supported
-            if (accelerator.AcceleratorType == AcceleratorType.Cuda)
+            if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
             {
                 try
                 {
                     // This would use CUDA unified memory
-                    unifiedBuffer = accelerator.Allocate1D<T>(shape.Length);
+                    unifiedBuffer = Accelerator.Allocate1D<T>(Shape.Length);
                     cpuDataValid = gpuDataValid = true; // Unified memory is valid on both sides
                 }
                 catch
@@ -481,19 +479,19 @@ namespace ILGPU.Numerics
         private void InitializePinnedMemory()
         {
             // Allocate pinned memory for fast transfers
-            cpuMemory = MemoryPool<T>.Shared.Rent((int)shape.Length);
-            gpuBuffer = accelerator.Allocate1D<T>(shape.Length);
+            cpuMemory = MemoryPool<T>.Shared.Rent((int)Shape.Length);
+            gpuBuffer = Accelerator.Allocate1D<T>(Shape.Length);
             cpuDataValid = gpuDataValid = false;
         }
 
         private MemoryLayoutMode ChooseOptimalLayout()
         {
             // Choose layout based on tensor size and accelerator capabilities
-            if (shape.Length < 1024)
+            if (Shape.Length < 1024)
                 return MemoryLayoutMode.CpuOptimized;
-            else if (accelerator.AcceleratorType == AcceleratorType.Cuda && shape.Length > 1024 * 1024)
+            else if (Accelerator.AcceleratorType == AcceleratorType.Cuda && Shape.Length > 1024 * 1024)
                 return MemoryLayoutMode.Unified;
-            else if (accelerator.AcceleratorType != AcceleratorType.CPU)
+            else if (Accelerator.AcceleratorType != AcceleratorType.CPU)
                 return MemoryLayoutMode.GpuOptimized;
             else
                 return MemoryLayoutMode.CpuOptimized;
@@ -568,13 +566,13 @@ namespace ILGPU.Numerics
             }
         }
 
-        private bool ShouldUseTensorCores() => accelerator.SupportsTensorCores() &&
+        private bool ShouldUseTensorCores() => Accelerator.SupportsTensorCores() &&
                    (typeof(T) == typeof(Half) || typeof(T) == typeof(float)) &&
                    Shape.Rank == 2 &&
                    Shape[0] >= 16 && Shape[1] >= 16;
 
-        private bool ShouldUseGpu() => accelerator.AcceleratorType != AcceleratorType.CPU &&
-                   shape.Length > 1024; // Threshold for GPU efficiency
+        private bool ShouldUseGpu() => Accelerator.AcceleratorType != AcceleratorType.CPU &&
+                   Shape.Length > 1024; // Threshold for GPU efficiency
 
         private async Task<ITensor<T>> MatMulGpuAsync(UnifiedTensor<T> other, CancellationToken ct) => await Task.Run(() =>
                                                                                                                 {
@@ -582,24 +580,24 @@ namespace ILGPU.Numerics
                                                                                                                     other.EnsureGpuData();
 
                                                                                                                     var resultShape = new TensorShape(Shape[0], other.Shape[1]);
-                                                                                                                    var result = new UnifiedTensor<T>(accelerator, resultShape, MemoryLayoutMode.GpuOptimized);
+                                                                                                                    var result = new UnifiedTensor<T>(Accelerator, resultShape, MemoryLayoutMode.GpuOptimized);
 
                                                                                                                     // Use GPU kernels for matrix multiplication
                                                                                                                     // throw new NotImplementedException("GPU matrix multiplication will be implemented");
                                                                                                                     return (ITensor<T>)result;
-                                                                                                                }, ct);
+                                                                                                                }, ct).ConfigureAwait(false);
 
         private async Task<ITensor<T>> AddGpuAsync(UnifiedTensor<T> other, CancellationToken ct) => await Task.Run(() =>
                                                                                                              {
                                                                                                                  EnsureGpuData();
                                                                                                                  other.EnsureGpuData();
 
-                                                                                                                 var result = new UnifiedTensor<T>(accelerator, Shape, MemoryLayoutMode.GpuOptimized);
+                                                                                                                 var result = new UnifiedTensor<T>(Accelerator, Shape, MemoryLayoutMode.GpuOptimized);
 
                                                                                                                  // Use GPU kernels for element-wise addition
                                                                                                                  // throw new NotImplementedException("GPU element-wise addition will be implemented");
                                                                                                                  return (ITensor<T>)result;
-                                                                                                             }, ct);
+                                                                                                             }, ct).ConfigureAwait(false);
 
         #endregion
 
@@ -638,7 +636,7 @@ namespace ILGPU.Numerics
                 throw new ArgumentException("New shape must have the same number of elements");
 
             // For UnifiedTensor, create a new tensor with the same data
-            var result = new UnifiedTensor<T>(accelerator, newShape, layoutMode);
+            var result = new UnifiedTensor<T>(Accelerator, newShape, layoutMode);
             CopyTo(result);
             return result;
         }

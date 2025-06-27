@@ -147,7 +147,7 @@ namespace ILGPU.Runtime.AI
             var alpha = GetOne<T>();
             var beta = GetZero<T>();
             
-            await primitives.GemmAsync(A, B, C, alpha, beta, cancellationToken);
+            await primitives.GemmAsync(A, B, C, alpha, beta, cancellationToken).ConfigureAwait(false);
         }
 
         private static TElement GetOne<TElement>() where TElement : unmanaged
@@ -252,7 +252,7 @@ namespace ILGPU.Runtime.AI
                 Output = TensorFactory.Create<T>(outputShape, ComputeLocation.Gpu);
             }
 
-            await primitives.Conv2DAsync(Input, Kernel, Output, Parameters, cancellationToken);
+            await primitives.Conv2DAsync(Input, Kernel, Output, Parameters, cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -338,7 +338,7 @@ namespace ILGPU.Runtime.AI
         public async Task AggregateResultsAsync(IEnumerable<WorkloadPartition> partitions, CancellationToken cancellationToken = default) =>
             // Results are already in the correct positions in C
             // No additional aggregation needed for row-wise partitioning
-            await Task.CompletedTask;
+            await Task.CompletedTask.ConfigureAwait(false);
 
         /// <summary>
         /// Executes the workload.
@@ -393,7 +393,7 @@ namespace ILGPU.Runtime.AI
             IWorkload workload,
             IReadOnlyList<AcceleratorProfile> profiles)
         {
-            await Task.CompletedTask; // Placeholder for async analysis
+            await Task.CompletedTask.ConfigureAwait(false); // Placeholder for async analysis
             
             // Simple strategy selection based on workload type and complexity
             if (workload.EstimatedComplexity > 1000000 && profiles.Count > 1)
@@ -424,7 +424,7 @@ namespace ILGPU.Runtime.AI
             IDistributedWorkload workload,
             IReadOnlyList<AcceleratorProfile> profiles)
         {
-            await Task.CompletedTask; // Placeholder for async partitioning
+            await Task.CompletedTask.ConfigureAwait(false); // Placeholder for async partitioning
             
             var suitableProfiles = profiles.Where(p => p.CanExecute(workload)).ToList();
             var partitions = workload.Partition(suitableProfiles.Count).ToList();

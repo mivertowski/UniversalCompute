@@ -30,7 +30,6 @@ namespace ILGPU.Apple.NeuralEngine
     public sealed class AppleNeuralEngineAccelerator : Accelerator
     {
         private readonly AppleNeuralEngine _neuralEngine;
-        private readonly ANECapabilities _capabilities;
         private bool _disposed;
 
         /// <summary>
@@ -44,7 +43,7 @@ namespace ILGPU.Apple.NeuralEngine
             // Create the ANE instance with a dummy MetalDevice
             // In a real implementation, this would properly interface with Metal
             _neuralEngine = new AppleNeuralEngine(null);
-            _capabilities = _neuralEngine.Capabilities;
+            ANECapabilities = _neuralEngine.Capabilities;
             
             // Properties are inherited from the device parameter
         }
@@ -52,28 +51,20 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the Neural Engine capabilities.
         /// </summary>
-        public ANECapabilities ANECapabilities => _capabilities;
+        public ANECapabilities ANECapabilities { get; }
 
 
         #region Accelerator Implementation
 
         protected override AcceleratorStream CreateStreamInternal() => new ANEStream(this);
 
-        protected override void SynchronizeInternal()
-        {
+        protected override void SynchronizeInternal() =>
             // ANE operations are asynchronous but we can sync here
             System.Threading.Thread.MemoryBarrier();
-        }
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new ANEBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new ANEBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
-            return new ANEKernel(this, compiledKernel);
-        }
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new ANEKernel(this, compiledKernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
@@ -97,10 +88,7 @@ namespace ILGPU.Apple.NeuralEngine
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
-            return Math.Max(1, NumMultiprocessors / groupSize);
-        }
+            int dynamicSharedMemorySizeInBytes) => Math.Max(1, NumMultiprocessors / groupSize);
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -124,25 +112,13 @@ namespace ILGPU.Apple.NeuralEngine
 
         protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) => false;
 
-        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("ANE does not support peer access");
-        }
+        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("ANE does not support peer access");
 
-        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("ANE does not support peer access");
-        }
+        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("ANE does not support peer access");
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
-            return new NullPageLockScope<T>(this, pinned, numElements);
-        }
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) => new NullPageLockScope<T>(this, pinned, numElements);
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by ANE accelerator");
-        }
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by ANE accelerator");
 
         protected override void OnBind()
         {
@@ -189,20 +165,14 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Synchronizes the stream.
         /// </summary>
-        public override void Synchronize()
-        {
-            System.Threading.Thread.MemoryBarrier();
-        }
+        public override void Synchronize() => System.Threading.Thread.MemoryBarrier();
 
 
         /// <summary>
         /// Adds a profiling marker for ANE operations.
         /// </summary>
         /// <returns>A profiling marker for timing measurements.</returns>
-        protected override ProfilingMarker AddProfilingMarkerInternal()
-        {
-            return new ANEProfilingMarker(_accelerator);
-        }
+        protected override ProfilingMarker AddProfilingMarkerInternal() => new ANEProfilingMarker(_accelerator);
 
         /// <summary>
         /// Disposes the ANE stream.

@@ -31,7 +31,6 @@ namespace ILGPU.Runtime
     /// </remarks>
     public sealed class KernelExecutionResult
     {
-        private readonly AcceleratorStream stream;
         private readonly TaskCompletionSource<object?> completionSource;
         private readonly CancellationTokenRegistration cancellationRegistration;
 
@@ -42,7 +41,7 @@ namespace ILGPU.Runtime
         /// <param name="cancellationToken">The cancellation token.</param>
         internal KernelExecutionResult(AcceleratorStream stream, CancellationToken cancellationToken)
         {
-            this.stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            this.Stream = stream ?? throw new ArgumentNullException(nameof(stream));
             completionSource = new TaskCompletionSource<object?>();
             
             if (cancellationToken.CanBeCanceled)
@@ -77,7 +76,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets the accelerator stream used for this kernel execution.
         /// </summary>
-        public AcceleratorStream Stream => stream;
+        public AcceleratorStream Stream { get; }
 
         /// <summary>
         /// Waits for the kernel execution to complete.

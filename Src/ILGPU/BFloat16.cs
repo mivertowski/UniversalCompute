@@ -98,7 +98,6 @@ namespace ILGPU
         /// <summary>
         /// The raw 16-bit value.
         /// </summary>
-        private readonly ushort value;
 
         /// <summary>
         /// Initializes a new BFloat16 from raw bits.
@@ -106,7 +105,7 @@ namespace ILGPU
         /// <param name="rawValue">The raw 16-bit value.</param>
         private BFloat16(ushort rawValue)
         {
-            value = rawValue;
+            RawValue = rawValue;
         }
 
         #endregion
@@ -116,42 +115,42 @@ namespace ILGPU
         /// <summary>
         /// Gets the raw bits representation.
         /// </summary>
-        public ushort RawValue => value;
+        public ushort RawValue { get; }
 
         /// <summary>
         /// Returns true if this value is NaN.
         /// </summary>
-        public bool IsNaN => (value & 0x7FFF) > 0x7F80;
+        public bool IsNaN => (RawValue & 0x7FFF) > 0x7F80;
 
         /// <summary>
         /// Returns true if this value is positive or negative infinity.
         /// </summary>
-        public bool IsInfinity => (value & 0x7FFF) == 0x7F80;
+        public bool IsInfinity => (RawValue & 0x7FFF) == 0x7F80;
 
         /// <summary>
         /// Returns true if this value is positive infinity.
         /// </summary>
-        public bool IsPositiveInfinity => value == 0x7F80;
+        public bool IsPositiveInfinity => RawValue == 0x7F80;
 
         /// <summary>
         /// Returns true if this value is negative infinity.
         /// </summary>
-        public bool IsNegativeInfinity => value == 0xFF80;
+        public bool IsNegativeInfinity => RawValue == 0xFF80;
 
         /// <summary>
         /// Returns true if this value is finite (not NaN or infinity).
         /// </summary>
-        public bool IsFinite => (value & 0x7F80) != 0x7F80;
+        public bool IsFinite => (RawValue & 0x7F80) != 0x7F80;
 
         /// <summary>
         /// Returns true if this value is negative.
         /// </summary>
-        public bool IsNegative => (value & 0x8000) != 0;
+        public bool IsNegative => (RawValue & 0x8000) != 0;
 
         /// <summary>
         /// Returns true if this value is subnormal.
         /// </summary>
-        public bool IsSubnormal => (value & 0x7F80) == 0 && (value & 0x007F) != 0;
+        public bool IsSubnormal => (RawValue & 0x7F80) == 0 && (RawValue & 0x007F) != 0;
 
         #endregion
 
@@ -206,7 +205,7 @@ namespace ILGPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public float ToFloat()
         {
-            uint bits = ((uint)value) << 16;
+            uint bits = ((uint)RawValue) << 16;
             return Unsafe.As<uint, float>(ref bits);
         }
 
@@ -262,7 +261,7 @@ namespace ILGPU
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BFloat16 operator -(BFloat16 value) =>
-            new((ushort)(value.value ^ 0x8000));
+            new((ushort)(value.RawValue ^ 0x8000));
 
         /// <summary>
         /// Returns the value unchanged.
@@ -282,7 +281,7 @@ namespace ILGPU
         {
             if (left.IsNaN || right.IsNaN)
                 return false;
-            return left.value == right.value;
+            return left.RawValue == right.RawValue;
         }
 
         /// <summary>
@@ -330,7 +329,7 @@ namespace ILGPU
         public override bool Equals(object? obj) => obj is BFloat16 other && Equals(other);
 
         /// <inheritdoc/>
-        public override int GetHashCode() => value.GetHashCode();
+        public override int GetHashCode() => RawValue.GetHashCode();
 
         #endregion
 
@@ -410,7 +409,7 @@ namespace ILGPU
         /// <summary>
         /// Gets the debugger display string.
         /// </summary>
-        private string GetDebuggerDisplay() => $"{ToFloat()} (0x{value:X4})";
+        private string GetDebuggerDisplay() => $"{ToFloat()} (0x{RawValue:X4})";
 
         #endregion
 
@@ -421,7 +420,7 @@ namespace ILGPU
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static BFloat16 Abs(BFloat16 value) =>
-            new((ushort)(value.value & 0x7FFF));
+            new((ushort)(value.RawValue & 0x7FFF));
 
         /// <summary>
         /// Returns the maximum of two values.
