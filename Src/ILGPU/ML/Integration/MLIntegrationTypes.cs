@@ -815,7 +815,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the parameter name.
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the parameter type.

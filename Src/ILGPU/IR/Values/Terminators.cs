@@ -198,7 +198,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns true if the current return terminator is a void return.
         /// </summary>
-        public bool IsVoidReturn => Type.IsVoidType;
+        public bool IsVoidReturn => Type!.IsVoidType;
 
         /// <summary>
         /// Returns the associated return value.
@@ -212,7 +212,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            ReturnValue.Type;
+            ReturnValue.Type!;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(
@@ -486,8 +486,8 @@ namespace ILGPU.IR.Values
             : base(initializer)
         {
             Location.Assert(
-                condition.Type.IsPrimitiveType &&
-                condition.Type.BasicValueType == BasicValueType.Int1);
+                condition.Type!.IsPrimitiveType &&
+                condition.Type!.BasicValueType == BasicValueType.Int1);
             Flags = flags;
 
             var targets = BlockList.Create(trueTarget, falseTarget);
@@ -717,8 +717,8 @@ namespace ILGPU.IR.Values
             : base(initializer)
         {
             Location.Assert(
-                value.Type.IsPrimitiveType &&
-                value.Type.BasicValueType.IsInt());
+                value.Type!.IsPrimitiveType &&
+                value.Type!.BasicValueType.IsInt());
 
             SealTargets(ref targets);
             Seal(value);

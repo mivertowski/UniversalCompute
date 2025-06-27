@@ -266,7 +266,7 @@ namespace ILGPU.IR.Analyses
         /// Creates initial analysis data using <see cref="IsUniformByDefinition"/>.
         /// </summary>
         protected override AnalysisValue<ValueInfo> CreateData(Value node) =>
-            CreateValue(IsUniformByDefinition(node), node.Type);
+            CreateValue(IsUniformByDefinition(node), node.Type!);
 
         /// <summary>
         /// Returns the maximum of the first and the second kind.

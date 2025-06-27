@@ -27,9 +27,9 @@ namespace ILGPU.Frontend
         private void MakeBox()
         {
             var value = Block.Pop();
-            if (!value.Type.IsObjectType)
+            if (!value.Type!.IsObjectType)
                 throw Location.GetInvalidOperationException();
-            var alloca = CreateTempAlloca(value.Type);
+            var alloca = CreateTempAlloca(value.Type!);
             CreateStore(alloca, value);
         }
 

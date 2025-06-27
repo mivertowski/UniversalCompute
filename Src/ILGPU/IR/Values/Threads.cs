@@ -270,7 +270,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            Variable.Type;
+            Variable.Type!;
 
         #endregion
     }

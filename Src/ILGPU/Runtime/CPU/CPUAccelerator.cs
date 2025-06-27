@@ -122,7 +122,7 @@ namespace ILGPU.Runtime.CPU
 
             if (!description.Equals(CPUDevice.Implicit))
                 Bind();
-            Init(context.DefautltILBackend);
+            Init(context.DefautltILBackend!);
         }
 
         #endregion

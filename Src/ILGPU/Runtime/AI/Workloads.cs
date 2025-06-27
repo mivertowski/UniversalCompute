@@ -346,9 +346,12 @@ namespace ILGPU.Runtime.AI
         /// <param name="context">The execution context.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A task representing the operation.</returns>
-        public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default) =>
+        public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default)
+        {
             // For distributed workload, this should not be called directly
+            await Task.Delay(0, cancellationToken).ConfigureAwait(false);
             throw new InvalidOperationException("Use DistributedWorkloadOrchestrator for distributed execution");
+        }
 
         private ITensor<T> CreateTensorSlice(ITensor<T> tensor, int startRow, int endRow) =>
             // This would create a tensor slice/view

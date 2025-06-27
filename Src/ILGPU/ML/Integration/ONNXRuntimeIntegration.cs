@@ -257,7 +257,7 @@ namespace ILGPU.ML.Integration
         private async Task<ONNXModel> LoadONNXModelAsync(string modelPath) =>
             // Implementation would load and parse ONNX model file
             // This is a simplified placeholder
-            await Task.FromResult(new ONNXModel(modelPath)).ConfigureAwait(false);
+            await Task.FromResult(new ONNXModel(modelPath) { ModelBytes = Array.Empty<byte>() }).ConfigureAwait(false);
 
         private async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel) =>
             // Implementation would convert ONNX operators to ILGPU compute operations

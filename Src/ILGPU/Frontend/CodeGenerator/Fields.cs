@@ -49,7 +49,7 @@ namespace ILGPU.Frontend
                 throw Location.GetInvalidOperationException();
 
             var fieldValue = Block.Pop();
-            if (fieldValue.Type.IsPointerType)
+            if (fieldValue.Type!.IsPointerType)
             {
                 // Load field from address
                 Block.Push(fieldValue);
@@ -138,7 +138,7 @@ namespace ILGPU.Frontend
         private void MakeLoadStaticFieldAddress(FieldInfo field)
         {
             var fieldValue = CreateLoadStaticFieldValue(field);
-            var tempAlloca = CreateTempAlloca(fieldValue.Type);
+            var tempAlloca = CreateTempAlloca(fieldValue.Type!);
             Builder.CreateStore(Location, tempAlloca, fieldValue);
             Block.Push(tempAlloca);
         }
