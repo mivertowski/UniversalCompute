@@ -351,7 +351,7 @@ namespace ILGPU.IR.Values
             : base(initializer)
         {
             this.Assert(
-                values[0].Type.As<ArrayType>(this).NumDimensions == values.Count - 1);
+                values[0].Type!.As<ArrayType>(this).NumDimensions == values.Count - 1);
 
             Seal(ref values);
         }
@@ -380,7 +380,7 @@ namespace ILGPU.IR.Values
         /// <inheritdoc/>
         protected override TypeNode ComputeType(in ValueInitializer initializer)
         {
-            var sourceType = ArrayValue.Type.As<ArrayType>(Location);
+            var sourceType = ArrayValue.Type!.As<ArrayType>(Location);
             return initializer.Context.CreatePointerType(
                 sourceType.ElementType,
                 MemoryAddressSpace.Generic);
@@ -473,7 +473,7 @@ namespace ILGPU.IR.Values
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer)
         {
-            var pointerType = Source.Type.As<PointerType>(Location);
+            var pointerType = Source.Type!.As<PointerType>(Location);
             var structureType = pointerType.ElementType.As<StructureType>(Location);
 
             var fieldType = structureType.Get(initializer.Context, FieldSpan);

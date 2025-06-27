@@ -38,8 +38,8 @@ namespace ILGPU.IR.Values
             : base(initializer)
         {
             Location.Assert(
-                condition.Type.IsPrimitiveType &&
-                condition.Type.BasicValueType == BasicValueType.Int1);
+                condition.Type!.IsPrimitiveType &&
+                condition.Type!.BasicValueType == BasicValueType.Int1);
             Seal(condition, trueValue, falseValue);
         }
 
@@ -76,7 +76,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            TrueValue.Type;
+            TrueValue.Type!;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(

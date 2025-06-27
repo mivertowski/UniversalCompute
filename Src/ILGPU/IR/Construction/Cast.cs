@@ -46,7 +46,7 @@ namespace ILGPU.IR.Construction
             Value node,
             BasicValueType targetType)
         {
-            location.Assert(node.Type.IsPointerType && targetType.IsInt());
+            location.Assert(node.Type!.IsPointerType && targetType.IsInt());
             return Append(new PointerAsIntCast(
                 GetInitializer(location),
                 node,
@@ -66,7 +66,7 @@ namespace ILGPU.IR.Construction
             Value node,
             TypeNode targetElementType)
         {
-            var type = node.Type.As<PointerType>(location);
+            var type = node.Type!.As<PointerType>(location);
 
             // Check whether the element types are the same
             if (type.ElementType == targetElementType)
@@ -107,7 +107,7 @@ namespace ILGPU.IR.Construction
             Value node,
             MemoryAddressSpace targetAddressSpace)
         {
-            var type = node.Type.As<AddressSpaceType>(location);
+            var type = node.Type!.As<AddressSpaceType>(location);
 
             // Simplify chained casts
             if (node is AddressSpaceCast cast)

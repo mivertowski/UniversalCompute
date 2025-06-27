@@ -88,12 +88,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the model type.
         /// </summary>
-        public string ModelType { get; set; }
+        public required string ModelType { get; set; }
 
         /// <summary>
         /// Gets or sets the framework.
         /// </summary>
-        public string Framework { get; set; }
+        public required string Framework { get; set; }
     }
 
     /// <summary>
@@ -119,7 +119,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the device used.
         /// </summary>
-        public string DeviceUsed { get; set; }
+        public required string DeviceUsed { get; set; }
 
         /// <summary>
         /// Gets or sets the batch size.
@@ -160,7 +160,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the bottleneck analysis.
         /// </summary>
-        public string BottleneckAnalysis { get; set; }
+        public required string BottleneckAnalysis { get; set; }
 
         /// <summary>
         /// Gets or sets optimization suggestions.
@@ -249,7 +249,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the best device for the workload.
         /// </summary>
-        public string BestDevice { get; set; }
+        public required string BestDevice { get; set; }
 
         /// <summary>
         /// Gets or sets the profiling duration.
@@ -429,7 +429,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the provider name.
         /// </summary>
-        public string ProviderName { get; set; }
+        public required string ProviderName { get; set; }
 
         /// <summary>
         /// Gets or sets the execution count.
