@@ -36,7 +36,7 @@ namespace ILGPU.IR
         /// <summary>
         /// Returns the associated type information.
         /// </summary>
-        TypeNode Type { get; }
+        TypeNode? Type { get; }
 
         /// <summary>
         /// Returns the parent basic block.
@@ -357,7 +357,7 @@ namespace ILGPU.IR
         /// Returns the associated type.
         /// </summary>
         [field: DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public TypeNode Type
+        public TypeNode? Type
         {
             get
             {
@@ -379,7 +379,7 @@ namespace ILGPU.IR
         /// Returns the associated basic value type.
         /// </summary>
         public BasicValueType BasicValueType =>
-            Type != null ? Type.BasicValueType : BasicValueType.None;
+            Type?.BasicValueType ?? BasicValueType.None;
 
         /// <summary>
         /// Returns the associated value flags.

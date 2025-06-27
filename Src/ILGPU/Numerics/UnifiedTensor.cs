@@ -534,7 +534,7 @@ namespace ILGPU.Numerics
                 if (cpuDataValid && cpuMemory != null)
                 {
                     // Transfer from CPU to GPU  
-                    gpuBuffer!.CopyFromCPU(cpuMemory.Memory.Span.ToArray());
+                    gpuBuffer!.CopyFromCPU(cpuMemory!.Memory.Span.ToArray());
                 }
                 else if (unifiedBuffer != null)
                 {

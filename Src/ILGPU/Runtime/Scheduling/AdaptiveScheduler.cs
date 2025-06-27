@@ -281,7 +281,7 @@ namespace ILGPU.Runtime.Scheduling
             return assignments;
         }
 
-        private async Task<Dictionary<ComputeNode, ComputeDevice>> CreateLoadBalancedAssignmentsAsync(
+        private Task<Dictionary<ComputeNode, ComputeDevice>> CreateLoadBalancedAssignmentsAsync(
             ComputeGraph graph, 
             WorkloadAnalysis analysis)
         {
@@ -313,7 +313,7 @@ namespace ILGPU.Runtime.Scheduling
                 }
             }
 
-            return assignments;
+            return Task.FromResult(assignments);
         }
 
         private Dictionary<ComputeNode, ComputeDevice> CreateLatencyOptimizedAssignments(
