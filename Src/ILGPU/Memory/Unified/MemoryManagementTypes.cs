@@ -198,7 +198,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Finds the accelerator with most available memory.
         /// </summary>
-        public Accelerator FindBestAcceleratorForAllocation(long requiredBytes)
+        public Accelerator? FindBestAcceleratorForAllocation(long requiredBytes)
         {
             lock (_syncLock)
             {
@@ -352,7 +352,7 @@ namespace ILGPU.Memory.Unified
 
             return new MemoryPlacementDecision
             {
-                TargetAccelerator = bestAccelerator,
+                TargetAccelerator = bestAccelerator ?? throw new InvalidOperationException("No suitable accelerator found for memory allocation"),
                 RequiredBytes = requiredBytes,
                 Strategy = PlacementStrategy.LeastUsed
             };
@@ -361,7 +361,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Suggests memory transfers for optimization.
         /// </summary>
-        public async Task<List<MemoryTransferSuggestion>> SuggestTransfersAsync()
+        public Task<List<MemoryTransferSuggestion>> SuggestTransfersAsync()
         {
             var suggestions = new List<MemoryTransferSuggestion>();
             
@@ -389,7 +389,7 @@ namespace ILGPU.Memory.Unified
                 }
             }
             
-            return suggestions;
+            return Task.FromResult(suggestions);
         }
 
         /// <summary>

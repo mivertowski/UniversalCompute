@@ -1086,17 +1086,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
-        public object Value { get; set; }
+        public required object Value { get; set; }
 
         /// <summary>
         /// Gets or sets the data type.
         /// </summary>
-        public string DataType { get; set; }
+        public required string DataType { get; set; }
 
         /// <summary>
         /// Creates a named ONNX value.

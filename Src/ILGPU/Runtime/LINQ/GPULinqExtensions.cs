@@ -107,7 +107,7 @@ namespace ILGPU.Runtime.LINQ
                             System.Linq.Expressions.Expression.Invoke(
                                 System.Linq.Expressions.Expression.Constant(selector),
                                 System.Linq.Expressions.Expression.Parameter(typeof(TSource), "x")),
-                            System.Linq.Expressions.Expression.Parameter(typeof(TSource), "x"))))) as IGPUQueryable<TResult>;
+                            System.Linq.Expressions.Expression.Parameter(typeof(TSource), "x"))))) as IGPUQueryable<TResult>!;
         }
 
         /// <summary>
@@ -138,7 +138,7 @@ namespace ILGPU.Runtime.LINQ
                             System.Linq.Expressions.Expression.Invoke(
                                 System.Linq.Expressions.Expression.Constant(predicate),
                                 System.Linq.Expressions.Expression.Parameter(typeof(T), "x")),
-                            System.Linq.Expressions.Expression.Parameter(typeof(T), "x"))))) as IGPUQueryable<T>;
+                            System.Linq.Expressions.Expression.Parameter(typeof(T), "x"))))) as IGPUQueryable<T>!;
         }
 
         /// <summary>

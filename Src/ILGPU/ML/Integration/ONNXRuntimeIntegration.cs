@@ -272,15 +272,18 @@ namespace ILGPU.ML.Integration
             foreach (var input in inputs)
             {
                 var tensor = await ConvertOnnxValueToTensorAsync(input).ConfigureAwait(false);
-                tensorInputs[input.Name] = tensor;
+                if (tensor != null)
+                {
+                    tensorInputs[input.Name] = tensor;
+                }
             }
 
             return tensorInputs;
         }
 
-        private async Task<ITensor<float>> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue) =>
+        private async Task<ITensor<float>?> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue) =>
             // Implementation would convert ONNX tensor format to ILGPU tensor format
-            await Task.FromResult<ITensor<float>>(null).ConfigureAwait(false);
+            await Task.FromResult<ITensor<float>?>(null).ConfigureAwait(false);
 
         private async Task<NamedOnnxValue[]> ConvertTensorsToOutputsAsync(
             Dictionary<string, ITensor<float>> tensors,
@@ -293,16 +296,19 @@ namespace ILGPU.ML.Integration
                 if (tensors.TryGetValue(outputName, out var tensor))
                 {
                     var onnxValue = await ConvertTensorToOnnxValueAsync(outputName, tensor).ConfigureAwait(false);
-                    outputs.Add(onnxValue);
+                    if (onnxValue != null)
+                    {
+                        outputs.Add(onnxValue);
+                    }
                 }
             }
 
             return outputs.ToArray();
         }
 
-        private async Task<NamedOnnxValue> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>
+        private async Task<NamedOnnxValue?> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>
             // Implementation would convert ILGPU tensor back to ONNX format
-            await Task.FromResult<NamedOnnxValue>(null).ConfigureAwait(false);
+            await Task.FromResult<NamedOnnxValue?>(null).ConfigureAwait(false);
 
         private async Task<Dictionary<ComputeNode, CompiledKernel>> CompileKernelsAsync(ExecutionPlan plan)
         {

@@ -313,13 +313,13 @@ namespace ILGPU.Backends.IL
                     sourceBuilder.Append($".{field.Name}");
                     break;
                 case "ldsfld":
-                    sourceBuilder.Append($"{GetTypeString(field.DeclaringType)}.{field.Name}");
+                    sourceBuilder.Append($"{GetTypeString(field.DeclaringType!)}.{field.Name}");
                     break;
                 case "stfld":
                     sourceBuilder.Append($".{field.Name} = ");
                     break;
                 case "stsfld":
-                    sourceBuilder.Append($"{GetTypeString(field.DeclaringType)}.{field.Name} = ");
+                    sourceBuilder.Append($"{GetTypeString(field.DeclaringType!)}.{field.Name} = ");
                     break;
                 default:
                     sourceBuilder.Append($"/* {opCode.Name} {field.Name} */");
