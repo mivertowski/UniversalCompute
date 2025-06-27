@@ -37,7 +37,7 @@ namespace ILGPU.Backends.OpenCL
         /// Constructs a new variable instance.
         /// </remarks>
         /// <param name="allocaInfo">The source allocation info.</param>
-        private sealed class GloballySharedMemoryVariable(in AllocaInformation allocaInfo) : TypedVariable(-1, allocaInfo.Alloca.Type)
+        private sealed class GloballySharedMemoryVariable(in AllocaInformation allocaInfo) : TypedVariable(-1, allocaInfo.Alloca.Type!)
         {
 
             /// <summary>
@@ -62,7 +62,7 @@ namespace ILGPU.Backends.OpenCL
         /// Constructs a new variable instance.
         /// </remarks>
         /// <param name="allocaInfo">The source allocation info.</param>
-        private sealed class GloballySharedMemoryLengthVariable(in AllocaInformation allocaInfo) : TypedVariable(-1, allocaInfo.Alloca.Type)
+        private sealed class GloballySharedMemoryLengthVariable(in AllocaInformation allocaInfo) : TypedVariable(-1, allocaInfo.Alloca.Type!)
         {
 
             /// <summary>

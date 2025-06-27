@@ -46,6 +46,7 @@ var binaryOpNestedRewriterSettings = new[]
     },
 };
 #>
+#nullable enable
 
 using ILGPU.IR.Values;
 using ILGPU.Util;

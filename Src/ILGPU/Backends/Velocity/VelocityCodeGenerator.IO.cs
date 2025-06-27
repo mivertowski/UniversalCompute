@@ -24,7 +24,7 @@ namespace ILGPU.Backends.Velocity
         {
             var mask = GetBlockMask(load.BasicBlock);
             var source = GetLocal(load.Source);
-            CreateLoad(mask, source, load.Type);
+            CreateLoad(mask, source, load.Type!);
             Store(load);
         }
 

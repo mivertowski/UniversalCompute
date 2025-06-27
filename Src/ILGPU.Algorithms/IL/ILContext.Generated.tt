@@ -16,6 +16,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
+#nullable enable
 using ILGPU.IR.Intrinsics;
 
 namespace ILGPU.Algorithms.IL

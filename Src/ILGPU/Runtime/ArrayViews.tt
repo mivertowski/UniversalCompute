@@ -17,6 +17,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 <# var alignmentValues = new int[] { 16, 32, 64, 128, 256, 512 }; #>
+#nullable enable
 
 using ILGPU.Util;
 using System.Diagnostics;

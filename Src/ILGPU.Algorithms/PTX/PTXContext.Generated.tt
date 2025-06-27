@@ -59,6 +59,7 @@ var xmathBinaryRedirects = new[]
         "IEEERemainder",
     };
 #>
+#nullable enable
 using ILGPU.IR.Intrinsics;
 using ILGPU.IR.Values;
 using ILGPU.Runtime.Cuda;

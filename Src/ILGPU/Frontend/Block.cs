@@ -153,7 +153,7 @@ namespace ILGPU.Frontend
             location.Assert(StackCounter > 0);
             var value = GetValue(
                 new VariableRef(StackCounter - 1, VariableRefType.Stack));
-            return value.Type;
+            return value.Type!;
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace ILGPU.Frontend
                 ? Pop()
                 : PopCompareOrArithmeticValue(location, flags);
 
-            if (right.Type.IsPointerType || left.Type.IsPointerType)
+            if (right.Type!.IsPointerType || left.Type!.IsPointerType)
                 return ArithmeticOperandKind.Pointer;
 
             Value result;
@@ -391,7 +391,7 @@ namespace ILGPU.Frontend
                 case BasicValueType.Int64:
                 case BasicValueType.Float32:
                 case BasicValueType.Float64:
-                    result = Convert(right, left.Type, flags);
+                    result = Convert(right, left.Type!, flags);
                     break;
                 default:
                     throw location.GetNotSupportedException(

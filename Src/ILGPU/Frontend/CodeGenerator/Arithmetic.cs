@@ -117,19 +117,19 @@ namespace ILGPU.Frontend
                 out var right) == Block.ArithmeticOperandKind.Pointer)
             {
                 // This is a pointer access
-                bool isLeftPointer = left.Type.IsPointerType;
+                bool isLeftPointer = left.Type!.IsPointerType;
                 if (!isLeftPointer)
                     Utilities.Swap(ref left, ref right);
 
                 // Check for raw combinations of two pointer values
                 if (
-                    !right.Type.IsPointerType &&
+                    !right.Type!.IsPointerType &&
                     // Check whether this can be safely converted into a LEA value
                     kind == BinaryArithmeticKind.Add)
                 {
                     // Check the size of the element type and divide the raw offset
                     // by the element size to retrieve the actual element index.
-                    var elementType = left.Type.As<PointerType>(Location).ElementType;
+                    var elementType = left.Type!.As<PointerType>(Location).ElementType;
                     var elementSize = Builder.CreateSizeOf(Location, elementType);
 
                     // Create the actual address computation

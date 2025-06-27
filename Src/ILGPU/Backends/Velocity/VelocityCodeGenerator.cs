@@ -514,7 +514,7 @@ namespace ILGPU.Backends.Velocity
         public void LoadVectorized(Value value, out Type type)
         {
             Load(value);
-            type = GetVectorizedType(value.Type);
+            type = GetVectorizedType(value.Type!);
         }
 
         /// <summary>
@@ -536,7 +536,7 @@ namespace ILGPU.Backends.Velocity
         public void LoadRefAndType(Value value, out Type type)
         {
             LoadRef(value);
-            type = GetVectorizedType(value.Type);
+            type = GetVectorizedType(value.Type!);
         }
 
         /// <summary>
@@ -566,12 +566,12 @@ namespace ILGPU.Backends.Velocity
             value.Assert(!locals.ContainsKey(value));
             if (!value.Uses.HasAny)
             {
-                if (!value.Type.IsVoidType)
+                if (!value.Type!.IsVoidType)
                     Emitter.Emit(OpCodes.Pop);
                 return;
             }
 
-            var local = Emitter.DeclareLocal(GetVectorizedType(value.Type));
+            var local = Emitter.DeclareLocal(GetVectorizedType(value.Type!));
             locals.Add(value, local);
             Emitter.Emit(LocalOperation.Store, local);
         }

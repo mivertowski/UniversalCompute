@@ -407,7 +407,7 @@ namespace ILGPU.Backends
         /// <returns>The allocated register.</returns>
         public HardwareRegister AllocateHardware(Value node)
         {
-            var description = ResolveRegisterDescription(node.Type);
+            var description = ResolveRegisterDescription(node.Type!);
             return Allocate(node, description);
         }
 
@@ -423,7 +423,7 @@ namespace ILGPU.Backends
                 node = alias;
             if (!registerLookup.TryGetValue(node, out RegisterEntry entry))
             {
-                var targetRegister = AllocateType(node.Type);
+                var targetRegister = AllocateType(node.Type!);
                 entry = new RegisterEntry(targetRegister, node);
                 registerLookup.Add(node, entry);
             }
