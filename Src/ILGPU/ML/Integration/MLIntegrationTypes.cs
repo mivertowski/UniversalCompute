@@ -20,6 +20,7 @@ using ILGPU.Runtime;
 using ILGPU.Runtime.Scheduling;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -213,6 +214,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the DeviceProfileResult class.
         /// </summary>
+        [SetsRequiredMembers]
         public DeviceProfileResult(ComputeDevice device, bool success, double avgLatency, double throughput)
         {
             DeviceName = device.ToString();
@@ -226,6 +228,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the DeviceProfileResult class with error message.
         /// </summary>
+        [SetsRequiredMembers]
         public DeviceProfileResult(ComputeDevice device, bool success, double avgLatency, double throughput, string errorMessage)
             : this(device, success, avgLatency, throughput)
         {
@@ -266,6 +269,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the DeviceProfileResults class.
         /// </summary>
+        [SetsRequiredMembers]
         public DeviceProfileResults(Dictionary<ComputeDevice, DeviceProfileResult> results)
         {
             Results = [.. results.Values];
@@ -799,6 +803,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the CompiledKernel class.
         /// </summary>
+        [SetsRequiredMembers]
         public CompiledKernel(ComputeNode node, ComputeDevice device)
         {
             KernelName = $"{node.Operation.GetType().Name}_{device}";
@@ -868,6 +873,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the ModelProfilingResults class with device results.
         /// </summary>
+        [SetsRequiredMembers]
         public ModelProfilingResults(Dictionary<ComputeDevice, DeviceProfilingResult> deviceResults)
         {
             TotalInferenceTimeMs = deviceResults.Values.Sum(r => r.ExecutionTimeMs);
@@ -916,6 +922,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the DeviceProfilingResult class.
         /// </summary>
+        [SetsRequiredMembers]
         public DeviceProfilingResult(ComputeDevice device, bool success, double avgLatency, double throughput)
         {
             DeviceName = device.ToString();
@@ -927,6 +934,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the DeviceProfilingResult class with error.
         /// </summary>
+        [SetsRequiredMembers]
         public DeviceProfilingResult(ComputeDevice device, bool success, double avgLatency, double throughput, string errorMessage)
             : this(device, success, avgLatency, throughput)
         {
@@ -1072,9 +1080,11 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Initializes a new instance of the ONNXModel class.
         /// </summary>
+        [SetsRequiredMembers]
         public ONNXModel(string modelPath)
         {
             ModelPath = modelPath;
+            ModelBytes = Array.Empty<byte>(); // Default empty bytes
         }
     }
 

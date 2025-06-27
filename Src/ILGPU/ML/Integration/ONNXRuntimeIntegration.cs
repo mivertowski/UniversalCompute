@@ -257,7 +257,11 @@ namespace ILGPU.ML.Integration
         private async Task<ONNXModel> LoadONNXModelAsync(string modelPath) =>
             // Implementation would load and parse ONNX model file
             // This is a simplified placeholder
-            await Task.FromResult(new ONNXModel(modelPath) { ModelBytes = Array.Empty<byte>() }).ConfigureAwait(false);
+            await Task.FromResult(new ONNXModel
+            {
+                ModelPath = modelPath,
+                ModelBytes = Array.Empty<byte>()
+            }).ConfigureAwait(false);
 
         private async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel) =>
             // Implementation would convert ONNX operators to ILGPU compute operations
@@ -325,7 +329,12 @@ namespace ILGPU.ML.Integration
 
         private async Task<CompiledKernel> CompileNodeKernelAsync(ComputeNode node, ComputeDevice device) =>
             // Implementation would compile the node's operation to device-specific code
-            await Task.FromResult(new CompiledKernel(node, device)).ConfigureAwait(false);
+            await Task.FromResult(new CompiledKernel
+            {
+                KernelName = $"{node.Operation.GetType().Name}_{device}",
+                EntryPoint = "main",
+                CompiledCode = [0x00] // Placeholder
+            }).ConfigureAwait(false);
 
         private async Task<DeviceProfilingResult> ProfileOnDeviceAsync(
             string modelPath,

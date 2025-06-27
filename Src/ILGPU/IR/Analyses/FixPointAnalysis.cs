@@ -594,7 +594,7 @@ namespace ILGPU.IR.Analyses
                     Merge(
                         source.Data,
                         sourceValue[fieldSpan.Index]),
-                    getField.Type);
+                    getField.Type!);
             }
 
             var newChildData = new T[fieldSpan.Span];
@@ -736,7 +736,7 @@ namespace ILGPU.IR.Analyses
             var newData = source.Data;
             foreach (Value node in value.Nodes)
                 newData = Merge(newData, context[node].Data);
-            return CreateValue(newData, value.Type);
+            return CreateValue(newData, value.Type!);
         }
 
         #endregion

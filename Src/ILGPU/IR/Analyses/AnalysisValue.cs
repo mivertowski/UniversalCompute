@@ -54,7 +54,7 @@ namespace ILGPU.IR.Analyses
         /// Returns the value of <see cref="Value"/> for all input nodes.
         /// </summary>
         public readonly AnalysisValue<T> this[Value value] =>
-            AnalysisValue.Create(Value, value.Type);
+            AnalysisValue.Create(Value, value.Type!);
     }
 
     /// <summary>
