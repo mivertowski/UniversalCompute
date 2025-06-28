@@ -20,6 +20,7 @@
 // you may not use this file except in compliance with the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using ILGPU.Runtime;
 using ILGPU.FFT;
@@ -110,7 +111,19 @@ namespace ILGPU.Algorithms.FFT
         /// <param name="input">Input 2D data array.</param>
         /// <param name="forward">True for forward transform, false for inverse.</param>
         /// <returns>Output 2D FFT data.</returns>
-        public static Complex[,] FFT2D(Accelerator accelerator, Complex[,] input, bool forward = true)
+        [SuppressMessage(
+            "Performance",
+            "CA1814:Prefer jagged arrays over multidimensional",
+            Justification = "FFT algorithms conventionally work with rectangular matrices. " +
+                          "Multidimensional arrays ensure rectangular structure and provide " +
+                          "better cache locality for 2D FFT operations.")]
+        public static Complex[,] FFT2D(Accelerator accelerator, 
+            [SuppressMessage(
+                "Performance",
+                "CA1814:Prefer jagged arrays over multidimensional",
+                Justification = "FFT algorithms require rectangular input matrices for proper " +
+                              "2D transform operations.")]
+            Complex[,] input, bool forward = true)
         {
             if (input == null)
                 throw new ArgumentException("Input array cannot be null");
@@ -118,6 +131,11 @@ namespace ILGPU.Algorithms.FFT
             // Placeholder implementation - copy input to output
             var height = input.GetLength(0);
             var width = input.GetLength(1);
+            [SuppressMessage(
+                "Performance",
+                "CA1814:Prefer jagged arrays over multidimensional",
+                Justification = "FFT output must match input structure as rectangular matrix " +
+                              "for proper 2D transform operations.")]
             var output = new Complex[height, width];
             Array.Copy(input, output, input.Length);
             return output;
@@ -287,7 +305,7 @@ namespace ILGPU.Algorithms.FFT
         public static float[] ApplyWindow(float[] signal, WindowFunction windowFunction)
         {
             if (signal == null || signal.Length == 0)
-                return signal;
+                return signal ?? Array.Empty<float>();
 
             var windowed = new float[signal.Length];
             var n = signal.Length;

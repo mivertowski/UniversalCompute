@@ -157,7 +157,7 @@ namespace ILGPU.IR.Values
         protected override string ToArgString() =>
             ArrayLength.Resolve() is PrimitiveValue value
             ? $"{Type} [{value}]"
-            : Type.ToString();
+            : Type!.ToString();
 
         #endregion
     }
@@ -297,7 +297,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            Source.Type.AsNotNullCast<PointerType>().ElementType;
+            Source.Type!.AsNotNullCast<PointerType>().ElementType;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(

@@ -462,6 +462,15 @@ namespace ILGPU.ML.Integration
     public class ModelCompilationOptions
     {
         /// <summary>
+        /// Initializes a new instance of the ModelCompilationOptions class.
+        /// </summary>
+        [SetsRequiredMembers]
+        public ModelCompilationOptions()
+        {
+            TargetDevice = "default";
+        }
+
+        /// <summary>
         /// Gets or sets the optimization level.
         /// </summary>
         public OptimizationLevel OptimizationLevel { get; set; } = OptimizationLevel.Level2;
@@ -479,7 +488,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the target device.
         /// </summary>
-        public string TargetDevice { get; set; }
+        public required string TargetDevice { get; set; }
 
         /// <summary>
         /// Gets or sets custom compilation flags.
@@ -541,15 +550,20 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public async Task<OptimizedModel> OptimizeAsync(
             object model,
-            ModelCompilationOptions options) =>
+            ModelCompilationOptions options)
+        {
+            // Simulate async operation
+            await Task.Delay(1).ConfigureAwait(false);
+            
             // Placeholder implementation
-            new OptimizedModel
+            return new OptimizedModel
             {
                 OriginalModel = model,
                 OptimizationApplied = true,
                 OptimizationDetails = ["Graph fusion", "Memory layout optimization"],
                 OptimizedGraph = model as ComputeGraph ?? new ComputeGraph()
             };
+        }
 
         /// <summary>
         /// Analyzes model for optimization opportunities.
@@ -576,9 +590,19 @@ namespace ILGPU.ML.Integration
     public class OptimizedModel
     {
         /// <summary>
+        /// Initializes a new instance of the OptimizedModel class.
+        /// </summary>
+        [SetsRequiredMembers]
+        public OptimizedModel()
+        {
+            OriginalModel = new object();
+            OptimizedGraph = new ComputeGraph();
+        }
+
+        /// <summary>
         /// Gets or sets the original model.
         /// </summary>
-        public object OriginalModel { get; set; }
+        public required object OriginalModel { get; set; }
 
         /// <summary>
         /// Gets or sets whether optimization was applied.
@@ -593,7 +617,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the optimized compute graph.
         /// </summary>
-        public ComputeGraph OptimizedGraph { get; set; }
+        public required ComputeGraph OptimizedGraph { get; set; }
 
         /// <summary>
         /// Implicit conversion to ComputeGraph.

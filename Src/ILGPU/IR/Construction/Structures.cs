@@ -110,7 +110,7 @@ namespace ILGPU.IR.Construction
                     // (e.g. it was the start of a fixed buffer) copy the remaining
                     // elements.
                     var fieldTypeInfo = typeInfo.GetFieldTypeInfo(i);
-                    var initialBytes = fieldValue.Type.Size;
+                    var initialBytes = fieldValue.Type!.Size;
                     var numBytes = fieldTypeInfo.Size;
                     if (initialBytes < numBytes)
                     {
@@ -503,7 +503,7 @@ namespace ILGPU.IR.Construction
             FieldSpan fieldSpan,
             Value value)
         {
-            var structureType = objectValue.Type.As<StructureType>(location);
+            var structureType = objectValue.Type!.As<StructureType>(location);
             location.Assert(structureType.Get(BaseContext, fieldSpan) == value.Type);
 
             // Fold structure values

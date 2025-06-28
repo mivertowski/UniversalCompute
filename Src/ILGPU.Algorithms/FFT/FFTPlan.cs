@@ -84,9 +84,22 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Disposes this FFT plan and associated resources.
         /// </summary>
-        public virtual void Dispose()
+        public void Dispose()
         {
-            FFTManager?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes this FFT plan and associated resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                FFTManager?.Dispose();
+            }
         }
 
         #endregion
@@ -296,8 +309,10 @@ namespace ILGPU.Algorithms.FFT
         public FFTPlan2D(Context context, int width, int height)
             : base(context)
         {
-            if (width <= 0 || height <= 0)
-                throw new ArgumentOutOfRangeException("Width and height must be positive");
+            if (width <= 0)
+                throw new ArgumentOutOfRangeException(nameof(width), "Width must be positive");
+            if (height <= 0)
+                throw new ArgumentOutOfRangeException(nameof(height), "Height must be positive");
 
             Width = width;
             Height = height;

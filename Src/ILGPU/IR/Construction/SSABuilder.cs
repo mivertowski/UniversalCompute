@@ -199,7 +199,7 @@ namespace ILGPU.IR.Construction
                 get
                 {
                     field ??= Parent.MethodBuilder[Block];
-                    return field;
+                    return field!;
                 }
             }
 

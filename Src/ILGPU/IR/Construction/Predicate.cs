@@ -31,7 +31,7 @@ namespace ILGPU.IR.Construction
             Value trueValue,
             Value falseValue)
         {
-            location.Assert(condition.Type.BasicValueType == BasicValueType.Int1);
+            location.Assert(condition.Type!.BasicValueType == BasicValueType.Int1);
 
             if (trueValue.Type != falseValue.Type)
             {

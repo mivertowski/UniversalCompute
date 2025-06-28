@@ -133,7 +133,7 @@ namespace ILGPU.IR.Values
             builder.CreateConvert(
                 Location,
                 rebuilder.Rebuild(Value),
-                Type,
+                Type!,
                 Flags);
 
         /// <summary cref="Value.Write{T}(T)"/>

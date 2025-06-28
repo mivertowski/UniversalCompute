@@ -176,7 +176,7 @@ namespace ILGPU.IR.Values
                         BasicValueType.Int32);
                     break;
             }
-            return type;
+            return type!;
         }
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
@@ -267,8 +267,8 @@ namespace ILGPU.IR.Values
             ArithmeticFlags flags)
             : base(initializer, flags)
         {
-            bool isLeftPointer = left.Type.IsPointerType;
-            bool isRightPointer = right.Type.IsPointerType;
+            bool isLeftPointer = left.Type!.IsPointerType;
+            bool isRightPointer = right.Type!.IsPointerType;
             initializer.Assert(
                 // Check whether the types are the same
                 left.Type == right.Type ||
@@ -315,7 +315,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            Left.Type;
+            Left.Type!;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(
@@ -450,7 +450,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            First.Type;
+            First.Type!;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(

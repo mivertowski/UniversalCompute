@@ -289,7 +289,7 @@ namespace ILGPU.IR.Values
                     // TODO: extend this functionality in the future to support
                     // typed signed/unsigned outputs
                     var argument = this[expression.Argument];
-                    string argumentFormat = argument.Type.IsPointerType
+                    string argumentFormat = argument.Type!.IsPointerType
                         ? PrintFPointerFormat
                         : GetPrintFFormat(
                             argument.BasicValueType.GetArithmeticBasicValueType(false));

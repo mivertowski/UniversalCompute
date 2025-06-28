@@ -119,7 +119,7 @@ namespace ILGPU.IR.Construction
             Location location,
             Value source)
         {
-            location.Assert(source.Type.IsPointerType);
+            location.Assert(source.Type!.IsPointerType);
 
             return Append(new Load(
                 GetInitializer(location),
@@ -176,7 +176,7 @@ namespace ILGPU.IR.Construction
             Value length)
         {
             location.Assert(
-                source.Type.IsViewType &&
+                source.Type!.IsViewType &&
                 IRTypeContext.IsViewIndexType(offset.BasicValueType) &&
                 IRTypeContext.IsViewIndexType(length.BasicValueType));
 
@@ -238,7 +238,7 @@ namespace ILGPU.IR.Construction
             Value source,
             FieldSpan fieldSpan)
         {
-            var pointerType = source.Type.As<PointerType>(location);
+            var pointerType = source.Type!.As<PointerType>(location);
 
             // Simplify pseudo-structure accesses
             if (!pointerType.ElementType.IsStructureType && fieldSpan.Span < 2)

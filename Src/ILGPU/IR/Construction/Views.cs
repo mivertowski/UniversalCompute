@@ -71,7 +71,7 @@ namespace ILGPU.IR.Construction
             Value view,
             BasicValueType lengthType)
         {
-            location.Assert(view.Type.IsViewType);
+            location.Assert(view.Type!.IsViewType);
 
             // Fold trivial cases
             if (view is NewView newView)

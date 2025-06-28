@@ -47,13 +47,13 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns the source type to convert the value from.
         /// </summary>
-        public TypeNode SourceType => Value.Type;
+        public TypeNode SourceType => Value.Type!;
 
         /// <summary>
         /// Returns the target type to convert the value to.
         /// </summary>
         /// <remarks>This is equivalent to asking for the type.</remarks>
-        public TypeNode TargetType => Type;
+        public TypeNode TargetType => Type!;
 
         #endregion
 
@@ -102,7 +102,7 @@ namespace ILGPU.IR.Values
             : base(initializer, source)
         {
             initializer.Assert(
-                source.Type.BasicValueType.IsInt());
+                source.Type!.BasicValueType.IsInt());
         }
 
         #endregion
@@ -170,7 +170,7 @@ namespace ILGPU.IR.Values
             : base(initializer, source)
         {
             initializer.Assert(
-                source.Type.IsPointerType &&
+                source.Type!.IsPointerType &&
                 targetType.BasicValueType.IsInt());
 
             TargetType = targetType;
@@ -296,7 +296,7 @@ namespace ILGPU.IR.Values
         /// Returns the source element type.
         /// </summary>
         public TypeNode SourceElementType =>
-            Value.Type.AsNotNullCast<PointerType>().ElementType;
+            Value.Type!.AsNotNullCast<PointerType>().ElementType;
 
         /// <summary>
         /// Returns the target element type.
@@ -367,8 +367,8 @@ namespace ILGPU.IR.Values
         {
             TargetAddressSpace = targetAddressSpace;
             initializer.Assert(
-                value.Type.IsViewOrPointerType &&
-                value.Type.AsNotNullCast<AddressSpaceType>().AddressSpace !=
+                value.Type!.IsViewOrPointerType &&
+                value.Type!.AsNotNullCast<AddressSpaceType>().AddressSpace !=
                 targetAddressSpace);
         }
 
@@ -546,7 +546,7 @@ namespace ILGPU.IR.Values
             ValueReference sourceArray)
             : base(initializer, sourceArray)
         {
-            this.Assert(sourceArray.Type.IsArrayType);
+            this.Assert(sourceArray.Type!.IsArrayType);
         }
 
         #endregion
@@ -623,7 +623,7 @@ namespace ILGPU.IR.Values
             PrimitiveType targetType)
             : base(initializer, source)
         {
-            initializer.Assert(source.Type.IsPrimitiveType);
+            initializer.Assert(source.Type!.IsPrimitiveType);
             TargetPrimitiveType = targetType;
         }
 
@@ -687,7 +687,7 @@ namespace ILGPU.IR.Values
                   source,
                   targetType)
         {
-            var basicValueType = source.Type.BasicValueType;
+            var basicValueType = source.Type!.BasicValueType;
             initializer.Assert(
                 basicValueType == BasicValueType.Float16 ||
                 basicValueType == BasicValueType.Float32 ||
@@ -756,7 +756,7 @@ namespace ILGPU.IR.Values
                   source,
                   targetType)
         {
-            var basicValueType = source.Type.BasicValueType;
+            var basicValueType = source.Type!.BasicValueType;
             initializer.Assert(
                 basicValueType == BasicValueType.Int16 ||
                 basicValueType == BasicValueType.Int32 ||

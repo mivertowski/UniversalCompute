@@ -197,7 +197,7 @@ namespace ILGPU.IR.Values
                 if (expression.HasArgument)
                 {
                     var argument = this[expression.Argument];
-                    string argumentFormat = argument.Type.ToString();
+                    string argumentFormat = argument.Type!.ToString();
                     result.Append('{');
                     result.Append(expression.Argument);
                     result.Append(':');
