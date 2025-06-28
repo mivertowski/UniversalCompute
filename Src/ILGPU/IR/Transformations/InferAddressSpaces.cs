@@ -286,7 +286,7 @@ namespace ILGPU.IR.Transformations
 
             // Create a new target type
             var targetType = builder.SpecializeAddressSpaceType(
-                phiValue.Type.As<AddressSpaceType>(location),
+                phiValue.Type!.As<AddressSpaceType>(location),
                 targetAddressSpace);
             var phiBuilder = builder.CreatePhi(location, targetType, phiValue.Count);
 
@@ -637,7 +637,7 @@ namespace ILGPU.IR.Transformations
             MemoryAddressSpace targetAddressSpace)
         {
             // Check if the current value is affected by the conversion
-            var type = value.Type;
+            var type = value.Type!;
             if (!type.HasFlags(TypeFlags.AddressSpaceDependent))
                 return value;
 
@@ -655,7 +655,7 @@ namespace ILGPU.IR.Transformations
                 // We need to create a wrapper structure that has the correct address
                 // space information
                 var typeConverter = GetAddressSpaceConverter(targetAddressSpace);
-                var targetType = typeConverter.ConvertType(context.Builder, value.Type);
+                var targetType = typeConverter.ConvertType(context.Builder, value.Type!);
                 return type == targetType
                     ? value
                     : context.AssembleStructure(
@@ -695,7 +695,7 @@ namespace ILGPU.IR.Transformations
             // Determine the target address space
             var targetAddressSpace = provider[parameter];
             var converted = GetAddressSpaceConverter(targetAddressSpace).
-                ConvertType(builder, parameter.Type);
+                ConvertType(builder, parameter.Type!);
 
             // Append a new parameter using the converted target type
             var targetParam = methodBuilder.AddParameter(converted, parameter.Name);
@@ -736,7 +736,7 @@ namespace ILGPU.IR.Transformations
         {
             foreach (Value argument in call)
             {
-                if (argument.Type.HasFlags(TypeFlags.AddressSpaceDependent))
+                if (argument.Type!.HasFlags(TypeFlags.AddressSpaceDependent))
                     return true;
             }
             var returnType = call.Target.ReturnType;
@@ -772,7 +772,7 @@ namespace ILGPU.IR.Transformations
             context.MarkConverted(newCall);
 
             // Check the return type for a potential conversion
-            if (newCall.Type.HasFlags(TypeFlags.AddressSpaceDependent))
+            if (newCall.Type!.HasFlags(TypeFlags.AddressSpaceDependent))
             {
                 // If the return type of the callee changed, we have to emit an address
                 // space cast to ensure a valid IR

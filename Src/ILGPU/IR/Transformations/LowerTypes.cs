@@ -55,10 +55,10 @@ namespace ILGPU.IR.Transformations
             var builder = context.Builder;
             var location = value.Location;
 
-            var sourceType = typeConverter[value].AsNotNullCast<StructureType>();
+            var sourceType = typeConverter[value]!.AsNotNullCast<StructureType>();
             var instance = builder.CreateStructure(
                 location,
-                typeConverter.ConvertType(sourceType).AsNotNullCast<StructureType>());
+                typeConverter.ConvertType(sourceType)!.AsNotNullCast<StructureType>());
 
             for (int i = 0, e = sourceType.NumFields; i < e; ++i)
             {

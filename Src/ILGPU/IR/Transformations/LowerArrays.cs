@@ -207,7 +207,7 @@ namespace ILGPU.IR.Transformations
             Value array = value.ArrayValue;
 
             // Get and validate the array type
-            var structureType = array.Type.As<StructureType>(location);
+            var structureType = array.Type!.As<StructureType>(location);
 
             // Compute linear address based on the .Net array layouts
             Value elementIndex = builder.CreatePrimitiveValue(location, 0L);
@@ -290,7 +290,7 @@ namespace ILGPU.IR.Transformations
                 }
 
                 // Check whether the field index is out of range
-                var structType = value.ArrayValue.Type.As<StructureType>(location);
+                var structType = value.ArrayValue.Type!.As<StructureType>(location);
                 int index = primitiveValue.Int32Value;
                 if (index < 0 || index >= structType.NumFields - 1)
                 {

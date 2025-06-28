@@ -148,7 +148,7 @@ namespace ILGPU.IR.Transformations
                 result = builder.CreateConvert(
                     sourceValue.Location,
                     result,
-                    variable.Type);
+                    variable.Type!);
             }
             return result;
         }

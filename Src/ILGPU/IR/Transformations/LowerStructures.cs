@@ -103,7 +103,7 @@ namespace ILGPU.IR.Transformations
             var newValue = implementation.Lower(
                 context.Builder,
                 value,
-                variable).ResolveAs<TValue>().AsNotNull();
+                variable).ResolveAs<TValue>()!;
 
             // Disassemble the resulting structure value
             DisassembleStructure(context, structureType, newValue);
@@ -194,7 +194,7 @@ namespace ILGPU.IR.Transformations
             Load load) =>
             DisassembleStructure(
                 context,
-                load.Type.AsNotNullCast<StructureType>(),
+                load.Type!.AsNotNullCast<StructureType>(),
                 load);
 
         /// <summary>
@@ -206,7 +206,7 @@ namespace ILGPU.IR.Transformations
             Load load)
         {
             var builder = context.Builder;
-            foreach (var (_, fieldAccess) in load.Type.AsNotNullCast<StructureType>())
+            foreach (var (_, fieldAccess) in load.Type!.AsNotNullCast<StructureType>())
             {
                 // Update source address
                 var address = builder.CreateLoadFieldAddress(
@@ -235,7 +235,7 @@ namespace ILGPU.IR.Transformations
         {
             var newValue = AssembleStructure(
                 context,
-                store.Value.Type.AsNotNullCast<StructureType>(),
+                store.Value.Type!.AsNotNullCast<StructureType>(),
                 store.Value);
             var newStore = context.Builder.CreateStore(
                 store.Location,
@@ -253,7 +253,7 @@ namespace ILGPU.IR.Transformations
             Store store)
         {
             var builder = context.Builder;
-            var structureType = store.Value.Type.AsNotNullCast<StructureType>();
+            var structureType = store.Value.Type!.AsNotNullCast<StructureType>();
             foreach (var (_, fieldAccess) in structureType)
             {
                 // Update target address
@@ -283,7 +283,7 @@ namespace ILGPU.IR.Transformations
             LoweringData _,
             NullValue nullValue)
         {
-            var structureType = nullValue.Type.AsNotNullCast<StructureType>();
+            var structureType = nullValue.Type!.AsNotNullCast<StructureType>();
             foreach (var (fieldType, fieldAccess) in structureType)
             {
                 // Build the new target value
@@ -366,7 +366,7 @@ namespace ILGPU.IR.Transformations
             LoweringData _,
             SetField setField)
         {
-            foreach (var (_, fieldAccess) in setField.Type.AsNotNullCast<StructureType>())
+            foreach (var (_, fieldAccess) in setField.Type!.AsNotNullCast<StructureType>())
             {
                 Value value;
                 if (setField.FieldSpan.Contains(fieldAccess))
@@ -407,7 +407,7 @@ namespace ILGPU.IR.Transformations
             LoweringData data,
             PhiValue phi)
         {
-            var structureType = phi.Type.AsNotNullCast<StructureType>();
+            var structureType = phi.Type!.AsNotNullCast<StructureType>();
             foreach (var (fieldType, fieldAccess) in structureType)
             {
                 // Build a new phi which might become dead in the future
@@ -435,7 +435,7 @@ namespace ILGPU.IR.Transformations
             LoweringData _,
             Predicate predicate)
         {
-            var structureType = predicate.Type.AsNotNullCast<StructureType>();
+            var structureType = predicate.Type!.AsNotNullCast<StructureType>();
             foreach (var (_, fieldAccess) in structureType)
             {
                 // Build a new if predicate which might become dead in the future
@@ -507,7 +507,7 @@ namespace ILGPU.IR.Transformations
                 Broadcast,
                 LowerThreadIntrinsics.BroadcastLowering>(
                 context,
-                value.Type.AsNotNullCast<StructureType>(),
+                value.Type!.AsNotNullCast<StructureType>(),
                 value);
 
         /// <summary>
@@ -521,7 +521,7 @@ namespace ILGPU.IR.Transformations
                 WarpShuffle,
                 LowerThreadIntrinsics.WarpShuffleLowering>(
                 context,
-                value.Type.AsNotNullCast<StructureType>(),
+                value.Type!.AsNotNullCast<StructureType>(),
                 value);
 
         /// <summary>
@@ -535,7 +535,7 @@ namespace ILGPU.IR.Transformations
                 SubWarpShuffle,
                 LowerThreadIntrinsics.SubWarpShuffleLowering>(
                 context,
-                value.Type.AsNotNullCast<StructureType>(),
+                value.Type!.AsNotNullCast<StructureType>(),
                 value);
 
         /// <summary>
@@ -552,7 +552,7 @@ namespace ILGPU.IR.Transformations
 
             // Assemble return value
             Value returnValue = value.ReturnValue;
-            var returnType = returnValue.Type.As<StructureType>(value);
+            var returnType = returnValue.Type!.As<StructureType>(value);
             var newReturnValue = AssembleStructure(
                 context.SpecializeBuilder(blockBuilder),
                 returnType,
@@ -573,7 +573,7 @@ namespace ILGPU.IR.Transformations
             Value value) =>
             DisassembleStructure(
                 context,
-                value.Type.As<StructureType>(value),
+                value.Type!.As<StructureType>(value),
                 value);
 
         #endregion
