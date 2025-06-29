@@ -131,11 +131,6 @@ namespace ILGPU.Algorithms.FFT
             // Placeholder implementation - copy input to output
             var height = input.GetLength(0);
             var width = input.GetLength(1);
-            [SuppressMessage(
-                "Performance",
-                "CA1814:Prefer jagged arrays over multidimensional",
-                Justification = "FFT output must match input structure as rectangular matrix " +
-                              "for proper 2D transform operations.")]
             var output = new Complex[height, width];
             Array.Copy(input, output, input.Length);
             return output;
