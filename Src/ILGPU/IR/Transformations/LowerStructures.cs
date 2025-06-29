@@ -599,14 +599,14 @@ namespace ILGPU.IR.Transformations
         private static void AddRewriters(SSARewriter<FieldRef, LoweringData> rewriter)
         {
             // Keep particular values that cannot be rewritten by this pass
-            rewriter.Add<Parameter>((_, value) => value.Type.IsStructureType, Keep);
-            rewriter.Add<AlignTo>((_, value) => value.Type.IsStructureType, Keep);
+            rewriter.Add<Parameter>((_, value) => value.Type!.IsStructureType, Keep);
+            rewriter.Add<AlignTo>((_, value) => value.Type!.IsStructureType, Keep);
 
             // Rewrite known values
-            rewriter.Add<NullValue>((_, value) => value.Type.IsStructureType, Lower);
-            rewriter.Add<StructureValue>((_, value) => value.Type.IsStructureType, Lower);
-            rewriter.Add<PhiValue>((_, value) => value.Type.IsStructureType, Lower);
-            rewriter.Add<Broadcast>((_, value) => value.Type.IsStructureType, Lower);
+            rewriter.Add<NullValue>((_, value) => value.Type!.IsStructureType, Lower);
+            rewriter.Add<StructureValue>((_, value) => value.Type!.IsStructureType, Lower);
+            rewriter.Add<PhiValue>((_, value) => value.Type!.IsStructureType, Lower);
+            rewriter.Add<Broadcast>((_, value) => value.Type!.IsStructureType, Lower);
             rewriter.Add<WarpShuffle>((_, value) => value.Type.IsStructureType, Lower);
             rewriter.Add<SubWarpShuffle>((_, value) => value.Type.IsStructureType, Lower);
 

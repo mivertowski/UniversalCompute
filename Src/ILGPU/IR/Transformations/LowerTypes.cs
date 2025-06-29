@@ -248,7 +248,7 @@ namespace ILGPU.IR.Transformations
         protected static bool Register<TValue>(
             TypeLowering<TType> typeConverter,
             TValue value)
-            where TValue : Value => Register(typeConverter, value, value.Type);
+            where TValue : Value => Register(typeConverter, value, value.Type!);
 
         /// <summary>
         /// Registers a type-mapping entry and returns always true.
@@ -268,7 +268,7 @@ namespace ILGPU.IR.Transformations
             TypeLowering<TType> typeConverter,
             TValue value)
             where TValue : Value =>
-            IsTypeDependent(typeConverter, value, value.Type);
+            IsTypeDependent(typeConverter, value, value.Type!);
 
         /// <summary>
         /// Returns true if the type is type dependent and registers a type-mapping

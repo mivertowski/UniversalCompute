@@ -66,7 +66,7 @@ namespace ILGPU.IR.Values
         /// Returns the target address space this atomic operates on.
         /// </summary>
         public MemoryAddressSpace TargetAddressSpace =>
-            Target.Type.As<AddressSpaceType>(this)!.AddressSpace;
+            Target.Type!.As<AddressSpaceType>(this)!.AddressSpace;
 
         /// <summary>
         /// Returns the target value.
