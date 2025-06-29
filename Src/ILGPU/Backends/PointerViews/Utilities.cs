@@ -12,6 +12,7 @@
 using ILGPU.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace ILGPU.Backends.PointerViews
@@ -31,6 +32,7 @@ namespace ILGPU.Backends.PointerViews
         /// </summary>
         /// <param name="elementType">The view element type.</param>
         /// <returns>The implement type.</returns>
+        [RequiresDynamicCode("Creates generic implementation types at runtime")]
         public static Type GetImplementationType(Type elementType) =>
             ImplementationType.MakeGenericType(elementType);
 
@@ -51,6 +53,8 @@ namespace ILGPU.Backends.PointerViews
         /// </summary>
         /// <param name="implType">The view implementation type.</param>
         /// <returns>The resolved view constructor.</returns>
+        [RequiresDynamicCode("Creates generic ArrayView types at runtime")]
+        [RequiresUnreferencedCode("Uses reflection to access constructor that may be trimmed")]
         public static ConstructorInfo GetViewConstructor(Type implType) =>
             implType.GetConstructor(
             [

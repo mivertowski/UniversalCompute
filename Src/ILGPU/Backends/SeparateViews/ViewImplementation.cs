@@ -45,6 +45,7 @@ namespace ILGPU.Backends.SeparateViews
         /// </summary>
         /// <param name="sourceType">The source array-view type.</param>
         /// <returns>The resolved creation method.</returns>
+        [RequiresDynamicCode("Creates generic method instances at runtime")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MethodInfo GetCreateMethod(Type sourceType)
         {

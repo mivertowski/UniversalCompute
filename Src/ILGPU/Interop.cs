@@ -12,6 +12,7 @@
 using ILGPU.Frontend.Intrinsic;
 using ILGPU.Util;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -96,6 +97,8 @@ namespace ILGPU
         /// </summary>
         /// <param name="type">The target type</param>
         /// <remarks>Only supports unmanaged types.</remarks>
+        [RequiresDynamicCode("Creates generic method instances at runtime")]
+        [RequiresUnreferencedCode("Uses reflection to invoke generic SizeOf method that may be trimmed")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SizeOf(Type type) =>
             (int)InteropSizeOfMethod

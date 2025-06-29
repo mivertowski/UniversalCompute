@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -44,6 +45,8 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="expression">The expression tree.</param>
         /// <returns>A queryable representing the expression.</returns>
+        [RequiresDynamicCode("Creates instances of generic queryable types determined at runtime")]
+        [RequiresUnreferencedCode("Uses reflection to create queryable instances that may access trimmed members")]
         public IQueryable CreateQuery(Expression expression)
         {
             if (expression == null)
@@ -125,6 +128,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="seqType">The sequence type.</param>
         /// <returns>The IEnumerable interface type.</returns>
+        [RequiresUnreferencedCode("Uses reflection to examine type hierarchy that may be trimmed")]
         private static Type? FindIEnumerable(Type seqType)
         {
             if (seqType == null || seqType == typeof(string))

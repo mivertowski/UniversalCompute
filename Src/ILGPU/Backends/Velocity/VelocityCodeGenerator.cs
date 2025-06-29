@@ -23,6 +23,7 @@ using ILGPU.IR.Values;
 using ILGPU.Util;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Emit;
 
 namespace ILGPU.Backends.Velocity
@@ -123,6 +124,7 @@ namespace ILGPU.Backends.Velocity
         /// <param name="args">The generator args to use.</param>
         /// <param name="method">The current method to generate code for.</param>
         /// <param name="allocas">All allocations of the current method.</param>
+        [RequiresDynamicCode("Creates instances of IL emitter types determined at runtime")]
         protected VelocityCodeGenerator(
             in GeneratorArgs args,
             Method method,

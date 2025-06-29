@@ -111,6 +111,8 @@ namespace ILGPU.Runtime
         /// <returns>
         /// A dynamic kernel launcher that automatically specializes kernels.
         /// </returns>
+        [RequiresDynamicCode("Creates instances of generic cache types determined at runtime")]
+        [RequiresUnreferencedCode("Uses reflection to create specialized launcher delegates that may access trimmed members")]
         public static TDelegate CreateSpecializedLauncher<TDelegate, TLoader>(
             Accelerator accelerator,
             in EntryPointDescription entry,

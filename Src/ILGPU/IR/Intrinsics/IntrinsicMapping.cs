@@ -14,6 +14,7 @@ using ILGPU.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -247,6 +248,7 @@ namespace ILGPU.IR.Intrinsics
         /// The resolved generic arguments (if any).
         /// </param>
         /// <returns>The resolved target method (if any).</returns>
+        [RequiresDynamicCode("Creates generic method instances at runtime for intrinsic implementations")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected MethodInfo ResolveTarget<TResolver>(
             TResolver resolver,

@@ -16,6 +16,7 @@ using ILGPU.Backends.Velocity.Vec128;
 #endif
 using ILGPU.Util;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Runtime.Velocity
 {
@@ -64,6 +65,7 @@ namespace ILGPU.Runtime.Velocity
         /// Creates a new velocity device using the given device type.
         /// </summary>
         /// <param name="deviceType">The Velocity device type to use.</param>
+        [RequiresDynamicCode("Creates instances of velocity specializer types determined at runtime")]
         public VelocityDevice(VelocityDeviceType deviceType)
         {
             switch (deviceType)
