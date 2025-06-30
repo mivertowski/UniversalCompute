@@ -53,9 +53,19 @@ namespace ILGPU.Memory.Unified
         public virtual void InvalidateCache() => throw new NotImplementedException();
         public virtual UniversalBufferStats GetStats() => throw new NotImplementedException();
 
-        public virtual void Dispose()
+        public void Dispose()
         {
-            // Stub implementation
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the buffer.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            // Stub implementation for derived classes to override
         }
     }
     /// <summary>
@@ -124,13 +134,13 @@ namespace ILGPU.Memory.Unified
         public override DataLocation CurrentLocation => DataLocation.Device;
         public override ArrayView<T> View => _wrappedBuffer.View;
 
-        public override void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (_takeOwnership)
+            if (disposing && _takeOwnership)
             {
                 _wrappedBuffer?.Dispose();
             }
-            base.Dispose();
+            base.Dispose(disposing);
         }
     }
 }
