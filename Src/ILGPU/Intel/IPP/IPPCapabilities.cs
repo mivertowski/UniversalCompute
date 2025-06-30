@@ -301,7 +301,7 @@ namespace ILGPU.Intel.IPP
         /// <summary>
         /// Optimal FFT sizes for this CPU.
         /// </summary>
-        public IList<int> OptimalFFTSizes { get; set; } = new List<int>();
+        public IList<int> OptimalFFTSizes { get; set; }
 
         /// <summary>
         /// Performance characteristics of this IPP installation.
