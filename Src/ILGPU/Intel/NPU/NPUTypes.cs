@@ -188,9 +188,24 @@ namespace ILGPU.Intel.NPU
             Parameters = parameters;
         }
 
-        public override TensorShape CalculateOutputShape(TensorShape inputShape, TensorShape weightsShape)
+        public override TensorShape CalculateOutputShape(TensorShape inputShape)
         {
-            // Simplified calculation for demonstration
+            // Simplified calculation for demonstration - assumes default weights shape
+            var outputHeight = (inputShape[2] + 2 * Parameters.Padding.Height - Parameters.KernelSize.Height) / Parameters.Stride.Height + 1;
+            var outputWidth = (inputShape[3] + 2 * Parameters.Padding.Width - Parameters.KernelSize.Width) / Parameters.Stride.Width + 1;
+            // Use the same number of output channels as input for demonstration
+            return new TensorShape(inputShape[0], inputShape[1], outputHeight, outputWidth);
+        }
+
+        /// <summary>
+        /// Calculates the output shape for the given input and weights shapes.
+        /// </summary>
+        /// <param name="inputShape">The input tensor shape.</param>
+        /// <param name="weightsShape">The weights tensor shape.</param>
+        /// <returns>The output tensor shape.</returns>
+        public TensorShape CalculateOutputShape(TensorShape inputShape, TensorShape weightsShape)
+        {
+            // Convolution with specific weights shape
             var outputHeight = (inputShape[2] + 2 * Parameters.Padding.Height - Parameters.KernelSize.Height) / Parameters.Stride.Height + 1;
             var outputWidth = (inputShape[3] + 2 * Parameters.Padding.Width - Parameters.KernelSize.Width) / Parameters.Stride.Width + 1;
             return new TensorShape(inputShape[0], weightsShape[0], outputHeight, outputWidth);
