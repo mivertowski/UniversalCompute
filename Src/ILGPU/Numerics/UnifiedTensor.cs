@@ -63,9 +63,24 @@ namespace ILGPU.Numerics
     /// </summary>
     public enum MemoryLocation
     {
+        /// <summary>
+        /// Data is currently in CPU memory.
+        /// </summary>
         CPU,
+        
+        /// <summary>
+        /// Data is currently in GPU memory.
+        /// </summary>
         GPU,
+        
+        /// <summary>
+        /// Data is in unified memory accessible by both CPU and GPU.
+        /// </summary>
         Unified,
+        
+        /// <summary>
+        /// Data is in pinned memory for efficient transfers.
+        /// </summary>
         Pinned
     }
 

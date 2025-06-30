@@ -404,14 +404,13 @@ namespace ILGPU.Runtime
     }
 
     /// <summary>
-    /// Annotates classes derived from <see cref="Device"/>.
+    /// Annotates classes derived from <see cref="Device"/> with their accelerator type.
     /// </summary>
     /// <remarks>
-    /// Constructs a new device type attribute.
+    /// This attribute is used to automatically identify the accelerator type for device classes,
+    /// enabling proper device registration and type identification in the ILGPU context.
     /// </remarks>
-    /// <param name="acceleratorType">
-    /// The accelerator type of the annotated device.
-    /// </param>
+    /// <param name="acceleratorType">The accelerator type of the annotated device.</param>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public sealed class DeviceTypeAttribute(AcceleratorType acceleratorType) : Attribute
     {
