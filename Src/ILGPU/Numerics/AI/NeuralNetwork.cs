@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System;
+using System.Collections.Generic;
 
 namespace ILGPU.Numerics.AI
 {
@@ -26,7 +27,7 @@ namespace ILGPU.Numerics.AI
     /// Initializes a new instance of the NeuralNetwork class.
     /// </remarks>
     /// <param name="modelPath">The path to the model file.</param>
-    public sealed class NeuralNetwork(string modelPath) : IDisposable
+    public sealed class NeuralNetwork(string modelPath, IReadOnlyList<NeuralOperation> operations) : IDisposable
     {
         private bool _disposed;
 
@@ -34,6 +35,11 @@ namespace ILGPU.Numerics.AI
         /// Gets the path to the model file.
         /// </summary>
         public string ModelPath { get; } = modelPath ?? throw new ArgumentNullException(nameof(modelPath));
+
+        /// <summary>
+        /// Gets the operations in the neural network.
+        /// </summary>
+        public IReadOnlyList<NeuralOperation> Operations { get; } = operations ?? Array.Empty<NeuralOperation>();
 
         /// <summary>
         /// Gets the input shape expected by the network.

@@ -342,4 +342,78 @@ namespace ILGPU.Numerics.AI
         /// </summary>
         Mixed
     }
+
+    /// <summary>
+    /// Represents a convolution operation.
+    /// </summary>
+    public sealed class ConvolutionOperation : NeuralOperation
+    {
+        public override string Name => "Convolution";
+        public override NeuralOperationType Type => NeuralOperationType.Convolution;
+        public override TensorShape InputShape { get; }
+
+        public ConvolutionParameters Parameters { get; }
+
+        public ConvolutionOperation(TensorShape inputShape, ConvolutionParameters parameters)
+        {
+            InputShape = inputShape;
+            Parameters = parameters;
+        }
+
+        public override TensorShape CalculateOutputShape(TensorShape inputShape)
+        {
+            // Simplified calculation for demonstration
+            var outputHeight = (inputShape[2] + 2 * Parameters.Padding.Height - Parameters.KernelSize.Height) / Parameters.Stride.Height + 1;
+            var outputWidth = (inputShape[3] + 2 * Parameters.Padding.Width - Parameters.KernelSize.Width) / Parameters.Stride.Width + 1;
+            return new TensorShape(inputShape[0], Parameters.Groups, outputHeight, outputWidth);
+        }
+    }
+
+    /// <summary>
+    /// Represents a matrix multiplication operation.
+    /// </summary>
+    public sealed class MatMulOperation : NeuralOperation
+    {
+        public override string Name => "MatMul";
+        public override NeuralOperationType Type => NeuralOperationType.MatMul;
+        public override TensorShape InputShape { get; }
+
+        public MatMulConfiguration Configuration { get; }
+
+        public MatMulOperation(TensorShape inputShape, MatMulConfiguration configuration)
+        {
+            InputShape = inputShape;
+            Configuration = configuration;
+        }
+
+        public override TensorShape CalculateOutputShape(TensorShape inputShape)
+        {
+            // Simplified calculation for demonstration
+            return new TensorShape(inputShape[0], Configuration.N);
+        }
+    }
+
+    /// <summary>
+    /// Represents an attention operation.
+    /// </summary>
+    public sealed class AttentionOperation : NeuralOperation
+    {
+        public override string Name => "Attention";
+        public override NeuralOperationType Type => NeuralOperationType.Attention;
+        public override TensorShape InputShape { get; }
+
+        public AttentionParameters Parameters { get; }
+
+        public AttentionOperation(TensorShape inputShape, AttentionParameters parameters)
+        {
+            InputShape = inputShape;
+            Parameters = parameters;
+        }
+
+        public override TensorShape CalculateOutputShape(TensorShape inputShape)
+        {
+            // Attention typically preserves sequence length
+            return inputShape;
+        }
+    }
 }

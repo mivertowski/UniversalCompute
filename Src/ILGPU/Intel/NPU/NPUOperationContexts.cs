@@ -18,7 +18,7 @@
 using ILGPU.Numerics;
 using ILGPU.Numerics.AI;
 using System;
-using AppleNeuralNetwork = ILGPU.Apple.NeuralEngine.NeuralNetwork;
+using System.Linq;
 
 namespace ILGPU.Intel.NPU
 {
@@ -30,14 +30,14 @@ namespace ILGPU.Intel.NPU
     /// </remarks>
     /// <param name="network">The neural network to execute.</param>
     /// <param name="capabilities">The NPU capabilities.</param>
-    internal sealed class NPUInferenceContext(AppleNeuralNetwork network, NPUCapabilities capabilities) : IDisposable
+    internal sealed class NPUInferenceContext(ILGPU.Numerics.AI.NeuralNetwork network, NPUCapabilities capabilities) : IDisposable
     {
         private bool _disposed;
 
         /// <summary>
         /// Gets the neural network.
         /// </summary>
-        public AppleNeuralNetwork Network { get; } = network ?? throw new ArgumentNullException(nameof(network));
+        public ILGPU.Numerics.AI.NeuralNetwork Network { get; } = network ?? throw new ArgumentNullException(nameof(network));
 
         /// <summary>
         /// Gets the NPU capabilities.
@@ -47,9 +47,48 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the native context handle.
         /// </summary>
-        public IntPtr NativeContext { get; private set; } = CreateNativeContext(network, capabilities);
+        public IntPtr NativeContext { get; private set; } = CreateNativeContext(network, capabilities, network.Operations.Select(op => MapNeuralOperation(op)).ToArray());
 
-        private static IntPtr CreateNativeContext(AppleNeuralNetwork network, NPUCapabilities capabilities) =>
+        private static ILGPU.Intel.NPU.NeuralOperation MapNeuralOperation(ILGPU.Numerics.AI.NeuralOperation operation)
+        {
+            // Implement mapping logic here based on the actual types of operations
+            // For now, a placeholder that throws an exception if the type is not supported
+            switch (operation.Type)
+            {
+                case ILGPU.Numerics.AI.NeuralOperationType.Convolution:
+                    var convOp = (ILGPU.Numerics.AI.ConvolutionOperation)operation;
+                    return new ILGPU.Intel.NPU.ConvolutionOperation(
+                        new ILGPU.Intel.NPU.ConvolutionParameters
+                        {
+                            KernelSize = (convOp.Parameters.KernelSize.Height, convOp.Parameters.KernelSize.Width),
+                            Stride = (convOp.Parameters.Stride.Height, convOp.Parameters.Stride.Width),
+                            Padding = (convOp.Parameters.Padding.Height, convOp.Parameters.Padding.Width)
+                        });
+                case ILGPU.Numerics.AI.NeuralOperationType.MatMul:
+                    var matMulOp = (ILGPU.Numerics.AI.MatMulOperation)operation;
+                    return new ILGPU.Intel.NPU.MatMulOperation(
+                        new ILGPU.Intel.NPU.MatMulConfiguration
+                        {
+                            M = matMulOp.Configuration.M,
+                            K = matMulOp.Configuration.K,
+                            N = matMulOp.Configuration.N,
+                            UseBF16 = matMulOp.Configuration.UseBF16,
+                            UseSparsity = matMulOp.Configuration.UseSparsity
+                        });
+                case ILGPU.Numerics.AI.NeuralOperationType.Attention:
+                    var attentionOp = (ILGPU.Numerics.AI.AttentionOperation)operation;
+                    return new ILGPU.Intel.NPU.AttentionOperation(attentionOp.InputShape,
+                        new ILGPU.Intel.NPU.AttentionParameters
+                        {
+                            NumHeads = attentionOp.Parameters.NumHeads,
+                            HeadDim = attentionOp.Parameters.HeadDim
+                        });
+                default:
+                    throw new NotSupportedException($"Unsupported NeuralOperation type: {operation.GetType().Name}");
+            }
+        }
+
+        private static IntPtr CreateNativeContext(ILGPU.Numerics.AI.NeuralNetwork network, NPUCapabilities capabilities, ILGPU.Intel.NPU.NeuralOperation[] operations) =>
             // In a real implementation, this would create a native NPU context
             // For now, return a placeholder
             IntPtr.Zero;
@@ -241,13 +280,6 @@ namespace ILGPU.Intel.NPU
         }
     }
 
-    /// <summary>
-    /// Model optimizer for NPU execution.
-    /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of the NPUModelOptimizer class.
-    /// </remarks>
-    /// <param name="capabilities">The NPU capabilities.</param>
     internal sealed class NPUModelOptimizer(NPUCapabilities capabilities)
     {
         private readonly NPUCapabilities _capabilities = capabilities;
@@ -258,7 +290,7 @@ namespace ILGPU.Intel.NPU
         /// <param name="model">The model to optimize.</param>
         /// <param name="options">The optimization options.</param>
         /// <returns>The optimized model.</returns>
-        public AppleNeuralNetwork OptimizeForNPU(AppleNeuralNetwork model, OptimizationOptions options)
+        public ILGPU.Intel.NPU.NeuralNetwork OptimizeForNPU(ILGPU.Numerics.AI.NeuralNetwork model, OptimizationOptions options)
         {
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
@@ -266,9 +298,8 @@ namespace ILGPU.Intel.NPU
                 throw new ArgumentNullException(nameof(options));
 
             // Create optimized model (copy operations from original model)
-            var optimizedModel = new AppleNeuralNetwork(
-                $"{model.Name}_NPU_Optimized",
-                model.Operations);
+            var optimizedModel = new ILGPU.Intel.NPU.NeuralNetwork(
+                $"{model.ModelPath}_NPU_Optimized", model.Operations.Select(op => MapNeuralOperation(op)).ToArray());
 
             // Apply optimizations based on NPU capabilities
             ApplyQuantization(optimizedModel, options);
@@ -278,7 +309,7 @@ namespace ILGPU.Intel.NPU
             return optimizedModel;
         }
 
-        private void ApplyQuantization(AppleNeuralNetwork model, OptimizationOptions options)
+        private void ApplyQuantization(ILGPU.Intel.NPU.NeuralNetwork model, OptimizationOptions options)
         {
             // Apply quantization based on NPU capabilities
             if (_capabilities.SupportsInt8)
@@ -291,12 +322,12 @@ namespace ILGPU.Intel.NPU
             }
         }
 
-        private void ApplyKernelFusion(AppleNeuralNetwork model, OptimizationOptions options)
+        private void ApplyKernelFusion(ILGPU.Intel.NPU.NeuralNetwork model, OptimizationOptions options)
         {
             // Fuse operations for NPU efficiency
         }
 
-        private void ApplyPruning(AppleNeuralNetwork model, OptimizationOptions options)
+        private void ApplyPruning(ILGPU.Intel.NPU.NeuralNetwork model, OptimizationOptions options)
         {
             if (!options.EnablePruning || !_capabilities.SupportsSparsity) return;
 
@@ -315,7 +346,7 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities);
+        ILGPU.Intel.NPU.NeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities);
     }
 
     /// <summary>
@@ -329,9 +360,9 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the ONNX model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
+        public ILGPU.Intel.NPU.NeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load ONNX model - placeholder implementation
-            new AppleNeuralNetwork("ONNX_Model");
+            new ILGPU.Intel.NPU.NeuralNetwork("ONNX_Model");
     }
 
     /// <summary>
@@ -345,9 +376,9 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the OpenVINO model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
+        public ILGPU.Intel.NPU.NeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load OpenVINO model - placeholder implementation
-            new AppleNeuralNetwork("OpenVINO_Model");
+            new ILGPU.Intel.NPU.NeuralNetwork("OpenVINO_Model");
     }
 
     /// <summary>
@@ -361,9 +392,9 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the TensorFlow model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
+        public ILGPU.Intel.NPU.NeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load TensorFlow model - placeholder implementation
-            new AppleNeuralNetwork("TensorFlow_Model");
+            new ILGPU.Intel.NPU.NeuralNetwork("TensorFlow_Model");
     }
 
     /// <summary>
@@ -377,8 +408,8 @@ namespace ILGPU.Intel.NPU
         /// <param name="modelPath">The path to the PyTorch model file.</param>
         /// <param name="capabilities">The NPU capabilities.</param>
         /// <returns>The loaded neural network.</returns>
-        public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
+        public ILGPU.Intel.NPU.NeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load PyTorch model - placeholder implementation
-            new AppleNeuralNetwork("PyTorch_Model");
+            new ILGPU.Intel.NPU.NeuralNetwork("PyTorch_Model");
     }
 }

@@ -141,7 +141,7 @@ namespace ILGPU
                 sourceBuilder.AppendLine($"        /// </summary>");
                 sourceBuilder.Append($"        public static {GetTypeString(ReturnType)} {MethodName}(");
                 
-                for (int i = 0; i < ParameterTypes.Length; i++)
+                for (int i = 0; i < ParameterTypes.Count; i++)
                 {
                     if (i > 0) sourceBuilder.Append(", ");
                     sourceBuilder.Append($"{GetTypeString(ParameterTypes[i])} arg{i}");

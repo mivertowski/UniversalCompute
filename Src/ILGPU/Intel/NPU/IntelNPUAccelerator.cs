@@ -20,6 +20,7 @@ using ILGPU.Intel.NPU.Native;
 using ILGPU.Runtime;
 using ILGPU.IR.Analyses;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
@@ -107,8 +108,8 @@ namespace ILGPU.Intel.NPU
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Create NPU-compatible neural network representation
-                var appleNetwork = new Apple.NeuralEngine.NeuralNetwork("NPU_Converted", []);
-                using var npuContext = new NPUInferenceContext(appleNetwork, Capabilities);
+                var npuNetwork = new ILGPU.Numerics.AI.NeuralNetwork("NPU_Converted", new List<ILGPU.Numerics.AI.NeuralOperation>());
+                using var npuContext = new NPUInferenceContext(npuNetwork, Capabilities);
                 
                 // Execute inference on NPU
                 var result = ExecuteNPUInference(input, npuContext);
