@@ -290,7 +290,7 @@ namespace ILGPU.IR.Construction
                                 MathOpFlags.Bools => "left.BasicValueType == BasicValueType.Int1",
                                 MathOpFlags.Ints => "left.BasicValueType.IsInt()",
                                 MathOpFlags.Floats => "left.BasicValueType.IsFloat()",
-                                MathOpFlags.Pointers => "left.Type.IsPointerType",
+                                MathOpFlags.Pointers => "left.Type!.IsPointerType",
                                 _ => throw new NotSupportedException()
                             })) #>
                     );

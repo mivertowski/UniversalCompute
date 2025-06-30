@@ -91,6 +91,7 @@ namespace ILGPU.Algorithms.Tests
         public void <#= function.TestName #>(<#= function.DataType #> divisor)
         {
             var inputArray = <#= function.TestName #>TestData
+                .Cast<object[]>()
                 .Select(x => (<#= function.DataType #>)x[0])
                 .ToArray();
             var expected = inputArray
