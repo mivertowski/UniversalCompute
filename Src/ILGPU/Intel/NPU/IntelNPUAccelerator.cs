@@ -291,7 +291,7 @@ namespace ILGPU.Intel.NPU
         #region Accelerator Implementation
 
 
-        protected override AcceleratorStream CreateStreamInternal() => new NPUStream(this);
+        protected override AcceleratorStream CreateStreamInternal() => new NPUExecutionContext(this);
 
         protected override void SynchronizeInternal() =>
             // NPU operations are handled asynchronously
@@ -600,17 +600,17 @@ namespace ILGPU.Intel.NPU
 
 
     /// <summary>
-    /// NPU stream implementation.
+    /// NPU execution context implementation.
     /// </summary>
-    public sealed class NPUStream : AcceleratorStream
+    public sealed class NPUExecutionContext : AcceleratorStream
     {
         private readonly IntelNPUAccelerator _accelerator;
 
         /// <summary>
-        /// Initializes a new instance of the NPUStream class.
+        /// Initializes a new instance of the NPUExecutionContext class.
         /// </summary>
         /// <param name="accelerator">The NPU accelerator.</param>
-        public NPUStream(IntelNPUAccelerator accelerator)
+        public NPUExecutionContext(IntelNPUAccelerator accelerator)
             : base(accelerator)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));

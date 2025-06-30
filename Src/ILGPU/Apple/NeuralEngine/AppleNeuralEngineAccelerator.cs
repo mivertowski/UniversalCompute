@@ -56,7 +56,7 @@ namespace ILGPU.Apple.NeuralEngine
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal() => new ANEStream(this);
+        protected override AcceleratorStream CreateStreamInternal() => new ANEExecutionContext(this);
 
         protected override void SynchronizeInternal() =>
             // ANE operations are asynchronous but we can sync here
@@ -146,17 +146,17 @@ namespace ILGPU.Apple.NeuralEngine
     }
 
     /// <summary>
-    /// ANE stream implementation.
+    /// ANE execution context implementation.
     /// </summary>
-    public sealed class ANEStream : AcceleratorStream
+    public sealed class ANEExecutionContext : AcceleratorStream
     {
         private readonly AppleNeuralEngineAccelerator _accelerator;
 
         /// <summary>
-        /// Initializes a new instance of the ANEStream class.
+        /// Initializes a new instance of the ANEExecutionContext class.
         /// </summary>
         /// <param name="accelerator">The ANE accelerator.</param>
-        public ANEStream(AppleNeuralEngineAccelerator accelerator)
+        public ANEExecutionContext(AppleNeuralEngineAccelerator accelerator)
             : base(accelerator)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));

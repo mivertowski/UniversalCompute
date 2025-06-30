@@ -229,11 +229,15 @@ namespace ILGPU.FFT
         /// <summary>
         /// Disposes this IPP FFT accelerator.
         /// </summary>
-        public override void Dispose()
+        /// <param name="disposing">True if disposing from Dispose() method, false if from finalizer.</param>
+        protected override void Dispose(bool disposing)
         {
             if (!_disposed)
             {
-                // No persistent resources to clean up
+                if (disposing)
+                {
+                    // No persistent resources to clean up
+                }
                 _disposed = true;
             }
         }

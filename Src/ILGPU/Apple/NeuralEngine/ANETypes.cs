@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System;
+using System.Collections.ObjectModel;
 
 namespace ILGPU.Apple.NeuralEngine
 {
@@ -48,7 +49,8 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets a copy of all dimensions.
         /// </summary>
-        public int[] Dimensions => (int[])_dimensions.Clone();
+        /// <returns>A copy of all dimensions.</returns>
+        public int[] GetDimensions() => (int[])_dimensions.Clone();
     }
 
     /// <summary>
@@ -288,9 +290,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         public string Name { get; }
         /// <summary>
-        /// Gets the array of neural operations in this network.
+        /// Gets the neural operations in this network.
         /// </summary>
-        public NeuralOperation[] Operations { get; }
+        public ReadOnlyCollection<NeuralOperation> Operations { get; }
 
         /// <summary>
         /// Initializes a new instance of the NeuralNetwork class.
@@ -300,7 +302,7 @@ namespace ILGPU.Apple.NeuralEngine
         public NeuralNetwork(string name, NeuralOperation[]? operations = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Operations = operations ?? Array.Empty<NeuralOperation>();
+            Operations = new ReadOnlyCollection<NeuralOperation>(operations ?? Array.Empty<NeuralOperation>());
         }
     }
 

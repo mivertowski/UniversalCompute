@@ -241,7 +241,20 @@ namespace ILGPU.FFT
         /// <summary>
         /// Disposes this FFT accelerator and frees associated resources.
         /// </summary>
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes this FFT accelerator and frees associated resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing from Dispose() method, false if from finalizer.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            // Derived classes should override this method to dispose their resources
+        }
 
         #endregion
     }

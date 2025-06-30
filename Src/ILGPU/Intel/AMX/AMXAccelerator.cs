@@ -138,7 +138,7 @@ namespace ILGPU.Intel.AMX
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal() => new AMXStream(this);
+        protected override AcceleratorStream CreateStreamInternal() => new AMXExecutionContext(this);
 
         protected override void SynchronizeInternal() =>
             // AMX operations are synchronous by nature
@@ -299,17 +299,17 @@ namespace ILGPU.Intel.AMX
     }
 
     /// <summary>
-    /// AMX stream implementation.
+    /// AMX execution context implementation.
     /// </summary>
-    public sealed class AMXStream : AcceleratorStream
+    public sealed class AMXExecutionContext : AcceleratorStream
     {
         private readonly AMXAccelerator _accelerator;
 
         /// <summary>
-        /// Initializes a new instance of the AMXStream class.
+        /// Initializes a new instance of the AMXExecutionContext class.
         /// </summary>
         /// <param name="accelerator">The AMX accelerator.</param>
-        public AMXStream(AMXAccelerator accelerator)
+        public AMXExecutionContext(AMXAccelerator accelerator)
             : base(accelerator)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));

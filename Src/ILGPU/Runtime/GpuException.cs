@@ -325,6 +325,25 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Initializes a new instance of the GpuDeviceException class.
         /// </summary>
+        public GpuDeviceException()
+            : base("A device error occurred.", GpuErrorCode.DeviceError, default(DeviceErrorInfo))
+        {
+            NativeErrorCode = 0;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuDeviceException class.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        public GpuDeviceException(string message)
+            : base(message, GpuErrorCode.DeviceError, default(DeviceErrorInfo))
+        {
+            NativeErrorCode = 0;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuDeviceException class.
+        /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="deviceInfo">Information about the device.</param>
         /// <param name="nativeErrorCode">The native error code from the device driver.</param>

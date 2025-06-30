@@ -20,6 +20,7 @@
 // you may not use this file except in compliance with the License.
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ILGPU.Intel.IPP.Native;
 
@@ -298,9 +299,9 @@ namespace ILGPU.Intel.IPP
         public bool SupportsAVX512 { get; set; }
 
         /// <summary>
-        /// Array of optimal FFT sizes for this CPU.
+        /// Optimal FFT sizes for this CPU.
         /// </summary>
-        public int[] OptimalFFTSizes { get; set; }
+        public IList<int> OptimalFFTSizes { get; set; } = new List<int>();
 
         /// <summary>
         /// Performance characteristics of this IPP installation.

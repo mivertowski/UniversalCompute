@@ -354,11 +354,15 @@ namespace ILGPU.FFT
         /// <summary>
         /// Disposes this CUDA FFT accelerator.
         /// </summary>
-        public override void Dispose()
+        /// <param name="disposing">True if disposing from Dispose() method, false if from finalizer.</param>
+        protected override void Dispose(bool disposing)
         {
             if (!_disposed)
             {
-                // No persistent resources to clean up in this implementation
+                if (disposing)
+                {
+                    // No persistent resources to clean up in this implementation
+                }
                 _disposed = true;
             }
         }

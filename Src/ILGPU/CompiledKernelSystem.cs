@@ -105,7 +105,7 @@ namespace ILGPU
                 
                 MethodName = methodName;
                 ReturnType = returnType;
-                ParameterTypes = parameterTypes;
+                ParameterTypes = Array.AsReadOnly(parameterTypes);
 
                 // Generate method signature
                 GenerateMethodSignature();
@@ -124,7 +124,7 @@ namespace ILGPU
             /// <summary>
             /// Returns the parameter types.
             /// </summary>
-            public Type[] ParameterTypes { get; }
+            public IReadOnlyList<Type> ParameterTypes { get; }
 
             /// <summary>
             /// Returns the compile-time IL emitter.
