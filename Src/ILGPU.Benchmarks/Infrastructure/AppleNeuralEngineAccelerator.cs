@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
 
 #if APPLE_COREML_AVAILABLE
 // Note: These would be actual Core ML bindings
@@ -30,6 +31,7 @@ namespace ILGPU.Benchmarks.Infrastructure;
 /// <summary>
 /// Real Apple Neural Engine accelerator using Core ML framework.
 /// </summary>
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Specialized accelerator must handle all exceptions gracefully for fallback behavior")]
 public sealed class CoreMLNeuralEngineAccelerator : ISpecializedAccelerator
 {
     private readonly bool _aneAvailable;
@@ -325,6 +327,7 @@ internal class MockCoreMLModel : ICoreMLModel
 /// <summary>
 /// Stub implementation when Core ML is not available.
 /// </summary>
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Specialized accelerator must handle all exceptions gracefully for fallback behavior")]
 public sealed class CoreMLNeuralEngineAccelerator : ISpecializedAccelerator
 {
     public string Name => "Apple Neural Engine (Core ML not available)";

@@ -436,6 +436,7 @@ namespace ILGPU.Frontend
         /// <param name="compilationStackLocation">The source location.</param>
         /// <param name="detectedMethods">The set of newly detected methods.</param>
         /// <param name="generatedMethod">The resolved IR method.</param>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Required to wrap all exceptions with location information for compiler error reporting")]
         internal void GenerateCodeInternal(
             MethodBase method,
             bool isExternalRequest,

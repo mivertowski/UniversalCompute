@@ -21,6 +21,7 @@ using ILGPU.Runtime.DependencyInjection;
 using ILGPU.Runtime.Scheduling;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -236,6 +237,7 @@ namespace ILGPU.ML.Integration
             return outputs;
         }
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Device profiling must handle all exceptions to provide fallback behavior")]
         private async Task<DeviceProfileResults> ProfileDevicesAsync(TInput[] sampleInputs)
         {
             var results = new Dictionary<ComputeDevice, DeviceProfileResult>();

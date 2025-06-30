@@ -45,7 +45,7 @@ namespace ILGPU.Tests
     /// Wraps a test value.
     /// </summary>
     /// <typeparam name="T">The value to wrap.</typeparam>
-    internal class TestData<T> : IXunitSerializable
+    public class TestData<T> : IXunitSerializable
     {
         public TestData()
         {
@@ -150,7 +150,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    internal struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
+    public struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
         where T1 : struct
         where T2 : struct
     {
@@ -637,7 +637,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// An abstraction to inline a specialized sizes.
     /// </summary>
-    internal interface ILength : IXunitSerializable
+    public interface ILength : IXunitSerializable
     {
         int Length { get; }
     }

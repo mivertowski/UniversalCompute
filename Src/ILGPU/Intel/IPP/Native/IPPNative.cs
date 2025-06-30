@@ -100,7 +100,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Gets the size of the FFT specification structure and work buffer.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTGetSize_C_32fc(
+        internal static extern IppStatus ippsFFTGetSize_C_32fc(
             int order,
             int flag,
             IppHintAlgorithm hint,
@@ -112,7 +112,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Initializes the FFT specification structure.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTInit_C_32fc(
+        internal static extern IppStatus ippsFFTInit_C_32fc(
             out IntPtr ppFFTSpec,
             int order,
             int flag,
@@ -124,7 +124,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Performs forward complex-to-complex FFT.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTFwd_CToC_32fc(
+        internal static extern IppStatus ippsFFTFwd_CToC_32fc(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -134,7 +134,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Performs inverse complex-to-complex FFT.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTInv_CToC_32fc(
+        internal static extern IppStatus ippsFFTInv_CToC_32fc(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -148,7 +148,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Gets the size of the real FFT specification structure and work buffer.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTGetSize_R_32f(
+        internal static extern IppStatus ippsFFTGetSize_R_32f(
             int order,
             int flag,
             IppHintAlgorithm hint,
@@ -160,7 +160,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Initializes the real FFT specification structure.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTInit_R_32f(
+        internal static extern IppStatus ippsFFTInit_R_32f(
             out IntPtr ppFFTSpec,
             int order,
             int flag,
@@ -172,7 +172,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Performs forward real-to-complex FFT.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTFwd_RToPack_32f(
+        internal static extern IppStatus ippsFFTFwd_RToPack_32f(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -182,7 +182,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Performs inverse complex-to-real FFT.
         /// </summary>
         [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippsFFTInv_PackToR_32f(
+        internal static extern IppStatus ippsFFTInv_PackToR_32f(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -196,7 +196,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Gets the size of 2D FFT specification structure and work buffer.
         /// </summary>
         [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippiFFTGetSize_C_32fc(
+        internal static extern IppStatus ippiFFTGetSize_C_32fc(
             IppiSize roiSize,
             int flag,
             IppHintAlgorithm hint,
@@ -208,7 +208,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Initializes 2D FFT specification structure.
         /// </summary>
         [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippiFFTInit_C_32fc(
+        internal static extern IppStatus ippiFFTInit_C_32fc(
             out IntPtr ppFFTSpec,
             IppiSize roiSize,
             int flag,
@@ -220,7 +220,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Performs forward 2D complex-to-complex FFT.
         /// </summary>
         [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippiFFTFwd_CToC_32fc_C1R(
+        internal static extern IppStatus ippiFFTFwd_CToC_32fc_C1R(
             IntPtr pSrc,
             int srcStep,
             IntPtr pDst,
@@ -232,7 +232,7 @@ namespace ILGPU.Intel.IPP.Native
         /// Performs inverse 2D complex-to-complex FFT.
         /// </summary>
         [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippiFFTInv_CToC_32fc_C1R(
+        internal static extern IppStatus ippiFFTInv_CToC_32fc_C1R(
             IntPtr pSrc,
             int srcStep,
             IntPtr pDst,
@@ -278,19 +278,19 @@ namespace ILGPU.Intel.IPP.Native
         /// Allocates aligned memory for IPP operations.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr ippsMalloc_32f(int len);
+        internal static extern IntPtr ippsMalloc_32f(int len);
 
         /// <summary>
         /// Allocates aligned memory for complex IPP operations.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr ippsMalloc_32fc(int len);
+        internal static extern IntPtr ippsMalloc_32fc(int len);
 
         /// <summary>
         /// Frees memory allocated by IPP.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void ippsFree(IntPtr ptr);
+        internal static extern void ippsFree(IntPtr ptr);
 
         #endregion
 
@@ -300,13 +300,13 @@ namespace ILGPU.Intel.IPP.Native
         /// Gets CPU features supported by IPP.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern ulong ippGetCpuFeatures();
+        internal static extern ulong ippGetCpuFeatures();
 
         /// <summary>
         /// Gets the current CPU type.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppCpuType ippGetCpuType();
+        internal static extern IppCpuType ippGetCpuType();
 
         /// <summary>
         /// CPU types supported by IPP.
@@ -358,13 +358,13 @@ namespace ILGPU.Intel.IPP.Native
         /// Initializes IPP library.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IppStatus ippInit();
+        internal static extern IppStatus ippInit();
 
         /// <summary>
         /// Gets IPP library version information.
         /// </summary>
         [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr ippGetLibVersion();
+        internal static extern IntPtr ippGetLibVersion();
 
         #endregion
     }

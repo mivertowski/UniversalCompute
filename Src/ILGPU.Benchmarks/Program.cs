@@ -24,6 +24,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace ILGPU.Benchmarks;
@@ -33,6 +34,7 @@ namespace ILGPU.Benchmarks;
 /// </summary>
 public class Program
 {
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Main method must handle all exceptions for proper application exit codes")]
     public static async Task<int> Main(string[] args)
     {
         try
@@ -165,6 +167,7 @@ public class Program
     /// <summary>
     /// Runs benchmarks in unattended mode for CI/CD integration.
     /// </summary>
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Unattended mode must handle all exceptions for proper CI/CD integration")]
     private static async Task<int> RunUnattendedBenchmarksAsync(string[] args)
     {
         Console.WriteLine("Starting UniversalCompute Benchmarks in unattended mode...");
@@ -226,6 +229,7 @@ public class Program
 /// </summary>
 public static class SystemInfo
 {
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "System information display should handle all exceptions gracefully")]
     public static void DisplaySystemInformation()
     {
         var table = new Table()

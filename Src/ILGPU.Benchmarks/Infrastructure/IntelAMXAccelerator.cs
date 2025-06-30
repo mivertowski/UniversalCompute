@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System.Runtime.InteropServices;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Intrinsics;
 
 namespace ILGPU.Benchmarks.Infrastructure;
@@ -23,6 +24,7 @@ namespace ILGPU.Benchmarks.Infrastructure;
 /// <summary>
 /// Real Intel AMX accelerator using native AMX intrinsics.
 /// </summary>
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Specialized accelerator must handle all exceptions gracefully for fallback behavior")]
 public sealed class IntelAMXAccelerator : ISpecializedAccelerator
 {
     private bool _disposed;

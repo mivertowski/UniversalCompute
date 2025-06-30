@@ -20,6 +20,7 @@ using ILGPU.Runtime.KernelCache;
 using ILGPU.Runtime.CPU;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -369,6 +370,7 @@ namespace ILGPU.Tests.CPU
         }
 
         [Fact]
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Test infrastructure needs to collect all exceptions from concurrent operations")]
         public void KernelCache_ConcurrentAccess()
         {
             const int threadCount = 10;

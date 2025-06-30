@@ -19,6 +19,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -34,6 +35,7 @@ namespace ILGPU.SourceGenerators.Generators
     [Generator]
     public sealed class NativeLibraryGenerator : IIncrementalGenerator
     {
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Source generators must catch all exceptions to report diagnostics properly")]
         public void Initialize(IncrementalGeneratorInitializationContext context)
         {
             // Create a provider that triggers generation on any compilation
@@ -98,6 +100,7 @@ namespace ILGPU.SourceGenerators.Generators
             }
         }
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Source generators must catch all exceptions to report diagnostics properly")]
         private static void GenerateLibraryImportsFromXmlContent(SourceProductionContext context, string xmlContent, string apiName)
         {
             try

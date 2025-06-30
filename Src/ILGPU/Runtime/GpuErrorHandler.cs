@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -104,6 +105,7 @@ namespace ILGPU.Runtime
         /// <param name="operationName">The name of the operation for logging.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The result of the operation.</returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Required to wrap all exceptions in GpuException for consistent error handling")]
         public static T HandleOperation<T>(
             Func<T> operation,
             Accelerator? accelerator,
@@ -174,6 +176,7 @@ namespace ILGPU.Runtime
         /// <param name="operationName">The name of the operation for logging.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task representing the async operation.</returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Required to wrap all exceptions in GpuException for consistent error handling")]
         public static async Task<T> HandleOperationAsync<T>(
             Func<Task<T>> operation,
             Accelerator? accelerator = null,

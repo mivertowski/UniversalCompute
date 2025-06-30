@@ -18,6 +18,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Benchmarks.Infrastructure;
 
@@ -50,6 +51,7 @@ public record HardwareInfo
 /// <summary>
 /// Hardware detection service for AI acceleration units.
 /// </summary>
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Hardware detection must handle all exceptions gracefully to provide fallback capabilities")]
 public static class HardwareDetection
 {
     private static HardwareInfo? _cachedInfo;

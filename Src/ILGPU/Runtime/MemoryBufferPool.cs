@@ -14,6 +14,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -293,6 +294,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Callback for the automatic pool trimming timer.
         /// </summary>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Timer callback must not throw exceptions")]
         private void TrimPoolCallback(object? state)
         {
             try

@@ -18,6 +18,7 @@
 #if INTEL_OPENVINO_AVAILABLE
 using OpenVinoSharp;
 #endif
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Benchmarks.Infrastructure;
 
@@ -26,6 +27,7 @@ namespace ILGPU.Benchmarks.Infrastructure;
 /// <summary>
 /// Real Intel NPU accelerator using OpenVINO Runtime.
 /// </summary>
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Specialized accelerator must handle all exceptions gracefully for fallback behavior")]
 public sealed class OpenVINONPUAccelerator : ISpecializedAccelerator
 {
     private readonly Core _core;
@@ -299,6 +301,7 @@ internal class ModelBuilder
 /// <summary>
 /// Stub implementation when OpenVINO is not available.
 /// </summary>
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Specialized accelerator must handle all exceptions gracefully for fallback behavior")]
 public sealed class OpenVINONPUAccelerator : ISpecializedAccelerator
 {
     public string Name => "Intel NPU (OpenVINO not available)";

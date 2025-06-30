@@ -19,6 +19,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -129,6 +130,7 @@ namespace ILGPU.Runtime.MultiGPU
         /// </summary>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A task representing the execution with results.</returns>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Multi-GPU orchestrator needs to handle all exceptions for proper result reporting")]
         public async Task<MultiGPUResult> ExecuteAsync(CancellationToken cancellationToken = default)
         {
             if (disposed)
@@ -655,6 +657,7 @@ namespace ILGPU.Runtime.MultiGPU
         /// Timer callback for load balancing.
         /// </summary>
         /// <param name="state">Timer state (unused).</param>
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Timer callback must not throw exceptions")]
         private async void LoadBalancingCallback(object? state)
         {
             try
