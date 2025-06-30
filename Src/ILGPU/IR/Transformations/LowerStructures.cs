@@ -631,9 +631,9 @@ namespace ILGPU.IR.Transformations
 
             AddRewriters(LoadStoreRewriter);
             LoadStoreRewriter.Add<Load>(
-                (_, value) => value.Type.IsStructureType, Lower);
+                (_, value) => value.Type!.IsStructureType, Lower);
             LoadStoreRewriter.Add<Store>(
-                (_, value) => value.Value.Type.IsStructureType, Lower);
+                (_, value) => value.Value.Type!.IsStructureType, Lower);
         }
 
         #endregion
