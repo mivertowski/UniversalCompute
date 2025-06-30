@@ -214,7 +214,7 @@ jobs:
             $params = "--version-suffix", $suffix
           }
 
-          dotnet pack Src --configuration=Release @params
+          dotnet pack Src --configuration=Release --output ./Bin/Release @params
 
       - name: Upload NuGet package artifacts
         uses: actions/upload-artifact@v4
