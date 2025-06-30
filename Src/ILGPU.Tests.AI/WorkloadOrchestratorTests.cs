@@ -301,8 +301,17 @@ namespace ILGPU.Tests.AI
 
         public void Dispose()
         {
-            _orchestrator?.Dispose();
-            _context?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _orchestrator?.Dispose();
+                _context?.Dispose();
+            }
         }
     }
 }

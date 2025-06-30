@@ -45,7 +45,7 @@ namespace ILGPU.Tests
     /// Wraps a test value.
     /// </summary>
     /// <typeparam name="T">The value to wrap.</typeparam>
-    public class TestData<T> : IXunitSerializable
+    internal class TestData<T> : IXunitSerializable
     {
         public TestData()
         {
@@ -83,7 +83,7 @@ namespace ILGPU.Tests
     /// <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The element type.</typeparam>
-    public interface IValueStructure<T>
+    internal interface IValueStructure<T>
     {
         /// <summary>
         /// The nested element value.
@@ -92,7 +92,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct EmptyStruct : IXunitSerializable, IEquatable<EmptyStruct>
+    internal struct EmptyStruct : IXunitSerializable, IEquatable<EmptyStruct>
     {
         public void Deserialize(IXunitSerializationInfo info) { }
 
@@ -120,7 +120,7 @@ namespace ILGPU.Tests
     [Serializable]
     // warning disabled intentionally for testing this scenario
 #pragma warning disable CS0659 // Type does not override Object.GetHashCode()
-    public struct NoHashCodeStruct : IXunitSerializable, IEquatable<NoHashCodeStruct>
+    internal struct NoHashCodeStruct : IXunitSerializable, IEquatable<NoHashCodeStruct>
 #pragma warning restore CS0659 // Type does not override Object.GetHashCode()
     {
         public void Deserialize(IXunitSerializationInfo info) { }
@@ -150,7 +150,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
+    internal struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
         where T1 : struct
         where T2 : struct
     {
@@ -183,7 +183,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct TestStruct : IXunitSerializable, IEquatable<TestStruct>
+    internal struct TestStruct : IXunitSerializable, IEquatable<TestStruct>
     {
         public int X;
         public long Y;
@@ -229,7 +229,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct TestStruct<T> : IXunitSerializable, IValueStructure<T>
+    internal struct TestStruct<T> : IXunitSerializable, IValueStructure<T>
         where T : struct
     {
         public byte Val0;
@@ -270,7 +270,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct TestStructEquatable<T> :
+    internal struct TestStructEquatable<T> :
         IXunitSerializable,
         IValueStructure<T>,
         IEquatable<TestStructEquatable<T>>
@@ -342,7 +342,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct TestStruct<T1, T2> : IXunitSerializable, IValueStructure<T2>
+    internal struct TestStruct<T1, T2> : IXunitSerializable, IValueStructure<T2>
         where T1 : struct
         where T2 : struct
     {
@@ -384,7 +384,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct TestStructEquatable<T1, T2> :
+    internal struct TestStructEquatable<T1, T2> :
         IXunitSerializable,
         IValueStructure<T2>,
         IEquatable<TestStructEquatable<T1, T2>>
@@ -456,7 +456,7 @@ namespace ILGPU.Tests
 
     }
 
-    public struct DeepStructure<T> : IXunitSerializable
+    internal struct DeepStructure<T> : IXunitSerializable
         where T : struct
     {
         public TestStruct<
@@ -521,7 +521,7 @@ namespace ILGPU.Tests
     }
 
     [StructLayout(LayoutKind.Sequential, Size = 64)]
-    public struct SmallCustomSizeStruct : IXunitSerializable
+    internal struct SmallCustomSizeStruct : IXunitSerializable
     {
         public byte Data;
 
@@ -539,7 +539,7 @@ namespace ILGPU.Tests
     }
 
     [StructLayout(LayoutKind.Sequential, Size = 512)]
-    public struct CustomSizeStruct : IXunitSerializable
+    internal struct CustomSizeStruct : IXunitSerializable
     {
         public byte Data;
 
@@ -556,7 +556,7 @@ namespace ILGPU.Tests
 
     }
 
-    public unsafe struct ShortFixedBufferStruct : IXunitSerializable
+    internal unsafe struct ShortFixedBufferStruct : IXunitSerializable
     {
         public const int Length = 7;
 
@@ -593,7 +593,7 @@ namespace ILGPU.Tests
         }
     }
 
-    public unsafe struct LongFixedBufferStruct : IXunitSerializable
+    internal unsafe struct LongFixedBufferStruct : IXunitSerializable
     {
         public const int Length = 19;
 
@@ -637,7 +637,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// An abstraction to inline a specialized sizes.
     /// </summary>
-    public interface ILength : IXunitSerializable
+    internal interface ILength : IXunitSerializable
     {
         int Length { get; }
     }
@@ -645,7 +645,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 0.
     /// </summary>
-    public struct Length0 : ILength
+    internal struct Length0 : ILength
     {
         public int Length => 0;
 
@@ -657,7 +657,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 1.
     /// </summary>
-    public struct Length1 : ILength
+    internal struct Length1 : ILength
     {
         public int Length => 1;
 
@@ -669,7 +669,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 2.
     /// </summary>
-    public struct Length2 : ILength
+    internal struct Length2 : ILength
     {
         public int Length => 2;
 
@@ -681,7 +681,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 31.
     /// </summary>
-    public struct Length31 : ILength
+    internal struct Length31 : ILength
     {
         public int Length => 31;
 
@@ -693,7 +693,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 32.
     /// </summary>
-    public struct Length32 : ILength
+    internal struct Length32 : ILength
     {
         public int Length => 32;
 
@@ -705,7 +705,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 33.
     /// </summary>
-    public struct Length33 : ILength
+    internal struct Length33 : ILength
     {
         public int Length => 33;
 
@@ -717,7 +717,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 65.
     /// </summary>
-    public struct Length65 : ILength
+    internal struct Length65 : ILength
     {
         public int Length => 65;
 
@@ -729,7 +729,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Array size of 127.
     /// </summary>
-    public struct Length127 : ILength
+    internal struct Length127 : ILength
     {
         public int Length => 127;
 

@@ -434,7 +434,7 @@ namespace ILGPU.Tests
             Verify(output.View, expected);
         }
 
-        public unsafe struct FieldStruct
+        internal unsafe struct FieldStruct
         {
             public fixed int Array[3];
             public int Cursor;

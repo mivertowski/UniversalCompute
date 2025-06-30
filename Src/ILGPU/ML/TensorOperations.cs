@@ -490,9 +490,22 @@ namespace ILGPU.ML
         /// <inheritdoc/>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the tensor and releases all resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (!disposed)
             {
-                Buffer?.Dispose();
+                if (disposing)
+                {
+                    Buffer?.Dispose();
+                }
                 disposed = true;
             }
         }

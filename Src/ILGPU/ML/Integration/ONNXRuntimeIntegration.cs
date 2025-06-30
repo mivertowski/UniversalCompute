@@ -393,13 +393,26 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the execution provider and releases all resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (_disposed)
                 return;
 
-            ClearModelCache();
-            _computeEngine?.Dispose();
-            _scheduler?.Dispose();
-            _modelOptimizer?.Dispose();
+            if (disposing)
+            {
+                ClearModelCache();
+                _computeEngine?.Dispose();
+                _scheduler?.Dispose();
+                _modelOptimizer?.Dispose();
+            }
 
             _disposed = true;
         }

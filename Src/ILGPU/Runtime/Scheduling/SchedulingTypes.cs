@@ -244,10 +244,19 @@ namespace ILGPU.Runtime.Scheduling
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (!disposed)
             {
-                accelerators.Clear();
-                currentLoads.Clear();
+                if (disposing)
+                {
+                    accelerators.Clear();
+                    currentLoads.Clear();
+                }
                 disposed = true;
             }
         }
@@ -339,10 +348,19 @@ namespace ILGPU.Runtime.Scheduling
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (!disposed)
             {
-                executionTimes.Clear();
-                activeExecutions.Clear();
+                if (disposing)
+                {
+                    executionTimes.Clear();
+                    activeExecutions.Clear();
+                }
                 disposed = true;
             }
         }

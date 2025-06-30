@@ -394,8 +394,21 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
-            _accelerators?.Clear();
-            _loadBalancer?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the hybrid compute orchestrator.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _accelerators?.Clear();
+                _loadBalancer?.Dispose();
+            }
         }
     }
 
@@ -580,7 +593,20 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
-            // Nothing to dispose for now
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the model optimizer.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // Nothing to dispose for now
+            }
         }
     }
 
@@ -728,7 +754,23 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Disposes the compiled model.
         /// </summary>
-        public void Dispose() => Metadata?.Clear();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the compiled model.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Metadata?.Clear();
+            }
+        }
     }
 
     /// <summary>
@@ -1049,7 +1091,23 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Disposes the universal compute engine.
         /// </summary>
-        public void Dispose() => _backends.Clear();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the universal compute engine.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _backends.Clear();
+            }
+        }
     }
 
     /// <summary>

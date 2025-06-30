@@ -246,17 +246,30 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the memory manager and all associated resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (_disposed)
                 return;
 
-            foreach (var manager in _acceleratorManagers.Values)
+            if (disposing)
             {
-                manager.Dispose();
-            }
+                foreach (var manager in _acceleratorManagers.Values)
+                {
+                    manager.Dispose();
+                }
 
-            _acceleratorManagers.Clear();
-            _usageTracker.Dispose();
-            _placementOptimizer.Dispose();
+                _acceleratorManagers.Clear();
+                _usageTracker.Dispose();
+                _placementOptimizer.Dispose();
+            }
 
             _disposed = true;
         }

@@ -249,28 +249,41 @@ namespace ILGPU.Runtime.MemoryPooling
         /// <inheritdoc/>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the memory pool and releases all resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        private void Dispose(bool disposing)
+        {
             if (disposed) return;
             disposed = true;
 
-            trimTimer?.Dispose();
-
-            // Dispose all pooled buffers
-            foreach (var queue in sizeBuckets.Values)
+            if (disposing)
             {
-                while (queue.TryDequeue(out var buffer))
+                trimTimer?.Dispose();
+
+                // Dispose all pooled buffers
+                foreach (var queue in sizeBuckets.Values)
+                {
+                    while (queue.TryDequeue(out var buffer))
+                    {
+                        buffer.Buffer.Dispose();
+                    }
+                }
+
+                // Dispose rented buffers (this is unusual but ensures cleanup)
+                foreach (var buffer in rentedBuffers.Keys.ToArray())
                 {
                     buffer.Buffer.Dispose();
                 }
-            }
 
-            // Dispose rented buffers (this is unusual but ensures cleanup)
-            foreach (var buffer in rentedBuffers.Keys.ToArray())
-            {
-                buffer.Buffer.Dispose();
+                sizeBuckets.Clear();
+                rentedBuffers.Clear();
             }
-
-            sizeBuckets.Clear();
-            rentedBuffers.Clear();
         }
 
         private long GetBucketSize(long requestedLength)

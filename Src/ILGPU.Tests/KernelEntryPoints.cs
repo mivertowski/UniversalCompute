@@ -733,7 +733,7 @@ namespace ILGPU.Tests
             Verify(buffer.View, expected);
         }
 
-        public struct MyAlignedStruct
+        internal struct MyAlignedStruct
         {
             public byte X;
             public Int128 Y;

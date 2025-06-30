@@ -38,7 +38,7 @@ namespace ILGPU.Algorithms.Tests
 
         #region Objectives
 
-        public interface IPredefineTestFunction
+        internal interface IPredefineTestFunction
         {
             float Result { get; }
             float[] LowerBounds { get; }

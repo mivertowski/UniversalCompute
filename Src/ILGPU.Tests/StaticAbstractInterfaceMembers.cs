@@ -126,12 +126,12 @@ namespace ILGPU.Tests
             Verify(output.View, expected);
         }
 
-        public interface IStaticAbstract
+        internal interface IStaticAbstract
         {
             static abstract int Inc(int x);
         }
 
-        public class Incrementer : IStaticAbstract
+        internal class Incrementer : IStaticAbstract
         {
             public static int Inc(int x)
             {
