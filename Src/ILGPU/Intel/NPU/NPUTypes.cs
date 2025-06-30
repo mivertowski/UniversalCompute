@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace ILGPU.Intel.NPU
 
         public int this[int index] => _dimensions[index];
         public int Rank => _dimensions.Length;
-        public int[] Dimensions => (int[])_dimensions.Clone();
+        public IReadOnlyList<int> Dimensions => _dimensions;
     }
 
     /// <summary>
@@ -96,12 +97,12 @@ namespace ILGPU.Intel.NPU
     public class NeuralNetwork
     {
         public string Name { get; }
-        public NeuralOperation[] Operations { get; }
+        public IReadOnlyList<NeuralOperation> Operations { get; }
 
         public NeuralNetwork(string name, NeuralOperation[]? operations = null)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            Operations = operations ?? Array.Empty<NeuralOperation>();
+            Operations = operations != null ? Array.AsReadOnly(operations) : Array.Empty<NeuralOperation>();
         }
     }
 

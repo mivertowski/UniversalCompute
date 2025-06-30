@@ -421,7 +421,7 @@ namespace ILGPU.Runtime
         public long TotalBytesAllocated { get; } = totalBytesAllocated;
         public long TotalBytesReused { get; } = totalBytesReused;
         public long TotalPooledBytes { get; } = totalPooledBytes;
-        public int[] BucketCounts { get; } = bucketCounts;
-        public long[] BucketSizes { get; } = bucketSizes;
+        public IReadOnlyList<int> BucketCounts { get; } = Array.AsReadOnly(bucketCounts);
+        public IReadOnlyList<long> BucketSizes { get; } = Array.AsReadOnly(bucketSizes);
     }
 }

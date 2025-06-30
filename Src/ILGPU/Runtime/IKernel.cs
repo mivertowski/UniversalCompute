@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -154,7 +155,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets or sets additional compiler flags.
         /// </summary>
-        public string[]? AdditionalFlags { get; set; }
+        public IReadOnlyList<string>? AdditionalFlags { get; set; }
 
         /// <summary>
         /// Gets or sets the target architecture.

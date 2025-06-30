@@ -104,7 +104,7 @@ namespace ILGPU.Intel.IPP
                         }
 
                         // Determine optimal FFT sizes based on CPU capabilities
-                        info.OptimalFFTSizes = DetermineOptimalFFTSizes(info);
+                        info.OptimalFFTSizes = Array.AsReadOnly(DetermineOptimalFFTSizes(info));
 
                         // Estimate performance characteristics
                         info.EstimatedPerformance = EstimatePerformance(info);
@@ -301,7 +301,7 @@ namespace ILGPU.Intel.IPP
         /// <summary>
         /// Optimal FFT sizes for this CPU.
         /// </summary>
-        public IList<int> OptimalFFTSizes { get; set; }
+        public IReadOnlyList<int> OptimalFFTSizes { get; set; }
 
         /// <summary>
         /// Performance characteristics of this IPP installation.

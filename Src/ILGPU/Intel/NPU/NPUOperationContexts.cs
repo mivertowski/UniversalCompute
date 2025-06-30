@@ -49,7 +49,7 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         public IntPtr NativeContext { get; private set; } = CreateNativeContext(network, capabilities, network.Operations.Select(op => MapNeuralOperation(op)).ToArray());
 
-        private static ILGPU.Intel.NPU.NeuralOperation MapNeuralOperation(ILGPU.Numerics.AI.NeuralOperation operation)
+        internal static ILGPU.Intel.NPU.NeuralOperation MapNeuralOperation(ILGPU.Numerics.AI.NeuralOperation operation)
         {
             // Implement mapping logic here based on the actual types of operations
             // For now, a placeholder that throws an exception if the type is not supported
@@ -58,6 +58,7 @@ namespace ILGPU.Intel.NPU
                 case ILGPU.Numerics.AI.NeuralOperationType.Convolution:
                     var convOp = (ILGPU.Numerics.AI.ConvolutionOperation)operation;
                     return new ILGPU.Intel.NPU.ConvolutionOperation(
+                        ConvertTensorShape(convOp.InputShape),
                         new ILGPU.Intel.NPU.ConvolutionParameters
                         {
                             KernelSize = (convOp.Parameters.KernelSize.Height, convOp.Parameters.KernelSize.Width),
@@ -67,6 +68,7 @@ namespace ILGPU.Intel.NPU
                 case ILGPU.Numerics.AI.NeuralOperationType.MatMul:
                     var matMulOp = (ILGPU.Numerics.AI.MatMulOperation)operation;
                     return new ILGPU.Intel.NPU.MatMulOperation(
+                        ConvertTensorShape(matMulOp.InputShape),
                         new ILGPU.Intel.NPU.MatMulConfiguration
                         {
                             M = matMulOp.Configuration.M,
@@ -77,7 +79,8 @@ namespace ILGPU.Intel.NPU
                         });
                 case ILGPU.Numerics.AI.NeuralOperationType.Attention:
                     var attentionOp = (ILGPU.Numerics.AI.AttentionOperation)operation;
-                    return new ILGPU.Intel.NPU.AttentionOperation(attentionOp.InputShape,
+                    return new ILGPU.Intel.NPU.AttentionOperation(
+                        ConvertTensorShape(attentionOp.InputShape),
                         new ILGPU.Intel.NPU.AttentionParameters
                         {
                             NumHeads = attentionOp.Parameters.NumHeads,
@@ -86,6 +89,16 @@ namespace ILGPU.Intel.NPU
                 default:
                     throw new NotSupportedException($"Unsupported NeuralOperation type: {operation.GetType().Name}");
             }
+        }
+
+        /// <summary>
+        /// Converts ILGPU.Numerics.TensorShape to ILGPU.Intel.NPU.TensorShape.
+        /// </summary>
+        /// <param name="shape">The source tensor shape.</param>
+        /// <returns>The converted tensor shape.</returns>
+        private static ILGPU.Intel.NPU.TensorShape ConvertTensorShape(ILGPU.Numerics.TensorShape shape)
+        {
+            return new ILGPU.Intel.NPU.TensorShape(shape.Dimensions.ToArray());
         }
 
         private static IntPtr CreateNativeContext(ILGPU.Numerics.AI.NeuralNetwork network, NPUCapabilities capabilities, ILGPU.Intel.NPU.NeuralOperation[] operations) =>
@@ -299,7 +312,7 @@ namespace ILGPU.Intel.NPU
 
             // Create optimized model (copy operations from original model)
             var optimizedModel = new ILGPU.Intel.NPU.NeuralNetwork(
-                $"{model.ModelPath}_NPU_Optimized", model.Operations.Select(op => MapNeuralOperation(op)).ToArray());
+                $"{model.ModelPath}_NPU_Optimized", model.Operations.Select(op => NPUInferenceContext.MapNeuralOperation(op)).ToArray());
 
             // Apply optimizations based on NPU capabilities
             ApplyQuantization(optimizedModel, options);

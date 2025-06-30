@@ -32,12 +32,22 @@ namespace ILGPU.Numerics
         /// <summary>
         /// The width dimension.
         /// </summary>
-        public readonly int Width = width;
+        private readonly int _width = width;
 
         /// <summary>
         /// The height dimension.
         /// </summary>
-        public readonly int Height = height;
+        private readonly int _height = height;
+
+        /// <summary>
+        /// Gets the width dimension.
+        /// </summary>
+        public int Width => _width;
+
+        /// <summary>
+        /// Gets the height dimension.
+        /// </summary>
+        public int Height => _height;
 
         /// <summary>
         /// Gets a Size2D with zero dimensions.
@@ -54,7 +64,7 @@ namespace ILGPU.Numerics
         /// </summary>
         /// <param name="other">The Size2D to compare with.</param>
         /// <returns>True if the sizes are equal; otherwise, false.</returns>
-        public bool Equals(Size2D other) => Width == other.Width && Height == other.Height;
+        public bool Equals(Size2D other) => _width == other._width && _height == other._height;
 
         /// <summary>
         /// Determines whether the specified object is equal to the current Size2D.
@@ -67,13 +77,13 @@ namespace ILGPU.Numerics
         /// Returns the hash code for this instance.
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetHashCode() => HashCode.Combine(Width, Height);
+        public override int GetHashCode() => HashCode.Combine(_width, _height);
 
         /// <summary>
         /// Returns a string representation of the Size2D.
         /// </summary>
         /// <returns>A string representation of the size.</returns>
-        public override string ToString() => $"({Width}, {Height})";
+        public override string ToString() => $"({_width}, {_height})";
 
         /// <summary>
         /// Determines whether two Size2D instances are equal.

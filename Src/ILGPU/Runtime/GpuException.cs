@@ -209,6 +209,23 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Initializes a new instance of the GpuMemoryException class.
         /// </summary>
+        public GpuMemoryException()
+            : this("An out-of-memory error occurred.", 0, 0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuMemoryException class with a specified error message.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        public GpuMemoryException(string message)
+            : this(message, 0, 0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuMemoryException class.
+        /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="requestedSize">The size that was requested.</param>
         /// <param name="availableSize">The available memory size.</param>
@@ -337,6 +354,17 @@ namespace ILGPU.Runtime
         /// <param name="message">The message that describes the error.</param>
         public GpuDeviceException(string message)
             : base(message, GpuErrorCode.DeviceError, default(DeviceErrorInfo))
+        {
+            NativeErrorCode = 0;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuDeviceException class with a specified error message and inner exception.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public GpuDeviceException(string message, Exception innerException)
+            : base(message, innerException)
         {
             NativeErrorCode = 0;
         }
