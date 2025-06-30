@@ -607,10 +607,10 @@ namespace ILGPU.IR.Transformations
             rewriter.Add<StructureValue>((_, value) => value.Type!.IsStructureType, Lower);
             rewriter.Add<PhiValue>((_, value) => value.Type!.IsStructureType, Lower);
             rewriter.Add<Broadcast>((_, value) => value.Type!.IsStructureType, Lower);
-            rewriter.Add<WarpShuffle>((_, value) => value.Type.IsStructureType, Lower);
-            rewriter.Add<SubWarpShuffle>((_, value) => value.Type.IsStructureType, Lower);
+            rewriter.Add<WarpShuffle>((_, value) => value.Type!.IsStructureType, Lower);
+            rewriter.Add<SubWarpShuffle>((_, value) => value.Type!.IsStructureType, Lower);
 
-            rewriter.Add<Predicate>((_, value) => value.Type.IsStructureType, Lower);
+            rewriter.Add<Predicate>((_, value) => value.Type!.IsStructureType, Lower);
 
             rewriter.Add<ReturnTerminator>(
                 (_, value) => value.Method.ReturnType.IsStructureType, Lower);
@@ -626,8 +626,8 @@ namespace ILGPU.IR.Transformations
         static LowerStructures()
         {
             AddRewriters(Rewriter);
-            Rewriter.Add<Load>((_, value) => value.Type.IsStructureType, Keep);
-            Rewriter.Add<Store>((_, value) => value.Value.Type.IsStructureType, Keep);
+            Rewriter.Add<Load>((_, value) => value.Type!.IsStructureType, Keep);
+            Rewriter.Add<Store>((_, value) => value.Value.Type!.IsStructureType, Keep);
 
             AddRewriters(LoadStoreRewriter);
             LoadStoreRewriter.Add<Load>(
