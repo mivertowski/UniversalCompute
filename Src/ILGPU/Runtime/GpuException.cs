@@ -224,6 +224,20 @@ namespace ILGPU.Runtime
         }
 
         /// <summary>
+        /// Initializes a new instance of the GpuMemoryException class with a specified error message and inner exception.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public GpuMemoryException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+            RequestedSize = 0;
+            AvailableSize = 0;
+            Context["RequestedSize"] = RequestedSize;
+            Context["AvailableSize"] = AvailableSize;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the GpuMemoryException class.
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
@@ -244,7 +258,7 @@ namespace ILGPU.Runtime
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
         [Obsolete("Binary serialization is obsolete and should not be used.")]
-        private GpuMemoryException(SerializationInfo info, StreamingContext context)
+        protected GpuMemoryException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             RequestedSize = info.GetInt64(nameof(RequestedSize));
@@ -284,6 +298,37 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Initializes a new instance of the GpuKernelException class.
         /// </summary>
+        public GpuKernelException()
+            : this("A kernel execution error occurred.", "Unknown", default(KernelConfig))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuKernelException class with a specified error message.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        public GpuKernelException(string message)
+            : this(message, "Unknown", default(KernelConfig))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuKernelException class with a specified error message and inner exception.
+        /// </summary>
+        /// <param name="message">The message that describes the error.</param>
+        /// <param name="innerException">The exception that is the cause of the current exception.</param>
+        public GpuKernelException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+            KernelName = "Unknown";
+            LaunchConfig = default(KernelConfig);
+            Context["KernelName"] = KernelName;
+            Context["LaunchConfig"] = LaunchConfig.ToString()!;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the GpuKernelException class.
+        /// </summary>
         /// <param name="message">The message that describes the error.</param>
         /// <param name="kernelName">The name of the kernel that failed.</param>
         /// <param name="launchConfig">The kernel launch configuration.</param>
@@ -302,7 +347,7 @@ namespace ILGPU.Runtime
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
         [Obsolete("Binary serialization is obsolete and should not be used.")]
-        private GpuKernelException(SerializationInfo info, StreamingContext context)
+        protected GpuKernelException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             KernelName = info.GetString(nameof(KernelName)) ?? "Unknown";
@@ -388,7 +433,7 @@ namespace ILGPU.Runtime
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
         [Obsolete("Binary serialization is obsolete and should not be used.")]
-        private GpuDeviceException(SerializationInfo info, StreamingContext context)
+        protected GpuDeviceException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             NativeErrorCode = info.GetInt32(nameof(NativeErrorCode));

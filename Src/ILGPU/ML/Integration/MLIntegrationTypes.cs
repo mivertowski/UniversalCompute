@@ -77,14 +77,14 @@ namespace ILGPU.ML.Integration
     public class ModelMetadata
     {
         /// <summary>
-        /// Gets or sets the input shapes.
+        /// Gets the input shapes.
         /// </summary>
-        public Dictionary<string, int[]> InputShapes { get; set; } = [];
+        public Dictionary<string, int[]> InputShapes { get; } = [];
 
         /// <summary>
-        /// Gets or sets the output shapes.
+        /// Gets the output shapes.
         /// </summary>
-        public Dictionary<string, int[]> OutputShapes { get; set; } = [];
+        public Dictionary<string, int[]> OutputShapes { get; } = [];
 
         /// <summary>
         /// Gets or sets the model type.
@@ -166,7 +166,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization suggestions.
         /// </summary>
-        public List<string> OptimizationSuggestions { get; set; } = [];
+        public IList<string> OptimizationSuggestions { get; set; } = new List<string>();
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the individual device results.
         /// </summary>
-        public List<DeviceProfileResult> Results { get; set; } = [];
+        public IList<DeviceProfileResult> Results { get; set; } = new List<DeviceProfileResult>();
 
         /// <summary>
         /// Gets or sets the best device for the workload.
@@ -272,7 +272,7 @@ namespace ILGPU.ML.Integration
         [SetsRequiredMembers]
         public DeviceProfileResults(Dictionary<ComputeDevice, DeviceProfileResult> results)
         {
-            Results = [.. results.Values];
+            Results = new List<DeviceProfileResult>(results.Values);
             BestDevice = results.OrderByDescending(r => r.Value.MeasuredPerformanceGFLOPS).FirstOrDefault().Key.ToString();
             ProfilingDurationMs = 1000.0; // Placeholder
         }
@@ -353,7 +353,7 @@ namespace ILGPU.ML.Integration
             MemoryBandwidthUtilizationPercent = 75.0,
             ComputeEfficiency = 0.9,
             BottleneckAnalysis = "Memory bandwidth limited",
-            OptimizationSuggestions = ["Increase batch size", "Optimize memory access patterns"]
+            OptimizationSuggestions = new List<string> { "Increase batch size", "Optimize memory access patterns" }
         };
 
         /// <summary>
@@ -573,7 +573,7 @@ namespace ILGPU.ML.Integration
             {
                 OriginalModel = model,
                 OptimizationApplied = true,
-                OptimizationDetails = ["Graph fusion", "Memory layout optimization"],
+                OptimizationDetails = new List<string> { "Graph fusion", "Memory layout optimization" },
                 OptimizedGraph = model as ComputeGraph ?? new ComputeGraph()
             };
         }
@@ -638,7 +638,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization details.
         /// </summary>
-        public List<string> OptimizationDetails { get; set; } = [];
+        public IList<string> OptimizationDetails { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the optimized compute graph.
@@ -723,12 +723,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input names.
         /// </summary>
-        public List<string> InputNames { get; set; } = [];
+        public IList<string> InputNames { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the output names.
         /// </summary>
-        public List<string> OutputNames { get; set; } = [];
+        public IList<string> OutputNames { get; set; } = new List<string>();
 
         /// <summary>
         /// Initializes a new instance of the CompiledModel class.
@@ -741,7 +741,7 @@ namespace ILGPU.ML.Integration
         /// Initializes a new instance of the CompiledModel class.
         /// </summary>
         [SetsRequiredMembers]
-        public CompiledModel(string modelPath, ComputeGraph graph, List<string> inputNames, List<string> outputNames)
+        public CompiledModel(string modelPath, ComputeGraph graph, IList<string> inputNames, IList<string> outputNames)
         {
             ModelId = modelPath;
             ComputeGraph = graph;
@@ -786,7 +786,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the execution steps.
         /// </summary>
-        public List<ExecutionStep> Steps { get; set; } = [];
+        public IList<ExecutionStep> Steps { get; set; } = new List<ExecutionStep>();
 
         /// <summary>
         /// Gets or sets the estimated execution time.
@@ -809,7 +809,7 @@ namespace ILGPU.ML.Integration
         /// Initializes a new instance of the CompiledExecutionPlan class.
         /// </summary>
         [SetsRequiredMembers]
-        public CompiledExecutionPlan(ExecutionPlan executionPlan, Dictionary<ComputeNode, CompiledKernel> compiledKernels, List<string> inputNames, List<string> outputNames)
+        public CompiledExecutionPlan(ExecutionPlan executionPlan, Dictionary<ComputeNode, CompiledKernel> compiledKernels, IList<string> inputNames, IList<string> outputNames)
         {
             PlanId = Guid.NewGuid().ToString();
             OutputNames = outputNames;
@@ -861,7 +861,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets kernel parameters.
         /// </summary>
-        public List<KernelParameter> Parameters { get; set; } = [];
+        public IList<KernelParameter> Parameters { get; set; } = new List<KernelParameter>();
 
         /// <summary>
         /// Initializes a new instance of the CompiledKernel class.
@@ -1144,12 +1144,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input names.
         /// </summary>
-        public List<string> InputNames { get; set; } = [];
+        public IList<string> InputNames { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the output names.
         /// </summary>
-        public List<string> OutputNames { get; set; } = [];
+        public IList<string> OutputNames { get; set; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the model version.

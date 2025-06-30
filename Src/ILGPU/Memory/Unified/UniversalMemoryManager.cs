@@ -18,6 +18,7 @@
 using ILGPU.Runtime;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -67,7 +68,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets the available memory placements on the current platform.
         /// </summary>
-        public MemoryPlacementInfo[] AvailablePlacements => 
+        public IReadOnlyList<MemoryPlacementInfo> AvailablePlacements => 
             MemoryPlacementCapabilities.GetAvailablePlacements();
 
         /// <summary>
@@ -317,7 +318,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets additional optimization hints.
         /// </summary>
-        public string[] OptimizationHints { get; } = optimizationHints;
+        public IReadOnlyList<string> OptimizationHints { get; } = optimizationHints ?? Array.Empty<string>();
     }
 
 }

@@ -69,6 +69,8 @@ namespace ILGPU.Runtime.LINQ
         /// <typeparam name="TElement">The element type.</typeparam>
         /// <param name="expression">The expression tree.</param>
         /// <returns>A queryable representing the expression.</returns>
+        [RequiresDynamicCode("Creates instances of generic queryable types determined at runtime")]
+        [RequiresUnreferencedCode("Uses reflection to create queryable instances that may access trimmed members")]
         public IQueryable<TElement> CreateQuery<TElement>(Expression expression)
         {
             if (expression == null)
@@ -83,6 +85,8 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="expression">The expression tree.</param>
         /// <returns>The query result.</returns>
+        [RequiresDynamicCode("Executes expressions that may require dynamic code generation")]
+        [RequiresUnreferencedCode("Executes expressions that may access trimmed members through reflection")]
         public object Execute(Expression expression)
         {
             if (expression == null)
@@ -98,6 +102,8 @@ namespace ILGPU.Runtime.LINQ
         /// <typeparam name="TResult">The result type.</typeparam>
         /// <param name="expression">The expression tree.</param>
         /// <returns>The query result.</returns>
+        [RequiresDynamicCode("Executes expressions that may require dynamic code generation")]
+        [RequiresUnreferencedCode("Executes expressions that may access trimmed members through reflection")]
         public TResult Execute<TResult>(Expression expression)
         {
             if (expression == null)
