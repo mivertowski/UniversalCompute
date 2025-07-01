@@ -165,9 +165,9 @@ namespace ILGPU.ML.Integration
         public required string BottleneckAnalysis { get; set; }
 
         /// <summary>
-        /// Gets or sets optimization suggestions.
+        /// Gets optimization suggestions.
         /// </summary>
-        public Collection<string> OptimizationSuggestions { get; set; } = [];
+        public Collection<string> OptimizationSuggestions { get; } = [];
     }
 
     /// <summary>
@@ -634,9 +634,9 @@ namespace ILGPU.ML.Integration
         public bool OptimizationApplied { get; set; }
 
         /// <summary>
-        /// Gets or sets optimization details.
+        /// Gets optimization details.
         /// </summary>
-        public Collection<string> OptimizationDetails { get; set; } = [];
+        public Collection<string> OptimizationDetails { get; } = [];
 
         /// <summary>
         /// Gets or sets the optimized compute graph.
@@ -698,7 +698,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the compiled bytecode.
         /// </summary>
-        public required byte[] CompiledBytecode { get; set; }
+        public required IList<byte> CompiledBytecode { get; set; }
 
         /// <summary>
         /// Gets or sets the target device.
@@ -706,9 +706,9 @@ namespace ILGPU.ML.Integration
         public required string TargetDevice { get; set; }
 
         /// <summary>
-        /// Gets or sets compilation metadata.
+        /// Gets compilation metadata.
         /// </summary>
-        public Dictionary<string, object> Metadata { get; set; } = [];
+        public Dictionary<string, object> Metadata { get; } = [];
 
         /// <summary>
         /// Gets or sets the compute graph.
@@ -716,14 +716,14 @@ namespace ILGPU.ML.Integration
         public required ComputeGraph ComputeGraph { get; set; }
 
         /// <summary>
-        /// Gets or sets the input names.
+        /// Gets the input names.
         /// </summary>
-        public IList<string> InputNames { get; set; } = [];
+        public IList<string> InputNames { get; } = [];
 
         /// <summary>
-        /// Gets or sets the output names.
+        /// Gets the output names.
         /// </summary>
-        public IList<string> OutputNames { get; set; } = [];
+        public IList<string> OutputNames { get; } = [];
 
         /// <summary>
         /// Initializes a new instance of the CompiledModel class.
@@ -779,9 +779,9 @@ namespace ILGPU.ML.Integration
         public required string PlanId { get; set; }
 
         /// <summary>
-        /// Gets or sets the execution steps.
+        /// Gets the execution steps.
         /// </summary>
-        public IList<ExecutionStep> Steps { get; set; } = [];
+        public IList<ExecutionStep> Steps { get; } = [];
 
         /// <summary>
         /// Gets or sets the estimated execution time.
@@ -846,7 +846,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the compiled code.
         /// </summary>
-        public required byte[] CompiledCode { get; set; }
+        public required IList<byte> CompiledCode { get; set; }
 
         /// <summary>
         /// Gets or sets the entry point.
@@ -854,9 +854,9 @@ namespace ILGPU.ML.Integration
         public required string EntryPoint { get; set; }
 
         /// <summary>
-        /// Gets or sets kernel parameters.
+        /// Gets kernel parameters.
         /// </summary>
-        public IList<KernelParameter> Parameters { get; set; } = [];
+        public IList<KernelParameter> Parameters { get; } = [];
 
         /// <summary>
         /// Initializes a new instance of the CompiledKernel class.
@@ -909,14 +909,14 @@ namespace ILGPU.ML.Integration
     public class ModelProfilingResults
     {
         /// <summary>
-        /// Gets or sets the layer timings.
+        /// Gets the layer timings.
         /// </summary>
-        public Dictionary<string, double> LayerTimings { get; set; } = [];
+        public Dictionary<string, double> LayerTimings { get; } = [];
 
         /// <summary>
-        /// Gets or sets the memory usage per layer.
+        /// Gets the memory usage per layer.
         /// </summary>
-        public Dictionary<string, long> LayerMemoryUsage { get; set; } = [];
+        public Dictionary<string, long> LayerMemoryUsage { get; } = [];
 
         /// <summary>
         /// Gets or sets the total inference time.
@@ -1134,17 +1134,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the model bytes.
         /// </summary>
-        public required byte[] ModelBytes { get; set; }
+        public required IList<byte> ModelBytes { get; set; }
 
         /// <summary>
-        /// Gets or sets the input names.
+        /// Gets the input names.
         /// </summary>
-        public IList<string> InputNames { get; set; } = [];
+        public IList<string> InputNames { get; } = [];
 
         /// <summary>
-        /// Gets or sets the output names.
+        /// Gets the output names.
         /// </summary>
-        public IList<string> OutputNames { get; set; } = [];
+        public IList<string> OutputNames { get; } = [];
 
         /// <summary>
         /// Gets or sets the model version.

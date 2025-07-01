@@ -17,6 +17,7 @@
 
 using ILGPU.Backends;
 using ILGPU.Runtime.Vulkan.Native;
+using ILGPU.Util;
 using System;
 
 namespace ILGPU.Runtime.Vulkan
@@ -324,15 +325,15 @@ namespace ILGPU.Runtime.Vulkan
         protected internal override unsafe void CopyFrom(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
         {
             var sourcePtr = sourceView.LoadEffectiveAddress();
-            var targetPtr = nativePtr + targetView.Index;
-            Buffer.MemoryCopy(sourcePtr.ToPointer(), targetPtr.ToPointer(), LengthInBytes - targetView.Index, targetView.Length);
+            var targetPtr = (byte*)nativePtr + targetView.Index;
+            Buffer.MemoryCopy(sourcePtr.ToPointer(), targetPtr, LengthInBytes - targetView.Index, targetView.Length);
         }
 
         protected internal override unsafe void CopyTo(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
         {
-            var sourcePtr = nativePtr + sourceView.Index;
+            var sourcePtr = (byte*)nativePtr + sourceView.Index;
             var targetPtr = targetView.LoadEffectiveAddress();
-            Buffer.MemoryCopy(sourcePtr.ToPointer(), targetPtr.ToPointer(), targetView.Length, sourceView.Length);
+            Buffer.MemoryCopy(sourcePtr, targetPtr.ToPointer(), targetView.Length, sourceView.Length);
         }
 
         protected override void DisposeAcceleratorObject(bool disposing)

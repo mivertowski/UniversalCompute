@@ -245,7 +245,7 @@ namespace ILGPU.Numerics.Hybrid
         public bool SupportsHybridExecution { get; set; }
         public int MaxCpuCores { get; set; }
         public int MaxGpuDevices { get; set; }
-        public TensorPrecision[] SupportedPrecisions { get; set; }
+        public IList<TensorPrecision> SupportedPrecisions { get; set; }
         public long GpuMemoryBytes { get; set; }
         public long CpuMemoryBytes { get; set; }
     }

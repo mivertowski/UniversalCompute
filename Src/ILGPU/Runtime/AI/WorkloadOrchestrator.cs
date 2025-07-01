@@ -452,7 +452,7 @@ namespace ILGPU.Runtime.AI
         /// <summary>
         /// Gets the accelerators.
         /// </summary>
-        public List<Accelerator> Accelerators { get; } = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
+        public IReadOnlyList<Accelerator> Accelerators { get; } = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
 
         /// <summary>
         /// Gets the strategy type.

@@ -422,9 +422,9 @@ namespace ILGPU.Runtime.AMX.Native
                     config.colsb[0] = 32; // Tile A
                     config.colsb[1] = 32; // Tile B
                     config.colsb[2] = 64; // Tile C (FP32 output)
-                    config.rows[0] = Math.Min(16, (byte)m);
-                    config.rows[1] = Math.Min(16, (byte)k);
-                    config.rows[2] = Math.Min(16, (byte)m);
+                    config.rows[0] = Math.Min((byte)16, (byte)m);
+                    config.rows[1] = Math.Min((byte)16, (byte)k);
+                    config.rows[2] = Math.Min((byte)16, (byte)m);
                     break;
                     
                 case AMXDataType.INT8:
@@ -434,9 +434,9 @@ namespace ILGPU.Runtime.AMX.Native
                     config.colsb[0] = 16; // Tile A
                     config.colsb[1] = 16; // Tile B
                     config.colsb[2] = 64; // Tile C (INT32 output)
-                    config.rows[0] = Math.Min(16, (byte)m);
-                    config.rows[1] = Math.Min(16, (byte)k);
-                    config.rows[2] = Math.Min(16, (byte)m);
+                    config.rows[0] = Math.Min((byte)16, (byte)m);
+                    config.rows[1] = Math.Min((byte)16, (byte)k);
+                    config.rows[2] = Math.Min((byte)16, (byte)m);
                     break;
                     
                 default:
@@ -587,6 +587,7 @@ namespace ILGPU.Runtime.AMX.Native
     /// </summary>
     public class AMXException : Exception
     {
+        public AMXException() { }
         public AMXException(string message) : base(message) { }
         public AMXException(string message, Exception innerException) : base(message, innerException) { }
     }

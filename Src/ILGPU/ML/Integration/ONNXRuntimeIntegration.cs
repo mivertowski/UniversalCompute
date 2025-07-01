@@ -384,13 +384,22 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (_disposed)
                 return;
 
-            ClearModelCache();
-            _computeEngine?.Dispose();
-            _scheduler?.Dispose();
-            _modelOptimizer?.Dispose();
+            if (disposing)
+            {
+                ClearModelCache();
+                _computeEngine?.Dispose();
+                _scheduler?.Dispose();
+                _modelOptimizer?.Dispose();
+            }
 
             _disposed = true;
         }
@@ -483,7 +492,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets suggested optimizations.
         /// </summary>
-        public string[] SuggestedOptimizations { get; } = suggestedOptimizations;
+        public IReadOnlyList<string> SuggestedOptimizations { get; } = suggestedOptimizations;
     }
 
     /// <summary>

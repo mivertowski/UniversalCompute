@@ -93,15 +93,17 @@ namespace ILGPU.Runtime.OneAPI
                 SYCLDevice = device.NativeDevice;
 
                 // Create SYCL context
-                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out SYCLContext);
+                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out var context);
                 SYCLException.ThrowIfFailed(result);
+                SYCLContext = context;
 
                 // Create SYCL queue
                 result = SYCLNative.CreateQueue(
                     SYCLContext, 
                     SYCLDevice, 
                     SYCLQueueProperties.ProfilingEnable, 
-                    out SYCLQueue);
+                    out var queue);
+                SYCLQueue = queue;
                 SYCLException.ThrowIfFailed(result);
 
                 // Initialize device properties
@@ -139,7 +141,12 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
+        public MemoryInfo MemoryInfo => new MemoryInfo(
+            Device.MemorySize, 
+            Device.MemorySize, // Assume available = total for simple case
+            0, // Used memory
+            Device.MemorySize // Max allocation size
+        );
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
@@ -553,6 +560,7 @@ namespace ILGPU.Runtime.OneAPI
     /// </summary>
     public class SYCLException : AcceleratorException
     {
+        public SYCLException() { }
         public SYCLException(string message) : base(message) { }
         public SYCLException(string message, Exception innerException) : base(message, innerException) { }
 

@@ -542,9 +542,18 @@ namespace ILGPU.ML
         /// <inheritdoc/>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (!disposed)
             {
-                Buffer?.Dispose();
+                if (disposing)
+                {
+                    Buffer?.Dispose();
+                }
                 disposed = true;
             }
         }

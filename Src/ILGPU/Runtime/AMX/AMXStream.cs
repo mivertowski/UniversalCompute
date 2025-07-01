@@ -18,6 +18,7 @@
 using ILGPU.Backends;
 using ILGPU.Runtime.AMX.Native;
 using System;
+using System.Collections.Generic;
 using static ILGPU.Runtime.AMX.Native.AMXNative;
 
 namespace ILGPU.Runtime.AMX
@@ -369,7 +370,7 @@ namespace ILGPU.Runtime.AMX
     /// </summary>
     public class AMXCompiledKernel : CompiledKernel
     {
-        public byte[] NativeCode { get; }
+        public IReadOnlyList<byte> NativeCode { get; }
         public string FunctionName { get; }
 
         public AMXCompiledKernel(Context context, byte[] nativeCode, string functionName, KernelInfo info)

@@ -23,6 +23,49 @@ using System.Numerics;
 namespace ILGPU.TensorCores
 {
     /// <summary>
+    /// Parameters for batched GEMM operations.
+    /// </summary>
+    public readonly struct BatchedGemmParams
+    {
+        public readonly int M, N, K;
+        public readonly int LdA, StrideA;
+        public readonly int LdB, StrideB;
+        public readonly int LdC, StrideC;
+
+        public BatchedGemmParams(int m, int n, int k, int ldA, int strideA, int ldB, int strideB, int ldC, int strideC)
+        {
+            M = m; N = n; K = k;
+            LdA = ldA; StrideA = strideA;
+            LdB = ldB; StrideB = strideB;
+            LdC = ldC; StrideC = strideC;
+        }
+    }
+
+    /// <summary>
+    /// Parameters for convolution operations.
+    /// </summary>
+    public readonly struct ConvolutionParams
+    {
+        public readonly int InputN, InputC, InputH, InputW;
+        public readonly int FilterK, FilterC, FilterR, FilterS;
+        public readonly int StrideH, StrideW;
+        public readonly int PadH, PadW;
+        public readonly int OutputH, OutputW;
+
+        public ConvolutionParams(int inputN, int inputC, int inputH, int inputW,
+                               int filterK, int filterC, int filterR, int filterS,
+                               int strideH, int strideW, int padH, int padW,
+                               int outputH, int outputW)
+        {
+            InputN = inputN; InputC = inputC; InputH = inputH; InputW = inputW;
+            FilterK = filterK; FilterC = filterC; FilterR = filterR; FilterS = filterS;
+            StrideH = strideH; StrideW = strideW;
+            PadH = padH; PadW = padW;
+            OutputH = outputH; OutputW = outputW;
+        }
+    }
+
+    /// <summary>
     /// Provides high-level tensor operations using tensor cores.
     /// </summary>
     public static class TensorOperations
@@ -225,13 +268,12 @@ namespace ILGPU.TensorCores
             // For now, implement as sequential batch of regular GEMM operations
             // This can be optimized with true batched tensor core operations later
             
+            var gemmParams = new BatchedGemmParams(m, n, k, lda, strideA, ldb, strideB, ldc, strideC);
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                Index1D, int, int, int, int, T, ArrayView<T>, int, int, 
-                ArrayView<T>, int, int, T, ArrayView<T>, int, int, TensorConfig>(
+                Index1D, int, T, ArrayView<T>, ArrayView<T>, T, ArrayView<T>, BatchedGemmParams, TensorConfig>(
                 TensorBatchedGemmKernel);
 
-            kernel(stream, batchCount, batchCount, m, n, k, alpha, a, lda, strideA, 
-                   b, ldb, strideB, beta, c, ldc, strideC, cfg);
+            kernel(batchCount, alpha, a, b, beta, c, gemmParams, cfg);
         }
 
         /// <summary>
@@ -295,10 +337,12 @@ namespace ILGPU.TensorCores
             if (filterC != inputC)
                 throw new ArgumentException("Filter channels must match input channels");
             
+            var convParams = new ConvolutionParams(inputN, inputC, inputH, inputW,
+                                                  filterK, filterC, filterR, filterS,
+                                                  strideH, strideW, padH, padW,
+                                                  outputH, outputW);
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                Index3D, ArrayView<T>, ArrayView<T>, ArrayView<T>,
-                int, int, int, int, int, int, int, int,
-                int, int, int, int, int, int, int, int>(
+                Index3D, ArrayView<T>, ArrayView<T>, ArrayView<T>, ConvolutionParams, TensorConfig>(
                 TensorConvolutionKernel);
                 
             var gridDim = new Index3D(
@@ -306,10 +350,7 @@ namespace ILGPU.TensorCores
                 (outputW + cfg.TileSize - 1) / cfg.TileSize,
                 filterK);
                 
-            kernel(stream, gridDim, input, filter, output,
-                   inputN, inputC, inputH, inputW,
-                   filterK, filterC, filterR, filterS,
-                   outputH, outputW, strideH, strideW, padH, padW);
+            kernel(gridDim, input, filter, output, convParams, cfg);
         }
 
         /// <summary>
@@ -331,20 +372,12 @@ namespace ILGPU.TensorCores
         private static void TensorBatchedGemmKernel<T>(
             Index1D index,
             int batchCount,
-            int m,
-            int n,
-            int k,
             T alpha,
             ArrayView<T> a,
-            int lda,
-            int strideA,
             ArrayView<T> b,
-            int ldb,
-            int strideB,
             T beta,
             ArrayView<T> c,
-            int ldc,
-            int strideC,
+            BatchedGemmParams gemmParams,
             TensorConfig config)
             where T : unmanaged, INumber<T>
         {
@@ -352,22 +385,22 @@ namespace ILGPU.TensorCores
             if (batchIndex >= batchCount) return;
 
             // Calculate batch offsets
-            int aOffset = batchIndex * strideA;
-            int bOffset = batchIndex * strideB;
-            int cOffset = batchIndex * strideC;
+            int aOffset = batchIndex * gemmParams.StrideA;
+            int bOffset = batchIndex * gemmParams.StrideB;
+            int cOffset = batchIndex * gemmParams.StrideC;
 
             // For now, implement basic matrix multiplication
             // This would be replaced with actual tensor core operations
-            for (int i = 0; i < m; i++)
+            for (int i = 0; i < gemmParams.M; i++)
             {
-                for (int j = 0; j < n; j++)
+                for (int j = 0; j < gemmParams.N; j++)
                 {
                     T sum = T.Zero;
-                    for (int ki = 0; ki < k; ki++)
+                    for (int ki = 0; ki < gemmParams.K; ki++)
                     {
-                        sum += a[aOffset + i * lda + ki] * b[bOffset + ki * ldb + j];
+                        sum += a[aOffset + i * gemmParams.LdA + ki] * b[bOffset + ki * gemmParams.LdB + j];
                     }
-                    c[cOffset + i * ldc + j] = alpha * sum + beta * c[cOffset + i * ldc + j];
+                    c[cOffset + i * gemmParams.LdC + j] = alpha * sum + beta * c[cOffset + i * gemmParams.LdC + j];
                 }
             }
         }
@@ -380,40 +413,38 @@ namespace ILGPU.TensorCores
             ArrayView<T> input,
             ArrayView<T> filter,
             ArrayView<T> output,
-            int inputN, int inputC, int inputH, int inputW,
-            int filterK, int filterC, int filterR, int filterS,
-            int outputH, int outputW,
-            int strideH, int strideW, int padH, int padW)
+            ConvolutionParams convParams,
+            TensorConfig config)
             where T : unmanaged, INumber<T>
         {
             int oh = index.X;
             int ow = index.Y;
             int k = index.Z;
 
-            if (oh >= outputH || ow >= outputW || k >= filterK) return;
+            if (oh >= convParams.OutputH || ow >= convParams.OutputW || k >= convParams.FilterK) return;
 
             // Basic convolution implementation
             T sum = T.Zero;
-            for (int c = 0; c < inputC; c++)
+            for (int c = 0; c < convParams.InputC; c++)
             {
-                for (int r = 0; r < filterR; r++)
+                for (int r = 0; r < convParams.FilterR; r++)
                 {
-                    for (int s = 0; s < filterS; s++)
+                    for (int s = 0; s < convParams.FilterS; s++)
                     {
-                        int ih = oh * strideH + r - padH;
-                        int iw = ow * strideW + s - padW;
+                        int ih = oh * convParams.StrideH + r - convParams.PadH;
+                        int iw = ow * convParams.StrideW + s - convParams.PadW;
 
-                        if (ih >= 0 && ih < inputH && iw >= 0 && iw < inputW)
+                        if (ih >= 0 && ih < convParams.InputH && iw >= 0 && iw < convParams.InputW)
                         {
-                            int inputIdx = c * inputH * inputW + ih * inputW + iw;
-                            int filterIdx = k * filterC * filterR * filterS + c * filterR * filterS + r * filterS + s;
+                            int inputIdx = c * convParams.InputH * convParams.InputW + ih * convParams.InputW + iw;
+                            int filterIdx = k * convParams.FilterC * convParams.FilterR * convParams.FilterS + c * convParams.FilterR * convParams.FilterS + r * convParams.FilterS + s;
                             sum += input[inputIdx] * filter[filterIdx];
                         }
                     }
                 }
             }
 
-            int outputIdx = k * outputH * outputW + oh * outputW + ow;
+            int outputIdx = k * convParams.OutputH * convParams.OutputW + oh * convParams.OutputW + ow;
             output[outputIdx] = sum;
         }
     }
