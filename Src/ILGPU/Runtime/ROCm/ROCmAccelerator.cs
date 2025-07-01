@@ -15,6 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using ILGPU.Backends;
 using ILGPU.Backends.ROCm;
 using ILGPU.Resources;
@@ -180,6 +182,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Default kernel launcher for ROCm kernels.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void DefaultLauncher()
         {
             // Default launcher implementation

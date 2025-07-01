@@ -15,6 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using ILGPU.Backends;
 using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.AMX.Native;
@@ -207,9 +209,10 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Default kernel launcher for AMX kernels.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         private static void DefaultLauncher()
         {
-            // Default launcher implementation
+            // Default launcher implementation - this is a placeholder for future AMX kernel execution
             throw new NotImplementedException("AMX kernel launcher not implemented");
         }
 
