@@ -102,7 +102,6 @@ The samples are organized into categories based on complexity and feature areas.
 #### Specialized Applications
 - **Mandelbrot** - Interactive fractal visualization
 - **MatrixMultiply** - Optimized matrix multiplication
-- **BlazorSampleApp** - Web-based GPU computing with Blazor
 - **MonitorProgress** - Real-time kernel progress monitoring
 - **ProfilingMarkers** - Performance profiling integration
 
