@@ -226,27 +226,27 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the name of this accelerator.
         /// </summary>
-        public override string Name => Device.Name;
+        public string Name => Device.Name;
 
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
+        public MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
         /// </summary>
-        public override Index3D MaxGridSize => Device.MaxGridSize;
+        public Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size supported by this accelerator.
         /// </summary>
-        public override Index3D MaxGroupSize => Device.MaxGroupSize;
+        public Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.

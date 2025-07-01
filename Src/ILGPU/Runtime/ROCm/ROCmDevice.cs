@@ -25,7 +25,7 @@ namespace ILGPU.Runtime.ROCm
     /// <summary>
     /// Represents an AMD ROCm GPU device.
     /// </summary>
-    [DebuggerDisplay("ROCm Device {DeviceId}: {Name}")]
+    [DebuggerDisplay("ROCm Device {ROCmDeviceId}: {Name}")]
     public sealed class ROCmDevice : Device
     {
         #region Instance
@@ -38,7 +38,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public int DeviceId { get; }
+        public int ROCmDeviceId { get; }
 
         /// <summary>
         /// Gets the compute capability major version.
@@ -142,8 +142,22 @@ namespace ILGPU.Runtime.ROCm
 
         internal ROCmDevice(int deviceId, HipDeviceProperties properties)
         {
-            DeviceId = deviceId;
+            ROCmDeviceId = deviceId;
             Properties = properties;
+            
+            // Set Device base class properties
+            Name = Properties.Name ?? $"ROCm Device {ROCmDeviceId}";
+            MemorySize = (long)Properties.TotalGlobalMem;
+            MaxGridSize = new Index3D(Properties.MaxGridSize[0], Properties.MaxGridSize[1], Properties.MaxGridSize[2]);
+            MaxGroupSize = new Index3D(Properties.MaxThreadsDim[0], Properties.MaxThreadsDim[1], Properties.MaxThreadsDim[2]);
+            MaxNumThreadsPerGroup = Properties.MaxThreadsPerBlock;
+            MaxSharedMemoryPerGroup = Properties.SharedMemPerBlock;
+            MaxConstantMemory = Properties.TotalConstMem;
+            WarpSize = Properties.WarpSize;
+            NumMultiprocessors = Properties.MultiProcessorCount;
+            MaxNumThreadsPerMultiprocessor = Properties.MaxThreadsPerMultiProcessor;
+            
+            InitializeMemoryInfo();
         }
 
         #endregion
@@ -151,45 +165,28 @@ namespace ILGPU.Runtime.ROCm
         #region Properties
 
         /// <summary>
-        /// Gets the device name.
+        /// Gets the device ID.
         /// </summary>
-        public override string Name => Properties.Name ?? $"ROCm Device {DeviceId}";
+        public override DeviceId DeviceId => new DeviceId(ROCmDeviceId, AcceleratorType.ROCm);
 
-        /// <summary>
-        /// Gets the total device memory in bytes.
-        /// </summary>
-        public override long MemorySize => (long)Properties.TotalGlobalMem;
-
-        /// <summary>
-        /// Gets the accelerator type.
-        /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.ROCm;
-
-        /// <summary>
-        /// Gets the maximum grid size in each dimension.
-        /// </summary>
-        public Index3D MaxGridSize => new Index3D(
-            Properties.MaxGridSize[0],
-            Properties.MaxGridSize[1],
-            Properties.MaxGridSize[2]);
-
-        /// <summary>
-        /// Gets the maximum group size in each dimension.
-        /// </summary>
-        public Index3D MaxGroupSize => new Index3D(
-            Properties.MaxThreadsDim[0],
-            Properties.MaxThreadsDim[1],
-            Properties.MaxThreadsDim[2]);
-
-        /// <summary>
-        /// Gets the maximum number of threads per group.
-        /// </summary>
-        public int MaxNumThreadsPerGroup => Properties.MaxThreadsPerBlock;
 
         /// <summary>
         /// Gets the device vendor (AMD).
         /// </summary>
-        public override string Vendor => "AMD";
+        public string Vendor => "AMD";
+
+        /// <summary>
+        /// Creates an accelerator for this device.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <returns>The created accelerator.</returns>
+        public override Accelerator CreateAccelerator(Context context)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            return new ROCmAccelerator(context, this);
+        }
 
         #endregion
 
@@ -310,13 +307,13 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <returns>The string representation.</returns>
         public override string ToString() => 
-            $"ROCm Device {DeviceId}: {Name} ({Architecture}, {MemorySize / (1024 * 1024)} MB)";
+            $"ROCm Device {ROCmDeviceId}: {Name} ({Architecture}, {MemorySize / (1024 * 1024)} MB)";
 
         /// <summary>
         /// Returns the hash code of this device.
         /// </summary>
         /// <returns>The hash code.</returns>
-        public override int GetHashCode() => DeviceId.GetHashCode();
+        public override int GetHashCode() => ROCmDeviceId.GetHashCode();
 
         /// <summary>
         /// Checks for equality with another object.
@@ -324,7 +321,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="obj">The other object.</param>
         /// <returns>True if equal; otherwise, false.</returns>
         public override bool Equals(object? obj) =>
-            obj is ROCmDevice other && DeviceId == other.DeviceId;
+            obj is ROCmDevice other && ROCmDeviceId == other.ROCmDeviceId;
 
         #endregion
     }

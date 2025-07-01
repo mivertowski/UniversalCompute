@@ -19,7 +19,9 @@ using ILGPU.Runtime.AMX.Native;
 using ILGPU.Util;
 using System;
 using System.Diagnostics;
+#if WINDOWS
 using System.Management;
+#endif
 
 namespace ILGPU.Runtime.AMX
 {
@@ -110,17 +112,17 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public override string Name => $"Intel AMX ({ProcessorName})";
+        public string Name => $"Intel AMX ({ProcessorName})";
 
         /// <summary>
         /// Gets the total device memory in bytes (system RAM).
         /// </summary>
-        public override long MemorySize => GetSystemMemorySize();
+        public long MemorySize => GetSystemMemorySize();
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
+        public AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -165,7 +167,20 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the device vendor.
         /// </summary>
-        public override string Vendor => "Intel";
+        public string Vendor => "Intel";
+
+        /// <summary>
+        /// Gets the device ID.
+        /// </summary>
+        public override DeviceId DeviceId => new DeviceId(0, AcceleratorType.CPU);
+
+        /// <summary>
+        /// Creates an accelerator for this device.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <returns>The created accelerator.</returns>
+        public override Accelerator CreateAccelerator(Context context) =>
+            new IntelAMXAccelerator(context, this);
 
         #endregion
 

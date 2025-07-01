@@ -16,12 +16,14 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.Backends.ROCm;
 using ILGPU.Resources;
 using ILGPU.Runtime.ROCm.Native;
 using ILGPU.Util;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ILGPU.Runtime.ROCm
@@ -109,55 +111,6 @@ namespace ILGPU.Runtime.ROCm
 
         #region Properties
 
-        /// <summary>
-        /// Gets the accelerator type.
-        /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.ROCm;
-
-        /// <summary>
-        /// Gets the name of this accelerator.
-        /// </summary>
-        public override string Name => Device.Name;
-
-        /// <summary>
-        /// Gets the memory information of this accelerator.
-        /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
-
-        /// <summary>
-        /// Gets the maximum grid size supported by this accelerator.
-        /// </summary>
-        public override Index3D MaxGridSize => Device.MaxGridSize;
-
-        /// <summary>
-        /// Gets the maximum group size supported by this accelerator.
-        /// </summary>
-        public override Index3D MaxGroupSize => Device.MaxGroupSize;
-
-        /// <summary>
-        /// Gets the maximum number of threads per group.
-        /// </summary>
-        public override int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
-
-        /// <summary>
-        /// Gets the maximum shared memory per group in bytes.
-        /// </summary>
-        public override long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
-
-        /// <summary>
-        /// Gets the maximum constant memory in bytes.
-        /// </summary>
-        public override long MaxConstantMemory => Device.MaxConstantMemory;
-
-        /// <summary>
-        /// Gets the warp size (wavefront size on AMD).
-        /// </summary>
-        public override int WarpSize => Device.WarpSize;
-
-        /// <summary>
-        /// Gets the number of multiprocessors (compute units).
-        /// </summary>
-        public override int NumMultiprocessors => Device.MultiprocessorCount;
 
         #endregion
 
@@ -191,15 +144,47 @@ namespace ILGPU.Runtime.ROCm
         #region Kernel Management
 
         /// <summary>
-        /// Loads the given kernel.
+        /// Creates a kernel from the given compiled kernel.
         /// </summary>
-        /// <param name="kernel">The kernel to load.</param>
+        /// <param name="compiledKernel">The compiled kernel.</param>
+        /// <returns>The created kernel.</returns>
+        protected override ROCmKernel CreateKernel(ROCmCompiledKernel compiledKernel) =>
+            new ROCmKernel(this, compiledKernel, MaxNumThreadsPerGroup);
+
+        /// <summary>
+        /// Creates a kernel from the given compiled kernel with launcher.
+        /// </summary>
+        /// <param name="compiledKernel">The compiled kernel.</param>
+        /// <param name="launcher">The kernel launcher method.</param>
+        /// <returns>The created kernel.</returns>
+        protected override ROCmKernel CreateKernel(ROCmCompiledKernel compiledKernel, MethodInfo launcher) =>
+            new ROCmKernel(this, compiledKernel, MaxNumThreadsPerGroup);
+
+        /// <summary>
+        /// Generates a kernel launcher method.
+        /// </summary>
+        /// <param name="kernel">The compiled kernel.</param>
         /// <param name="customGroupSize">The custom group size.</param>
-        /// <returns>The loaded kernel.</returns>
-        protected override ROCmKernel LoadKernelInternal(
+        /// <returns>The launcher method.</returns>
+        protected override MethodInfo GenerateKernelLauncherMethod(
             ROCmCompiledKernel kernel,
-            int customGroupSize) =>
-            new ROCmKernel(this, kernel, customGroupSize);
+            int customGroupSize)
+        {
+            // For ROCm accelerator, use default launcher generation
+            // In a real implementation, this would generate optimized ROCm-specific launchers
+            return typeof(ROCmAccelerator).GetMethod(nameof(DefaultLauncher), 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                ?? throw new InvalidOperationException("Default launcher method not found");
+        }
+
+        /// <summary>
+        /// Default kernel launcher for ROCm kernels.
+        /// </summary>
+        private static void DefaultLauncher()
+        {
+            // Default launcher implementation
+            throw new NotImplementedException("ROCm kernel launcher not implemented");
+        }
 
         #endregion
 
@@ -330,6 +315,28 @@ namespace ILGPU.Runtime.ROCm
                 _ => dynamicSharedMemorySizeInBytes,
                 maxGroupSize,
                 out minGridSize);
+        }
+
+        #endregion
+
+        #region Binding
+
+        /// <summary>
+        /// Called when the accelerator is bound to the current thread.
+        /// </summary>
+        protected override void OnBind()
+        {
+            // ROCm-specific binding logic
+            // In a real implementation, this would set the current HIP device context
+        }
+
+        /// <summary>
+        /// Called when the accelerator is unbound from the current thread.
+        /// </summary>
+        protected override void OnUnbind()
+        {
+            // ROCm-specific unbinding logic
+            // In a real implementation, this would clear the current HIP device context
         }
 
         #endregion

@@ -15,7 +15,9 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Backends.EntryPoints;
 using ILGPU.IR;
+using ILGPU.Runtime;
 using ILGPU.Runtime.ROCm;
 using ILGPU.Util;
 using System;
@@ -67,10 +69,12 @@ namespace ILGPU.Backends.ROCm
         /// Compiles the given entry point into a ROCm kernel.
         /// </summary>
         /// <param name="entryPoint">The entry point.</param>
+        /// <param name="backendContext">The backend context.</param>
         /// <param name="specialization">The kernel specialization.</param>
         /// <returns>The compiled kernel.</returns>
-        public override CompiledKernel Compile(
+        protected override CompiledKernel Compile(
             EntryPoint entryPoint,
+            in BackendContext backendContext,
             in KernelSpecialization specialization)
         {
             // For now, create a placeholder compiled kernel
@@ -90,9 +94,9 @@ namespace ILGPU.Backends.ROCm
 
             return new Runtime.ROCm.ROCmCompiledKernel(
                 Context,
-                placeholderBinary,
-                entryPoint.Name,
-                kernelInfo);
+                entryPoint,
+                kernelInfo,
+                placeholderBinary);
         }
 
         #endregion
@@ -102,7 +106,7 @@ namespace ILGPU.Backends.ROCm
         /// <summary>
         /// Gets the backend type.
         /// </summary>
-        public override string Name => "ROCm";
+        public string Name => "ROCm";
 
         #endregion
     }

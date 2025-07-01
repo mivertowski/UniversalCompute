@@ -117,12 +117,12 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the name of this accelerator.
         /// </summary>
-        public override string Name => Device.Name;
+        public string Name => Device.Name;
 
         /// <summary>
         /// Gets the memory information of this accelerator.
@@ -387,9 +387,9 @@ namespace ILGPU.Runtime.OneAPI
         public unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
-            SYCLStream? stream = null)
+            OneAPIStream? stream = null)
         {
-            var queueHandle = stream?.SYCLQueue ?? SYCLQueue;
+            var queueHandle = stream?.NativeQueue ?? SYCLQueue;
             
             try
             {
@@ -419,7 +419,7 @@ namespace ILGPU.Runtime.OneAPI
         public async Task ExecuteAIInferenceAsync(
             IntPtr input, IntPtr output, 
             byte[] modelData,
-            SYCLStream? stream = null)
+            OneAPIStream? stream = null)
         {
             await Task.Run(() =>
             {

@@ -719,8 +719,6 @@ namespace ILGPU.Intel.NPU.Native
                 output[i] = value[i];
         }
 
-        #endregion
-
         #region OpenVINO Implementation Methods
 
         /// <summary>
@@ -795,20 +793,37 @@ namespace ILGPU.Intel.NPU.Native
 
         #region OpenVINO Native Bindings (Placeholder)
 
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
+#if WINDOWS
+        [DllImport("openvino", EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr CreateInferenceRequest();
 
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("openvino", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl)]
         private static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
 
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("openvino", EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
         private static extern void ExecuteInference(IntPtr request);
 
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("openvino", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl)]
         private static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
 
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("openvino", EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]
         private static extern void ReleaseInferenceRequest(IntPtr request);
+#else
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr CreateInferenceRequest();
+
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
+
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void ExecuteInference(IntPtr request);
+
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
+
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void ReleaseInferenceRequest(IntPtr request);
+#endif
 
         private static void SetConvolutionParameters(IntPtr request, int strideH, int strideW, int padH, int padW)
         {

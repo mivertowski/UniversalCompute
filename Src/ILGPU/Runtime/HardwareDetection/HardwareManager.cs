@@ -15,8 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Apple.NeuralEngine;
 using ILGPU.Runtime.AMX;
-using ILGPU.Runtime.Apple;
 using ILGPU.Runtime.Cuda;
 using ILGPU.Runtime.OpenCL;
 using ILGPU.Runtime.OneAPI;

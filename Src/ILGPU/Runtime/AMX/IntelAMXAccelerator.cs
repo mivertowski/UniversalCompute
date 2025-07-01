@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.AMX.Native;
 using ILGPU.Util;
 using System;
@@ -27,7 +28,7 @@ namespace ILGPU.Runtime.AMX
     /// <summary>
     /// Intel AMX (Advanced Matrix Extensions) accelerator for AI workload acceleration.
     /// </summary>
-    public sealed class IntelAMXAccelerator : Accelerator
+    public sealed class IntelAMXAccelerator : KernelAccelerator<AMXCompiledKernel, AMXKernel>
     {
         #region Instance
 
@@ -101,52 +102,58 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
+        public AcceleratorType AcceleratorType => AcceleratorType.CPU;
 
         /// <summary>
-        /// Gets the name of this accelerator.
+        /// Gets the accelerator name.
         /// </summary>
-        public override string Name => Device.Name;
+        public string Name => $"Intel AMX ({Device.ProcessorName})";
 
         /// <summary>
-        /// Gets the memory information of this accelerator.
+        /// Gets the memory size in bytes.
         /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
+        public long MemorySize => Device.MemorySize;
 
         /// <summary>
-        /// Gets the maximum grid size supported by this accelerator.
+        /// Gets the maximum grid size.
         /// </summary>
-        public override Index3D MaxGridSize => Device.MaxGridSize;
+        public Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
-        /// Gets the maximum group size supported by this accelerator.
+        /// Gets the maximum group size.
         /// </summary>
-        public override Index3D MaxGroupSize => Device.MaxGroupSize;
+        public Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
-        /// Gets the maximum number of threads per group.
+        /// Gets the warp size.
         /// </summary>
-        public override int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public int WarpSize => 1; // AMX operates on single thread
 
         /// <summary>
-        /// Gets the maximum shared memory per group in bytes.
+        /// Gets the number of multiprocessors.
         /// </summary>
-        public override long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public int NumMultiprocessors => Device.NumCores;
+
+        #endregion
+
+        #region Abstract Method Implementations
 
         /// <summary>
-        /// Gets the maximum constant memory in bytes.
+        /// Called when the accelerator is bound to the current thread.
         /// </summary>
-        public override long MaxConstantMemory => Device.MaxConstantMemory;
+        protected override void OnBind()
+        {
+            // AMX-specific binding logic if needed
+        }
 
         /// <summary>
-        /// Gets the warp size (effectively 1 for AMX since it's CPU-based).
+        /// Called when the accelerator is unbound from the current thread.
         /// </summary>
-        public override int WarpSize => 1;
+        protected override void OnUnbind()
+        {
+            // AMX-specific unbinding logic if needed
+        }
 
-        /// <summary>
-        /// Gets the number of multiprocessors (CPU cores with AMX support).
-        /// </summary>
-        public override int NumMultiprocessors => Device.NumCores;
 
         #endregion
 
@@ -340,7 +347,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="n">Columns in B and C.</param>
         /// <param name="dataType">Data type for computation.</param>
         /// <param name="stream">AMX stream.</param>
-        public unsafe void ExecuteMatMul(
+        internal unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             AMXDataType dataType,
@@ -410,7 +417,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="outputSize">Output feature size.</param>
         /// <param name="dataType">Data type for computation.</param>
         /// <param name="stream">AMX stream.</param>
-        public async Task ExecuteAIInferenceAsync(
+        internal async Task ExecuteAIInferenceAsync(
             IntPtr input, IntPtr weights, IntPtr output,
             int batchSize, int inputSize, int outputSize,
             AMXDataType dataType,

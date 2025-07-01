@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.ROCm.Native;
 using ILGPU.Util;
 using System;
@@ -41,28 +42,20 @@ namespace ILGPU.Runtime.ROCm
         /// Initializes a new ROCm compiled kernel.
         /// </summary>
         /// <param name="context">The context.</param>
-        /// <param name="kernelBinary">The kernel binary.</param>
-        /// <param name="entryPointName">The entry point name.</param>
+        /// <param name="entryPoint">The entry point.</param>
         /// <param name="info">The kernel info.</param>
-        public ROCmCompiledKernel(
+        /// <param name="kernelBinary">The kernel binary.</param>
+        internal ROCmCompiledKernel(
             Context context,
-            byte[] kernelBinary,
-            string entryPointName,
-            KernelInfo info)
-            : base(context, info, null)
+            EntryPoint entryPoint,
+            KernelInfo? info,
+            byte[] kernelBinary)
+            : base(context, entryPoint, info)
         {
             KernelBinary = kernelBinary ?? throw new ArgumentNullException(nameof(kernelBinary));
-            EntryPointName = entryPointName ?? throw new ArgumentNullException(nameof(entryPointName));
+            EntryPointName = entryPoint.Name ?? throw new ArgumentNullException(nameof(entryPoint));
         }
 
-        /// <summary>
-        /// Disposes this compiled kernel.
-        /// </summary>
-        /// <param name="disposing">True if disposing.</param>
-        protected override void DisposeAcceleratorObject(bool disposing)
-        {
-            // No resources to dispose for compiled kernels
-        }
     }
 
     /// <summary>

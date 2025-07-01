@@ -15,8 +15,10 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Backends;
 using ILGPU.Runtime.AMX.Native;
 using System;
+using static ILGPU.Runtime.AMX.Native.AMXNative;
 
 namespace ILGPU.Runtime.AMX
 {
@@ -77,7 +79,7 @@ namespace ILGPU.Runtime.AMX
         /// Configures AMX tiles for matrix operations.
         /// </summary>
         /// <param name="config">Tile configuration.</param>
-        public void ConfigureTiles(AMXTileConfig config)
+        internal void ConfigureTiles(AMXTileConfig config)
         {
             try
             {
@@ -126,7 +128,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="k">Columns in A, rows in B.</param>
         /// <param name="n">Columns in B and C.</param>
         /// <param name="dataType">Data type for computation.</param>
-        public unsafe void ExecuteMatMul(
+        internal unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             AMXDataType dataType)

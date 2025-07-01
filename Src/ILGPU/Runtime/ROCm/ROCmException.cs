@@ -51,7 +51,7 @@ namespace ILGPU.Runtime.ROCm
         /// Constructs a new ROCm exception.
         /// </summary>
         /// <param name="errorCode">The ROCm error code.</param>
-        public ROCmException(HipError errorCode)
+        internal ROCmException(HipError errorCode)
             : base(GetErrorString(errorCode))
         {
             ErrorCode = errorCode;
@@ -71,7 +71,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="message">The error message.</param>
         /// <param name="errorCode">The ROCm error code.</param>
-        public ROCmException(string message, HipError errorCode)
+        internal ROCmException(string message, HipError errorCode)
             : base(message)
         {
             ErrorCode = errorCode;
@@ -106,7 +106,12 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Returns the associated ROCm error code.
         /// </summary>
-        public HipError ErrorCode { get; }
+        internal HipError ErrorCode { get; }
+
+        /// <summary>
+        /// Gets the accelerator type.
+        /// </summary>
+        public override AcceleratorType AcceleratorType => AcceleratorType.ROCm;
 
         #endregion
 
@@ -127,7 +132,7 @@ namespace ILGPU.Runtime.ROCm
         /// Throws a ROCm exception if the given error code represents an error.
         /// </summary>
         /// <param name="errorCode">The error code to check.</param>
-        public static void ThrowIfFailed(HipError errorCode)
+        internal static void ThrowIfFailed(HipError errorCode)
         {
             if (errorCode != HipError.Success)
                 throw new ROCmException(errorCode);
@@ -138,7 +143,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="errorCode">The error code to check.</param>
         /// <returns>True if the operation was successful.</returns>
-        public static bool VerifyResult(HipError errorCode)
+        internal static bool VerifyResult(HipError errorCode)
         {
             if (errorCode == HipError.Success)
                 return true;
@@ -151,7 +156,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="errorCode">The error code.</param>
         /// <returns>The error string.</returns>
-        public static string GetErrorString(HipError errorCode)
+        internal static string GetErrorString(HipError errorCode)
         {
             return errorCode switch
             {
