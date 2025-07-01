@@ -39,7 +39,7 @@ namespace ILGPU.Backends.ROCm
         /// <summary>
         /// The ROCm capabilities.
         /// </summary>
-        public ROCmCapabilities Capabilities { get; }
+        public new ROCmCapabilities Capabilities { get; }
 
         /// <summary>
         /// Initializes a new ROCm backend.

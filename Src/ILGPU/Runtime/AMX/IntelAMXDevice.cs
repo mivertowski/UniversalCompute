@@ -122,12 +122,12 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
+        public new AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public Index3D MaxGridSize
+        public new Index3D MaxGridSize
         {
             get
             {
@@ -140,7 +140,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public Index3D MaxGroupSize
+        public new Index3D MaxGroupSize
         {
             get
             {
@@ -152,17 +152,17 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public int MaxNumThreadsPerGroup => MaxTileSize * MaxTileSize;
+        public new int MaxNumThreadsPerGroup => MaxTileSize * MaxTileSize;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public long MaxSharedMemoryPerGroup => CacheSize / NumCores; // L3 cache per core
+        public new long MaxSharedMemoryPerGroup => CacheSize / NumCores; // L3 cache per core
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public long MaxConstantMemory => CacheSize; // Use cache as constant memory
+        public new long MaxConstantMemory => CacheSize; // Use cache as constant memory
 
         /// <summary>
         /// Gets the device vendor.

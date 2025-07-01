@@ -174,7 +174,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public int NumMultiprocessors => Device.NumMultiprocessors;
+        public new int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 
