@@ -61,6 +61,11 @@ namespace ILGPU.Core
         public long ElementCount { get; }
 
         /// <summary>
+        /// Gets the total number of elements in this tensor (alias for ElementCount).
+        /// </summary>
+        public long TotalElements => ElementCount;
+
+        /// <summary>
         /// Gets the dimension at the specified index.
         /// </summary>
         /// <param name="index">The dimension index.</param>

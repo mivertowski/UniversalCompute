@@ -112,12 +112,12 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public string Name => $"Intel AMX ({ProcessorName})";
+        public new string Name => $"Intel AMX ({ProcessorName})";
 
         /// <summary>
         /// Gets the total device memory in bytes (system RAM).
         /// </summary>
-        public long MemorySize => GetSystemMemorySize();
+        public new long MemorySize => GetSystemMemorySize();
 
         /// <summary>
         /// Gets the accelerator type.
