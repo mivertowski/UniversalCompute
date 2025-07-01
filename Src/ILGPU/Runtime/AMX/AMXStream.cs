@@ -373,13 +373,11 @@ namespace ILGPU.Runtime.AMX
         public string FunctionName { get; }
 
         public AMXCompiledKernel(Context context, byte[] nativeCode, string functionName, KernelInfo info)
-            : base(context, info, null)
+            : base(context, entryPoint: null, info)
         {
             NativeCode = nativeCode ?? throw new ArgumentNullException(nameof(nativeCode));
             FunctionName = functionName ?? throw new ArgumentNullException(nameof(functionName));
         }
-
-        protected override void DisposeAcceleratorObject(bool disposing) { }
     }
 
     /// <summary>

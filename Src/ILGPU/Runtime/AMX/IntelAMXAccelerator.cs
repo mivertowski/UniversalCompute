@@ -21,6 +21,7 @@ using ILGPU.Runtime.AMX.Native;
 using ILGPU.Util;
 using System;
 using System.Collections.Immutable;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace ILGPU.Runtime.AMX
@@ -187,38 +188,38 @@ namespace ILGPU.Runtime.AMX
         #region Kernel Management
 
         /// <summary>
-        /// Loads the given kernel.
+        /// Generates a kernel launcher method for the given compiled kernel.
         /// </summary>
-        /// <param name="kernel">The kernel to load.</param>
-        /// <returns>The loaded kernel.</returns>
-        protected override Kernel LoadKernelInternal(CompiledKernel kernel) =>
-            new AMXKernel(this, kernel as AMXCompiledKernel ?? 
-                throw new ArgumentException("Invalid kernel type"));
-
-        /// <summary>
-        /// Loads an auto-grouped kernel.
-        /// </summary>
-        protected override Kernel LoadAutoGroupedKernelInternal(
-            CompiledKernel kernel,
-            out KernelInfo? kernelInfo)
+        /// <param name="kernel">The compiled kernel.</param>
+        /// <param name="customGroupSize">The custom group size.</param>
+        /// <returns>The kernel launcher method.</returns>
+        protected override MethodInfo GenerateKernelLauncherMethod(
+            AMXCompiledKernel kernel,
+            int customGroupSize)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), 
-                ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
-            return LoadKernelInternal(kernel);
+            // For AMX accelerator, use default launcher generation
+            // In a real implementation, this would generate optimized AMX-specific launchers
+            return typeof(IntelAMXAccelerator).GetMethod(nameof(DefaultLauncher), 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                ?? throw new InvalidOperationException("Default launcher method not found");
         }
 
         /// <summary>
-        /// Loads an implicitly grouped kernel.
+        /// Default kernel launcher for AMX kernels.
         /// </summary>
-        protected override Kernel LoadImplicitlyGroupedKernelInternal(
-            CompiledKernel kernel,
-            int customGroupSize,
-            out KernelInfo? kernelInfo)
+        private static void DefaultLauncher()
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), 
-                ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
-            return LoadKernelInternal(kernel);
+            // Default launcher implementation
+            throw new NotImplementedException("AMX kernel launcher not implemented");
         }
+
+        /// <summary>
+        /// Creates a kernel from the given compiled kernel.
+        /// </summary>
+        /// <param name="compiledKernel">The compiled kernel.</param>
+        /// <returns>The created kernel.</returns>
+        protected override AMXKernel CreateKernel(AMXCompiledKernel compiledKernel) =>
+            new AMXKernel(this, compiledKernel);
 
         #endregion
 
