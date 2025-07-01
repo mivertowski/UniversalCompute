@@ -52,11 +52,6 @@ namespace ILGPU.Runtime.OneAPI
         internal IntPtr SYCLDevice { get; private set; }
 
         /// <summary>
-        /// The native SYCL context handle.
-        /// </summary>
-        internal IntPtr SYCLContext { get; private set; }
-
-        /// <summary>
         /// Gets the device handle for stream creation.
         /// </summary>
         internal IntPtr DeviceHandle => SYCLDevice;
@@ -142,42 +137,42 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public override MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
+        public MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
         /// </summary>
-        public override Index3D MaxGridSize => Device.MaxGridSize;
+        public Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size supported by this accelerator.
         /// </summary>
-        public override Index3D MaxGroupSize => Device.MaxGroupSize;
+        public Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public override int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public override long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public override long MaxConstantMemory => Device.MaxConstantMemory;
+        public long MaxConstantMemory => Device.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
         /// </summary>
-        public override int WarpSize => Device.WarpSize;
+        public int WarpSize => Device.WarpSize;
 
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public override int NumMultiprocessors => Device.NumMultiprocessors;
+        public int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 
@@ -259,6 +254,26 @@ namespace ILGPU.Runtime.OneAPI
         {
             if (DefaultStream is OneAPIStream stream)
                 stream.Synchronize();
+        }
+
+        #endregion
+
+        #region Abstract Method Implementations
+
+        /// <summary>
+        /// Called when the accelerator is bound to the current thread.
+        /// </summary>
+        protected override void OnBind()
+        {
+            // OneAPI-specific binding logic if needed
+        }
+
+        /// <summary>
+        /// Called when the accelerator is unbound from the current thread.
+        /// </summary>
+        protected override void OnUnbind()
+        {
+            // OneAPI-specific unbinding logic if needed
         }
 
         #endregion
@@ -539,7 +554,12 @@ namespace ILGPU.Runtime.OneAPI
         public SYCLException(string message) : base(message) { }
         public SYCLException(string message, Exception innerException) : base(message, innerException) { }
 
-        public static void ThrowIfFailed(SYCLResult result)
+        /// <summary>
+        /// Gets the accelerator type.
+        /// </summary>
+        public override AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+
+        internal static void ThrowIfFailed(SYCLResult result)
         {
             if (result != SYCLResult.Success)
                 throw new SYCLException($"SYCL operation failed with result: {result}");

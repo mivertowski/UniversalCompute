@@ -757,7 +757,7 @@ namespace ILGPU.Runtime.OneAPI.Native
     /// <summary>
     /// Intel GPU architecture enumeration.
     /// </summary>
-    internal enum IntelGPUArchitecture
+    public enum IntelGPUArchitecture
     {
         Unknown = 0,
         Gen9 = 9,       // Intel HD Graphics (Skylake)

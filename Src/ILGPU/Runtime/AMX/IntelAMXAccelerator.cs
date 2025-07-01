@@ -221,6 +221,15 @@ namespace ILGPU.Runtime.AMX
         protected override AMXKernel CreateKernel(AMXCompiledKernel compiledKernel) =>
             new AMXKernel(this, compiledKernel);
 
+        /// <summary>
+        /// Creates a kernel from the given compiled kernel with launcher method.
+        /// </summary>
+        /// <param name="compiledKernel">The compiled kernel.</param>
+        /// <param name="launcher">The launcher method.</param>
+        /// <returns>The created kernel.</returns>
+        protected override AMXKernel CreateKernel(AMXCompiledKernel compiledKernel, MethodInfo launcher) =>
+            new AMXKernel(this, compiledKernel);
+
         #endregion
 
         #region Stream Management

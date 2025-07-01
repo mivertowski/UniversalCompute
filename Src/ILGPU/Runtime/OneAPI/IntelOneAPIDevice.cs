@@ -113,17 +113,17 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public override string Name => DeviceInfo.Name ?? $"Intel GPU Device";
+        public string Name => DeviceInfo.Name ?? $"Intel GPU Device";
 
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public override long MemorySize => (long)DeviceInfo.GlobalMemSize;
+        public long MemorySize => (long)DeviceInfo.GlobalMemSize;
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -200,7 +200,20 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device vendor.
         /// </summary>
-        public override string Vendor => "Intel";
+        public string Vendor => "Intel";
+
+        /// <summary>
+        /// Gets the device ID.
+        /// </summary>
+        public override DeviceId DeviceId => new DeviceId(DeviceIndex, AcceleratorType.OneAPI);
+
+        /// <summary>
+        /// Creates an accelerator for this device.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <returns>The created accelerator.</returns>
+        public override Accelerator CreateAccelerator(Context context) =>
+            new IntelOneAPIAccelerator(context, this);
 
         #endregion
 
