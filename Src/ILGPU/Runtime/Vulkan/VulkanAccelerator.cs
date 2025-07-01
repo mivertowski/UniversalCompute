@@ -228,7 +228,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public new AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the name of this accelerator.
@@ -263,17 +263,17 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public long MaxConstantMemory => Device.MaxConstantMemory;
+        public new long MaxConstantMemory => Device.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Vulkan).
         /// </summary>
-        public int WarpSize => Device.WarpSize;
+        public new int WarpSize => Device.WarpSize;
 
         /// <summary>
         /// Gets the number of multiprocessors (shader engines).
         /// </summary>
-        public int NumMultiprocessors => Device.NumMultiprocessors;
+        public new int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 

@@ -151,12 +151,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public long MaxConstantMemory => 64 * 1024; // 64KB typical
+        public new long MaxConstantMemory => 64 * 1024; // 64KB typical
 
         /// <summary>
         /// Gets the warp/subgroup size.
         /// </summary>
-        public int WarpSize
+        public new int WarpSize
         {
             get
             {
@@ -174,7 +174,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the number of multiprocessors/compute units.
         /// </summary>
-        public int NumMultiprocessors
+        public new int NumMultiprocessors
         {
             get
             {
