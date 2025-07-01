@@ -190,12 +190,12 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
         /// </summary>
-        public int WarpSize => SubgroupSize > 0 ? SubgroupSize : GetDefaultSubgroupSize();
+        public new int WarpSize => SubgroupSize > 0 ? SubgroupSize : GetDefaultSubgroupSize();
 
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public int NumMultiprocessors => ComputeUnits;
+        public new int NumMultiprocessors => ComputeUnits;
 
         /// <summary>
         /// Gets the device vendor.

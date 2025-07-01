@@ -35,7 +35,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// The associated Vulkan device.
         /// </summary>
-        public VulkanDevice Device { get; }
+        public new VulkanDevice Device { get; }
 
         /// <summary>
         /// The native Vulkan instance handle.
@@ -60,7 +60,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
-        public bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
+        public new bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
 
         /// <summary>
         /// Initializes a new Vulkan accelerator.
@@ -228,12 +228,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public override AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the name of this accelerator.
         /// </summary>
-        public string Name => Device.Name;
+        public new string Name => Device.Name;
 
         /// <summary>
         /// Gets the memory information of this accelerator.
@@ -243,22 +243,22 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
         /// </summary>
-        public Index3D MaxGridSize => Device.MaxGridSize;
+        public new Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size supported by this accelerator.
         /// </summary>
-        public Index3D MaxGroupSize => Device.MaxGroupSize;
+        public new Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public new int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public new long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
