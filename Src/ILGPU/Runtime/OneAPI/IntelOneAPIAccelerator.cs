@@ -52,6 +52,21 @@ namespace ILGPU.Runtime.OneAPI
         internal IntPtr SYCLDevice { get; private set; }
 
         /// <summary>
+        /// The native SYCL context handle.
+        /// </summary>
+        internal IntPtr SYCLContext { get; private set; }
+
+        /// <summary>
+        /// Gets the device handle for stream creation.
+        /// </summary>
+        internal IntPtr DeviceHandle => SYCLDevice;
+
+        /// <summary>
+        /// Gets the context handle for stream creation.
+        /// </summary>
+        internal IntPtr ContextHandle => SYCLContext;
+
+        /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
         public bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
@@ -231,18 +246,18 @@ namespace ILGPU.Runtime.OneAPI
         #region Stream Management
 
         /// <summary>
-        /// Creates a new SYCL stream.
+        /// Creates a new OneAPI stream.
         /// </summary>
         /// <returns>The created stream.</returns>
         protected override AcceleratorStream CreateStreamInternal() =>
-            new SYCLStream(this);
+            new OneAPIStream(this);
 
         /// <summary>
         /// Synchronizes all pending operations.
         /// </summary>
         protected override void SynchronizeInternal()
         {
-            if (DefaultStream is SYCLStream stream)
+            if (DefaultStream is OneAPIStream stream)
                 stream.Synchronize();
         }
 
