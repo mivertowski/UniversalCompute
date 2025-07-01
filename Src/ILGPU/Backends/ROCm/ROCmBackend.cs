@@ -17,6 +17,7 @@
 
 using ILGPU.Backends.EntryPoints;
 using ILGPU.IR;
+using ILGPU.IR.Analyses;
 using ILGPU.Runtime;
 using ILGPU.Runtime.ROCm;
 using ILGPU.Util;
@@ -53,9 +54,9 @@ namespace ILGPU.Backends.ROCm
             ROCmCapabilities capabilities)
             : base(
                 context,
+                capabilities, // Use ROCm capabilities
                 BackendType.OpenCL, // Use OpenCL as base for now
-                BackendFlags.None,
-                new ArgumentMapper(context))
+                ArgumentMapper.CreateDefault(context, capabilities))
         {
             InstructionSet = instructionSet;
             Capabilities = capabilities;
@@ -84,10 +85,8 @@ namespace ILGPU.Backends.ROCm
             // 3. Return the compiled binary
 
             var kernelInfo = new KernelInfo(
-                localMemorySize: 0,
-                sharedMemorySize: 0,
-                allocaKindInformation: new AllocaKindInformation(),
-                functions: System.Collections.Immutable.ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+                new AllocaKindInformation(),
+                System.Collections.Immutable.ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
 
             // Generate a placeholder binary (in real implementation, this would be actual HIP code)
             var placeholderBinary = new byte[] { 0x48, 0x49, 0x50, 0x00 }; // "HIP\0"

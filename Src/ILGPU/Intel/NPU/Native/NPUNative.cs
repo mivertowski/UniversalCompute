@@ -570,8 +570,8 @@ namespace ILGPU.Intel.NPU.Native
                 throw new ArgumentException("Invalid parameters for NPU float inference");
             
             // Basic inference fallback: identity operation
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
                 output[i] = input[i];
@@ -592,8 +592,8 @@ namespace ILGPU.Intel.NPU.Native
                 throw new ArgumentException("Invalid parameters for NPU BF16 inference");
             
             // Basic BF16 inference fallback: identity operation
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
                 output[i] = input[i];
@@ -614,8 +614,8 @@ namespace ILGPU.Intel.NPU.Native
                 throw new ArgumentException("Invalid parameters for NPU Int8 inference");
             
             // Basic Int8 inference fallback: identity operation
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
                 output[i] = input[i];
@@ -636,12 +636,12 @@ namespace ILGPU.Intel.NPU.Native
                 throw new ArgumentException("Invalid parameters for NPU convolution");
             
             // Basic convolution fallback: simplified operation
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             // Simple identity with bias from weights
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
-                output[i] = input[i] + (i < weightsShape.TotalElements ? weights[i % weightsShape.TotalElements] * 0.1f : 0.0f);
+                output[i] = input[i] + (i < weightsShape.ElementCount ? weights[i % weightsShape.ElementCount] * 0.1f : 0.0f);
         }
 
         /// <summary>
@@ -713,8 +713,8 @@ namespace ILGPU.Intel.NPU.Native
                 throw new ArgumentException("Invalid parameters for NPU attention");
             
             // Basic attention fallback: copy value (simplified attention with weights = 1)
-            var querySize = queryShape.TotalElements;
-            var valueSize = valueShape.TotalElements;
+            var querySize = queryShape.ElementCount;
+            var valueSize = valueShape.ElementCount;
             
             for (int i = 0; i < Math.Min(querySize, valueSize); i++)
                 output[i] = value[i];

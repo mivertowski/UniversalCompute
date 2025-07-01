@@ -18,6 +18,7 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using ILGPU.Backends;
+using ILGPU.IR.Analyses;
 using ILGPU.Runtime.Vulkan.Native;
 using ILGPU.Util;
 using System;

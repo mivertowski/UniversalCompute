@@ -331,7 +331,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
                 // Execute inference using Core ML
                 ANENative.ExecuteCoreMLInference(
                     input, result,
-                    inputShape.TotalElements, outputShape.TotalElements,
+                    inputShape.ElementCount, outputShape.ElementCount,
                     modelHandle, context);
             }
             finally
@@ -348,8 +348,8 @@ namespace ILGPU.Apple.NeuralEngine.Native
             TensorShape inputShape, TensorShape outputShape)
         {
             // Simple CPU convolution fallback
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             // Basic identity operation with scaling
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
@@ -414,7 +414,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
             // Use Core ML matrix multiplication primitive
             ANENative.ExecuteMatMul(
                 input, result,
-                inputShape.TotalElements, outputShape.TotalElements,
+                inputShape.ElementCount, outputShape.ElementCount,
                 context);
         }
 
@@ -426,8 +426,8 @@ namespace ILGPU.Apple.NeuralEngine.Native
             TensorShape inputShape, TensorShape outputShape)
         {
             // Basic matrix multiplication fallback on CPU
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             // Simple identity operation as basic fallback
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
@@ -473,7 +473,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
             // Use Core ML attention primitive
             ANENative.ExecuteAttention(
                 input, result,
-                inputShape.TotalElements, outputShape.TotalElements,
+                inputShape.ElementCount, outputShape.ElementCount,
                 context);
         }
 
@@ -485,8 +485,8 @@ namespace ILGPU.Apple.NeuralEngine.Native
             TensorShape inputShape, TensorShape outputShape)
         {
             // Basic attention mechanism fallback
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             // Simple attention simulation: weighted copy
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
@@ -507,8 +507,8 @@ namespace ILGPU.Apple.NeuralEngine.Native
                 throw new ArgumentException("Invalid parameters for ANE Core ML inference");
             
             // Basic inference fallback
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
             
             // Identity copy as simple fallback
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
@@ -557,7 +557,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
             // Use Core ML convolution with bias primitive
             ANENative.ExecuteConvolutionWithBias(
                 input, weights, bias, result,
-                inputShape.TotalElements, weightsShape.TotalElements, outputShape.TotalElements,
+                inputShape.ElementCount, weightsShape.ElementCount, outputShape.ElementCount,
                 context);
         }
 
@@ -569,9 +569,9 @@ namespace ILGPU.Apple.NeuralEngine.Native
             TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape)
         {
             // Basic convolution with bias fallback
-            var inputSize = inputShape.TotalElements;
-            var outputSize = outputShape.TotalElements;
-            var biasSize = weightsShape.TotalElements;
+            var inputSize = inputShape.ElementCount;
+            var outputSize = outputShape.ElementCount;
+            var biasSize = weightsShape.ElementCount;
             
             // Simple fallback: input convolution simulation + bias
             for (int i = 0; i < Math.Min(inputSize, outputSize); i++)
@@ -624,7 +624,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
             // Use Core ML multi-head attention primitive
             ANENative.ExecuteMultiHeadAttention(
                 query, key, value, result,
-                queryShape.TotalElements, keyShape.TotalElements, valueShape.TotalElements,
+                queryShape.ElementCount, keyShape.ElementCount, valueShape.ElementCount,
                 context);
         }
 
@@ -636,8 +636,8 @@ namespace ILGPU.Apple.NeuralEngine.Native
             TensorShape queryShape, TensorShape keyShape, TensorShape valueShape)
         {
             // Basic multi-head attention fallback (simplified)
-            var querySize = queryShape.TotalElements;
-            var valueSize = valueShape.TotalElements;
+            var querySize = queryShape.ElementCount;
+            var valueSize = valueShape.ElementCount;
             var outputSize = Math.Min(querySize, valueSize);
             
             // Simple attention simulation: weighted average of value with query influence

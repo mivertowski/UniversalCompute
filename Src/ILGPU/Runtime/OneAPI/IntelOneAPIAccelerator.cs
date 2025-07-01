@@ -18,6 +18,7 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using ILGPU.Backends;
+using ILGPU.IR.Analyses;
 using ILGPU.Runtime.OneAPI.Native;
 using ILGPU.Util;
 using System;
@@ -195,7 +196,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <returns>The allocated memory buffer.</returns>
         protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
         {
-            return new SYCLMemoryBuffer(this, length, elementSize);
+            return new OneAPIMemoryBuffer(this, length, elementSize);
         }
 
         /// <summary>
@@ -208,7 +209,7 @@ namespace ILGPU.Runtime.OneAPI
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(
             IntPtr pinned,
             long numElements) =>
-            new SYCLPageLockScope<T>(this, pinned, numElements);
+            new OneAPIPageLockScope<T>(this, pinned, numElements);
 
         #endregion
 
@@ -220,7 +221,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <param name="kernel">The kernel to load.</param>
         /// <returns>The loaded kernel.</returns>
         protected override Kernel LoadKernelInternal(CompiledKernel kernel) =>
-            new SYCLKernel(this, kernel as SYCLCompiledKernel ?? throw new ArgumentException("Invalid kernel type"));
+            new OneAPIKernel(this, kernel as OneAPICompiledKernel ?? throw new ArgumentException("Invalid kernel type"));
 
         /// <summary>
         /// Loads an auto-grouped kernel.
