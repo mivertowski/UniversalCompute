@@ -258,7 +258,7 @@ namespace ILGPU.Runtime
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
         [Obsolete("Binary serialization is obsolete and should not be used.")]
-        protected GpuMemoryException(SerializationInfo info, StreamingContext context)
+        private GpuMemoryException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             RequestedSize = info.GetInt64(nameof(RequestedSize));
@@ -347,7 +347,7 @@ namespace ILGPU.Runtime
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
         [Obsolete("Binary serialization is obsolete and should not be used.")]
-        protected GpuKernelException(SerializationInfo info, StreamingContext context)
+        private GpuKernelException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             KernelName = info.GetString(nameof(KernelName)) ?? "Unknown";
@@ -433,7 +433,7 @@ namespace ILGPU.Runtime
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
         [Obsolete("Binary serialization is obsolete and should not be used.")]
-        protected GpuDeviceException(SerializationInfo info, StreamingContext context)
+        private GpuDeviceException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             NativeErrorCode = info.GetInt32(nameof(NativeErrorCode));

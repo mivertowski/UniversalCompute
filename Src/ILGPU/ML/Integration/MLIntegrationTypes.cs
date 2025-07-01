@@ -166,7 +166,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization suggestions.
         /// </summary>
-        public IList<string> OptimizationSuggestions { get; set; } = new List<string>();
+        public IList<string> OptimizationSuggestions { get; } = new List<string>();
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the individual device results.
         /// </summary>
-        public IList<DeviceProfileResult> Results { get; set; } = new List<DeviceProfileResult>();
+        public IList<DeviceProfileResult> Results { get; } = new List<DeviceProfileResult>();
 
         /// <summary>
         /// Gets or sets the best device for the workload.
@@ -506,7 +506,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets custom compilation flags.
         /// </summary>
-        public Dictionary<string, object> CustomFlags { get; set; } = [];
+        public Dictionary<string, object> CustomFlags { get; } = [];
     }
 
     /// <summary>
@@ -638,7 +638,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization details.
         /// </summary>
-        public IList<string> OptimizationDetails { get; set; } = new List<string>();
+        public IList<string> OptimizationDetails { get; } = new List<string>();
 
         /// <summary>
         /// Gets or sets the optimized compute graph.
@@ -687,7 +687,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets suggested optimizations.
         /// </summary>
-        public string[] SuggestedOptimizations { get; set; } = ["Graph fusion", "Memory optimization"];
+        public IReadOnlyList<string> SuggestedOptimizations { get; } = ["Graph fusion", "Memory optimization"];
     }
 
     /// <summary>
