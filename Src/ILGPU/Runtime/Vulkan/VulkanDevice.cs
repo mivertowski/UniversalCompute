@@ -104,12 +104,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public override string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
+        public string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
 
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public override long MemorySize
+        public long MemorySize
         {
             get
             {
@@ -126,7 +126,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public override AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -202,7 +202,20 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device vendor.
         /// </summary>
-        public override string Vendor => GetVendorName();
+        public string Vendor => GetVendorName();
+
+        /// <summary>
+        /// Gets the device ID.
+        /// </summary>
+        public override DeviceId DeviceId => new DeviceId(DeviceID, AcceleratorType.Vulkan);
+
+        /// <summary>
+        /// Creates an accelerator for this device.
+        /// </summary>
+        /// <param name="context">The ILGPU context.</param>
+        /// <returns>The created accelerator.</returns>
+        public override Accelerator CreateAccelerator(Context context) =>
+            new VulkanAccelerator(context, this);
 
         #endregion
 

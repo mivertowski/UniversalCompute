@@ -15,6 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Backends;
 using ILGPU.Runtime.Vulkan.Native;
 using System;
 
@@ -391,8 +392,6 @@ namespace ILGPU.Runtime.Vulkan
             SPIRVBinary = spirvBinary ?? throw new ArgumentNullException(nameof(spirvBinary));
             EntryPointName = entryPointName ?? throw new ArgumentNullException(nameof(entryPointName));
         }
-
-        protected override void DisposeAcceleratorObject(bool disposing) { }
     }
 
     /// <summary>

@@ -251,27 +251,27 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public override int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public override long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public override long MaxConstantMemory => Device.MaxConstantMemory;
+        public long MaxConstantMemory => Device.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Vulkan).
         /// </summary>
-        public override int WarpSize => Device.WarpSize;
+        public int WarpSize => Device.WarpSize;
 
         /// <summary>
         /// Gets the number of multiprocessors (shader engines).
         /// </summary>
-        public override int NumMultiprocessors => Device.NumMultiprocessors;
+        public int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 
@@ -554,6 +554,26 @@ namespace ILGPU.Runtime.Vulkan
         }
 
         #endregion
+
+        #region Abstract Method Implementations
+
+        /// <summary>
+        /// Called when the accelerator is bound to the current thread.
+        /// </summary>
+        protected override void OnBind()
+        {
+            // Vulkan-specific binding logic if needed
+        }
+
+        /// <summary>
+        /// Called when the accelerator is unbound from the current thread.
+        /// </summary>
+        protected override void OnUnbind()
+        {
+            // Vulkan-specific unbinding logic if needed
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -564,7 +584,12 @@ namespace ILGPU.Runtime.Vulkan
         public VulkanException(string message) : base(message) { }
         public VulkanException(string message, Exception innerException) : base(message, innerException) { }
 
-        public static void ThrowIfFailed(VkResult result)
+        /// <summary>
+        /// Gets the accelerator type.
+        /// </summary>
+        public override AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+
+        internal static void ThrowIfFailed(VkResult result)
         {
             if (result != VkResult.VK_SUCCESS)
                 throw new VulkanException($"Vulkan operation failed with result: {result}");

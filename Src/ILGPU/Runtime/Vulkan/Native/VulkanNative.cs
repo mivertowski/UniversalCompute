@@ -851,7 +851,7 @@ namespace ILGPU.Runtime.Vulkan.Native
     }
 
     // Additional supporting structures (simplified)
-    internal enum VkPhysicalDeviceType : int
+    public enum VkPhysicalDeviceType : int
     {
         VK_PHYSICAL_DEVICE_TYPE_OTHER = 0,
         VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU = 1,
