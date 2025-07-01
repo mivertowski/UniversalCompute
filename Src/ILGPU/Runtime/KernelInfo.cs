@@ -66,9 +66,9 @@ namespace ILGPU.Runtime
                   minGroupSize,
                   minGridSize,
                   new AllocaKindInformation(
-                      ImmutableArray<AllocaInformation>.Empty,
+                      [],
                       0),
-                  ImmutableArray<CompiledKernel.FunctionInfo>.Empty)
+                  [])
         { }
 
         #endregion

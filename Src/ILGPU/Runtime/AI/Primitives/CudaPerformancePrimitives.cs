@@ -33,7 +33,7 @@ namespace ILGPU.Runtime.AI
     {
         protected override PerformancePrimitiveCapabilities InitializeCapabilities() =>
             // Query CUDA device capabilities
-            new PerformancePrimitiveCapabilities
+            new()
             {
                 SupportsAcceleratedGemm = true,
                 SupportsAcceleratedConvolution = true,
@@ -193,7 +193,7 @@ namespace ILGPU.Runtime.AI
     /// </summary>
     public sealed class OpenCLPerformancePrimitives(Accelerator accelerator) : PerformancePrimitivesBase(accelerator)
     {
-        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new PerformancePrimitiveCapabilities
+        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new()
         {
             SupportsAcceleratedGemm = true,
             SupportsAcceleratedConvolution = true,
@@ -231,7 +231,7 @@ namespace ILGPU.Runtime.AI
     /// </summary>
     public sealed class CPUPerformancePrimitives(Accelerator accelerator) : PerformancePrimitivesBase(accelerator)
     {
-        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new PerformancePrimitiveCapabilities
+        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new()
         {
             SupportsAcceleratedGemm = true,
             SupportsAcceleratedConvolution = false,

@@ -52,10 +52,10 @@ namespace ILGPU.Frontend.DebugInformation
         internal AssemblyDebugInformation(Assembly assembly)
         {
             Assembly = assembly;
-            Modules = ImmutableArray<Module>.Empty;
+            Modules = [];
 
             readerProvider =
-                MetadataReaderProvider.FromPortablePdbImage(ImmutableArray<byte>.Empty);
+                MetadataReaderProvider.FromPortablePdbImage([]);
             MetadataReader = readerProvider.GetMetadataReader();
         }
 
@@ -134,6 +134,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// <param name="method">The resolved method (or null).</param>
         /// <returns>True, if the given token could be resolved.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [RequiresUnreferencedCode("")]
         public bool TryResolveMethod(
             int metadataToken,
             [NotNullWhen(true)] out MethodBase? method)

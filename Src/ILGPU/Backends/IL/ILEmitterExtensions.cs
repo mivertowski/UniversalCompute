@@ -247,7 +247,7 @@ namespace ILGPU.Backends.IL
                 GetHashCodeInfo.Name,
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 typeof(int),
-                Array.Empty<Type>());
+                []);
 
             var emitter = new ILEmitter(getHashCode.GetILGenerator());
             var result = emitter.DeclareLocal(typeof(int));

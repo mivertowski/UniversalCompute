@@ -293,9 +293,9 @@ namespace ILGPU.IR.Types
                 this,
                 type,
                 0,
-                ImmutableArray<FieldInfo>.Empty,
-                ImmutableArray<int>.Empty,
-                ImmutableArray<Type>.Empty,
+                [],
+                [],
+                [],
                 1,
                 isBlittable,
                 isValidKernelParameter);

@@ -271,7 +271,7 @@ public class PlatformIntrinsicsBenchmarks
     }
 
     [Benchmark]
-    public void PlatformDetectionOverhead()
+    public static void PlatformDetectionOverhead()
     {
         // Measure the overhead of platform detection
         for (int i = 0; i < 1000; i++)

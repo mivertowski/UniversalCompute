@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,18 +24,13 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Represents tensor shape for Intel NPU operations.
     /// </summary>
-    public readonly struct TensorShape
+    public readonly struct TensorShape(params int[] dimensions)
     {
-        private readonly int[] _dimensions;
-
-        public TensorShape(params int[] dimensions)
-        {
-            _dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
-        }
+        private readonly int[] _dimensions = dimensions ?? throw new ArgumentNullException(nameof(dimensions));
 
         public int this[int index] => _dimensions[index];
         public int Rank => _dimensions.Length;
-        public IReadOnlyList<int> Dimensions => _dimensions;
+        public int[] Dimensions => (int[])_dimensions.Clone();
     }
 
     /// <summary>
@@ -94,16 +88,10 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Neural network definition.
     /// </summary>
-    public class NeuralNetwork
+    public class NeuralNetwork(string name, NeuralOperation[]? operations = null)
     {
-        public string Name { get; }
-        public IReadOnlyList<NeuralOperation> Operations { get; }
-
-        public NeuralNetwork(string name, NeuralOperation[]? operations = null)
-        {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Operations = operations != null ? Array.AsReadOnly(operations) : Array.Empty<NeuralOperation>();
-        }
+        public string Name { get; } = name ?? throw new ArgumentNullException(nameof(name));
+        public NeuralOperation[] Operations { get; } = operations ?? [];
     }
 
     /// <summary>
@@ -135,8 +123,6 @@ namespace ILGPU.Intel.NPU
         public (int Height, int Width) KernelSize { get; set; }
         public (int Height, int Width) Stride { get; set; } = (1, 1);
         public (int Height, int Width) Padding { get; set; } = (0, 0);
-        public int Groups { get; set; } = 1;
-        public int OutputChannels { get; set; }
     }
 
     /// <summary>
@@ -172,92 +158,6 @@ namespace ILGPU.Intel.NPU
         public bool UseSparsity { get; set; }
     }
 
-    /// <summary>
-    /// Represents a convolution operation.
-    /// </summary>
-    public sealed class ConvolutionOperation : NeuralOperation
-    {
-        public override string Name => "Convolution";
-        public override NeuralOperationType Type => NeuralOperationType.Convolution;
-        public override TensorShape InputShape { get; }
 
-        public ConvolutionParameters Parameters { get; }
 
-        public ConvolutionOperation(TensorShape inputShape, ConvolutionParameters parameters)
-        {
-            InputShape = inputShape;
-            Parameters = parameters;
-        }
-
-        public override TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
-            // Simplified calculation for demonstration - assumes default weights shape
-            var outputHeight = (inputShape[2] + 2 * Parameters.Padding.Height - Parameters.KernelSize.Height) / Parameters.Stride.Height + 1;
-            var outputWidth = (inputShape[3] + 2 * Parameters.Padding.Width - Parameters.KernelSize.Width) / Parameters.Stride.Width + 1;
-            // Use the same number of output channels as input for demonstration
-            return new TensorShape(inputShape[0], inputShape[1], outputHeight, outputWidth);
-        }
-
-        /// <summary>
-        /// Calculates the output shape for the given input and weights shapes.
-        /// </summary>
-        /// <param name="inputShape">The input tensor shape.</param>
-        /// <param name="weightsShape">The weights tensor shape.</param>
-        /// <returns>The output tensor shape.</returns>
-        public TensorShape CalculateOutputShape(TensorShape inputShape, TensorShape weightsShape)
-        {
-            // Convolution with specific weights shape
-            var outputHeight = (inputShape[2] + 2 * Parameters.Padding.Height - Parameters.KernelSize.Height) / Parameters.Stride.Height + 1;
-            var outputWidth = (inputShape[3] + 2 * Parameters.Padding.Width - Parameters.KernelSize.Width) / Parameters.Stride.Width + 1;
-            return new TensorShape(inputShape[0], weightsShape[0], outputHeight, outputWidth);
-        }
-    }
-
-    /// <summary>
-    /// Represents a matrix multiplication operation.
-    /// </summary>
-    public sealed class MatMulOperation : NeuralOperation
-    {
-        public override string Name => "MatMul";
-        public override NeuralOperationType Type => NeuralOperationType.MatMul;
-        public override TensorShape InputShape { get; }
-
-        public MatMulConfiguration Configuration { get; }
-
-        public MatMulOperation(TensorShape inputShape, MatMulConfiguration configuration)
-        {
-            InputShape = inputShape;
-            Configuration = configuration;
-        }
-
-        public override TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
-            // Simplified calculation for demonstration
-            return new TensorShape(inputShape[0], Configuration.N);
-        }
-    }
-
-    /// <summary>
-    /// Represents an attention operation.
-    /// </summary>
-    public sealed class AttentionOperation : NeuralOperation
-    {
-        public override string Name => "Attention";
-        public override NeuralOperationType Type => NeuralOperationType.Attention;
-        public override TensorShape InputShape { get; }
-
-        public AttentionParameters Parameters { get; }
-
-        public AttentionOperation(TensorShape inputShape, AttentionParameters parameters)
-        {
-            InputShape = inputShape;
-            Parameters = parameters;
-        }
-
-        public override TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
-            // Attention typically preserves sequence length
-            return inputShape;
-        }
-    }
 }

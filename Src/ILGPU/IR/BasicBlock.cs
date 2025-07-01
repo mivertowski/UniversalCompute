@@ -336,7 +336,7 @@ namespace ILGPU.IR
         /// </summary>
         public ReadOnlySpan<BasicBlock> CurrentSuccessors =>
             Terminator is null
-            ? ReadOnlySpan<BasicBlock>.Empty
+            ? []
             : Terminator.Targets;
 
         /// <summary>

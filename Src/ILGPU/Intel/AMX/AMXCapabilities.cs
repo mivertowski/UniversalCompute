@@ -105,7 +105,7 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         /// <param name="dataType">The data type.</param>
         /// <returns>Estimated GOPS performance.</returns>
-        public double GetEstimatedPerformance(AMXDataType dataType) =>
+        public static double GetEstimatedPerformance(AMXDataType dataType) =>
             // Rough estimates based on Sapphire Rapids specifications
             dataType switch
             {
@@ -198,7 +198,7 @@ namespace ILGPU.Intel.AMX
             }
         }
 
-        private static AMXCapabilities MapFromNative(AMXNativeCapabilities native) => new AMXCapabilities(
+        private static AMXCapabilities MapFromNative(AMXNativeCapabilities native) => new(
                 native.IsSupported != 0,
                 native.MaxTiles,
                 native.MaxTileRows,
@@ -277,7 +277,7 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         /// <param name="capabilities">The AMX capabilities.</param>
         /// <returns>A default tile configuration.</returns>
-        public static AMXTileConfiguration CreateDefault(AMXCapabilities capabilities) => new AMXTileConfiguration
+        public static AMXTileConfiguration CreateDefault(AMXCapabilities capabilities) => new()
         {
             DataType = capabilities.SupportsBF16 ? AMXDataType.BFloat16 : AMXDataType.Float32,
             TileRows = capabilities.MaxTileRows,
@@ -291,7 +291,7 @@ namespace ILGPU.Intel.AMX
         /// <param name="dataType">The data type.</param>
         /// <param name="capabilities">The AMX capabilities.</param>
         /// <returns>An optimized tile configuration.</returns>
-        public static AMXTileConfiguration CreateForDataType(AMXDataType dataType, AMXCapabilities capabilities) => new AMXTileConfiguration
+        public static AMXTileConfiguration CreateForDataType(AMXDataType dataType, AMXCapabilities capabilities) => new()
         {
             DataType = dataType,
             TileRows = capabilities.MaxTileRows,
@@ -310,7 +310,7 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         /// <param name="dataType">The new data type.</param>
         /// <returns>A new tile configuration.</returns>
-        public AMXTileConfiguration WithDataType(AMXDataType dataType) => new AMXTileConfiguration
+        public AMXTileConfiguration WithDataType(AMXDataType dataType) => new()
         {
             DataType = dataType,
             TileRows = TileRows,

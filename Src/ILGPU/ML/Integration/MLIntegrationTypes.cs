@@ -20,6 +20,7 @@ using ILGPU.Runtime;
 using ILGPU.Runtime.Scheduling;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -166,7 +167,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization suggestions.
         /// </summary>
-        public IList<string> OptimizationSuggestions { get; } = new List<string>();
+        public Collection<string> OptimizationSuggestions { get; set; } = [];
     }
 
     /// <summary>
@@ -247,7 +248,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the individual device results.
         /// </summary>
-        public IList<DeviceProfileResult> Results { get; } = new List<DeviceProfileResult>();
+        public IList<DeviceProfileResult> Results { get; } = [];
 
         /// <summary>
         /// Gets or sets the best device for the workload.
@@ -272,7 +273,7 @@ namespace ILGPU.ML.Integration
         [SetsRequiredMembers]
         public DeviceProfileResults(Dictionary<ComputeDevice, DeviceProfileResult> results)
         {
-            Results = new List<DeviceProfileResult>(results.Values);
+            Results = [.. results.Values];
             BestDevice = results.OrderByDescending(r => r.Value.MeasuredPerformanceGFLOPS).FirstOrDefault().Key.ToString();
             ProfilingDurationMs = 1000.0; // Placeholder
         }
@@ -346,48 +347,48 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets performance statistics for all accelerators.
         /// </summary>
-        public PerformanceAnalysis GetPerformanceStats() => new PerformanceAnalysis
+        public static PerformanceAnalysis GetPerformanceStats() => new()
         {
             TotalExecutionTimeMs = 1000.0,
             GpuUtilizationPercent = 85.0,
             MemoryBandwidthUtilizationPercent = 75.0,
             ComputeEfficiency = 0.9,
             BottleneckAnalysis = "Memory bandwidth limited",
-            OptimizationSuggestions = new List<string> { "Increase batch size", "Optimize memory access patterns" }
+            OptimizationSuggestions = ["Increase batch size", "Optimize memory access patterns"]
         };
 
         /// <summary>
         /// Executes a computation with ML model.
         /// </summary>
-        public async Task<TOutput> ExecuteAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput input)
+        public static async Task<TOutput> ExecuteAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput input)
             where TInput : class
             where TOutput : class => await model.PredictAsync(input).ConfigureAwait(false);
 
         /// <summary>
         /// Executes batch computation with ML model.
         /// </summary>
-        public async Task<TOutput[]> ExecuteBatchAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput[] inputs)
+        public static async Task<TOutput[]> ExecuteBatchAsync<TInput, TOutput>(IMLModel<TInput, TOutput> model, TInput[] inputs)
             where TInput : class
             where TOutput : class => await model.PredictBatchAsync(inputs).ConfigureAwait(false);
 
         /// <summary>
         /// Optimizes scheduling for better performance.
         /// </summary>
-        public async Task OptimizeSchedulingAsync() =>
+        public static async Task OptimizeSchedulingAsync() =>
             // Placeholder implementation
             await Task.CompletedTask.ConfigureAwait(false);
 
         /// <summary>
         /// Optimizes memory usage across accelerators.
         /// </summary>
-        public async Task OptimizeMemoryAsync() =>
+        public static async Task OptimizeMemoryAsync() =>
             // Placeholder implementation
             await Task.CompletedTask.ConfigureAwait(false);
 
         /// <summary>
         /// Analyzes performance across accelerators.
         /// </summary>
-        public PerformanceAnalysis AnalyzePerformance() => GetPerformanceStats();
+        public static PerformanceAnalysis AnalyzePerformance() => GetPerformanceStats();
 
         /// <summary>
         /// Disposes the hybrid compute orchestrator.
@@ -472,16 +473,15 @@ namespace ILGPU.ML.Integration
     /// <summary>
     /// Model compilation options.
     /// </summary>
-    public class ModelCompilationOptions
+    /// <remarks>
+    /// Initializes a new instance of the ModelCompilationOptions class.
+    /// </remarks>
+    [method: SetsRequiredMembers]
+    /// <summary>
+    /// Model compilation options.
+    /// </summary>
+    public class ModelCompilationOptions()
     {
-        /// <summary>
-        /// Initializes a new instance of the ModelCompilationOptions class.
-        /// </summary>
-        [SetsRequiredMembers]
-        public ModelCompilationOptions()
-        {
-            TargetDevice = "default";
-        }
 
         /// <summary>
         /// Gets or sets the optimization level.
@@ -501,7 +501,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the target device.
         /// </summary>
-        public required string TargetDevice { get; set; }
+        public required string TargetDevice { get; set; } = "default";
 
         /// <summary>
         /// Gets or sets custom compilation flags.
@@ -561,7 +561,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Optimizes a model for deployment.
         /// </summary>
-        public async Task<OptimizedModel> OptimizeAsync(
+        public static async Task<OptimizedModel> OptimizeAsync(
             object model,
             ModelCompilationOptions options)
         {
@@ -573,7 +573,7 @@ namespace ILGPU.ML.Integration
             {
                 OriginalModel = model,
                 OptimizationApplied = true,
-                OptimizationDetails = new List<string> { "Graph fusion", "Memory layout optimization" },
+                OptimizationDetails = ["Graph fusion", "Memory layout optimization"],
                 OptimizedGraph = model as ComputeGraph ?? new ComputeGraph()
             };
         }
@@ -581,7 +581,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Analyzes model for optimization opportunities.
         /// </summary>
-        public ModelAnalysisResult AnalyzeModel(object model) => new ModelAnalysisResult
+        public static ModelAnalysisResult AnalyzeModel(object model) => new()
         {
             TotalOperations = 1000,
             OptimizableOperations = 800,
@@ -613,22 +613,20 @@ namespace ILGPU.ML.Integration
     /// <summary>
     /// Optimized model result.
     /// </summary>
-    public class OptimizedModel
+    /// <remarks>
+    /// Initializes a new instance of the OptimizedModel class.
+    /// </remarks>
+    [method: SetsRequiredMembers]
+    /// <summary>
+    /// Optimized model result.
+    /// </summary>
+    public class OptimizedModel()
     {
-        /// <summary>
-        /// Initializes a new instance of the OptimizedModel class.
-        /// </summary>
-        [SetsRequiredMembers]
-        public OptimizedModel()
-        {
-            OriginalModel = new object();
-            OptimizedGraph = new ComputeGraph();
-        }
 
         /// <summary>
         /// Gets or sets the original model.
         /// </summary>
-        public required object OriginalModel { get; set; }
+        public required object OriginalModel { get; set; } = new object();
 
         /// <summary>
         /// Gets or sets whether optimization was applied.
@@ -638,20 +636,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets optimization details.
         /// </summary>
-        public IList<string> OptimizationDetails { get; } = new List<string>();
+        public Collection<string> OptimizationDetails { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the optimized compute graph.
         /// </summary>
-        public required ComputeGraph OptimizedGraph { get; set; }
+        public required ComputeGraph OptimizedGraph { get; set; } = new ComputeGraph();
 
         /// <summary>
         /// Implicit conversion to ComputeGraph.
         /// </summary>
-        public static implicit operator ComputeGraph(OptimizedModel optimizedModel)
-        {
-            return optimizedModel?.OptimizedGraph ?? new ComputeGraph();
-        }
+        public static implicit operator ComputeGraph(OptimizedModel optimizedModel) => optimizedModel?.OptimizedGraph ?? new ComputeGraph();
     }
 
     /// <summary>
@@ -723,12 +718,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input names.
         /// </summary>
-        public IList<string> InputNames { get; set; } = new List<string>();
+        public IList<string> InputNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the output names.
         /// </summary>
-        public IList<string> OutputNames { get; set; } = new List<string>();
+        public IList<string> OutputNames { get; set; } = [];
 
         /// <summary>
         /// Initializes a new instance of the CompiledModel class.
@@ -786,7 +781,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the execution steps.
         /// </summary>
-        public IList<ExecutionStep> Steps { get; set; } = new List<ExecutionStep>();
+        public IList<ExecutionStep> Steps { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the estimated execution time.
@@ -861,7 +856,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets kernel parameters.
         /// </summary>
-        public IList<KernelParameter> Parameters { get; set; } = new List<KernelParameter>();
+        public IList<KernelParameter> Parameters { get; set; } = [];
 
         /// <summary>
         /// Initializes a new instance of the CompiledKernel class.
@@ -1058,21 +1053,21 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Executes an execution plan with input tensors.
         /// </summary>
-        public async Task<Dictionary<string, ITensor<float>>> ExecuteAsync(ExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
+        public static async Task<Dictionary<string, ITensor<float>>> ExecuteAsync(ExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
             // Placeholder implementation
             await Task.FromResult(new Dictionary<string, ITensor<float>>()).ConfigureAwait(false);
 
         /// <summary>
         /// Executes a pre-compiled execution plan.
         /// </summary>
-        public async Task<Dictionary<string, ITensor<float>>> ExecuteCompiledAsync(CompiledExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
+        public static async Task<Dictionary<string, ITensor<float>>> ExecuteCompiledAsync(CompiledExecutionPlan plan, Dictionary<string, ITensor<float>> inputs) =>
             // Placeholder implementation
             await Task.FromResult(new Dictionary<string, ITensor<float>>()).ConfigureAwait(false);
 
         /// <summary>
         /// Gets execution provider statistics.
         /// </summary>
-        public ExecutionProviderStats GetStats() => new ExecutionProviderStats
+        public static ExecutionProviderStats GetStats() => new()
         {
             ProviderName = "UniversalComputeEngine",
             ExecutionCount = 0,
@@ -1084,7 +1079,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Optimizes memory usage based on workload analysis.
         /// </summary>
-        public async Task OptimizeMemoryAsync(WorkloadAnalysis analysis) =>
+        public static async Task OptimizeMemoryAsync(WorkloadAnalysis analysis) =>
             // Placeholder implementation
             await Task.CompletedTask.ConfigureAwait(false);
 
@@ -1144,12 +1139,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the input names.
         /// </summary>
-        public IList<string> InputNames { get; set; } = new List<string>();
+        public IList<string> InputNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the output names.
         /// </summary>
-        public IList<string> OutputNames { get; set; } = new List<string>();
+        public IList<string> OutputNames { get; set; } = [];
 
         /// <summary>
         /// Gets or sets the model version.
@@ -1198,7 +1193,7 @@ namespace ILGPU.ML.Integration
         /// Creates a named ONNX value.
         /// </summary>
         public static NamedOnnxValue CreateFromArray<T>(string name, T[] data)
-            where T : unmanaged => new NamedOnnxValue
+            where T : unmanaged => new()
             {
                 Name = name,
                 Value = data,

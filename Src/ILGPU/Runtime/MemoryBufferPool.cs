@@ -14,7 +14,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -147,8 +146,8 @@ namespace ILGPU.Runtime
                 // Pool hit - reuse existing buffer
                 Interlocked.Increment(ref totalHits);
                 Interlocked.Add(ref totalBytesReused, pooledBuffer.Buffer.LengthInBytes);
-                
-                pooledBuffer.Reset();
+
+                MemoryBufferPool<T>.PooledBuffer.Reset();
                 return new PooledMemoryBuffer<T>(this, pooledBuffer.Buffer, bucketIndex);
             }
 
@@ -294,7 +293,6 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Callback for the automatic pool trimming timer.
         /// </summary>
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Timer callback must not throw exceptions")]
         private void TrimPoolCallback(object? state)
         {
             try
@@ -346,7 +344,7 @@ namespace ILGPU.Runtime
             public MemoryBuffer1D<T, Stride1D.Dense> Buffer { get; } = buffer;
             public long LastUsed { get; } = lastUsed;
 
-            public void Reset()
+            public static void Reset()
             {
                 // Could implement buffer clearing here if needed for security
             }
@@ -423,7 +421,7 @@ namespace ILGPU.Runtime
         public long TotalBytesAllocated { get; } = totalBytesAllocated;
         public long TotalBytesReused { get; } = totalBytesReused;
         public long TotalPooledBytes { get; } = totalPooledBytes;
-        public IReadOnlyList<int> BucketCounts { get; } = Array.AsReadOnly(bucketCounts);
-        public IReadOnlyList<long> BucketSizes { get; } = Array.AsReadOnly(bucketSizes);
+        public int[] BucketCounts { get; } = bucketCounts;
+        public long[] BucketSizes { get; } = bucketSizes;
     }
 }

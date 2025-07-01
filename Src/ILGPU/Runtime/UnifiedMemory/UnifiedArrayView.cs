@@ -134,10 +134,7 @@ namespace ILGPU.Runtime.UnifiedMemory
         /// Implicitly converts a unified array view to a GPU array view.
         /// </summary>
         /// <param name="view">The unified array view.</param>
-        public static implicit operator ArrayView<T>(UnifiedArrayView<T> view)
-        {
-            return view.GPUView;
-        }
+        public static implicit operator ArrayView<T>(UnifiedArrayView<T> view) => view.GPUView;
 
         #endregion
     }

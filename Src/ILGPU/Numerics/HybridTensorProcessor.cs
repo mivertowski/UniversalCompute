@@ -245,7 +245,7 @@ namespace ILGPU.Numerics.Hybrid
         public bool SupportsHybridExecution { get; set; }
         public int MaxCpuCores { get; set; }
         public int MaxGpuDevices { get; set; }
-        public IReadOnlyList<TensorPrecision> SupportedPrecisions { get; set; }
+        public TensorPrecision[] SupportedPrecisions { get; set; }
         public long GpuMemoryBytes { get; set; }
         public long CpuMemoryBytes { get; set; }
     }
@@ -350,7 +350,7 @@ namespace ILGPU.Numerics.Hybrid
                 SupportsHybridExecution = cpuAccelerator != null && gpuAccelerator != null,
                 MaxCpuCores = Environment.ProcessorCount,
                 MaxGpuDevices = accelerators.Length,
-                SupportedPrecisions = gpuAccelerator?.GetSupportedTensorPrecisions() ?? (IReadOnlyList<TensorPrecision>)Array.Empty<TensorPrecision>(),
+                SupportedPrecisions = gpuAccelerator?.GetSupportedTensorPrecisions() ?? [],
                 GpuMemoryBytes = gpuAccelerator?.MemorySize ?? 0,
                 CpuMemoryBytes = GC.GetTotalMemory(false)
             };
@@ -459,7 +459,7 @@ namespace ILGPU.Numerics.Hybrid
             return await cpuTask.ConfigureAwait(false);
         }
 
-        private ITensor<T> ExecuteCpuOperation<T>(ITensor<T> input, TensorOperation operation)
+        private static ITensor<T> ExecuteCpuOperation<T>(ITensor<T> input, TensorOperation operation)
             where T : unmanaged, IFloatingPoint<T> =>
             // Execute operation using CPU SIMD operations
             operation.Type switch
@@ -474,7 +474,7 @@ namespace ILGPU.Numerics.Hybrid
                 _ => throw new NotSupportedException($"Operation type {operation.Type} not supported on CPU")
             };
 
-        private ITensor<T> ExecuteGpuTensorCoreOperation<T>(ITensor<T> input, TensorOperation operation, Accelerator accelerator)
+        private static ITensor<T> ExecuteGpuTensorCoreOperation<T>(ITensor<T> input, TensorOperation operation, Accelerator accelerator)
             where T : unmanaged, IFloatingPoint<T> =>
             // Execute operation using GPU tensor core operations
             operation.Type switch
@@ -486,7 +486,7 @@ namespace ILGPU.Numerics.Hybrid
                 _ => throw new NotSupportedException($"Operation type {operation.Type} not optimized for tensor cores")
             };
 
-        private ITensor<T> ExecuteGpuGeneralOperation<T>(ITensor<T> input, TensorOperation operation, Accelerator accelerator)
+        private static ITensor<T> ExecuteGpuGeneralOperation<T>(ITensor<T> input, TensorOperation operation, Accelerator accelerator)
             where T : unmanaged, IFloatingPoint<T> =>
             // Execute operation using GPU general compute operations
             operation.Type switch
@@ -507,7 +507,7 @@ namespace ILGPU.Numerics.Hybrid
                 throw new ObjectDisposedException(nameof(HybridTensorProcessor));
         }
 
-        private ITensor<T> CreateRandomResult<T>(ITensor<T> input) where T : unmanaged, IFloatingPoint<T> =>
+        private static ITensor<T> CreateRandomResult<T>(ITensor<T> input) where T : unmanaged, IFloatingPoint<T> =>
             // Create a result tensor with random data for benchmarking purposes
             // Return a result tensor for benchmarking purposes
             input;

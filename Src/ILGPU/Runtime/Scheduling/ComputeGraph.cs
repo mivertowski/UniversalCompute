@@ -186,7 +186,7 @@ namespace ILGPU.Runtime.Scheduling
         /// <summary>
         /// Optimizes the graph by merging compatible nodes and eliminating redundancies.
         /// </summary>
-        public void Optimize()
+        public static void Optimize()
         {
             // Merge compatible adjacent nodes
             MergeCompatibleNodes();
@@ -230,25 +230,25 @@ namespace ILGPU.Runtime.Scheduling
                 .Where(dep => dep.Consumer == node)
                 .Select(dep => dep.Producer);
 
-        private void MergeCompatibleNodes()
+        private static void MergeCompatibleNodes()
         {
             // Implementation for merging compatible nodes
             // This would identify nodes that can be fused for better performance
         }
 
-        private void EliminateRedundantTransfers()
+        private static void EliminateRedundantTransfers()
         {
             // Implementation for eliminating redundant data transfers
             // This would identify and remove unnecessary memory copies
         }
 
-        private void OptimizeMemoryAccess()
+        private static void OptimizeMemoryAccess()
         {
             // Implementation for optimizing memory access patterns
             // This would reorder operations to improve memory locality
         }
 
-        private double EstimateNodeExecutionTime(ComputeNode node, DevicePerformance performance) => node.Operation switch
+        private static double EstimateNodeExecutionTime(ComputeNode node, DevicePerformance performance) => node.Operation switch
         {
             MatMulOp matmul => EstimateMatMulTime(matmul, performance),
             ConvolutionOp conv => EstimateConvolutionTime(conv, performance),
@@ -256,24 +256,24 @@ namespace ILGPU.Runtime.Scheduling
             _ => node.EstimatedTimeMs
         };
 
-        private double EstimateMatMulTime(MatMulOp operation, DevicePerformance performance)
+        private static double EstimateMatMulTime(MatMulOp operation, DevicePerformance performance)
         {
             var flops = 2.0 * operation.M * operation.N * operation.K;
             return flops / performance.PeakGFLOPS / 1000.0; // Convert to milliseconds
         }
 
-        private double EstimateConvolutionTime(ConvolutionOp operation, DevicePerformance performance)
+        private static double EstimateConvolutionTime(ConvolutionOp operation, DevicePerformance performance)
         {
             // Simplified convolution time estimation
             var flops = operation.OutputSize * operation.KernelSize * operation.InputChannels * 2.0;
             return flops / performance.PeakGFLOPS / 1000.0;
         }
 
-        private double EstimateVectorTime(VectorOp operation, DevicePerformance performance)
+        private static double EstimateVectorTime(VectorOp operation, DevicePerformance performance)
         {
             var elements = operation.Size;
             var throughput = performance.MemoryBandwidthGBps * 1e9; // Convert to bytes/sec
-            var timeForMemory = (elements * operation.ElementSize * 2) / throughput; // Read + Write
+            var timeForMemory = elements * operation.ElementSize * 2 / throughput; // Read + Write
             var timeForCompute = elements / performance.PeakGFLOPS / 1e6; // Simplified
             
             return Math.Max(timeForMemory, timeForCompute) * 1000.0; // Convert to milliseconds

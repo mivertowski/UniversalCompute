@@ -440,8 +440,8 @@ public class IntelAMXBenchmarks : IDisposable
         const int AMX_TILE_SIZE = 16; // AMX supports 16x16 tiles
         
         // Process in AMX-sized subtiles for optimal register utilization
-        var tileRow = (row / AMX_TILE_SIZE) * AMX_TILE_SIZE;
-        var tileCol = (col / AMX_TILE_SIZE) * AMX_TILE_SIZE;
+        var tileRow = row / AMX_TILE_SIZE * AMX_TILE_SIZE;
+        var tileCol = col / AMX_TILE_SIZE * AMX_TILE_SIZE;
         var localRow = row % AMX_TILE_SIZE;
         var localCol = col % AMX_TILE_SIZE;
         

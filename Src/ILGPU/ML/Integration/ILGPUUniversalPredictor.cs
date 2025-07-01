@@ -21,7 +21,6 @@ using ILGPU.Runtime.DependencyInjection;
 using ILGPU.Runtime.Scheduling;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -67,9 +66,9 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets performance statistics from recent predictions.
         /// </summary>
-        public PredictionStats PerformanceStats => ConvertToPredictionStats(_orchestrator.GetPerformanceStats());
+        public PredictionStats PerformanceStats => ILGPUUniversalPredictor<TInput, TOutput>.ConvertToPredictionStats(HybridComputeOrchestrator.GetPerformanceStats());
 
-        private PredictionStats ConvertToPredictionStats(PerformanceAnalysis analysis) => new PredictionStats
+        private static PredictionStats ConvertToPredictionStats(PerformanceAnalysis analysis) => new()
         {
             InferenceTimeMs = analysis.TotalExecutionTimeMs,
             PreprocessingTimeMs = 0.0,
@@ -98,7 +97,7 @@ namespace ILGPU.ML.Integration
             var computeGraph = await Model.CreateComputeGraphAsync(inputTensor).ConfigureAwait(false);
 
             // Execute with optimal scheduling using the model
-            var result = await _orchestrator.ExecuteAsync(Model, input).ConfigureAwait(false);
+            var result = await HybridComputeOrchestrator.ExecuteAsync(Model, input).ConfigureAwait(false);
 
             // Return the result directly
             return result;
@@ -116,7 +115,7 @@ namespace ILGPU.ML.Integration
             if (inputs == null)
                 throw new ArgumentNullException(nameof(inputs));
             if (inputs.Length == 0)
-                return Array.Empty<TOutput>();
+                return [];
 
             // Convert inputs to tensor batch
             var inputTensors = await ConvertToTensorBatchAsync(inputs).ConfigureAwait(false);
@@ -125,7 +124,7 @@ namespace ILGPU.ML.Integration
             var computeGraph = await Model.CreateBatchedComputeGraphAsync(inputTensors).ConfigureAwait(false);
 
             // Execute with batch optimization
-            var results = await _orchestrator.ExecuteBatchAsync(Model, inputs).ConfigureAwait(false);
+            var results = await HybridComputeOrchestrator.ExecuteBatchAsync(Model, inputs).ConfigureAwait(false);
 
             // Return the results directly
             return results;
@@ -188,10 +187,10 @@ namespace ILGPU.ML.Integration
             var profileResults = await ProfileDevicesAsync(sampleInputs).ConfigureAwait(false);
 
             // Update scheduling strategy based on profiling results
-            await _orchestrator.OptimizeSchedulingAsync().ConfigureAwait(false);
+            await HybridComputeOrchestrator.OptimizeSchedulingAsync().ConfigureAwait(false);
 
             // Optimize memory layout and transfer patterns
-            await _orchestrator.OptimizeMemoryAsync().ConfigureAwait(false);
+            await HybridComputeOrchestrator.OptimizeMemoryAsync().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -201,7 +200,7 @@ namespace ILGPU.ML.Integration
         public PerformanceAnalysis AnalyzePerformance()
         {
             ThrowIfDisposed();
-            return _orchestrator.AnalyzePerformance();
+            return HybridComputeOrchestrator.AnalyzePerformance();
         }
 
         private async Task<ITensor<float>> ConvertToTensorAsync(TInput input) =>
@@ -237,7 +236,6 @@ namespace ILGPU.ML.Integration
             return outputs;
         }
 
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Device profiling must handle all exceptions to provide fallback behavior")]
         private async Task<DeviceProfileResults> ProfileDevicesAsync(TInput[] sampleInputs)
         {
             var results = new Dictionary<ComputeDevice, DeviceProfileResult>();
@@ -308,25 +306,12 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the predictor and releases all resources.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (_disposed)
                 return;
 
-            if (disposing)
-            {
-                _orchestrator?.Dispose();
-                _scheduler?.Dispose();
-                // _model doesn't implement IDisposable
-            }
+            _orchestrator?.Dispose();
+            _scheduler?.Dispose();
+            // _model doesn't implement IDisposable
 
             _disposed = true;
         }

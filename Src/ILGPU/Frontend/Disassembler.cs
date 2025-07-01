@@ -15,6 +15,7 @@ using ILGPU.Resources;
 using ILGPU.Util;
 using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -87,6 +88,7 @@ namespace ILGPU.Frontend
         /// The associated sequence-point enumerator.
         /// </param>
         /// <param name="compilationStackLocation">The source location (optional).</param>
+        [RequiresUnreferencedCode("")]
         public Disassembler(
             MethodBase methodBase,
             SequencePointEnumerator sequencePointEnumerator,
@@ -96,14 +98,14 @@ namespace ILGPU.Frontend
                 ?? throw new ArgumentNullException(nameof(methodBase));
             MethodGenericArguments = MethodBase is MethodInfo
                 ? MethodBase.GetGenericArguments()
-                : Array.Empty<Type>();
+                : [];
             TypeGenericArguments =
                 MethodBase.DeclaringType.AsNotNull().GetGenericArguments();
             MethodBody = MethodBase.GetMethodBody()
                 ?? throw new NotSupportedException(string.Format(
                     ErrorMessages.NativeMethodNotSupported,
                     MethodBase.Name));
-            il = MethodBody.GetILAsByteArray() ?? Array.Empty<byte>();
+            il = MethodBody.GetILAsByteArray() ?? [];
             instructions = ImmutableArray.CreateBuilder<ILInstruction>(il.Length);
             debugInformationEnumerator = sequencePointEnumerator;
             this.compilationStackLocation = compilationStackLocation;
@@ -221,6 +223,7 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="type">The instruction type.</param>
         /// <param name="methodToken">The token of the method to be disassembled.</param>
+        [RequiresUnreferencedCode("Calls ILGPU.Frontend.Disassembler.ResolveMethod(Int32)")]
         private void DisassembleCall(ILInstructionType type, int methodToken)
         {
             var method = ResolveMethod(methodToken).AsNotNull();
@@ -317,6 +320,7 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="token">The token of the type to resolve.</param>
         /// <returns>The resolved type.</returns>
+        [RequiresUnreferencedCode("Calls System.Reflection.Module.ResolveType(Int32, Type[], Type[])")]
         private Type ResolveType(int token) =>
             AssociatedModule.ResolveType(
                 token,
@@ -329,6 +333,7 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="token">The token of the method to resolve.</param>
         /// <returns>The resolved method.</returns>
+        [RequiresUnreferencedCode("Calls System.Reflection.Module.ResolveMethod(Int32, Type[], Type[])")]
         private MethodBase? ResolveMethod(int token) =>
             AssociatedModule.ResolveMethod(
                 token,
@@ -341,6 +346,7 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="token">The token of the field to resolve.</param>
         /// <returns>The resolved field.</returns>
+        [RequiresUnreferencedCode("Calls System.Reflection.Module.ResolveField(Int32, Type[], Type[])")]
         private FieldInfo? ResolveField(int token) =>
             AssociatedModule.ResolveField(
                 token,
@@ -397,6 +403,7 @@ namespace ILGPU.Frontend
         /// Reads a type reference from the current instruction data.
         /// </summary>
         /// <returns>The decoded type reference.</returns>
+        [RequiresUnreferencedCode("Calls ILGPU.Frontend.Disassembler.ResolveType(Int32)")]
         private Type ReadTypeArg()
         {
             var token = ReadIntArg();
@@ -407,6 +414,7 @@ namespace ILGPU.Frontend
         /// Reads a field reference from the current instruction data.
         /// </summary>
         /// <returns>The decoded field reference.</returns>
+        [RequiresUnreferencedCode("Calls ILGPU.Frontend.Disassembler.ResolveField(Int32)")]
         private FieldInfo? ReadFieldArg()
         {
             var token = ReadIntArg();

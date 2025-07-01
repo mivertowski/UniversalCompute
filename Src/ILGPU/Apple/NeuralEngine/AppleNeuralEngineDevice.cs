@@ -121,21 +121,17 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// Apple Neural Engine-specific capability context.
     /// </summary>
-    internal sealed class ANECapabilityContext : CapabilityContext
+    /// <remarks>
+    /// Initializes a new ANE capability context.
+    /// </remarks>
+    /// <param name="capabilities">The ANE capabilities.</param>
+    internal sealed class ANECapabilityContext(ANECapabilities capabilities) : CapabilityContext
     {
-        /// <summary>
-        /// Initializes a new ANE capability context.
-        /// </summary>
-        /// <param name="capabilities">The ANE capabilities.</param>
-        public ANECapabilityContext(ANECapabilities capabilities)
-        {
-            ANECapabilities = capabilities;
-        }
 
         /// <summary>
         /// Gets the ANE capabilities.
         /// </summary>
-        public ANECapabilities ANECapabilities { get; }
+        public ANECapabilities ANECapabilities { get; } = capabilities;
 
         // ANE has broad vector support across different data types
         // These capabilities are queried from the actual hardware

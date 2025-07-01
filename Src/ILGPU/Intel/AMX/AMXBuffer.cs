@@ -177,22 +177,15 @@ namespace ILGPU.Intel.AMX
     /// <summary>
     /// AMX kernel implementation.
     /// </summary>
-    public sealed class AMXKernel : Kernel
+    /// <remarks>
+    /// Initializes a new instance of the AMXKernel class.
+    /// </remarks>
+    /// <param name="accelerator">The AMX accelerator.</param>
+    /// <param name="compiledKernel">The compiled kernel.</param>
+    public sealed class AMXKernel(AMXAccelerator accelerator, CompiledKernel compiledKernel) : Kernel(accelerator, compiledKernel, null)
     {
-        private readonly AMXAccelerator _accelerator;
-        private readonly CompiledKernel _compiledKernel;
-
-        /// <summary>
-        /// Initializes a new instance of the AMXKernel class.
-        /// </summary>
-        /// <param name="accelerator">The AMX accelerator.</param>
-        /// <param name="compiledKernel">The compiled kernel.</param>
-        public AMXKernel(AMXAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel, null)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
-        }
+        private readonly AMXAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+        private readonly CompiledKernel _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
 
 
         /// <summary>

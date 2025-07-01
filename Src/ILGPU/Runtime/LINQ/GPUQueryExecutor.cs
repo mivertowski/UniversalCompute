@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -322,7 +323,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>The memory buffer or null.</returns>
-        private object? GetBuffer(Expression expression)
+        private static object? GetBuffer(Expression expression)
         {
             if (expression is ConstantExpression constant)
             {
@@ -356,7 +357,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <returns>The buffer length.</returns>
-        private long GetBufferLength(object buffer)
+        private static long GetBufferLength(object buffer)
         {
             var lengthProperty = buffer.GetType().GetProperty("Length");
             return (long)lengthProperty!.GetValue(buffer)!;
@@ -368,7 +369,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceBuffer">The source buffer.</param>
         /// <param name="outputBuffer">The output buffer.</param>
         /// <param name="selector">The selector function.</param>
-        private void ExecuteSelectKernel(object sourceBuffer, object outputBuffer, LambdaExpression selector)
+        private static void ExecuteSelectKernel(object sourceBuffer, object outputBuffer, LambdaExpression selector)
         {
             // Simplified implementation - in practice, would compile selector to GPU kernel
             // For now, copy data to CPU, apply selector, and copy back
@@ -397,6 +398,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceBuffer">The source buffer.</param>
         /// <param name="operation">The reduction operation.</param>
         /// <returns>The reduction result.</returns>
+        [RequiresUnreferencedCode("Calls ILGPU.Runtime.LINQ.GPUQueryExpressionVisitor.ApplyReduction(Array, String)")]
         private object ExecuteReductionKernel(object sourceBuffer, string operation)
         {
             var sourceData = GetBufferData(sourceBuffer);
@@ -409,7 +411,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceBuffer">The source buffer.</param>
         /// <param name="predicate">The predicate function.</param>
         /// <returns>True if all elements satisfy the predicate.</returns>
-        private bool ExecuteAllKernel(object sourceBuffer, LambdaExpression predicate)
+        private static bool ExecuteAllKernel(object sourceBuffer, LambdaExpression predicate)
         {
             var sourceData = GetBufferData(sourceBuffer);
             return ApplyAllPredicate(sourceData, predicate);
@@ -420,7 +422,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <returns>The buffer data as an array.</returns>
-        private Array GetBufferData(object buffer)
+        private static Array GetBufferData(object buffer)
         {
             var getAsArrayMethod = buffer.GetType().GetMethod("GetAsArray1D");
             return (Array)getAsArrayMethod!.Invoke(buffer, null)!;
@@ -431,7 +433,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="buffer">The buffer.</param>
         /// <param name="data">The data to set.</param>
-        private void SetBufferData(object buffer, Array data)
+        private static void SetBufferData(object buffer, Array data)
         {
             var copyFromMethod = buffer.GetType().GetMethod("CopyFromCPU");
             copyFromMethod!.Invoke(buffer, [data]);
@@ -456,7 +458,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceData">The source data.</param>
         /// <param name="selector">The selector function.</param>
         /// <returns>The transformed data.</returns>
-        private Array ApplySelector(Array sourceData, LambdaExpression selector)
+        private static Array ApplySelector(Array sourceData, LambdaExpression selector)
         {
             var compiledSelector = selector.Compile();
             var sourceList = sourceData.Cast<object>();
@@ -481,7 +483,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceData">The source data.</param>
         /// <param name="predicate">The predicate function.</param>
         /// <returns>The filtered data.</returns>
-        private Array ApplyPredicate(Array sourceData, LambdaExpression predicate)
+        private static Array ApplyPredicate(Array sourceData, LambdaExpression predicate)
         {
             var compiledPredicate = predicate.Compile();
             var sourceList = sourceData.Cast<object>().ToList();
@@ -500,7 +502,8 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceData">The source data.</param>
         /// <param name="operation">The reduction operation.</param>
         /// <returns>The reduction result.</returns>
-        private object ApplyReduction(Array sourceData, string operation)
+        [RequiresUnreferencedCode("Calls ILGPU.Runtime.LINQ.GPUQueryExpressionVisitor.ComputeMin(Array)")]
+        private static object ApplyReduction(Array sourceData, string operation)
         {
             if (sourceData.Length == 0)
                 throw new InvalidOperationException("Cannot perform reduction on empty sequence");
@@ -515,7 +518,7 @@ namespace ILGPU.Runtime.LINQ
             };
         }
 
-        private object ComputeSum(Array sourceData)
+        private static object ComputeSum(Array sourceData)
         {
             dynamic sum = Convert.ChangeType(0, sourceData.GetType().GetElementType()!);
             foreach (var item in sourceData)
@@ -525,7 +528,7 @@ namespace ILGPU.Runtime.LINQ
             return sum;
         }
 
-        private object ComputeAverage(Array sourceData)
+        private static object ComputeAverage(Array sourceData)
         {
             dynamic sum = Convert.ChangeType(0, sourceData.GetType().GetElementType()!);
             foreach (var item in sourceData)
@@ -535,7 +538,8 @@ namespace ILGPU.Runtime.LINQ
             return Convert.ToDouble(sum) / sourceData.Length;
         }
 
-        private object ComputeMin(Array sourceData)
+        [RequiresUnreferencedCode("Calls System.Collections.Generic.Comparer<T>.Compare(T, T)")]
+        private static object ComputeMin(Array sourceData)
         {
             dynamic min = sourceData.GetValue(0)!;
             foreach (var item in sourceData)
@@ -546,7 +550,8 @@ namespace ILGPU.Runtime.LINQ
             return min;
         }
 
-        private object ComputeMax(Array sourceData)
+        [RequiresUnreferencedCode("Calls System.Collections.Generic.Comparer<T>.Compare(T, T)")]
+        private static object ComputeMax(Array sourceData)
         {
             dynamic max = sourceData.GetValue(0)!;
             foreach (var item in sourceData)
@@ -563,7 +568,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="sourceData">The source data.</param>
         /// <param name="predicate">The predicate function.</param>
         /// <returns>True if all elements satisfy the predicate.</returns>
-        private bool ApplyAllPredicate(Array sourceData, LambdaExpression predicate)
+        private static bool ApplyAllPredicate(Array sourceData, LambdaExpression predicate)
         {
             var compiledPredicate = predicate.Compile();
             var sourceList = sourceData.Cast<object>().ToList();

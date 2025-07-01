@@ -322,8 +322,8 @@ namespace ILGPU.Runtime.AI
                 var endRow = startRow + rowsPerPartition + (i == acceleratorCount - 1 ? remainingRows : 0);
                 
                 // Create partition tensors (would use tensor slicing)
-                var aPartition = CreateTensorSlice(A, startRow, endRow);
-                var cPartition = C != null ? CreateTensorSlice(C, startRow, endRow) : null;
+                var aPartition = DistributedMatrixMultiplicationWorkload<T>.CreateTensorSlice(A, startRow, endRow);
+                var cPartition = C != null ? DistributedMatrixMultiplicationWorkload<T>.CreateTensorSlice(C, startRow, endRow) : null;
                 
                 yield return new MatrixMultiplicationWorkload<T>(aPartition, B, cPartition);
             }
@@ -346,14 +346,11 @@ namespace ILGPU.Runtime.AI
         /// <param name="context">The execution context.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A task representing the operation.</returns>
-        public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default)
-        {
+        public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default) =>
             // For distributed workload, this should not be called directly
-            await Task.Delay(0, cancellationToken).ConfigureAwait(false);
             throw new InvalidOperationException("Use DistributedWorkloadOrchestrator for distributed execution");
-        }
 
-        private ITensor<T> CreateTensorSlice(ITensor<T> tensor, int startRow, int endRow) =>
+        private static ITensor<T> CreateTensorSlice(ITensor<T> tensor, int startRow, int endRow) =>
             // This would create a tensor slice/view
             // For now, return the original tensor as placeholder
             tensor;
@@ -392,7 +389,7 @@ namespace ILGPU.Runtime.AI
         /// <param name="workload">The workload to analyze.</param>
         /// <param name="profiles">Available accelerator profiles.</param>
         /// <returns>The optimal execution strategy.</returns>
-        public async Task<ExecutionStrategy> AnalyzeWorkloadAsync(
+        public static async Task<ExecutionStrategy> AnalyzeWorkloadAsync(
             IWorkload workload,
             IReadOnlyList<AcceleratorProfile> profiles)
         {
@@ -423,7 +420,7 @@ namespace ILGPU.Runtime.AI
         /// <param name="workload">The distributed workload.</param>
         /// <param name="profiles">Available accelerator profiles.</param>
         /// <returns>A collection of workload partitions.</returns>
-        public async Task<IEnumerable<WorkloadPartition>> PartitionWorkloadAsync(
+        public static async Task<IEnumerable<WorkloadPartition>> PartitionWorkloadAsync(
             IDistributedWorkload workload,
             IReadOnlyList<AcceleratorProfile> profiles)
         {
@@ -482,7 +479,7 @@ namespace ILGPU.Runtime.AI
         /// <param name="workloadType">The workload type.</param>
         /// <param name="duration">The execution duration.</param>
         /// <param name="success">Whether the execution was successful.</param>
-        public void RecordExecution(WorkloadType workloadType, TimeSpan duration, bool success)
+        public static void RecordExecution(WorkloadType workloadType, TimeSpan duration, bool success)
         {
             // Record execution metrics
         }

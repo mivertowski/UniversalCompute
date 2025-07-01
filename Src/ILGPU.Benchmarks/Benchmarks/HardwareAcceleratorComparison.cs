@@ -282,7 +282,7 @@ public class HardwareAcceleratorComparison : IDisposable
         }
     }
 
-    private Action<Index1D, ArrayView<float>, ArrayView<float>, int, int> LoadKernelForAccelerator(Accelerator accelerator)
+    private static Action<Index1D, ArrayView<float>, ArrayView<float>, int, int> LoadKernelForAccelerator(Accelerator accelerator)
     {
         // Use specialized kernels for hardware accelerators, generic kernel for others
         return accelerator switch
@@ -321,8 +321,8 @@ public class HardwareAcceleratorComparison : IDisposable
 
         // Simulate AMX tile operations for optimal performance
         const int tileSize = 16; // AMX standard tile size
-        var tileRow = (row / tileSize) * tileSize;
-        var tileCol = (col / tileSize) * tileSize;
+        var tileRow = row / tileSize * tileSize;
+        var tileCol = col / tileSize * tileSize;
 
         float accumulator = 0.0f;
         
@@ -412,7 +412,7 @@ public class HardwareAcceleratorComparison : IDisposable
             if (inputIdx < input.Length)
             {
                 // Simulate ANE FP16 precision
-                var fp16Value = (float)((Half)input[inputIdx]);
+                var fp16Value = (float)(Half)input[inputIdx];
                 sum += fp16Value * fp16Value;
             }
         }

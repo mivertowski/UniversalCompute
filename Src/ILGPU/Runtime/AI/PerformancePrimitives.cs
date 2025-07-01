@@ -661,7 +661,7 @@ namespace ILGPU.Runtime.AI
     /// <param name="accelerator">The accelerator.</param>
     public sealed class GenericPerformancePrimitives(Accelerator accelerator) : PerformancePrimitivesBase(accelerator)
     {
-        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new PerformancePrimitiveCapabilities
+        protected override PerformancePrimitiveCapabilities InitializeCapabilities() => new()
         {
             SupportsAcceleratedGemm = false,
             SupportsAcceleratedConvolution = false,

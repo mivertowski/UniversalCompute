@@ -391,7 +391,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             return;
             
         // Coalesced memory access pattern
-        var coalescedIndex = (index * stride) % input.Length;
+        var coalescedIndex = index * stride % input.Length;
         output[index] = input[coalescedIndex];
     }
 
@@ -413,7 +413,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             return;
             
         // Random access pattern (pseudorandom based on index)
-        var randomIndex = ((index * 1103515245 + 12345) / 65536) % length;
+        var randomIndex = (index * 1103515245 + 12345) / 65536 % length;
         output[index] = input[randomIndex];
     }
 

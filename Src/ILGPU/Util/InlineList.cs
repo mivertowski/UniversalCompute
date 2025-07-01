@@ -95,7 +95,7 @@ namespace ILGPU.Util
         private InlineList(int capacity)
         {
             items = capacity < 1
-                ? Array.Empty<T>()
+                ? []
                 : new T[capacity];
             Count = 0;
         }
@@ -208,7 +208,7 @@ namespace ILGPU.Util
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            items = Array.Empty<T>();
+            items = [];
             Count = 0;
         }
 

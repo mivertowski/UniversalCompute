@@ -26,16 +26,10 @@ namespace ILGPU.Benchmarks.Infrastructure;
 /// <summary>
 /// Orchestrates the execution of different benchmark suites.
 /// </summary>
-public class BenchmarkRunner
+public class BenchmarkRunner(ILogger<BenchmarkRunner> logger, BenchmarkConfig config)
 {
-    private readonly ILogger<BenchmarkRunner> logger;
-    private readonly BenchmarkConfig config;
-
-    public BenchmarkRunner(ILogger<BenchmarkRunner> logger, BenchmarkConfig config)
-    {
-        this.logger = logger;
-        this.config = config;
-    }
+    private readonly ILogger<BenchmarkRunner> logger = logger;
+    private readonly BenchmarkConfig config = config;
 
     /// <summary>
     /// Runs a quick performance suite for basic validation.

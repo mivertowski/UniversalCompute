@@ -80,16 +80,10 @@ namespace ILGPU.Intel.IPP.Native
         /// Complex number structure for 32-bit float.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        public struct Ipp32fc
+        public struct Ipp32fc(float real, float imaginary)
         {
-            public float re;
-            public float im;
-
-            public Ipp32fc(float real, float imaginary)
-            {
-                re = real;
-                im = imaginary;
-            }
+            public float re = real;
+            public float im = imaginary;
         }
 
         #endregion
@@ -258,16 +252,10 @@ namespace ILGPU.Intel.IPP.Native
         /// Size structure for 2D operations.
         /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        public struct IppiSize
+        public struct IppiSize(int w, int h)
         {
-            public int width;
-            public int height;
-
-            public IppiSize(int w, int h)
-            {
-                width = w;
-                height = h;
-            }
+            public int width = w;
+            public int height = h;
         }
 
         #endregion

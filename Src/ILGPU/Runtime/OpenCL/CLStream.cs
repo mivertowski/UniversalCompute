@@ -82,7 +82,7 @@ namespace ILGPU.Runtime.OpenCL
             CLException.ThrowIfFailed(
                 CurrentAPI.EnqueueBarrierWithWaitList(
                     queuePtr,
-                    Array.Empty<IntPtr>(),
+                    [],
                     profilingEvent));
 
             // WORKAROUND: The OpenCL event needs to be awaited now, otherwise

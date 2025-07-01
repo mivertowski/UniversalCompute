@@ -220,7 +220,7 @@ public class UnattendedBenchmarkRunner
     /// <summary>
     /// Generates performance insights based on benchmark results.
     /// </summary>
-    private void GeneratePerformanceInsights(StringBuilder markdown, List<BenchmarkSuiteResult> results)
+    private static void GeneratePerformanceInsights(StringBuilder markdown, List<BenchmarkSuiteResult> results)
     {
         var insights = new List<string>();
 

@@ -157,7 +157,7 @@ namespace ILGPU.Memory.Unified
             var placements = new List<MemoryPlacementInfo>
             {
                 // Add standard placements that are always available
-                new MemoryPlacementInfo(
+                new(
                 MemoryPlacement.DeviceLocal,
                 supportsZeroCopy: false,
                 supportsAutoMigration: false,
@@ -165,7 +165,7 @@ namespace ILGPU.Memory.Unified
                 relativeLatency: 1.0f,
                 isAvailable: true,
                 description: "Standard device memory"),
-                new MemoryPlacementInfo(
+                new(
                 MemoryPlacement.HostPinned,
                 supportsZeroCopy: false,
                 supportsAutoMigration: false,

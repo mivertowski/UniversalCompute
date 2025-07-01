@@ -74,7 +74,7 @@ namespace ILGPU.Runtime.AI
                 throw new ArgumentNullException(nameof(workload));
 
             // Analyze workload and determine optimal execution strategy
-            var strategy = await _scheduler.AnalyzeWorkloadAsync(workload, _acceleratorProfiles).ConfigureAwait(false);
+            var strategy = await WorkloadScheduler.AnalyzeWorkloadAsync(workload, _acceleratorProfiles).ConfigureAwait(false);
             
             // Execute workload using the determined strategy
             var executionContext = new WorkloadExecutionContext(strategy, PerformanceTracker);
@@ -171,7 +171,7 @@ namespace ILGPU.Runtime.AI
                 throw new ArgumentNullException(nameof(workload));
 
             // Partition workload across available accelerators
-            var partitions = await _scheduler.PartitionWorkloadAsync(workload, _acceleratorProfiles).ConfigureAwait(false);
+            var partitions = await WorkloadScheduler.PartitionWorkloadAsync(workload, _acceleratorProfiles).ConfigureAwait(false);
             
             // Execute partitions in parallel
             var tasks = partitions.Select(partition => 
@@ -192,7 +192,7 @@ namespace ILGPU.Runtime.AI
             {
                 var primitives = PerformancePrimitivesFactory.Create(accelerator);
                 var profile = new AcceleratorProfile(accelerator, primitives);
-                
+
                 // Benchmark accelerator if needed
                 BenchmarkAccelerator(profile);
                 
@@ -203,7 +203,7 @@ namespace ILGPU.Runtime.AI
             _acceleratorProfiles.Sort((a, b) => b.PerformanceScore.CompareTo(a.PerformanceScore));
         }
 
-        private void BenchmarkAccelerator(AcceleratorProfile profile)
+        private static void BenchmarkAccelerator(AcceleratorProfile profile)
         {
             // Quick benchmark to determine relative performance
             var score = 0.0;
@@ -248,7 +248,7 @@ namespace ILGPU.Runtime.AI
             };
         }
 
-        private async Task ExecuteStrategyAsync(
+        private static async Task ExecuteStrategyAsync(
             IWorkload workload,
             WorkloadExecutionContext context,
             CancellationToken cancellationToken)
@@ -263,7 +263,7 @@ namespace ILGPU.Runtime.AI
                 var duration = DateTime.UtcNow - startTime;
                 PerformanceTracker.RecordExecution(workload.WorkloadType, duration, true);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Record failed execution
                 var duration = DateTime.UtcNow - startTime;
@@ -452,7 +452,7 @@ namespace ILGPU.Runtime.AI
         /// <summary>
         /// Gets the accelerators.
         /// </summary>
-        public IReadOnlyList<Accelerator> Accelerators { get; } = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
+        public List<Accelerator> Accelerators { get; } = accelerators?.ToList() ?? throw new ArgumentNullException(nameof(accelerators));
 
         /// <summary>
         /// Gets the strategy type.

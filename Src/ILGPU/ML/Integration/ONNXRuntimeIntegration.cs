@@ -60,12 +60,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets the provider name for ONNX Runtime registration.
         /// </summary>
-        public string Name => "ILGPUUniversal";
+        public static string Name => "ILGPUUniversal";
 
         /// <summary>
         /// Gets the supported device types.
         /// </summary>
-        public IEnumerable<string> SupportedDeviceTypes => new[] 
+        public static IEnumerable<string> SupportedDeviceTypes => new[] 
         { 
             "CPU", "CUDA", "OpenCL", "Metal", "DML", "IntelNPU", "AppleANE" 
         };
@@ -73,7 +73,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets performance statistics for the execution provider.
         /// </summary>
-        public ExecutionProviderStats Stats => _computeEngine.GetStats();
+        public static ExecutionProviderStats Stats => UniversalComputeEngine.GetStats();
 
         /// <summary>
         /// Runs inference on the ONNX model with automatic hardware optimization.
@@ -99,7 +99,7 @@ namespace ILGPU.ML.Integration
             var executionPlan = await _scheduler.CreateExecutionPlanAsync(compiledModel.ComputeGraph).ConfigureAwait(false);
 
             // Execute with universal compute engine
-            var outputTensors = await _computeEngine.ExecuteAsync(executionPlan, inputTensors).ConfigureAwait(false);
+            var outputTensors = await UniversalComputeEngine.ExecuteAsync(executionPlan, inputTensors).ConfigureAwait(false);
 
             // Convert outputs back to ONNX format
             return await ConvertTensorsToOutputsAsync(outputTensors, outputNames).ConfigureAwait(false);
@@ -121,7 +121,7 @@ namespace ILGPU.ML.Integration
             var inputTensors = await ConvertInputsToTensorsAsync(inputs).ConfigureAwait(false);
 
             // Execute with pre-compiled plan
-            var outputTensors = await _computeEngine.ExecuteCompiledAsync(executionPlan, inputTensors).ConfigureAwait(false);
+            var outputTensors = await UniversalComputeEngine.ExecuteCompiledAsync(executionPlan, inputTensors).ConfigureAwait(false);
 
             // Convert outputs back to ONNX format
             return await ConvertTensorsToOutputsAsync(outputTensors, executionPlan.OutputNames).ConfigureAwait(false);
@@ -148,7 +148,7 @@ namespace ILGPU.ML.Integration
             var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel).ConfigureAwait(false);
 
             // Optimize the compute graph
-            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, compilationOptions).ConfigureAwait(false);
+            var optimizedGraph = await ModelOptimizer.OptimizeAsync(computeGraph, compilationOptions).ConfigureAwait(false);
 
             // Create execution plan
             var executionPlan = await _scheduler.CreateExecutionPlanAsync(optimizedGraph).ConfigureAwait(false);
@@ -209,7 +209,7 @@ namespace ILGPU.ML.Integration
             await _scheduler.UpdatePolicyAsync(workloadAnalysis).ConfigureAwait(false);
 
             // Optimize memory management
-            await _computeEngine.OptimizeMemoryAsync(workloadAnalysis).ConfigureAwait(false);
+            await UniversalComputeEngine.OptimizeMemoryAsync(workloadAnalysis).ConfigureAwait(false);
 
             // Clear model cache to force recompilation with new optimizations
             ClearModelCache();
@@ -227,14 +227,14 @@ namespace ILGPU.ML.Integration
             var model = await LoadONNXModelAsync(modelPath).ConfigureAwait(false);
             var computeGraph = await ConvertONNXToComputeGraphAsync(model).ConfigureAwait(false);
             
-            var analysis = _modelOptimizer.AnalyzeModel(computeGraph);
+            var analysis = ModelOptimizer.AnalyzeModel(computeGraph);
             var deviceRecommendations = _scheduler.GetDeviceRecommendations(analysis);
             
             return new ConfigurationRecommendations(
                 deviceRecommendations,
                 analysis.RecommendedBatchSize,
                 analysis.OptimalMemoryLayout,
-                analysis.SuggestedOptimizations);
+                analysis.SuggestedOptimizations.ToArray());
         }
 
         private async Task<CompiledModel> GetOrCompileModelAsync(string modelPath)
@@ -246,7 +246,7 @@ namespace ILGPU.ML.Integration
 
             var onnxModel = await LoadONNXModelAsync(modelPath).ConfigureAwait(false);
             var computeGraph = await ConvertONNXToComputeGraphAsync(onnxModel).ConfigureAwait(false);
-            var optimizedGraph = await _modelOptimizer.OptimizeAsync(computeGraph, new ModelCompilationOptions()).ConfigureAwait(false);
+            var optimizedGraph = await ModelOptimizer.OptimizeAsync(computeGraph, new ModelCompilationOptions()).ConfigureAwait(false);
 
             var compiledModel = new CompiledModel(modelPath, optimizedGraph, onnxModel.InputNames, onnxModel.OutputNames);
             _modelCache[modelPath] = compiledModel;
@@ -254,21 +254,17 @@ namespace ILGPU.ML.Integration
             return compiledModel;
         }
 
-        private async Task<ONNXModel> LoadONNXModelAsync(string modelPath) =>
+        private static async Task<ONNXModel> LoadONNXModelAsync(string modelPath) =>
             // Implementation would load and parse ONNX model file
             // This is a simplified placeholder
-            await Task.FromResult(new ONNXModel
-            {
-                ModelPath = modelPath,
-                ModelBytes = Array.Empty<byte>()
-            }).ConfigureAwait(false);
+            await Task.FromResult(new ONNXModel(modelPath)).ConfigureAwait(false);
 
-        private async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel) =>
+        private static async Task<ComputeGraph> ConvertONNXToComputeGraphAsync(ONNXModel onnxModel) =>
             // Implementation would convert ONNX operators to ILGPU compute operations
             // This involves mapping ONNX ops to universal kernels
             await Task.FromResult(new ComputeGraph()).ConfigureAwait(false);
 
-        private async Task<Dictionary<string, ITensor<float>>> ConvertInputsToTensorsAsync(
+        private static async Task<Dictionary<string, ITensor<float>>> ConvertInputsToTensorsAsync(
             IReadOnlyCollection<NamedOnnxValue> inputs)
         {
             var tensorInputs = new Dictionary<string, ITensor<float>>();
@@ -285,11 +281,11 @@ namespace ILGPU.ML.Integration
             return tensorInputs;
         }
 
-        private async Task<ITensor<float>?> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue) =>
+        private static async Task<ITensor<float>?> ConvertOnnxValueToTensorAsync(NamedOnnxValue onnxValue) =>
             // Implementation would convert ONNX tensor format to ILGPU tensor format
             await Task.FromResult<ITensor<float>?>(null).ConfigureAwait(false);
 
-        private async Task<NamedOnnxValue[]> ConvertTensorsToOutputsAsync(
+        private static async Task<NamedOnnxValue[]> ConvertTensorsToOutputsAsync(
             Dictionary<string, ITensor<float>> tensors,
             IEnumerable<string> outputNames)
         {
@@ -310,11 +306,11 @@ namespace ILGPU.ML.Integration
             return outputs.ToArray();
         }
 
-        private async Task<NamedOnnxValue?> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>
+        private static async Task<NamedOnnxValue?> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>
             // Implementation would convert ILGPU tensor back to ONNX format
             await Task.FromResult<NamedOnnxValue?>(null).ConfigureAwait(false);
 
-        private async Task<Dictionary<ComputeNode, CompiledKernel>> CompileKernelsAsync(ExecutionPlan plan)
+        private static async Task<Dictionary<ComputeNode, CompiledKernel>> CompileKernelsAsync(ExecutionPlan plan)
         {
             var compiledKernels = new Dictionary<ComputeNode, CompiledKernel>();
 
@@ -327,14 +323,9 @@ namespace ILGPU.ML.Integration
             return compiledKernels;
         }
 
-        private async Task<CompiledKernel> CompileNodeKernelAsync(ComputeNode node, ComputeDevice device) =>
+        private static async Task<CompiledKernel> CompileNodeKernelAsync(ComputeNode node, ComputeDevice device) =>
             // Implementation would compile the node's operation to device-specific code
-            await Task.FromResult(new CompiledKernel
-            {
-                KernelName = $"{node.Operation.GetType().Name}_{device}",
-                EntryPoint = "main",
-                CompiledCode = [0x00] // Placeholder
-            }).ConfigureAwait(false);
+            await Task.FromResult(new CompiledKernel(node, device)).ConfigureAwait(false);
 
         private async Task<DeviceProfilingResult> ProfileOnDeviceAsync(
             string modelPath,
@@ -357,7 +348,7 @@ namespace ILGPU.ML.Integration
             return new DeviceProfilingResult(device, true, avgLatency, throughput);
         }
 
-        private WorkloadAnalysis AnalyzeWorkloadSamples(IEnumerable<WorkloadSample> samples)
+        private static WorkloadAnalysis AnalyzeWorkloadSamples(IEnumerable<WorkloadSample> samples)
         {
             // Analyze common patterns in workload samples
             var batchSizes = samples.Select(s => s.BatchSize).ToList();
@@ -393,26 +384,13 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the execution provider and releases all resources.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (_disposed)
                 return;
 
-            if (disposing)
-            {
-                ClearModelCache();
-                _computeEngine?.Dispose();
-                _scheduler?.Dispose();
-                _modelOptimizer?.Dispose();
-            }
+            ClearModelCache();
+            _computeEngine?.Dispose();
+            _scheduler?.Dispose();
+            _modelOptimizer?.Dispose();
 
             _disposed = true;
         }

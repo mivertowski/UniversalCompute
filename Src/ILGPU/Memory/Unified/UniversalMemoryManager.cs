@@ -18,7 +18,6 @@
 using ILGPU.Runtime;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -68,7 +67,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets the available memory placements on the current platform.
         /// </summary>
-        public IReadOnlyList<MemoryPlacementInfo> AvailablePlacements => 
+        public static MemoryPlacementInfo[] AvailablePlacements => 
             MemoryPlacementCapabilities.GetAvailablePlacements();
 
         /// <summary>
@@ -103,7 +102,7 @@ namespace ILGPU.Memory.Unified
             // Optimize placement if auto is requested
             if (placement == MemoryPlacement.Auto)
             {
-                placement = _placementOptimizer.GetOptimalPlacement<T>(
+                placement = MemoryPlacementOptimizer.GetOptimalPlacement<T>(
                     size, accessPattern, _usageTracker.GetCurrentUsage());
             }
 
@@ -247,30 +246,17 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the memory manager and all associated resources.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (_disposed)
                 return;
 
-            if (disposing)
+            foreach (var manager in _acceleratorManagers.Values)
             {
-                foreach (var manager in _acceleratorManagers.Values)
-                {
-                    manager.Dispose();
-                }
-
-                _acceleratorManagers.Clear();
-                _usageTracker.Dispose();
-                _placementOptimizer.Dispose();
+                manager.Dispose();
             }
+
+            _acceleratorManagers.Clear();
+            _usageTracker.Dispose();
+            _placementOptimizer.Dispose();
 
             _disposed = true;
         }
@@ -318,7 +304,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets additional optimization hints.
         /// </summary>
-        public IReadOnlyList<string> OptimizationHints { get; } = optimizationHints ?? Array.Empty<string>();
+        public string[] OptimizationHints { get; } = optimizationHints;
     }
 
 }

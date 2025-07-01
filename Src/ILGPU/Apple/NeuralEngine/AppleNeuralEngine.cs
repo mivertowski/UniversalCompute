@@ -111,7 +111,7 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var outputShape = model.GetOutputShape(input.Shape);
+                var outputShape = CoreMLModel.GetOutputShape(input.Shape);
                 var result = TensorFactory.Create<float>(outputShape, ComputeLocation.Npu);
 
                 ExecuteCoreMLInference(model, input, result);
@@ -194,7 +194,7 @@ namespace ILGPU.Apple.NeuralEngine
                 
                 if (options != null)
                 {
-                    model.OptimizeForNeuralEngine(options);
+                    CoreMLModel.OptimizeForNeuralEngine(options);
                 }
 
                 return model;
@@ -398,18 +398,20 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// Convolution operation for Neural operations.
     /// </summary>
-    public sealed class ConvolutionOperation : NeuralOperation
+    /// <inheritdoc/>
+    public sealed class ConvolutionOperation(ConvolutionParameters parameters) : NeuralOperation
     {
-        public ConvolutionOperation(ConvolutionParameters parameters)
-        {
-            Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-        }
 
+        /// <inheritdoc/>
         public override string Name => "Convolution";
+        /// <inheritdoc/>
         public override NeuralOperationType Type => NeuralOperationType.Convolution;
+        /// <inheritdoc/>
         public override TensorShape InputShape { get; }
-        public ConvolutionParameters Parameters { get; }
+        /// <inheritdoc/>
+        public ConvolutionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
+        /// <inheritdoc/>
         public override TensorShape CalculateOutputShape(TensorShape inputShape)
         {
             var batchSize = inputShape[0];
@@ -426,18 +428,20 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// Attention operation for Neural operations.
     /// </summary>
-    public sealed class AttentionOperation : NeuralOperation
+    /// <inheritdoc/>
+    public sealed class AttentionOperation(AttentionParameters parameters) : NeuralOperation
     {
-        public AttentionOperation(AttentionParameters parameters)
-        {
-            Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-        }
 
+        /// <inheritdoc/>
         public override string Name => "Attention";
+        /// <inheritdoc/>
         public override NeuralOperationType Type => NeuralOperationType.Attention;
+        /// <inheritdoc/>
         public override TensorShape InputShape { get; }
-        public AttentionParameters Parameters { get; }
+        /// <inheritdoc/>
+        public AttentionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
+        /// <inheritdoc/>
         public override TensorShape CalculateOutputShape(TensorShape inputShape) => inputShape; // Attention preserves input shape
     }
 }

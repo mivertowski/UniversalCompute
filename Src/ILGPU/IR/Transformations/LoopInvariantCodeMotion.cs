@@ -36,7 +36,7 @@ namespace ILGPU.IR.Transformations
         {
             #region Instance
 
-            private readonly Dictionary<Value, bool> mapping = new Dictionary<Value, bool>(loop.Count << 1);
+            private readonly Dictionary<Value, bool> mapping = new(loop.Count << 1);
 
             #endregion
 

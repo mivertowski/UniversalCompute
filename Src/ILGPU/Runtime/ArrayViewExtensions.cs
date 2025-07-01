@@ -1645,7 +1645,7 @@ namespace ILGPU.Runtime
             where T : unmanaged
         {
             if (view.HasNoData())
-                return Array.Empty<T>();
+                return [];
 
             if (view.UsesAutoPageLocking())
             {

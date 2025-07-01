@@ -394,7 +394,7 @@ namespace ILGPU.IR.Transformations
             /// The internal movement analysis instance used to move values during code
             /// placement.
             /// </summary>
-            private readonly Movement<Method.Builder> movement = new Movement<Method.Builder>(builder.SourceBlocks, builder);
+            private readonly Movement<Method.Builder> movement = new(builder.SourceBlocks, builder);
 
             #endregion
 

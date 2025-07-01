@@ -219,7 +219,7 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
             for (int j = 0; j < effectiveTileSize; j++)
             {
                 var aIndex = (startRow + i) * size + j;
-                var bIndex = j * size + (startCol + i);
+                var bIndex = j * size + startCol + i;
                 
                 if (aIndex < a.Length && bIndex < b.Length)
                 {
@@ -238,7 +238,7 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
         {
             for (int j = 0; j < effectiveTileSize; j++)
             {
-                var resultIndex = (startRow + i) * size + (startCol + j);
+                var resultIndex = (startRow + i) * size + startCol + j;
                 if (resultIndex < result.Length)
                 {
                     result[resultIndex] = tileC[i * tileSize + j];
@@ -272,7 +272,7 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
                     {
                         for (int kw = 0; kw < kernelSize; kw++)
                         {
-                            var inputIdx = c * height * width + (oh + kh) * width + (ow + kw);
+                            var inputIdx = c * height * width + (oh + kh) * width + ow + kw;
                             var kernelIdx = c * kernelSize * kernelSize + kh * kernelSize + kw;
                             
                             if (inputIdx < input.Length && kernelIdx < kernel.Length)
@@ -300,7 +300,7 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
     [DllImport("kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
     private static extern void ZeroMemory(IntPtr dest, IntPtr size);
 
-    private unsafe void LoadTileConfig(byte* config)
+    private static unsafe void LoadTileConfig(byte* config)
     {
         // In real implementation, this would use LDTILECFG instruction
         // For now, we'll use a placeholder that indicates tile configuration

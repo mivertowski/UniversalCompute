@@ -138,24 +138,11 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the memory manager.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
+            // Clean up any remaining allocations
+            lock (_syncLock)
             {
-                // Clean up any remaining allocations
-                lock (_syncLock)
-                {
-                    _allocations.Clear();
-                    _totalAllocatedBytes = 0;
-                }
+                _allocations.Clear();
+                _totalAllocatedBytes = 0;
             }
         }
 
@@ -304,22 +291,9 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the memory usage tracker.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
+            lock (_syncLock)
             {
-                lock (_syncLock)
-                {
-                    _usageStats.Clear();
-                }
+                _usageStats.Clear();
             }
         }
     }
@@ -421,7 +395,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets the optimal memory placement for the specified parameters.
         /// </summary>
-        public MemoryPlacement GetOptimalPlacement<T>(
+        public static MemoryPlacement GetOptimalPlacement<T>(
             long size, 
             MemoryAccessPattern accessPattern, 
             MemoryUsageInfo usageInfo) where T : unmanaged
@@ -464,23 +438,7 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Disposes the memory placement optimizer.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the memory placement optimizer.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                _accelerators?.Clear();
-            }
-        }
+        public void Dispose() => _accelerators?.Clear();
     }
 
     /// <summary>

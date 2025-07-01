@@ -110,21 +110,17 @@ namespace ILGPU.Intel.AMX
     /// <summary>
     /// AMX-specific capability context.
     /// </summary>
-    internal sealed class AMXCapabilityContext : CapabilityContext
+    /// <remarks>
+    /// Initializes a new AMX capability context.
+    /// </remarks>
+    /// <param name="capabilities">The AMX capabilities.</param>
+    internal sealed class AMXCapabilityContext(AMXCapabilities capabilities) : CapabilityContext
     {
-        /// <summary>
-        /// Initializes a new AMX capability context.
-        /// </summary>
-        /// <param name="capabilities">The AMX capabilities.</param>
-        public AMXCapabilityContext(AMXCapabilities capabilities)
-        {
-            AMXCapabilities = capabilities;
-        }
 
         /// <summary>
         /// Gets the AMX capabilities.
         /// </summary>
-        public AMXCapabilities AMXCapabilities { get; }
+        public AMXCapabilities AMXCapabilities { get; } = capabilities;
 
         // AMX has tile-based matrix operation capabilities
         // These capabilities are determined by the actual hardware
