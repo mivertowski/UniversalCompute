@@ -56,7 +56,7 @@ namespace ILGPU.Apple.NeuralEngine
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal() => new ANEExecutionContext(this);
+        protected override AcceleratorStream CreateStreamInternal() => new ANEStream(this);
 
         protected override void SynchronizeInternal() =>
             // ANE operations are asynchronous but we can sync here
@@ -71,7 +71,7 @@ namespace ILGPU.Apple.NeuralEngine
             out KernelInfo? kernelInfo)
         {
             var allocaInfo = default(AllocaKindInformation);
-            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, []);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -81,7 +81,7 @@ namespace ILGPU.Apple.NeuralEngine
             out KernelInfo? kernelInfo)
         {
             var allocaInfo = default(AllocaKindInformation);
-            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, []);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -146,21 +146,15 @@ namespace ILGPU.Apple.NeuralEngine
     }
 
     /// <summary>
-    /// ANE execution context implementation.
+    /// ANE stream implementation.
     /// </summary>
-    public sealed class ANEExecutionContext : AcceleratorStream
+    /// <remarks>
+    /// Initializes a new instance of the ANEStream class.
+    /// </remarks>
+    /// <param name="accelerator">The ANE accelerator.</param>
+    public sealed class ANEStream(AppleNeuralEngineAccelerator accelerator) : AcceleratorStream(accelerator)
     {
-        private readonly AppleNeuralEngineAccelerator _accelerator;
-
-        /// <summary>
-        /// Initializes a new instance of the ANEExecutionContext class.
-        /// </summary>
-        /// <param name="accelerator">The ANE accelerator.</param>
-        public ANEExecutionContext(AppleNeuralEngineAccelerator accelerator)
-            : base(accelerator)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        }
+        private readonly AppleNeuralEngineAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Synchronizes the stream.
@@ -273,22 +267,15 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// ANE kernel implementation.
     /// </summary>
-    public sealed class ANEKernel : Kernel
+    /// <remarks>
+    /// Initializes a new instance of the ANEKernel class.
+    /// </remarks>
+    /// <param name="accelerator">The ANE accelerator.</param>
+    /// <param name="compiledKernel">The compiled kernel.</param>
+    public sealed class ANEKernel(AppleNeuralEngineAccelerator accelerator, CompiledKernel compiledKernel) : Kernel(accelerator, compiledKernel, null)
     {
-        private readonly AppleNeuralEngineAccelerator _accelerator;
-        private readonly CompiledKernel _compiledKernel;
-
-        /// <summary>
-        /// Initializes a new instance of the ANEKernel class.
-        /// </summary>
-        /// <param name="accelerator">The ANE accelerator.</param>
-        /// <param name="compiledKernel">The compiled kernel.</param>
-        public ANEKernel(AppleNeuralEngineAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel, null)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
-        }
+        private readonly AppleNeuralEngineAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+        private readonly CompiledKernel _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
 
 
         /// <summary>

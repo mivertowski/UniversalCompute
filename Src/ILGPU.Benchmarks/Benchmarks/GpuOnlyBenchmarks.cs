@@ -179,7 +179,7 @@ public class GpuOnlyBenchmarks : IDisposable
         const int elementsPerThread = 4;
         for (int i = 0; i < elementsPerThread; i++)
         {
-            var globalIdx = index + i * (groupSize * Group.DimY);
+            var globalIdx = index + i * groupSize * Group.DimY;
             if (globalIdx < input.Length)
             {
                 localSum += input[globalIdx];

@@ -346,13 +346,13 @@ public class IntelNPUBenchmarks : IDisposable
         {
             var weightIndex = (index * inputSize + i) % weights.Length;
             // Simulate FP16 precision
-            var inputVal = (float)((Half)input[i]);
-            var weightVal = (float)((Half)weights[weightIndex]);
+            var inputVal = (float)(Half)input[i];
+            var weightVal = (float)(Half)weights[weightIndex];
             sum += inputVal * weightVal;
         }
         
         var biasIndex = index % bias.Length;
-        var biasVal = (float)((Half)bias[biasIndex]);
+        var biasVal = (float)(Half)bias[biasIndex];
         // ReLU activation with NPU-style saturation
         output[index] = IntrinsicMath.Min(65504.0f, IntrinsicMath.Max(0.0f, sum + biasVal));
     }
@@ -457,8 +457,8 @@ public class IntelNPUBenchmarks : IDisposable
                     var keyIdx = (j * hiddenSize + headOffset + d) % input.Length;
                     
                     // NPU-optimized FP16 precision computation
-                    var queryVal = (float)((Half)input[queryIdx]);
-                    var keyVal = (float)((Half)input[keyIdx]);
+                    var queryVal = (float)(Half)input[queryIdx];
+                    var keyVal = (float)(Half)input[keyIdx];
                     score += queryVal * keyVal;
                 }
                 
@@ -495,8 +495,8 @@ public class IntelNPUBenchmarks : IDisposable
                     var weightIdx = (headOffset + d) % weights.Length;
                     
                     // NPU-optimized computation with weight projection
-                    var valueVal = (float)((Half)input[valueIdx]);
-                    var weightVal = (float)((Half)weights[weightIdx]);
+                    var valueVal = (float)(Half)input[valueIdx];
+                    var weightVal = (float)(Half)weights[weightIdx];
                     headOutput += attentionScores[j] * valueVal * weightVal;
                 }
             }

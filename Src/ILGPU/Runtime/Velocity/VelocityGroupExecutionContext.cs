@@ -22,10 +22,10 @@ namespace ILGPU.Runtime.Velocity
     /// <param name="accelerator">The parent velocity accelerator.</param>
     sealed class VelocityGroupExecutionContext(VelocityAccelerator accelerator) : DisposeBase
     {
-        private readonly VelocityMemoryBufferPool sharedMemoryPool = new VelocityMemoryBufferPool(
+        private readonly VelocityMemoryBufferPool sharedMemoryPool = new(
                 accelerator,
                 accelerator.MaxSharedMemoryPerGroup);
-        private readonly VelocityMemoryBufferPool localMemoryPool = new VelocityMemoryBufferPool(
+        private readonly VelocityMemoryBufferPool localMemoryPool = new(
                 accelerator,
                 accelerator.MaxSharedMemoryPerGroup);
         private readonly int warpSize = accelerator.WarpSize;

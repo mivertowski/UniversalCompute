@@ -138,7 +138,7 @@ namespace ILGPU.Intel.AMX
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal() => new AMXExecutionContext(this);
+        protected override AcceleratorStream CreateStreamInternal() => new AMXStream(this);
 
         protected override void SynchronizeInternal() =>
             // AMX operations are synchronous by nature
@@ -153,7 +153,7 @@ namespace ILGPU.Intel.AMX
             out KernelInfo? kernelInfo)
         {
             var allocaInfo = default(AllocaKindInformation);
-            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, []);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -163,7 +163,7 @@ namespace ILGPU.Intel.AMX
             out KernelInfo? kernelInfo)
         {
             var allocaInfo = default(AllocaKindInformation);
-            kernelInfo = new KernelInfo(0, 0, in allocaInfo, ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, in allocaInfo, []);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -299,21 +299,15 @@ namespace ILGPU.Intel.AMX
     }
 
     /// <summary>
-    /// AMX execution context implementation.
+    /// AMX stream implementation.
     /// </summary>
-    public sealed class AMXExecutionContext : AcceleratorStream
+    /// <remarks>
+    /// Initializes a new instance of the AMXStream class.
+    /// </remarks>
+    /// <param name="accelerator">The AMX accelerator.</param>
+    public sealed class AMXStream(AMXAccelerator accelerator) : AcceleratorStream(accelerator)
     {
-        private readonly AMXAccelerator _accelerator;
-
-        /// <summary>
-        /// Initializes a new instance of the AMXExecutionContext class.
-        /// </summary>
-        /// <param name="accelerator">The AMX accelerator.</param>
-        public AMXExecutionContext(AMXAccelerator accelerator)
-            : base(accelerator)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        }
+        private readonly AMXAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Synchronizes the stream.

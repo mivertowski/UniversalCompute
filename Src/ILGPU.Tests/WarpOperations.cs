@@ -242,7 +242,7 @@ namespace ILGPU.Tests
             Execute(length, dataBuffer.View);
 
             var expected = Enumerable.Repeat(
-                (Accelerator.WarpSize * (Accelerator.WarpSize - 1)) / 2,
+                Accelerator.WarpSize * (Accelerator.WarpSize - 1) / 2,
                 length).ToArray();
 
             Verify(dataBuffer.View, expected);

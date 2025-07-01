@@ -63,24 +63,9 @@ namespace ILGPU.Numerics
     /// </summary>
     public enum MemoryLocation
     {
-        /// <summary>
-        /// Data is currently in CPU memory.
-        /// </summary>
         CPU,
-        
-        /// <summary>
-        /// Data is currently in GPU memory.
-        /// </summary>
         GPU,
-        
-        /// <summary>
-        /// Data is in unified memory accessible by both CPU and GPU.
-        /// </summary>
         Unified,
-        
-        /// <summary>
-        /// Data is in pinned memory for efficient transfers.
-        /// </summary>
         Pinned
     }
 
@@ -708,7 +693,7 @@ namespace ILGPU.Numerics
         /// Creates a unified tensor from CPU data.
         /// </summary>
         public static UnifiedTensor<T> FromArray<T>(Accelerator accelerator, TensorShape shape, T[] data, MemoryLayoutMode layoutMode = MemoryLayoutMode.Auto)
-            where T : unmanaged, INumber<T> => new UnifiedTensor<T>(accelerator, shape, data, layoutMode);
+            where T : unmanaged, INumber<T> => new(accelerator, shape, data, layoutMode);
 
         /// <summary>
         /// Creates a unified tensor with random values.

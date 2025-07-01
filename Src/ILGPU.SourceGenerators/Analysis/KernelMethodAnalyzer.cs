@@ -110,7 +110,7 @@ namespace ILGPU.SourceGenerators.Analysis
         /// <summary>
         /// Analyzes the method body for AOT-incompatible features.
         /// </summary>
-        private MethodBodyAnalysisResult AnalyzeMethodBody(MethodDeclarationSyntax methodSyntax)
+        private static MethodBodyAnalysisResult AnalyzeMethodBody(MethodDeclarationSyntax methodSyntax)
         {
             var bodyAnalysis = new MethodBodyAnalysisResult();
 
@@ -148,13 +148,13 @@ namespace ILGPU.SourceGenerators.Analysis
             return bodyAnalysis;
         }
 
-        private bool IsArrayViewType(ITypeSymbol type)
+        private static bool IsArrayViewType(ITypeSymbol type)
         {
             // Check if type is ArrayView<T> or similar ILGPU view types
             return type.Name.Contains("ArrayView") || type.Name.Contains("MemoryBuffer");
         }
 
-        private ITypeSymbol? GetArrayViewElementType(ITypeSymbol arrayViewType)
+        private static ITypeSymbol? GetArrayViewElementType(ITypeSymbol arrayViewType)
         {
             // Extract T from ArrayView<T>
             if (arrayViewType is INamedTypeSymbol namedType && namedType.TypeArguments.Length > 0)
@@ -162,7 +162,7 @@ namespace ILGPU.SourceGenerators.Analysis
             return null;
         }
 
-        private bool IsPrimitiveType(ITypeSymbol type)
+        private static bool IsPrimitiveType(ITypeSymbol type)
         {
             return type.SpecialType switch
             {
@@ -181,12 +181,12 @@ namespace ILGPU.SourceGenerators.Analysis
             };
         }
 
-        private bool IsStructType(ITypeSymbol type)
+        private static bool IsStructType(ITypeSymbol type)
         {
             return type.TypeKind == TypeKind.Struct && !IsPrimitiveType(type);
         }
 
-        private bool IsReflectionAPI(MemberAccessExpressionSyntax memberAccess)
+        private static bool IsReflectionAPI(MemberAccessExpressionSyntax memberAccess)
         {
             var memberName = memberAccess.Name.Identifier.ValueText;
             return memberName.Contains("GetType") || 

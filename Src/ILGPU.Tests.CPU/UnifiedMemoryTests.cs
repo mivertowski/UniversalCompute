@@ -151,7 +151,7 @@ namespace ILGPU.Tests.CPU
             var result = buffer.GetAsArray1D();
             for (int i = 0; i < length; i++)
             {
-                var expected = (i * 0.5f) * (i * 0.5f);
+                var expected = i * 0.5f * (i * 0.5f);
                 Assert.Equal(expected, result[i], 5);
             }
         }

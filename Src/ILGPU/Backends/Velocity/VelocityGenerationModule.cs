@@ -239,7 +239,7 @@ namespace ILGPU.Backends.Velocity
                 DumpMethodInfo.Name,
                 MethodAttributes.Public | MethodAttributes.Virtual,
                 typeof(void),
-                Array.Empty<Type>());
+                []);
 
             // Emit code to visualize each field
             var emitter = new ILEmitter(dumpMethod.GetILGenerator());

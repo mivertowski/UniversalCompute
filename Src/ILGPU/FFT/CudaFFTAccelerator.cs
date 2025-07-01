@@ -31,7 +31,11 @@ namespace ILGPU.FFT
     /// CUDA-based FFT accelerator using NVIDIA cuFFT library.
     /// Provides high-performance GPU FFT operations.
     /// </summary>
-    public sealed class CudaFFTAccelerator : FFTAccelerator
+    /// <remarks>
+    /// Constructs a new CUDA FFT accelerator.
+    /// </remarks>
+    /// <param name="cudaAccelerator">The parent CUDA accelerator.</param>
+    public sealed class CudaFFTAccelerator(CudaAccelerator cudaAccelerator) : FFTAccelerator(cudaAccelerator)
     {
         #region Native cuFFT Bindings
 
@@ -109,18 +113,8 @@ namespace ILGPU.FFT
 
         #region Instance
 
-        private readonly CudaAccelerator _cudaAccelerator;
+        private readonly CudaAccelerator _cudaAccelerator = cudaAccelerator ?? throw new ArgumentNullException(nameof(cudaAccelerator));
         private bool _disposed;
-
-        /// <summary>
-        /// Constructs a new CUDA FFT accelerator.
-        /// </summary>
-        /// <param name="cudaAccelerator">The parent CUDA accelerator.</param>
-        public CudaFFTAccelerator(CudaAccelerator cudaAccelerator)
-            : base(cudaAccelerator)
-        {
-            _cudaAccelerator = cudaAccelerator ?? throw new ArgumentNullException(nameof(cudaAccelerator));
-        }
 
         #endregion
 
@@ -144,7 +138,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// Gets the performance characteristics of this FFT accelerator.
         /// </summary>
-        public override FFTPerformanceInfo PerformanceInfo => new FFTPerformanceInfo
+        public override FFTPerformanceInfo PerformanceInfo => new()
         {
             RelativePerformance = 5.0, // High performance
             EstimatedGFLOPS = _cudaAccelerator.NumMultiprocessors * 100.0, // Rough estimate
@@ -627,15 +621,11 @@ namespace ILGPU.FFT
         /// <summary>
         /// Disposes this CUDA FFT accelerator.
         /// </summary>
-        /// <param name="disposing">True if disposing from Dispose() method, false if from finalizer.</param>
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
             if (!_disposed)
             {
-                if (disposing)
-                {
-                    // No persistent resources to clean up in this implementation
-                }
+                // No persistent resources to clean up in this implementation
                 _disposed = true;
             }
         }

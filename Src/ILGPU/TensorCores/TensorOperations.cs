@@ -471,9 +471,9 @@ namespace ILGPU.TensorCores
                         TensorPrecision.FP16 
                     ];
                 }
-                return Array.Empty<TensorPrecision>();
+                return [];
             }
-            return Array.Empty<TensorPrecision>();
+            return [];
         }
     }
 }

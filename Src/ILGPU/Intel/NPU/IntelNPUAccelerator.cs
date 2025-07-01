@@ -20,7 +20,6 @@ using ILGPU.Intel.NPU.Native;
 using ILGPU.Runtime;
 using ILGPU.IR.Analyses;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
@@ -108,8 +107,8 @@ namespace ILGPU.Intel.NPU
                 cancellationToken.ThrowIfCancellationRequested();
 
                 // Create NPU-compatible neural network representation
-                var npuNetwork = new ILGPU.Numerics.AI.NeuralNetwork("NPU_Converted", new List<ILGPU.Numerics.AI.NeuralOperation>());
-                using var npuContext = new NPUInferenceContext(npuNetwork, Capabilities);
+                var appleNetwork = new Apple.NeuralEngine.NeuralNetwork("NPU_Converted", []);
+                using var npuContext = new NPUInferenceContext(appleNetwork, Capabilities);
                 
                 // Execute inference on NPU
                 var result = ExecuteNPUInference(input, npuContext);
@@ -292,7 +291,7 @@ namespace ILGPU.Intel.NPU
         #region Accelerator Implementation
 
 
-        protected override AcceleratorStream CreateStreamInternal() => new NPUExecutionContext(this);
+        protected override AcceleratorStream CreateStreamInternal() => new NPUStream(this);
 
         protected override void SynchronizeInternal() =>
             // NPU operations are handled asynchronously
@@ -306,7 +305,7 @@ namespace ILGPU.Intel.NPU
             CompiledKernel compiledKernel,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), []);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -315,7 +314,7 @@ namespace ILGPU.Intel.NPU
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), []);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -389,7 +388,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Loads a pre-trained model for NPU execution.
         /// </summary>
-        public async Task<NeuralNetwork> LoadModelAsync(
+        public static async Task<NeuralNetwork> LoadModelAsync(
             string modelPath,
             ModelFormat format,
             CancellationToken cancellationToken = default)
@@ -409,7 +408,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Optimizes a model for NPU execution.
         /// </summary>
-        public async Task<NeuralNetwork> OptimizeModelAsync(
+        public static async Task<NeuralNetwork> OptimizeModelAsync(
             NeuralNetwork model,
             OptimizationOptions options,
             CancellationToken cancellationToken = default)
@@ -456,7 +455,7 @@ namespace ILGPU.Intel.NPU
 
         #region Private Implementation
 
-        private ITensor<T> ExecuteNPUInference<T>(ITensor<T> input, NPUInferenceContext context)
+        private static ITensor<T> ExecuteNPUInference<T>(ITensor<T> input, NPUInferenceContext context)
             where T : unmanaged
         {
             // Create result tensor with appropriate output shape
@@ -500,7 +499,7 @@ namespace ILGPU.Intel.NPU
             return result;
         }
 
-        private ITensor<float> ExecuteNPUConvolution(ITensor<float> input, ITensor<float> weights, NPUConvolutionConfig config)
+        private static ITensor<float> ExecuteNPUConvolution(ITensor<float> input, ITensor<float> weights, NPUConvolutionConfig config)
         {
             var outputShape = config.CalculateOutputShape(input.Shape, weights.Shape);
             var result = TensorFactory.Create<float>(outputShape, ComputeLocation.Npu);
@@ -518,7 +517,7 @@ namespace ILGPU.Intel.NPU
             return result;
         }
 
-        private ITensor<T> ExecuteNPUMatMul<T>(ITensor<T> a, ITensor<T> b, NPUMatMulConfig config)
+        private static ITensor<T> ExecuteNPUMatMul<T>(ITensor<T> a, ITensor<T> b, NPUMatMulConfig config)
             where T : unmanaged
         {
             var resultShape = new TensorShape(a.Shape[0], b.Shape[1]);
@@ -553,7 +552,7 @@ namespace ILGPU.Intel.NPU
             return result;
         }
 
-        private ITensor<float> ExecuteNPUAttention(ITensor<float> query, ITensor<float> key, 
+        private static ITensor<float> ExecuteNPUAttention(ITensor<float> query, ITensor<float> key, 
             ITensor<float> value, NPUAttentionConfig config)
         {
             var outputShape = query.Shape; // Attention preserves sequence length
@@ -573,7 +572,7 @@ namespace ILGPU.Intel.NPU
             return result;
         }
 
-        private NPUMatMulConfig CreateOptimalMatMulConfig(TensorShape aShape, TensorShape bShape) => new NPUMatMulConfig(new MatMulConfiguration
+        private NPUMatMulConfig CreateOptimalMatMulConfig(TensorShape aShape, TensorShape bShape) => new(new MatMulConfiguration
         {
             M = aShape[0],
             K = aShape[1],
@@ -582,7 +581,7 @@ namespace ILGPU.Intel.NPU
             UseSparsity = Capabilities.SupportsSparsity
         });
 
-        private IModelLoader CreateModelLoader(ModelFormat format) => format switch
+        private static IModelLoader CreateModelLoader(ModelFormat format) => format switch
         {
             ModelFormat.ONNX => new ONNXModelLoader(),
             ModelFormat.OpenVINO => new OpenVINOModelLoader(),
@@ -601,21 +600,15 @@ namespace ILGPU.Intel.NPU
 
 
     /// <summary>
-    /// NPU execution context implementation.
+    /// NPU stream implementation.
     /// </summary>
-    public sealed class NPUExecutionContext : AcceleratorStream
+    /// <remarks>
+    /// Initializes a new instance of the NPUStream class.
+    /// </remarks>
+    /// <param name="accelerator">The NPU accelerator.</param>
+    public sealed class NPUStream(IntelNPUAccelerator accelerator) : AcceleratorStream(accelerator)
     {
-        private readonly IntelNPUAccelerator _accelerator;
-
-        /// <summary>
-        /// Initializes a new instance of the NPUExecutionContext class.
-        /// </summary>
-        /// <param name="accelerator">The NPU accelerator.</param>
-        public NPUExecutionContext(IntelNPUAccelerator accelerator)
-            : base(accelerator)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        }
+        private readonly IntelNPUAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>
         /// Synchronizes the stream.
@@ -730,22 +723,15 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// NPU kernel implementation.
     /// </summary>
-    public sealed class NPUKernel : Kernel
+    /// <remarks>
+    /// Initializes a new instance of the NPUKernel class.
+    /// </remarks>
+    /// <param name="accelerator">The NPU accelerator.</param>
+    /// <param name="compiledKernel">The compiled kernel.</param>
+    public sealed class NPUKernel(IntelNPUAccelerator accelerator, CompiledKernel compiledKernel) : Kernel(accelerator, compiledKernel, null)
     {
-        private readonly IntelNPUAccelerator _accelerator;
-        private readonly CompiledKernel _compiledKernel;
-
-        /// <summary>
-        /// Initializes a new instance of the NPUKernel class.
-        /// </summary>
-        /// <param name="accelerator">The NPU accelerator.</param>
-        /// <param name="compiledKernel">The compiled kernel.</param>
-        public NPUKernel(IntelNPUAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel, null)
-        {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
-        }
+        private readonly IntelNPUAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+        private readonly CompiledKernel _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
 
 
         /// <summary>

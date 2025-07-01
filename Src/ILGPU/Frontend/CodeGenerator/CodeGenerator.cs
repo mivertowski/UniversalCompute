@@ -18,6 +18,7 @@ using ILGPU.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -48,6 +49,7 @@ namespace ILGPU.Frontend
         /// </param>
         /// <param name="compilationStackLocation">The source location.</param>
         /// <param name="detectedMethods">The set of newly detected methods.</param>
+        [RequiresUnreferencedCode("Calls ILGPU.Frontend.CodeGenerator.SetupVariables()")]
         public CodeGenerator(
             ILFrontend frontend,
             IRContext context,
@@ -79,6 +81,7 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Setups all parameter and local bindings.
         /// </summary>
+        [RequiresUnreferencedCode("Calls System.Reflection.MethodBase.GetMethodBody()")]
         private void SetupVariables()
         {
             var builder = EntryBlock.Builder;
@@ -503,7 +506,7 @@ namespace ILGPU.Frontend
             TypeNode type,
             ConvertFlags flags)
         {
-            if (type == null || !address.Type!.IsPointerType)
+            if (type == null || !address.Type.IsPointerType)
             {
                 throw CompilationStackLocation.Append(Location)
                     .GetInvalidOperationException();
@@ -525,7 +528,7 @@ namespace ILGPU.Frontend
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void CreateStore(Value address, Value value)
         {
-            if (!address.Type!.IsPointerType)
+            if (!address.Type.IsPointerType)
             {
                 throw CompilationStackLocation.Append(Location)
                     .GetInvalidOperationException();
@@ -533,7 +536,7 @@ namespace ILGPU.Frontend
 
             address = CreateConversion(
                 address,
-                Builder.CreatePointerType(value.Type!, MemoryAddressSpace.Generic),
+                Builder.CreatePointerType(value.Type, MemoryAddressSpace.Generic),
                 ConvertFlags.None);
             Builder.CreateStore(Location, address, value);
         }

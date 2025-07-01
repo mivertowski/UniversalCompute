@@ -228,7 +228,7 @@ public class MemoryLayoutBenchmarks : IDisposable
         try
         {
             // Add padding to avoid bank conflicts
-            var paddedWidth = ((MatrixSize + 31) / 32) * 32; // Align to 32-element boundary
+            var paddedWidth = (MatrixSize + 31) / 32 * 32; // Align to 32-element boundary
             var totalElements = paddedWidth * MatrixSize;
             
             using var buffer = accelerator!.Allocate1D<float>(totalElements);
@@ -272,7 +272,7 @@ public class MemoryLayoutBenchmarks : IDisposable
             compactBuffer.CopyFromCPU(testData!);
             
             // Aligned layout (with padding for better alignment)
-            var alignedSize = ((totalElements + 127) / 128) * 128; // 128-element alignment
+            var alignedSize = (totalElements + 127) / 128 * 128; // 128-element alignment
             using var alignedBuffer = accelerator.Allocate1D<float>(alignedSize);
             
             var alignedData = new float[alignedSize];
@@ -379,14 +379,14 @@ public class MemoryLayoutBenchmarks : IDisposable
         for (int i = 0; i < totalElements; i++)
         {
             // Simulate AOS access pattern (accessing all components of one element)
-            var baseIndex = (i % testData!.Length);
+            var baseIndex = i % testData!.Length;
             _ = testData[baseIndex]; // Complete struct access
         }
     }
 
     private void PaddedLayoutCpuAccess()
     {
-        var paddedWidth = ((MatrixSize + 31) / 32) * 32;
+        var paddedWidth = (MatrixSize + 31) / 32 * 32;
         for (int row = 0; row < MatrixSize; row++)
         {
             for (int col = 0; col < MatrixSize; col++)

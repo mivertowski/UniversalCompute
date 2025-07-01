@@ -99,7 +99,7 @@ namespace ILGPU.Runtime.Cuda
         /// <summary>
         /// Minor driver version.
         /// </summary>
-        public int Minor => (Value % MajorMultiplier) / MinorMultiplier;
+        public int Minor => Value % MajorMultiplier / MinorMultiplier;
 
         /// <summary>
         /// 

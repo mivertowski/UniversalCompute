@@ -136,7 +136,7 @@ public sealed class LightweightAMXAccelerator : ISpecializedAccelerator
                             {
                                 for (int kw = 0; kw < kernelSize; kw++)
                                 {
-                                    var inputIdx = c * height * width + (oh + kh) * width + (ow + kw);
+                                    var inputIdx = c * height * width + (oh + kh) * width + ow + kw;
                                     var kernelIdx = c * kernelSize * kernelSize + kh * kernelSize + kw;
                                     
                                     if (inputIdx < input.Length && kernelIdx < kernel.Length)

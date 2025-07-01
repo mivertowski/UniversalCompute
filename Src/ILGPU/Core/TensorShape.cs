@@ -97,8 +97,8 @@ namespace ILGPU.Core
                 throw new ArgumentException("Shapes are not compatible for matrix multiplication", nameof(other));
 
             // Handle batched matrix multiplication
-            var thisBatch = Rank > 2 ? dimensions[..^2] : Array.Empty<int>();
-            var otherBatch = other.Rank > 2 ? other.dimensions[..^2] : Array.Empty<int>();
+            var thisBatch = Rank > 2 ? dimensions[..^2] : [];
+            var otherBatch = other.Rank > 2 ? other.dimensions[..^2] : [];
             
             // Batch dimensions must be broadcastable
             var resultBatch = BroadcastDimensions(thisBatch, otherBatch);

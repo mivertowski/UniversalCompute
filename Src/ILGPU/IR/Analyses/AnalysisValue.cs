@@ -54,7 +54,7 @@ namespace ILGPU.IR.Analyses
         /// Returns the value of <see cref="Value"/> for all input nodes.
         /// </summary>
         public readonly AnalysisValue<T> this[Value value] =>
-            AnalysisValue.Create(Value, value.Type!);
+            AnalysisValue.Create(Value, value.Type);
     }
 
     /// <summary>
@@ -93,14 +93,14 @@ namespace ILGPU.IR.Analyses
     {
         #region Instance
 
-        private readonly T[] childData = childArray ?? Array.Empty<T>();
+        private readonly T[] childData = childArray ?? [];
 
         /// <summary>
         /// Constructs a new analysis value with the given data value.
         /// </summary>
         /// <param name="data">The accumulated data value.</param>
         public AnalysisValue(T data)
-            : this(data, Array.Empty<T>())
+            : this(data, [])
         { }
 
         #endregion

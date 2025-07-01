@@ -373,7 +373,7 @@ namespace ILGPU.IR
         /// Stores all parameters.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private ImmutableArray<Parameter> parameters = ImmutableArray<Parameter>.Empty;
+        private ImmutableArray<Parameter> parameters = [];
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private volatile Builder? builder = null;

@@ -20,7 +20,6 @@
 // you may not use this file except in compliance with the License.
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ILGPU.Intel.IPP.Native;
 
@@ -32,7 +31,7 @@ namespace ILGPU.Intel.IPP
     public static class IPPCapabilities
     {
         private static IPPInfo? _cachedInfo;
-        private static readonly object _lockObject = new object();
+        private static readonly object _lockObject = new();
 
         /// <summary>
         /// Detects if Intel IPP is available on the current system.
@@ -104,7 +103,7 @@ namespace ILGPU.Intel.IPP
                         }
 
                         // Determine optimal FFT sizes based on CPU capabilities
-                        info.OptimalFFTSizes = Array.AsReadOnly(DetermineOptimalFFTSizes(info));
+                        info.OptimalFFTSizes = DetermineOptimalFFTSizes(info);
 
                         // Estimate performance characteristics
                         info.EstimatedPerformance = EstimatePerformance(info);
@@ -299,9 +298,9 @@ namespace ILGPU.Intel.IPP
         public bool SupportsAVX512 { get; set; }
 
         /// <summary>
-        /// Optimal FFT sizes for this CPU.
+        /// Array of optimal FFT sizes for this CPU.
         /// </summary>
-        public IReadOnlyList<int> OptimalFFTSizes { get; set; }
+        public int[] OptimalFFTSizes { get; set; }
 
         /// <summary>
         /// Performance characteristics of this IPP installation.

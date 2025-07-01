@@ -358,7 +358,7 @@ namespace ILGPU.Runtime.OpenCL
                     CLException.ThrowIfFailed(
                         CurrentAPI.EnqueueBarrierWithWaitList(
                             stream.CommandQueue,
-                            Array.Empty<IntPtr>(),
+                            [],
                             resultEvent));
 
                     // Dereference the pointer so we can store it

@@ -99,8 +99,8 @@ namespace ILGPU.Algorithms.Tests
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static float Evaluate(float x, float y)
             {
-                float first = (x * x + y - 11);
-                float second = (x + y * y - 7);
+                float first = x * x + y - 11;
+                float second = x + y * y - 7;
                 return first * first + second * second;
             }
 

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -221,6 +222,7 @@ namespace ILGPU.Runtime.Profiling
         public IReadOnlyList<ProfileSessionReport> GetSessionReports() => completedSessions.ToList();
 
         /// <inheritdoc/>
+        [RequiresUnreferencedCode("")]
         public async Task ExportAsync(string filePath, ProfileExportFormat format, CancellationToken cancellationToken = default)
         {
             if (disposed)
@@ -361,7 +363,7 @@ namespace ILGPU.Runtime.Profiling
             };
         }
 
-        private KernelMetrics CalculateKernelMetrics(List<KernelExecutionRecord> executions)
+        private static KernelMetrics CalculateKernelMetrics(List<KernelExecutionRecord> executions)
         {
             if (executions.Count == 0)
                 return new KernelMetrics();
@@ -454,7 +456,7 @@ namespace ILGPU.Runtime.Profiling
             };
         }
 
-        private CustomEventMetrics CalculateCustomEventMetrics(List<CustomEventRecord> events)
+        private static CustomEventMetrics CalculateCustomEventMetrics(List<CustomEventRecord> events)
         {
             var eventStats = events
                 .GroupBy(e => e.EventName)
@@ -626,16 +628,17 @@ namespace ILGPU.Runtime.Profiling
             return recommendations;
         }
 
+        [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.SerializeAsync<TValue>(Stream, TValue, JsonSerializerOptions, CancellationToken)")]
         private static async Task ExportToJsonAsync(string filePath, IReadOnlyList<ProfileSessionReport> reports, CancellationToken cancellationToken)
         {
 
             // Create a simplified export data structure to avoid serialization issues
             var exportData = reports.Select(r => new
             {
-                SessionId = r.SessionId,
-                SessionName = r.SessionName,
-                StartTime = r.StartTime,
-                EndTime = r.EndTime,
+                r.SessionId,
+                r.SessionName,
+                r.StartTime,
+                r.EndTime,
                 Duration = r.Duration.TotalMilliseconds,
                 KernelCount = r.KernelExecutions.Count,
                 MemoryOperationCount = r.MemoryOperations.Count,
@@ -696,11 +699,13 @@ namespace ILGPU.Runtime.Profiling
             }
         }
 
+        [RequiresUnreferencedCode("Calls ILGPU.Runtime.Profiling.PerformanceProfiler.ExportToJsonAsync(String, IReadOnlyList<ProfileSessionReport>, CancellationToken)")]
         private static async Task ExportToChromeTracingAsync(string filePath, IReadOnlyList<ProfileSessionReport> reports, CancellationToken cancellationToken) =>
             // Chrome Tracing format implementation would go here
             // For now, fallback to JSON
             await ExportToJsonAsync(filePath, reports, cancellationToken).ConfigureAwait(false);
 
+        [RequiresUnreferencedCode("Calls ILGPU.Runtime.Profiling.PerformanceProfiler.ExportToJsonAsync(String, IReadOnlyList<ProfileSessionReport>, CancellationToken)")]
         private static async Task ExportToBinaryAsync(string filePath, IReadOnlyList<ProfileSessionReport> reports, CancellationToken cancellationToken) =>
             // Binary format implementation would go here
             // For now, fallback to JSON

@@ -151,7 +151,7 @@ namespace ILGPU.Runtime.Cuda
             libNvvmModule = NativeLibrary.Load(libNvvmPath);
             libDeviceBytes = !string.IsNullOrEmpty(libDevicePath)
                 ? File.ReadAllBytes(libDevicePath)
-                : Array.Empty<byte>();
+                : [];
 
             nvvmGetErrorString =
                 Marshal.GetDelegateForFunctionPointer<NvvmGetErrorString>(

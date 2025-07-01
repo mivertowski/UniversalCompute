@@ -23,7 +23,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -542,7 +541,7 @@ namespace ILGPU.Backends
         /// Returns the transformer that is applied before the final compilation step.
         /// </summary>
         protected ImmutableArray<Transformer> KernelTransformers { get; private set; } =
-            ImmutableArray<Transformer>.Empty;
+            [];
 
         /// <summary>
         /// Returns type of a native pointer.
@@ -682,7 +681,6 @@ namespace ILGPU.Backends
         /// <param name="specialization">The kernel specialization.</param>
         /// <param name="backendHook">The backend hook.</param>
         /// <returns>The compiled kernel that represents the compilation result.</returns>
-        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Required to wrap all exceptions in InternalCompilerException for consistent error handling")]
         public CompiledKernel Compile<TBackendHook>(
             Method kernelMethod,
             in EntryPointDescription entry,

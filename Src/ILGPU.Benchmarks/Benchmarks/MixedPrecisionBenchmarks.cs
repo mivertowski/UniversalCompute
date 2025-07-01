@@ -143,7 +143,7 @@ public class MixedPrecisionBenchmarks : IDisposable
         var random = new Random(42);
         for (int i = 0; i < size; i++)
         {
-            int8Data[i] = (sbyte)(random.Next(-128, 128));
+            int8Data[i] = (sbyte)random.Next(-128, 128);
         }
 
         // Simulate quantized to float conversion

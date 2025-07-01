@@ -28,14 +28,18 @@ namespace ILGPU.FFT
     /// <summary>
     /// Abstract base class for FFT accelerators that provide high-performance FFT operations.
     /// </summary>
-    public abstract class FFTAccelerator : IDisposable
+    /// <remarks>
+    /// Constructs a new FFT accelerator.
+    /// </remarks>
+    /// <param name="parentAccelerator">The parent ILGPU accelerator.</param>
+    public abstract class FFTAccelerator(Accelerator parentAccelerator) : IDisposable
     {
         #region Properties
 
         /// <summary>
         /// Gets the parent ILGPU accelerator.
         /// </summary>
-        public Accelerator ParentAccelerator { get; }
+        public Accelerator ParentAccelerator { get; } = parentAccelerator ?? throw new ArgumentNullException(nameof(parentAccelerator));
 
         /// <summary>
         /// Gets the FFT accelerator type.
@@ -58,17 +62,7 @@ namespace ILGPU.FFT
         public abstract FFTPerformanceInfo PerformanceInfo { get; }
 
         #endregion
-
         #region Constructor
-
-        /// <summary>
-        /// Constructs a new FFT accelerator.
-        /// </summary>
-        /// <param name="parentAccelerator">The parent ILGPU accelerator.</param>
-        protected FFTAccelerator(Accelerator parentAccelerator)
-        {
-            ParentAccelerator = parentAccelerator ?? throw new ArgumentNullException(nameof(parentAccelerator));
-        }
 
         #endregion
 
@@ -196,7 +190,7 @@ namespace ILGPU.FFT
         /// </summary>
         /// <param name="length">FFT length to check.</param>
         /// <returns>True if the size is supported.</returns>
-        public virtual bool IsSizeSupported(int length) => IsPowerOf2(length) && length >= 2 && length <= (1 << 30);
+        public virtual bool IsSizeSupported(int length) => IsPowerOf2(length) && length >= 2 && length <= 1 << 30;
 
         /// <summary>
         /// Estimates the performance for a given FFT size.
@@ -241,20 +235,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// Disposes this FFT accelerator and frees associated resources.
         /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes this FFT accelerator and frees associated resources.
-        /// </summary>
-        /// <param name="disposing">True if disposing from Dispose() method, false if from finalizer.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            // Derived classes should override this method to dispose their resources
-        }
+        public abstract void Dispose();
 
         #endregion
     }

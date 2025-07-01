@@ -244,19 +244,10 @@ namespace ILGPU.Runtime.Scheduling
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
             if (!disposed)
             {
-                if (disposing)
-                {
-                    accelerators.Clear();
-                    currentLoads.Clear();
-                }
+                accelerators.Clear();
+                currentLoads.Clear();
                 disposed = true;
             }
         }
@@ -295,7 +286,7 @@ namespace ILGPU.Runtime.Scheduling
             }
         }
 
-        public DevicePerformanceMetrics ProfileDevice(Accelerator accelerator) => new DevicePerformanceMetrics
+        public DevicePerformanceMetrics ProfileDevice(Accelerator accelerator) => new()
         {
             AverageLatencyMs = GetAverageTime("execution").TotalMilliseconds,
             ThroughputOpsPerSecond = 1000.0 / Math.Max(1, GetAverageTime("execution").TotalMilliseconds),
@@ -348,19 +339,10 @@ namespace ILGPU.Runtime.Scheduling
 
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
             if (!disposed)
             {
-                if (disposing)
-                {
-                    executionTimes.Clear();
-                    activeExecutions.Clear();
-                }
+                executionTimes.Clear();
+                activeExecutions.Clear();
                 disposed = true;
             }
         }

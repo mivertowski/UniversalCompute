@@ -201,7 +201,7 @@ public class TensorCoreBenchmarks : IDisposable
     }
 
     [Benchmark]
-    public void TensorFragmentOperations()
+    public static void TensorFragmentOperations()
     {
         try
         {

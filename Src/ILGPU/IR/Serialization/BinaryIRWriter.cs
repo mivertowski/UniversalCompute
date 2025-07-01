@@ -33,7 +33,7 @@ namespace ILGPU.IR.Serialization
     /// </param>
     public sealed partial class BinaryIRWriter(Stream stream, Encoding encoding) : DisposeBase, IIRWriter
     {
-        private readonly BinaryWriter writer = new BinaryWriter(stream, encoding);
+        private readonly BinaryWriter writer = new(stream, encoding);
 
         /// <inheritdoc/>
         public void Write(string tag, int value) =>

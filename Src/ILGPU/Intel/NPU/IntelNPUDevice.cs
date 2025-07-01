@@ -108,21 +108,17 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Intel NPU-specific capability context.
     /// </summary>
-    internal sealed class NPUCapabilityContext : CapabilityContext
+    /// <remarks>
+    /// Initializes a new NPU capability context.
+    /// </remarks>
+    /// <param name="capabilities">The NPU capabilities.</param>
+    internal sealed class NPUCapabilityContext(NPUCapabilities capabilities) : CapabilityContext
     {
-        /// <summary>
-        /// Initializes a new NPU capability context.
-        /// </summary>
-        /// <param name="capabilities">The NPU capabilities.</param>
-        public NPUCapabilityContext(NPUCapabilities capabilities)
-        {
-            NPUCapabilities = capabilities;
-        }
 
         /// <summary>
         /// Gets the NPU capabilities.
         /// </summary>
-        public NPUCapabilities NPUCapabilities { get; }
+        public NPUCapabilities NPUCapabilities { get; } = capabilities;
 
     }
 }

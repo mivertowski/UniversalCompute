@@ -92,7 +92,7 @@ namespace ILGPU.Backends.IL
         private readonly struct LinearScalarTypeProvider(VelocityTypeGenerator typeGenerator) : IExtendedTypeProvider
         {
             private readonly VelocityTypeGenerator parent = typeGenerator;
-            private readonly TypeNode.ScalarManagedTypeProvider scalarProvider = new TypeNode.ScalarManagedTypeProvider();
+            private readonly TypeNode.ScalarManagedTypeProvider scalarProvider = new();
 
             /// <summary>
             /// Returns the default managed type for the given primitive one.

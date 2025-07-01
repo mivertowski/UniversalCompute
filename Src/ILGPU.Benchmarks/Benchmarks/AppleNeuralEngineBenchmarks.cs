@@ -375,8 +375,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         for (int k = 0; k < size; k++)
         {
             // Simulate FP16 precision by converting to Half and back
-            var aVal = (float)((Half)a[index.X, k]);
-            var bVal = (float)((Half)b[k, index.Y]);
+            var aVal = (float)(Half)a[index.X, k];
+            var bVal = (float)(Half)b[k, index.Y];
             sum += aVal * bVal;
         }
         
@@ -407,8 +407,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
                 if (inputY < inputSize && inputX < inputSize)
                 {
                     // Simulate ANE FP16 precision
-                    var inputVal = (float)((Half)input[inputY, inputX]);
-                    var kernelVal = (float)((Half)kernel[ky, kx]);
+                    var inputVal = (float)(Half)input[inputY, inputX];
+                    var kernelVal = (float)(Half)kernel[ky, kx];
                     sum += inputVal * kernelVal;
                 }
             }
@@ -439,8 +439,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             if (outputIdx < weights.IntExtent.Y && i < weights.IntExtent.X)
             {
                 // Simulate ANE optimized computation
-                var inputVal = (float)((Half)input[inputOffset + i]);
-                var weightVal = (float)((Half)weights[outputIdx, i]);
+                var inputVal = (float)(Half)input[inputOffset + i];
+                var weightVal = (float)(Half)weights[outputIdx, i];
                 sum += inputVal * weightVal;
             }
         }
@@ -474,8 +474,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         float sum1 = 0.0f;
         for (int i = 0; i < inputSize && (inputOffset + i) < input.Length && i < weights.IntExtent.X; i++)
         {
-            var inputVal = (float)((Half)input[inputOffset + i]);
-            var weightVal = (float)((Half)weights[hidden, i]);
+            var inputVal = (float)(Half)input[inputOffset + i];
+            var weightVal = (float)(Half)weights[hidden, i];
             sum1 += inputVal * weightVal;
         }
         
@@ -500,7 +500,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         
         // ANE-optimized activation functions with proper implementations
         // Convert to FP16 for ANE precision simulation
-        var fp16Value = (float)((Half)value);
+        var fp16Value = (float)(Half)value;
         
         // ReLU activation
         var relu = IntrinsicMath.Max(0.0f, fp16Value);
@@ -512,12 +512,12 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         
         // GELU activation: 0.5 * x * (1 + tanh(sqrt(2/π) * (x + 0.044715 * x³)))
         var x3 = fp16Value * fp16Value * fp16Value;
-        var gelu_inner = (float)(Math.Sqrt(2.0 / Math.PI)) * (fp16Value + 0.044715f * x3);
+        var gelu_inner = (float)Math.Sqrt(2.0 / Math.PI) * (fp16Value + 0.044715f * x3);
         var gelu = 0.5f * fp16Value * (1.0f + TanhApprox(gelu_inner));
         
         // ANE supports dynamic activation blending based on operation type
         // Use a more sophisticated blend that respects the mathematical properties
-        var activationType = ((int)(index * 1103515245) % 3); // Pseudo-random selection per element
+        var activationType = (int)(index * 1103515245) % 3; // Pseudo-random selection per element
         
         float result = activationType switch
         {
@@ -549,7 +549,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             if (inputIdx < input.Length && outputIdx < output.Length)
             {
                 // Simulate ANE's efficient data processing
-                var value = (float)((Half)input[inputIdx]);
+                var value = (float)(Half)input[inputIdx];
                 
                 // Complex computation that benefits from ANE's architecture
                 var processed = value;

@@ -82,7 +82,7 @@ namespace ILGPU.Runtime.Scheduling
                 throw new ArgumentNullException(nameof(graph));
 
             // Optimize the graph structure
-            graph.Optimize();
+            ComputeGraph.Optimize();
 
             // Analyze workload characteristics
             var workloadAnalysis = AnalyzeWorkload(graph);
@@ -177,7 +177,7 @@ namespace ILGPU.Runtime.Scheduling
             }
         }
 
-        private WorkloadAnalysis AnalyzeWorkload(ComputeGraph graph)
+        private static WorkloadAnalysis AnalyzeWorkload(ComputeGraph graph)
         {
             var totalFlops = 0.0;
             var totalMemoryOps = 0L;
@@ -337,7 +337,7 @@ namespace ILGPU.Runtime.Scheduling
             return assignments;
         }
 
-        private Dictionary<ComputeNode, ComputeDevice> CreateDefaultAssignments(ComputeGraph graph)
+        private static Dictionary<ComputeNode, ComputeDevice> CreateDefaultAssignments(ComputeGraph graph)
         {
             var assignments = new Dictionary<ComputeNode, ComputeDevice>();
 
@@ -419,7 +419,7 @@ namespace ILGPU.Runtime.Scheduling
             };
         }
 
-        private double CalculateParallelismLevel(ComputeGraph graph)
+        private static double CalculateParallelismLevel(ComputeGraph graph)
         {
             var levels = graph.GetParallelExecutionLevels().ToList();
             var totalNodes = graph.Nodes.Count;
@@ -559,24 +559,11 @@ namespace ILGPU.Runtime.Scheduling
         /// </summary>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the adaptive scheduler and releases resources.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (_disposed)
                 return;
 
-            if (disposing)
-            {
-                _profiler?.Dispose();
-                _loadBalancer?.Dispose();
-            }
+            _profiler?.Dispose();
+            _loadBalancer?.Dispose();
             _disposed = true;
         }
     }

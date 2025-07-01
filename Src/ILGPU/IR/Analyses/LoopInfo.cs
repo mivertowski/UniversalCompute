@@ -93,7 +93,7 @@ namespace ILGPU.IR.Analyses
         {
             #region Instance
 
-            private readonly ExitSuccessorProvider exitProvider = new ExitSuccessorProvider(exitBlock);
+            private readonly ExitSuccessorProvider exitProvider = new(exitBlock);
 
             #endregion
 
@@ -759,7 +759,7 @@ namespace ILGPU.IR.Analyses
             kind <= UpdateOperationKind.Up;
 
         private static bool IsDownUpdate(UpdateOperationKind kind) =>
-            ((int)kind % 2) == 1;
+            (int)kind % 2 == 1;
 
         private static bool IsMultiplied2Update(UpdateOperationKind kind) =>
             kind >= UpdateOperationKind.DownMultiplied2;
@@ -954,16 +954,16 @@ namespace ILGPU.IR.Analyses
             if (initVal == 0 ||
                 // Can we ever reach the end of the loop while multiplying
                 isDown && lastVal > initVal &&
-                (isNegativeUpdate && (BreakOperation.Kind == CompareKind.GreaterEqual ||
+                isNegativeUpdate && (BreakOperation.Kind == CompareKind.GreaterEqual ||
                     BreakOperation.Kind == CompareKind.GreaterThan ||
-                    (!isNegativeUpdate && (BreakOperation.Kind == CompareKind.LessEqual ||
-                        BreakOperation.Kind == CompareKind.LessThan)))) ||
+                    !isNegativeUpdate && (BreakOperation.Kind == CompareKind.LessEqual ||
+                        BreakOperation.Kind == CompareKind.LessThan)) ||
                 // Can we ever reach the end of the loop while dividing
                 !isDown && lastVal < initVal &&
                 (isNegativeUpdate && (BreakOperation.Kind == CompareKind.GreaterEqual ||
                         BreakOperation.Kind == CompareKind.GreaterThan) ||
-                    (!isNegativeUpdate && (BreakOperation.Kind == CompareKind.LessEqual ||
-                        BreakOperation.Kind == CompareKind.LessThan))))
+                    !isNegativeUpdate && (BreakOperation.Kind == CompareKind.LessEqual ||
+                        BreakOperation.Kind == CompareKind.LessThan)))
             {
                 return null;
             }

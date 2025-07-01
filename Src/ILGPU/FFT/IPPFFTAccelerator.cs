@@ -32,24 +32,17 @@ namespace ILGPU.FFT
     /// <summary>
     /// Intel IPP-based FFT accelerator that provides high-performance CPU FFT operations.
     /// </summary>
-    public sealed class IPPFFTAccelerator : FFTAccelerator
+    /// <remarks>
+    /// Constructs a new IPP FFT accelerator.
+    /// </remarks>
+    /// <param name="cpuAccelerator">The parent CPU accelerator.</param>
+    public sealed class IPPFFTAccelerator(CPUAccelerator cpuAccelerator) : FFTAccelerator(cpuAccelerator)
     {
         #region Instance
 
-        private readonly CPUAccelerator _cpuAccelerator;
-        private readonly IPPInfo _capabilities;
+        private readonly CPUAccelerator _cpuAccelerator = cpuAccelerator ?? throw new ArgumentNullException(nameof(cpuAccelerator));
+        private readonly IPPInfo _capabilities = IPPCapabilities.Query();
         private bool _disposed;
-
-        /// <summary>
-        /// Constructs a new IPP FFT accelerator.
-        /// </summary>
-        /// <param name="cpuAccelerator">The parent CPU accelerator.</param>
-        public IPPFFTAccelerator(CPUAccelerator cpuAccelerator)
-            : base(cpuAccelerator)
-        {
-            _cpuAccelerator = cpuAccelerator ?? throw new ArgumentNullException(nameof(cpuAccelerator));
-            _capabilities = IPPCapabilities.Query();
-        }
 
         #endregion
 
@@ -73,7 +66,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// Gets the performance characteristics of this FFT accelerator.
         /// </summary>
-        public override FFTPerformanceInfo PerformanceInfo => new FFTPerformanceInfo
+        public override FFTPerformanceInfo PerformanceInfo => new()
         {
             RelativePerformance = _capabilities.EstimatedPerformance.RelativePerformance,
             EstimatedGFLOPS = _capabilities.EstimatedPerformance.EstimatedGFLOPS,
@@ -461,7 +454,7 @@ namespace ILGPU.FFT
         /// </summary>
         public override bool IsSizeSupported(int length) =>
             // IPP FFT requires power-of-2 sizes
-            IsPowerOf2(length) && length >= 2 && length <= (1 << 26);
+            IsPowerOf2(length) && length >= 2 && length <= 1 << 26;
 
         /// <summary>
         /// Gets the optimal FFT size for IPP (next power of 2).
@@ -475,15 +468,11 @@ namespace ILGPU.FFT
         /// <summary>
         /// Disposes this IPP FFT accelerator.
         /// </summary>
-        /// <param name="disposing">True if disposing from Dispose() method, false if from finalizer.</param>
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
             if (!_disposed)
             {
-                if (disposing)
-                {
-                    // No persistent resources to clean up
-                }
+                // No persistent resources to clean up
                 _disposed = true;
             }
         }

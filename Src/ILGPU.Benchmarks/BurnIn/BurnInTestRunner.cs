@@ -30,16 +30,10 @@ namespace ILGPU.Benchmarks.BurnIn;
 /// <summary>
 /// Runs burn-in tests for maximum load and throughput testing.
 /// </summary>
-public class BurnInTestRunner
+public class BurnInTestRunner(ILogger<BurnInTestRunner> logger, BenchmarkConfig config)
 {
-    private readonly ILogger<BurnInTestRunner> logger;
-    private readonly BenchmarkConfig config;
-
-    public BurnInTestRunner(ILogger<BurnInTestRunner> logger, BenchmarkConfig config)
-    {
-        this.logger = logger;
-        this.config = config;
-    }
+    private readonly ILogger<BurnInTestRunner> logger = logger;
+    private readonly BenchmarkConfig config = config;
 
     /// <summary>
     /// Runs the comprehensive burn-in test suite.

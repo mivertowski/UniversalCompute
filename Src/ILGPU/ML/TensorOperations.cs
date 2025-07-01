@@ -542,22 +542,9 @@ namespace ILGPU.ML
         /// <inheritdoc/>
         public void Dispose()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Disposes the tensor and releases all resources.
-        /// </summary>
-        /// <param name="disposing">True if disposing managed resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
             if (!disposed)
             {
-                if (disposing)
-                {
-                    Buffer?.Dispose();
-                }
+                Buffer?.Dispose();
                 disposed = true;
             }
         }
@@ -608,7 +595,7 @@ namespace ILGPU.ML
         /// Creates a tensor from CPU data.
         /// </summary>
         public static Tensor<T> FromArray<T>(Accelerator accelerator, TensorShape shape, T[] data)
-            where T : unmanaged, INumber<T> => new Tensor<T>(accelerator, shape, data);
+            where T : unmanaged, INumber<T> => new(accelerator, shape, data);
 
         private static void FillOnesKernel<TElement>(Index1D index, ArrayView<TElement> output)
             where TElement : unmanaged, INumber<TElement>
