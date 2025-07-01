@@ -21,9 +21,11 @@
 
 using System;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Intel.IPP;
+using ILGPU.Intel.IPP.Native;
 
 namespace ILGPU.FFT
 {
@@ -102,9 +104,21 @@ namespace ILGPU.FFT
             if (!IsSizeSupported(length))
                 throw new ArgumentException($"FFT size {length} is not supported");
 
-            // For now, implement a simple CPU FFT since IPP integration needs more work
-            // This is a placeholder implementation
-            throw new NotImplementedException("Intel IPP FFT integration needs additional work for production use");
+            try
+            {
+                // Try to use Intel IPP for high-performance FFT
+                PerformIPPFFT1D(input, output, forward);
+            }
+            catch (DllNotFoundException)
+            {
+                // Fall back to CPU implementation if IPP is not available
+                FallbackToCPU_FFT1D(input, output, forward);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // Fall back to CPU implementation if IPP functions are not found
+                FallbackToCPU_FFT1D(input, output, forward);
+            }
         }
 
         /// <summary>
@@ -122,8 +136,27 @@ namespace ILGPU.FFT
             if (output.Length < length / 2 + 1)
                 throw new ArgumentException("Output buffer too small for real FFT");
 
-            // Placeholder implementation
-            throw new NotImplementedException("Intel IPP real FFT integration needs additional work for production use");
+            // CPU fallback for real-to-complex FFT
+            var cpuInput = new float[length];
+            input.CopyToCPU(cpuInput);
+            
+            var outputLength = length / 2 + 1;
+            var outputData = new Complex[outputLength];
+            
+            // Perform real-to-complex FFT
+            for (int k = 0; k < outputLength; k++)
+            {
+                Complex sum = Complex.Zero;
+                for (int n = 0; n < length; n++)
+                {
+                    double angle = -2.0 * Math.PI * k * n / length;
+                    var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                    sum += cpuInput[n] * w;
+                }
+                outputData[k] = sum;
+            }
+            
+            output.SubView(0, outputLength).CopyFromCPU(outputData);
         }
 
         /// <summary>
@@ -141,8 +174,27 @@ namespace ILGPU.FFT
             if (input.Length < length / 2 + 1)
                 throw new ArgumentException("Input buffer too small for inverse real FFT");
 
-            // Placeholder implementation
-            throw new NotImplementedException("Intel IPP inverse real FFT integration needs additional work for production use");
+            // CPU fallback for complex-to-real inverse FFT
+            var inputLength = length / 2 + 1;
+            var cpuInput = new Complex[inputLength];
+            input.SubView(0, inputLength).CopyToCPU(cpuInput);
+            
+            var outputData = new float[length];
+            
+            // Perform complex-to-real inverse FFT
+            for (int n = 0; n < length; n++)
+            {
+                Complex sum = Complex.Zero;
+                for (int k = 0; k < inputLength; k++)
+                {
+                    double angle = 2.0 * Math.PI * k * n / length; // Positive for inverse
+                    var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                    sum += cpuInput[k] * w;
+                }
+                outputData[n] = (float)(sum.Real / length); // Normalize and take real part
+            }
+            
+            output.CopyFromCPU(outputData);
         }
 
         #endregion
@@ -165,8 +217,51 @@ namespace ILGPU.FFT
             if (!IsSizeSupported((int)extent.X) || !IsSizeSupported((int)extent.Y))
                 throw new ArgumentException($"FFT size {extent} is not supported");
 
-            // Placeholder implementation
-            throw new NotImplementedException("Intel IPP 2D FFT integration needs additional work for production use");
+            // CPU fallback for 2D FFT using separable transforms
+            var width = (int)extent.X;
+            var height = (int)extent.Y;
+            var totalSize = width * height;
+            
+            var cpuInput = new Complex[totalSize];
+            input.CopyToCPU(cpuInput);
+            
+            var tempData = new Complex[totalSize];
+            var outputData = new Complex[totalSize];
+            
+            // Perform row-wise FFT first
+            for (int row = 0; row < height; row++)
+            {
+                for (int k = 0; k < width; k++)
+                {
+                    Complex sum = Complex.Zero;
+                    for (int n = 0; n < width; n++)
+                    {
+                        double angle = -2.0 * Math.PI * k * n / width;
+                        var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                        sum += cpuInput[row * width + n] * w;
+                    }
+                    tempData[row * width + k] = sum;
+                }
+            }
+            
+            // Perform column-wise FFT
+            for (int col = 0; col < width; col++)
+            {
+                for (int k = 0; k < height; k++)
+                {
+                    Complex sum = Complex.Zero;
+                    for (int n = 0; n < height; n++)
+                    {
+                        double angle = -2.0 * Math.PI * k * n / height;
+                        var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                        sum += tempData[n * width + col] * w;
+                    }
+                    outputData[k * width + col] = sum;
+                }
+            }
+            
+            // Copy result back to CPU memory
+            output.CopyFromCPU(outputData);
         }
 
         #endregion
@@ -204,6 +299,157 @@ namespace ILGPU.FFT
             estimate.Confidence = 0.9; // High confidence for IPP estimates
 
             return estimate;
+        }
+
+        #endregion
+
+        #region Intel IPP Constants
+
+        private const int IPP_FFT_DIV_FWD_BY_N = 1;
+        private const int IPP_FFT_DIV_INV_BY_N = 2;
+        private const int IPP_FFT_DIV_BY_SQRTN = 4;
+        private const int IPP_FFT_NODIV_BY_ANY = 8;
+
+        #endregion
+
+        #region Intel IPP Implementation Methods
+
+        /// <summary>
+        /// Performs 1D FFT using Intel IPP native functions.
+        /// </summary>
+        private unsafe void PerformIPPFFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
+        {
+            var length = (int)input.Length;
+            
+            // Copy input data to CPU memory for IPP processing
+            var cpuInput = new Complex[length];
+            input.CopyToCPU(cpuInput);
+            
+            // Calculate FFT order (log2 of length)
+            int order = 0;
+            int temp = length;
+            while (temp > 1)
+            {
+                temp >>= 1;
+                order++;
+            }
+            
+            // Get required buffer sizes
+            var result = IPPNative.ippsFFTGetSize_C_32fc(
+                order, 
+                forward ? IPP_FFT_DIV_FWD_BY_N : IPP_FFT_DIV_INV_BY_N,
+                IPPNative.IppHintAlgorithm.ippAlgHintFast,
+                out int specSize,
+                out int specBufferSize,
+                out int bufferSize);
+            
+            CheckIPPResult(result, "Failed to get IPP FFT sizes");
+            
+            // Allocate memory for IPP structures
+            var specMemory = Marshal.AllocHGlobal(specSize);
+            var specBufferMemory = specBufferSize > 0 ? Marshal.AllocHGlobal(specBufferSize) : IntPtr.Zero;
+            var workBufferMemory = bufferSize > 0 ? Marshal.AllocHGlobal(bufferSize) : IntPtr.Zero;
+            
+            try
+            {
+                // Initialize FFT specification
+                result = IPPNative.ippsFFTInit_C_32fc(
+                    out IntPtr fftSpec,
+                    order,
+                    forward ? IPP_FFT_DIV_FWD_BY_N : IPP_FFT_DIV_INV_BY_N,
+                    IPPNative.IppHintAlgorithm.ippAlgHintFast,
+                    specMemory,
+                    specBufferMemory);
+                
+                CheckIPPResult(result, "Failed to initialize IPP FFT specification");
+                
+                // Convert Complex to IPP complex format
+                var ippInput = new IPPNative.Ipp32fc[length];
+                var ippOutput = new IPPNative.Ipp32fc[length];
+                
+                for (int i = 0; i < length; i++)
+                {
+                    ippInput[i] = new IPPNative.Ipp32fc((float)cpuInput[i].Real, (float)cpuInput[i].Imaginary);
+                }
+                
+                // Pin memory for IPP call
+                fixed (IPPNative.Ipp32fc* pInput = ippInput)
+                fixed (IPPNative.Ipp32fc* pOutput = ippOutput)
+                {
+                    // Perform FFT
+                    if (forward)
+                    {
+                        result = IPPNative.ippsFFTFwd_CToC_32fc(
+                            new IntPtr(pInput),
+                            new IntPtr(pOutput),
+                            fftSpec,
+                            workBufferMemory);
+                    }
+                    else
+                    {
+                        result = IPPNative.ippsFFTInv_CToC_32fc(
+                            new IntPtr(pInput),
+                            new IntPtr(pOutput),
+                            fftSpec,
+                            workBufferMemory);
+                    }
+                    
+                    CheckIPPResult(result, forward ? "Forward FFT failed" : "Inverse FFT failed");
+                }
+                
+                // Convert result back to System.Numerics.Complex
+                var outputData = new Complex[length];
+                for (int i = 0; i < length; i++)
+                {
+                    outputData[i] = new Complex(ippOutput[i].re, ippOutput[i].im);
+                }
+                
+                // Copy result back to GPU memory
+                output.CopyFromCPU(outputData);
+            }
+            finally
+            {
+                // Clean up allocated memory
+                if (specMemory != IntPtr.Zero) Marshal.FreeHGlobal(specMemory);
+                if (specBufferMemory != IntPtr.Zero) Marshal.FreeHGlobal(specBufferMemory);
+                if (workBufferMemory != IntPtr.Zero) Marshal.FreeHGlobal(workBufferMemory);
+            }
+        }
+
+        /// <summary>
+        /// CPU fallback implementation for 1D FFT.
+        /// </summary>
+        private void FallbackToCPU_FFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
+        {
+            var length = (int)input.Length;
+            var cpuInput = new Complex[length];
+            input.CopyToCPU(cpuInput);
+            
+            var outputData = new Complex[length];
+            
+            // Perform CPU FFT fallback (DFT implementation)
+            for (int k = 0; k < length; k++)
+            {
+                Complex sum = Complex.Zero;
+                for (int n = 0; n < length; n++)
+                {
+                    double angle = (forward ? -2.0 : 2.0) * Math.PI * k * n / length;
+                    var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                    sum += cpuInput[n] * w;
+                }
+                outputData[k] = forward ? sum : sum / length;
+            }
+            
+            output.CopyFromCPU(outputData);
+        }
+
+        /// <summary>
+        /// Checks IPP result and throws exception if not successful.
+        /// </summary>
+        private static void CheckIPPResult(IPPNative.IppStatus result, string operation)
+        {
+            if (result != IPPNative.IppStatus.ippStsNoErr)
+                throw new InvalidOperationException($"{operation}: {result}");
         }
 
         #endregion

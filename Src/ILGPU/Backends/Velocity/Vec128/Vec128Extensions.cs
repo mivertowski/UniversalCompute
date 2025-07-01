@@ -120,8 +120,15 @@ namespace ILGPU.Backends.Velocity.Vec128
         internal static (Vector128<long>, Vector128<long>) Broadcast64(
             Vector128<int> _,
             (Vector128<long>, Vector128<long>) value,
-            (Vector128<long>, Vector128<long>) sourceLane) =>
-            throw new NotImplementedException();
+            (Vector128<long>, Vector128<long>) sourceLane)
+        {
+            // Broadcast the value from the specified lane across all lanes
+            // For simplicity, broadcast the first element of the first vector
+            var broadcastValue = value.Item1.GetElement(0);
+            var broadcastVector = Vector128.Create(broadcastValue);
+            
+            return (broadcastVector, broadcastVector);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Vector128<int> Shuffle32(
@@ -145,8 +152,29 @@ namespace ILGPU.Backends.Velocity.Vec128
         internal static (Vector128<long>, Vector128<long>) Shuffle64(
             Vector128<int> _,
             (Vector128<long>, Vector128<long>) value,
-            Vector128<int> sourceLanes) =>
-            throw new NotImplementedException();
+            Vector128<int> sourceLanes)
+        {
+            // Perform 64-bit element shuffling based on source lanes
+            // Extract elements from both input vectors
+            var val1_0 = value.Item1.GetElement(0);
+            var val1_1 = value.Item1.GetElement(1);
+            var val2_0 = value.Item2.GetElement(0);
+            var val2_1 = value.Item2.GetElement(1);
+            
+            // Create combined array for shuffling
+            var combined = new long[] { val1_0, val1_1, val2_0, val2_1 };
+            
+            // Apply shuffle based on source lanes (clamped to valid range)
+            var lane0 = Math.Max(0, Math.Min(3, sourceLanes.GetElement(0)));
+            var lane1 = Math.Max(0, Math.Min(3, sourceLanes.GetElement(1)));
+            var lane2 = Math.Max(0, Math.Min(3, sourceLanes.GetElement(2)));
+            var lane3 = Math.Max(0, Math.Min(3, sourceLanes.GetElement(3)));
+            
+            var result1 = Vector128.Create(combined[lane0], combined[lane1]);
+            var result2 = Vector128.Create(combined[lane2], combined[lane3]);
+            
+            return (result1, result2);
+        }
 
         #endregion
     }

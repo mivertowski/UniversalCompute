@@ -584,10 +584,10 @@ namespace ILGPU.Intel.NPU
 
         private IModelLoader CreateModelLoader(ModelFormat format) => format switch
         {
-            ModelFormat.ONNX => throw new NotImplementedException("ONNX model loader not implemented"),
-            ModelFormat.OpenVINO => throw new NotImplementedException("OpenVINO model loader not implemented"),
-            ModelFormat.TensorFlow => throw new NotImplementedException("TensorFlow model loader not implemented"),
-            ModelFormat.PyTorch => throw new NotImplementedException("PyTorch model loader not implemented"),
+            ModelFormat.ONNX => new ONNXModelLoader(),
+            ModelFormat.OpenVINO => new OpenVINOModelLoader(),
+            ModelFormat.TensorFlow => new TensorFlowModelLoader(),
+            ModelFormat.PyTorch => new PyTorchModelLoader(),
             _ => throw new NotSupportedException($"Model format {format} not supported")
         };
 

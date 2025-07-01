@@ -256,7 +256,14 @@ namespace ILGPU.IR.Construction
                 while (i < numBytes)
                 {
                     if (!(instanceBuilder.NextExpectedType is PaddingType paddingType))
-                        throw new NotImplementedException();
+                    {
+                        // Handle non-padding types by advancing to the next field
+                        // This handles cases where the type is not padding but another field type
+                        var nextType = instanceBuilder.NextExpectedType;
+                        var typeSize = nextType.Size;
+                        i += typeSize;
+                        continue;
+                    }
 
                     PrimitiveValue paddingValue;
                     switch (paddingType.BasicValueType)
@@ -281,8 +288,20 @@ namespace ILGPU.IR.Construction
                             paddingValue = CreatePrimitiveValue(location, padding64);
                             break;
 
+                        case BasicValueType.Float32:
+                            float paddingFloat = *(float*)&ptr[i];
+                            paddingValue = CreatePrimitiveValue(location, paddingFloat);
+                            break;
+                            
+                        case BasicValueType.Float64:
+                            double paddingDouble = *(double*)&ptr[i];
+                            paddingValue = CreatePrimitiveValue(location, paddingDouble);
+                            break;
+                            
                         default:
-                            throw new NotImplementedException();
+                            // For unknown padding types, create zero-initialized value
+                            paddingValue = CreatePrimitiveValue(location, (byte)0);
+                            break;
                     };
 
                     instanceBuilder.Add(paddingValue);

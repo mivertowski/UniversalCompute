@@ -35,7 +35,11 @@ namespace ILGPU.FFT
     {
         #region Native cuFFT Bindings
 
-        private const string CuFFTLibrary = "cufft";
+#if WINDOWS
+        private const string CuFFTLibrary = "cufft64_11";
+#else
+        private const string CuFFTLibrary = "libcufft.so.11";
+#endif
 
         /// <summary>
         /// cuFFT result codes.
@@ -171,9 +175,50 @@ namespace ILGPU.FFT
             if (!IsSizeSupported(length))
                 throw new ArgumentException($"FFT size {length} is not supported");
 
-            // For now, provide a placeholder implementation
-            // Full cuFFT integration would require more complex memory management
-            throw new NotImplementedException("CUDA cuFFT integration needs additional work for production use");
+            try
+            {
+                // Create cuFFT plan for 1D complex-to-complex transform
+                var result = cufftPlan1d(out IntPtr plan, length, CufftType.C2C, 1);
+                CheckCuFFTResult(result, "Failed to create cuFFT 1D plan");
+
+                try
+                {
+                    // Get device pointers for input and output
+                    var inputPtr = input.LoadEffectiveAddressAsPtr();
+                    var outputPtr = output.LoadEffectiveAddressAsPtr();
+
+                    // Execute the FFT
+                    var direction = forward ? CufftDirection.Forward : CufftDirection.Inverse;
+                    result = cufftExecC2C(plan, inputPtr, outputPtr, direction);
+                    CheckCuFFTResult(result, "Failed to execute cuFFT 1D transform");
+
+                    // Synchronize if stream is provided
+                    if (stream is CudaStream cudaStream)
+                    {
+                        cudaStream.Synchronize();
+                    }
+                    else
+                    {
+                        // Default synchronization for the current accelerator
+                        _cudaAccelerator.Synchronize();
+                    }
+                }
+                finally
+                {
+                    // Clean up the plan
+                    cufftDestroy(plan);
+                }
+            }
+            catch (DllNotFoundException)
+            {
+                // Fall back to CPU implementation if cuFFT is not available
+                FallbackToCP_FFT1D(input, output, forward);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                // Fall back to CPU implementation if cuFFT functions are not found
+                FallbackToCP_FFT1D(input, output, forward);
+            }
         }
 
         /// <summary>
@@ -191,8 +236,45 @@ namespace ILGPU.FFT
             if (output.Length < length / 2 + 1)
                 throw new ArgumentException("Output buffer too small for real FFT");
 
-            // Placeholder implementation
-            throw new NotImplementedException("CUDA cuFFT real FFT integration needs additional work for production use");
+            try
+            {
+                // Create cuFFT plan for 1D real-to-complex transform
+                var result = cufftPlan1d(out IntPtr plan, length, CufftType.R2C, 1);
+                CheckCuFFTResult(result, "Failed to create cuFFT 1D real plan");
+
+                try
+                {
+                    // Get device pointers
+                    var inputPtr = input.LoadEffectiveAddressAsPtr();
+                    var outputPtr = output.LoadEffectiveAddressAsPtr();
+
+                    // Execute the real-to-complex FFT
+                    result = cufftExecR2C(plan, inputPtr, outputPtr);
+                    CheckCuFFTResult(result, "Failed to execute cuFFT 1D real transform");
+
+                    // Synchronize
+                    if (stream is CudaStream cudaStream)
+                    {
+                        cudaStream.Synchronize();
+                    }
+                    else
+                    {
+                        _cudaAccelerator.Synchronize();
+                    }
+                }
+                finally
+                {
+                    cufftDestroy(plan);
+                }
+            }
+            catch (DllNotFoundException)
+            {
+                FallbackToCPU_FFT1DReal(input, output);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                FallbackToCPU_FFT1DReal(input, output);
+            }
         }
 
         /// <summary>
@@ -210,8 +292,45 @@ namespace ILGPU.FFT
             if (input.Length < length / 2 + 1)
                 throw new ArgumentException("Input buffer too small for inverse real FFT");
 
-            // Placeholder implementation
-            throw new NotImplementedException("CUDA cuFFT inverse real FFT integration needs additional work for production use");
+            try
+            {
+                // Create cuFFT plan for 1D complex-to-real inverse transform
+                var result = cufftPlan1d(out IntPtr plan, length, CufftType.C2R, 1);
+                CheckCuFFTResult(result, "Failed to create cuFFT 1D inverse real plan");
+
+                try
+                {
+                    // Get device pointers
+                    var inputPtr = input.LoadEffectiveAddressAsPtr();
+                    var outputPtr = output.LoadEffectiveAddressAsPtr();
+
+                    // Execute the complex-to-real inverse FFT
+                    result = cufftExecC2R(plan, inputPtr, outputPtr);
+                    CheckCuFFTResult(result, "Failed to execute cuFFT 1D inverse real transform");
+
+                    // Synchronize
+                    if (stream is CudaStream cudaStream)
+                    {
+                        cudaStream.Synchronize();
+                    }
+                    else
+                    {
+                        _cudaAccelerator.Synchronize();
+                    }
+                }
+                finally
+                {
+                    cufftDestroy(plan);
+                }
+            }
+            catch (DllNotFoundException)
+            {
+                FallbackToCPU_IFFT1DReal(input, output);
+            }
+            catch (EntryPointNotFoundException)
+            {
+                FallbackToCPU_IFFT1DReal(input, output);
+            }
         }
 
         #endregion
@@ -234,8 +353,51 @@ namespace ILGPU.FFT
             if (!IsSizeSupported((int)extent.X) || !IsSizeSupported((int)extent.Y))
                 throw new ArgumentException($"FFT size {extent} is not supported");
 
-            // Placeholder implementation
-            throw new NotImplementedException("CUDA cuFFT 2D FFT integration needs additional work for production use");
+            // For now, use CPU fallback for 2D FFT by treating as separable 1D transforms
+            var width = (int)extent.X;
+            var height = (int)extent.Y;
+            var totalSize = width * height;
+            
+            var cpuInput = new Complex[totalSize];
+            input.CopyToCPU(cpuInput);
+            
+            var tempData = new Complex[totalSize];
+            var outputData = new Complex[totalSize];
+            
+            // Perform row-wise FFT first
+            for (int row = 0; row < height; row++)
+            {
+                for (int k = 0; k < width; k++)
+                {
+                    Complex sum = Complex.Zero;
+                    for (int n = 0; n < width; n++)
+                    {
+                        double angle = -2.0 * Math.PI * k * n / width;
+                        var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                        sum += cpuInput[row * width + n] * w;
+                    }
+                    tempData[row * width + k] = sum;
+                }
+            }
+            
+            // Perform column-wise FFT
+            for (int col = 0; col < width; col++)
+            {
+                for (int k = 0; k < height; k++)
+                {
+                    Complex sum = Complex.Zero;
+                    for (int n = 0; n < height; n++)
+                    {
+                        double angle = -2.0 * Math.PI * k * n / height;
+                        var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                        sum += tempData[n * width + col] * w;
+                    }
+                    outputData[k * width + col] = sum;
+                }
+            }
+            
+            // Copy result back to GPU
+            output.CopyFromCPU(outputData);
         }
 
         #endregion
@@ -268,8 +430,30 @@ namespace ILGPU.FFT
             if (!IsSizeSupported(length))
                 throw new ArgumentException($"FFT size {length} is not supported");
 
-            // Placeholder implementation
-            throw new NotImplementedException("CUDA cuFFT batch FFT integration needs additional work for production use");
+            // For now, use CPU fallback for batch FFT by processing each transform sequentially
+            for (int batch = 0; batch < inputs.Length; batch++)
+            {
+                var cpuInput = new Complex[length];
+                inputs[batch].CopyToCPU(cpuInput);
+                
+                var outputData = new Complex[length];
+                
+                // Perform FFT for this batch element
+                for (int k = 0; k < length; k++)
+                {
+                    Complex sum = Complex.Zero;
+                    for (int n = 0; n < length; n++)
+                    {
+                        double angle = -2.0 * Math.PI * k * n / length;
+                        var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                        sum += cpuInput[n] * w;
+                    }
+                    outputData[k] = sum;
+                }
+                
+                // Copy result back to GPU
+                outputs[batch].CopyFromCPU(outputData);
+            }
         }
 
         #endregion
@@ -345,6 +529,95 @@ namespace ILGPU.FFT
         {
             if (result != CufftResult.Success)
                 throw new InvalidOperationException($"{message}: {result}");
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// CPU fallback implementation for 1D FFT.
+        /// </summary>
+        private void FallbackToCP_FFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
+        {
+            var length = (int)input.Length;
+            var cpuInput = new Complex[length];
+            var outputData = new Complex[length];
+            
+            // Copy data from GPU to CPU
+            input.CopyToCPU(cpuInput);
+            
+            // Perform CPU FFT fallback (DFT implementation)
+            for (int k = 0; k < length; k++)
+            {
+                Complex sum = Complex.Zero;
+                for (int n = 0; n < length; n++)
+                {
+                    double angle = (forward ? -2.0 : 2.0) * Math.PI * k * n / length;
+                    var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                    sum += cpuInput[n] * w;
+                }
+                outputData[k] = forward ? sum : sum / length;
+            }
+            
+            // Copy result back to GPU
+            output.CopyFromCPU(outputData);
+        }
+
+        /// <summary>
+        /// CPU fallback implementation for 1D real-to-complex FFT.
+        /// </summary>
+        private void FallbackToCPU_FFT1DReal(ArrayView<float> input, ArrayView<Complex> output)
+        {
+            var length = (int)input.Length;
+            var cpuInput = new float[length];
+            input.CopyToCPU(cpuInput);
+            
+            var outputLength = length / 2 + 1;
+            var outputData = new Complex[outputLength];
+            
+            // Perform real-to-complex FFT (DFT implementation)
+            for (int k = 0; k < outputLength; k++)
+            {
+                Complex sum = Complex.Zero;
+                for (int n = 0; n < length; n++)
+                {
+                    double angle = -2.0 * Math.PI * k * n / length;
+                    var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                    sum += cpuInput[n] * w;
+                }
+                outputData[k] = sum;
+            }
+            
+            output.SubView(0, outputLength).CopyFromCPU(outputData);
+        }
+
+        /// <summary>
+        /// CPU fallback implementation for 1D complex-to-real inverse FFT.
+        /// </summary>
+        private void FallbackToCPU_IFFT1DReal(ArrayView<Complex> input, ArrayView<float> output)
+        {
+            var length = (int)output.Length;
+            var inputLength = length / 2 + 1;
+            var cpuInput = new Complex[inputLength];
+            input.SubView(0, inputLength).CopyToCPU(cpuInput);
+            
+            var outputData = new float[length];
+            
+            // Perform complex-to-real inverse FFT (DFT implementation)
+            for (int n = 0; n < length; n++)
+            {
+                Complex sum = Complex.Zero;
+                for (int k = 0; k < inputLength; k++)
+                {
+                    double angle = 2.0 * Math.PI * k * n / length; // Positive for inverse
+                    var w = new Complex(Math.Cos(angle), Math.Sin(angle));
+                    sum += cpuInput[k] * w;
+                }
+                outputData[n] = (float)(sum.Real / length); // Normalize and take real part
+            }
+            
+            output.CopyFromCPU(outputData);
         }
 
         #endregion

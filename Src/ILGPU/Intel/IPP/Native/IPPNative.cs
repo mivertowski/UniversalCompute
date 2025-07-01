@@ -32,9 +32,15 @@ namespace ILGPU.Intel.IPP.Native
     {
         #region Library Constants
 
+#if WINDOWS
         private const string IPPLibrary = "ipp";
         private const string IPPSLibrary = "ipps";
         private const string IPPCCLibrary = "ippcc";
+#else
+        private const string IPPLibrary = "libipp.so.11";
+        private const string IPPSLibrary = "libipps.so.11";
+        private const string IPPCCLibrary = "libippcc.so.11";
+#endif
 
         #endregion
 

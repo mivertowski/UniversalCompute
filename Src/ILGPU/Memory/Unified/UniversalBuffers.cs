@@ -36,22 +36,117 @@ namespace ILGPU.Memory.Unified
         public virtual bool SupportsZeroCopy => false;
         public virtual bool SupportsAutoMigration => true;
         public abstract DataLocation CurrentLocation { get; }
-        public virtual ArrayView<T> View => throw new NotImplementedException();
+        public virtual ArrayView<T> View
+        {
+            get
+            {
+                // Default implementation requires GetNativeBuffer to be implemented
+                var nativeBuffer = GetNativeBuffer(null);
+                return nativeBuffer?.View ?? throw new InvalidOperationException("No native buffer available for view access");
+            }
+        }
 
-        public virtual ArrayView2D<T, Stride2D.DenseX> As2DView(int width, int height) => throw new NotImplementedException();
-        public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth) => throw new NotImplementedException();
-        public virtual void CopyFromCPU(ReadOnlySpan<T> source) => throw new NotImplementedException();
-        public virtual void CopyToCPU(Span<T> destination) => throw new NotImplementedException();
-        public virtual Task CopyFromCPUAsync(ReadOnlyMemory<T> source) => throw new NotImplementedException();
-        public virtual Task CopyToCPUAsync(Memory<T> destination) => throw new NotImplementedException();
-        public virtual void CopyFrom(IUniversalBuffer<T> source) => throw new NotImplementedException();
-        public virtual Task CopyFromAsync(IUniversalBuffer<T> source) => throw new NotImplementedException();
-        public virtual void EnsureAvailable(Accelerator accelerator) => throw new NotImplementedException();
-        public virtual Task EnsureAvailableAsync(Accelerator accelerator) => throw new NotImplementedException();
-        public virtual void Prefetch(Accelerator accelerator) => throw new NotImplementedException();
-        public virtual MemoryBuffer1D<T, Stride1D.Dense>? GetNativeBuffer(Accelerator accelerator) => throw new NotImplementedException();
-        public virtual void InvalidateCache() => throw new NotImplementedException();
-        public virtual UniversalBufferStats GetStats() => throw new NotImplementedException();
+        public virtual ArrayView2D<T, Stride2D.DenseX> As2DView(int width, int height)
+        {
+            if (width * height > Length)
+                throw new ArgumentException("2D view dimensions exceed buffer size");
+            return View.As2DView(width, height);
+        }
+        public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth)
+        {
+            if (width * height * depth > Length)
+                throw new ArgumentException("3D view dimensions exceed buffer size");
+            return View.As3DView(width, height, depth);
+        }
+        public virtual void CopyFromCPU(ReadOnlySpan<T> source)
+        {
+            if (source.Length > Length)
+                throw new ArgumentException("Source data exceeds buffer capacity");
+            
+            // Default implementation uses array view
+            var view = View.SubView(0, source.Length);
+            view.CopyFromCPU(source.ToArray());
+        }
+        public virtual void CopyToCPU(Span<T> destination)
+        {
+            if (destination.Length > Length)
+                throw new ArgumentException("Destination buffer too small");
+            
+            // Default implementation uses array view
+            var tempArray = new T[destination.Length];
+            var view = View.SubView(0, destination.Length);
+            view.CopyToCPU(tempArray);
+            tempArray.AsSpan().CopyTo(destination);
+        }
+        public virtual Task CopyFromCPUAsync(ReadOnlyMemory<T> source)
+        {
+            // Default async implementation delegates to sync version
+            return Task.Run(() => CopyFromCPU(source.Span));
+        }
+        public virtual Task CopyToCPUAsync(Memory<T> destination)
+        {
+            // Default async implementation delegates to sync version
+            return Task.Run(() => CopyToCPU(destination.Span));
+        }
+        public virtual void CopyFrom(IUniversalBuffer<T> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            
+            if (source.Length > Length)
+                throw new ArgumentException("Source buffer exceeds destination capacity");
+            
+            // Default implementation via CPU
+            var tempData = new T[source.Length];
+            source.CopyToCPU(tempData);
+            CopyFromCPU(tempData);
+        }
+        public virtual Task CopyFromAsync(IUniversalBuffer<T> source)
+        {
+            // Default async implementation delegates to sync version
+            return Task.Run(() => CopyFrom(source));
+        }
+        public virtual void EnsureAvailable(Accelerator accelerator)
+        {
+            // Default implementation - data is already available if native buffer exists
+            // Derived classes should override for specific migration logic
+            var nativeBuffer = GetNativeBuffer(accelerator);
+            if (nativeBuffer == null)
+                throw new InvalidOperationException($"Buffer not available on accelerator {accelerator.Name}");
+        }
+        public virtual Task EnsureAvailableAsync(Accelerator accelerator)
+        {
+            // Default async implementation delegates to sync version
+            return Task.Run(() => EnsureAvailable(accelerator));
+        }
+        public virtual void Prefetch(Accelerator accelerator)
+        {
+            // Default implementation is a no-op
+            // Derived classes can override for specific prefetching logic
+        }
+        public virtual MemoryBuffer1D<T, Stride1D.Dense>? GetNativeBuffer(Accelerator accelerator)
+        {
+            // Base implementation returns null - derived classes must override
+            // This method is the core abstraction for accessing native buffers
+            return null;
+        }
+        public virtual void InvalidateCache()
+        {
+            // Default implementation is a no-op
+            // Derived classes can override for specific cache invalidation logic
+        }
+        public virtual UniversalBufferStats GetStats()
+        {
+            // Default implementation returns basic stats
+            return new UniversalBufferStats
+            {
+                SizeInBytes = SizeInBytes,
+                CurrentLocation = CurrentLocation,
+                Placement = Placement,
+                AccessCount = 0,
+                LastAccessTime = DateTime.UtcNow
+            };
+        }
 
         public void Dispose()
         {

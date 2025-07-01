@@ -222,8 +222,16 @@ namespace ILGPU.TensorCores
             
             var blockDim = new Index3D(32, 1, 1);
 
-            // Batched tensor operations require specialized ILGPU extensions
-            throw new NotImplementedException("Batched tensor core operations require ILGPU runtime extensions");
+            // For now, implement as sequential batch of regular GEMM operations
+            // This can be optimized with true batched tensor core operations later
+            
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<
+                Index1D, int, int, int, int, T, ArrayView<T>, int, int, 
+                ArrayView<T>, int, int, T, ArrayView<T>, int, int, TensorConfig>(
+                TensorBatchedGemmKernel);
+
+            kernel(stream, batchCount, batchCount, m, n, k, alpha, a, lda, strideA, 
+                   b, ldb, strideB, beta, c, ldc, strideC, cfg);
         }
 
         /// <summary>
@@ -274,10 +282,35 @@ namespace ILGPU.TensorCores
             int padH,
             int padW,
             TensorConfig? config = null)
-            where T : unmanaged, INumber<T> =>
-            // Convolution can be implemented as matrix multiplication
-            // using im2col transformation
-            throw new NotImplementedException("Tensor convolution will be implemented");
+            where T : unmanaged, INumber<T>
+        {
+            // Implement direct convolution for now - can be optimized with im2col later
+            var cfg = config ?? TensorConfig.Default;
+            
+            // Calculate output dimensions
+            int outputH = (inputH + 2 * padH - filterR) / strideH + 1;
+            int outputW = (inputW + 2 * padW - filterS) / strideW + 1;
+            
+            // Basic validation
+            if (filterC != inputC)
+                throw new ArgumentException("Filter channels must match input channels");
+            
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<
+                Index3D, ArrayView<T>, ArrayView<T>, ArrayView<T>,
+                int, int, int, int, int, int, int, int,
+                int, int, int, int, int, int, int, int>(
+                TensorConvolutionKernel);
+                
+            var gridDim = new Index3D(
+                (outputH + cfg.TileSize - 1) / cfg.TileSize,
+                (outputW + cfg.TileSize - 1) / cfg.TileSize,
+                filterK);
+                
+            kernel(stream, gridDim, input, filter, output,
+                   inputN, inputC, inputH, inputW,
+                   filterK, filterC, filterR, filterS,
+                   outputH, outputW, strideH, strideW, padH, padW);
+        }
 
         /// <summary>
         /// Validates that matrix dimensions are compatible with tensor cores.
@@ -290,6 +323,98 @@ namespace ILGPU.TensorCores
                     $"Matrix dimensions ({m}x{n}x{k}) must be multiples of tile size ({tileSize}) " +
                     "for tensor core operations. Consider padding the matrices.");
             }
+        }
+
+        /// <summary>
+        /// Kernel for batched tensor GEMM operations.
+        /// </summary>
+        private static void TensorBatchedGemmKernel<T>(
+            Index1D index,
+            int batchCount,
+            int m,
+            int n,
+            int k,
+            T alpha,
+            ArrayView<T> a,
+            int lda,
+            int strideA,
+            ArrayView<T> b,
+            int ldb,
+            int strideB,
+            T beta,
+            ArrayView<T> c,
+            int ldc,
+            int strideC,
+            TensorConfig config)
+            where T : unmanaged, INumber<T>
+        {
+            int batchIndex = index;
+            if (batchIndex >= batchCount) return;
+
+            // Calculate batch offsets
+            int aOffset = batchIndex * strideA;
+            int bOffset = batchIndex * strideB;
+            int cOffset = batchIndex * strideC;
+
+            // For now, implement basic matrix multiplication
+            // This would be replaced with actual tensor core operations
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    T sum = T.Zero;
+                    for (int ki = 0; ki < k; ki++)
+                    {
+                        sum += a[aOffset + i * lda + ki] * b[bOffset + ki * ldb + j];
+                    }
+                    c[cOffset + i * ldc + j] = alpha * sum + beta * c[cOffset + i * ldc + j];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Kernel for tensor convolution operations.
+        /// </summary>
+        private static void TensorConvolutionKernel<T>(
+            Index3D index,
+            ArrayView<T> input,
+            ArrayView<T> filter,
+            ArrayView<T> output,
+            int inputN, int inputC, int inputH, int inputW,
+            int filterK, int filterC, int filterR, int filterS,
+            int outputH, int outputW,
+            int strideH, int strideW, int padH, int padW)
+            where T : unmanaged, INumber<T>
+        {
+            int oh = index.X;
+            int ow = index.Y;
+            int k = index.Z;
+
+            if (oh >= outputH || ow >= outputW || k >= filterK) return;
+
+            // Basic convolution implementation
+            T sum = T.Zero;
+            for (int c = 0; c < inputC; c++)
+            {
+                for (int r = 0; r < filterR; r++)
+                {
+                    for (int s = 0; s < filterS; s++)
+                    {
+                        int ih = oh * strideH + r - padH;
+                        int iw = ow * strideW + s - padW;
+
+                        if (ih >= 0 && ih < inputH && iw >= 0 && iw < inputW)
+                        {
+                            int inputIdx = c * inputH * inputW + ih * inputW + iw;
+                            int filterIdx = k * filterC * filterR * filterS + c * filterR * filterS + r * filterS + s;
+                            sum += input[inputIdx] * filter[filterIdx];
+                        }
+                    }
+                }
+            }
+
+            int outputIdx = k * outputH * outputW + oh * outputW + ow;
+            output[outputIdx] = sum;
         }
     }
 

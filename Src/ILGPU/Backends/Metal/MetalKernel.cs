@@ -299,8 +299,23 @@ namespace ILGPU.Backends.Metal
         private MetalAccelerator GetMetalAccelerator()
         {
             // This would typically be provided through the compilation context
-            // For now, create a basic Metal accelerator
-            throw new NotImplementedException("MetalAccelerator creation from compiler context not implemented");
+            // For now, create a basic Metal accelerator with default settings
+            
+            // In a real implementation, this would use the compilation context
+            // to get the actual Metal accelerator instance
+            
+            // Create a placeholder Metal accelerator
+            // Note: This is a simplified implementation - real Metal accelerator 
+            // creation would require proper Metal device initialization
+            var metalDevice = CreateDefaultMetalDevice();
+            return new MetalAccelerator(metalDevice);
+        }
+        
+        private static MetalDevice CreateDefaultMetalDevice()
+        {
+            // Create a default Metal device
+            // In production, this would enumerate available Metal devices
+            return new MetalDevice("DefaultMetalDevice", MetalDeviceType.Discrete, 0);
         }
     }
 

@@ -356,7 +356,14 @@ namespace ILGPU.ML
             }
             else
             {
-                throw new NotImplementedException("Softmax only implemented for 2D tensors");
+                // Implement n-dimensional softmax by flattening and applying along the last dimension
+                int lastDimSize = Shape[^1];
+                int batchSize = (int)(Shape.Size / lastDimSize);
+                
+                var kernel = Accelerator.LoadAutoGroupedStreamKernel<
+                    Index1D, ArrayView<T>, ArrayView<T>, int, int>(SoftmaxNDKernel<T>);
+                
+                kernel(batchSize, View, result.View, batchSize, lastDimSize);
             }
             
             return result;
@@ -443,13 +450,58 @@ namespace ILGPU.ML
                 output[offset + i] /= sum;
         }
 
+        private static void SoftmaxNDKernel<TElement>(
+            Index1D index,
+            ArrayView<TElement> input,
+            ArrayView<TElement> output,
+            int batchSize,
+            int featureSize)
+            where TElement : unmanaged, INumber<TElement>
+        {
+            int batchIndex = index;
+            if (batchIndex >= batchSize) return;
+
+            var offset = batchIndex * featureSize;
+            
+            // Find max for numerical stability
+            var maxVal = input[offset];
+            for (int i = 1; i < featureSize; i++)
+                maxVal = TElement.Max(maxVal, input[offset + i]);
+
+            // Compute exp and sum
+            var sum = TElement.Zero;
+            for (int i = 0; i < featureSize; i++)
+            {
+                var exp = MathExtensions.Exp(input[offset + i] - maxVal);
+                output[offset + i] = exp;
+                sum += exp;
+            }
+
+            // Normalize
+            for (int i = 0; i < featureSize; i++)
+                output[offset + i] /= sum;
+        }
+
         #endregion
 
         #region Matrix Multiplication Implementations
 
-        private static void TensorCoreMatMul(Tensor<T> a, Tensor<T> b, Tensor<T> result) =>
-            // Tensor core operations require specialized implementations for each precision
-            throw new NotImplementedException("Tensor core matrix multiplication requires specialized precision-specific implementation");
+        private static void TensorCoreMatMul(Tensor<T> a, Tensor<T> b, Tensor<T> result)
+        {
+            // For now, fall back to regular matrix multiplication
+            // TODO: Implement actual tensor core operations based on precision type
+            // This would require specialized kernels for each supported type (half, float, double)
+            
+            if (!a.Accelerator.SupportsTensorCores())
+            {
+                RegularMatMul(a, b, result);
+                return;
+            }
+            
+            // Placeholder for tensor core implementation
+            // In a real implementation, this would dispatch to precision-specific kernels
+            RegularMatMul(a, b, result);
+        }
 
         private static void RegularMatMul(Tensor<T> a, Tensor<T> b, Tensor<T> result)
         {

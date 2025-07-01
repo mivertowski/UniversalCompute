@@ -58,32 +58,38 @@ namespace ILGPU.Algorithms.PTX
         #region IsNaN & IsInfinity
 
         /// <summary cref="XMath.IsNaN(double)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNaN(double value) =>
-            throw new NotImplementedException();
+            double.IsNaN(value);
 
         /// <summary cref="XMath.IsNaN(float)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNaN(float value) =>
-            throw new NotImplementedException();
+            float.IsNaN(value);
 
         /// <summary cref="XMath.IsInfinity(double)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsInfinity(double value) =>
-            throw new NotImplementedException();
+            double.IsInfinity(value);
 
         /// <summary cref="XMath.IsInfinity(float)"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsInfinity(float value) =>
-            throw new NotImplementedException();
+            float.IsInfinity(value);
 
         #endregion
 
         #region Rcp
 
         /// <summary cref="XMath.Rcp(double)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Rcp(double value) =>
-            throw new NotImplementedException();
+            1.0 / value;
 
         /// <summary cref="XMath.Rcp(float)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Rcp(float value) =>
-            throw new NotImplementedException();
+            1.0f / value;
 
         #endregion
 
@@ -163,11 +169,12 @@ namespace ILGPU.Algorithms.PTX
         /// <summary cref="XMath.Sqrt(double)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double Sqrt(double value) =>
-            throw new NotImplementedException();
+            Math.Sqrt(value);
 
         /// <summary cref="XMath.Sqrt(float)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sqrt(float value) =>
-            throw new NotImplementedException();
+            MathF.Sqrt(value);
 
         /// <summary cref="XMath.Rsqrt(double)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -213,8 +220,9 @@ namespace ILGPU.Algorithms.PTX
             XMath.Cordic.Sin(value);
 
         /// <summary cref="XMath.Sin(float)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sin(float value) =>
-            throw new NotImplementedException();
+            MathF.Sin(value);
 
         /// <summary cref="XMath.Sinh(double)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -272,8 +280,9 @@ namespace ILGPU.Algorithms.PTX
             XMath.Cordic.Cos(value);
 
         /// <summary cref="XMath.Cos(float)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Cos(float value) =>
-            throw new NotImplementedException();
+            MathF.Cos(value);
 
         /// <summary cref="XMath.Cosh(double)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -694,8 +703,9 @@ namespace ILGPU.Algorithms.PTX
             Exp(value * XMath.OneOverLog2ED);
 
         /// <summary cref="XMath.Exp2(float)" />
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Exp2(float value) =>
-            throw new NotImplementedException();
+            MathF.Pow(2.0f, value);
 
         #endregion
 
@@ -803,7 +813,7 @@ namespace ILGPU.Algorithms.PTX
         /// <summary cref="XMath.Log2(float)" />
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Log2(float value) =>
-            throw new NotImplementedException();
+            MathF.Log2(value);
 
         #endregion
 

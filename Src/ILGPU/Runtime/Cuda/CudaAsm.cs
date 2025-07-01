@@ -37,8 +37,15 @@ namespace ILGPU.Runtime.Cuda
         /// </summary>
         /// <param name="asm">The PTX assembly instruction string.</param>
         [LanguageIntrinsic(LanguageIntrinsicKind.EmitPTX)]
-        public static void Emit(string asm) =>
-            throw new NotImplementedException();
+        public static void Emit(string asm)
+        {
+            if (!IsSupported)
+                throw new NotSupportedException("CudaAsm.Emit is only supported on CUDA accelerators and must be called from within a GPU kernel.");
+            
+            // This method is replaced by the ILGPU compiler during code generation
+            // If we reach here, it means the method wasn't properly replaced by the compiler
+            throw new InvalidOperationException("CudaAsm.Emit must be called from within a GPU kernel compiled by ILGPU.");
+        }
     }
 
     /// <summary>
