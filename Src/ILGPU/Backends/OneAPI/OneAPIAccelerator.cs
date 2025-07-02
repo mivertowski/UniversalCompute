@@ -364,32 +364,9 @@ namespace ILGPU.Backends.OneAPI
 
         private string GenerateSYCLKernel(CompiledKernel compiledKernel)
         {
-            // This would translate ILGPU IR to SYCL/DPC++ code
-            // For now, generate a basic SYCL kernel template
-            var kernelName = compiledKernel.EntryPoint.Name;
-            
-            var syclCode = $@"
-// include <sycl/sycl.hpp>
-using namespace sycl;
-
-// Generated SYCL kernel for {kernelName}
-class {kernelName}_kernel {{
-public:
-    void operator()(nd_item<1> item) const {{
-        // TODO: Implement actual ILGPU IR to SYCL translation
-        // This is a placeholder implementation
-        auto globalId = item.get_global_id(0);
-        // Kernel logic would be generated here from ILGPU IR
-    }}
-}};
-
-// Kernel launch wrapper
-void launch_{kernelName}(queue& q, range<1> global_range, range<1> local_range) {{
-    q.parallel_for(nd_range<1>(global_range, local_range), {kernelName}_kernel{{}});
-}}
-";
-            
-            return syclCode;
+            // Use the new SYCL code generator for IR to SYCL translation
+            var syclGenerator = new SYCLCodeGenerator();
+            return syclGenerator.GenerateCode(compiledKernel.EntryPoint);
         }
 
         private void ThrowIfDisposed()
@@ -451,6 +428,11 @@ void launch_{kernelName}(queue& q, range<1> global_range, range<1> local_range) 
         {
             _queue = queue;
         }
+
+        /// <summary>
+        /// Gets the native queue handle.
+        /// </summary>
+        public IntPtr Queue => _queue;
 
         /// <summary>
         /// Synchronizes the stream.

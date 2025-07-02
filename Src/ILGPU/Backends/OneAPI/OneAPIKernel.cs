@@ -15,6 +15,12 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using ILGPU.Backends.EntryPoints;
+using ILGPU.Runtime;
+
 #if ENABLE_ONEAPI_ACCELERATOR
 namespace ILGPU.Backends.OneAPI
 {
@@ -93,6 +99,18 @@ namespace ILGPU.Backends.OneAPI
                 else if (value is Index3D index3d)
                 {
                     OneAPIKernelNative.SetKernelArg(_kernel, (uint)index, (nuint)Marshal.SizeOf<Index3D>(), &index3d);
+                }
+                else if (value is IntPtr ptrValue)
+                {
+                    OneAPIKernelNative.SetKernelArg(_kernel, (uint)index, (nuint)IntPtr.Size, &ptrValue);
+                }
+                else if (value is byte byteValue)
+                {
+                    OneAPIKernelNative.SetKernelArg(_kernel, (uint)index, sizeof(byte), &byteValue);
+                }
+                else if (value is short shortValue)
+                {
+                    OneAPIKernelNative.SetKernelArg(_kernel, (uint)index, sizeof(short), &shortValue);
                 }
                 else
                 {
@@ -235,19 +253,30 @@ namespace ILGPU.Backends.OneAPI
 
         private void SetKernelArguments(RuntimeKernelConfig config)
         {
-            // Set kernel arguments based on runtime configuration
-            var args = config.ToArguments();
-            for (int i = 0; i < args.Length; i++)
+            try
             {
-                _oneapiKernel.SetArgument(i, args[i]);
+                // Set kernel arguments based on runtime configuration
+                var args = config.ToArguments();
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] != null)
+                    {
+                        _oneapiKernel.SetArgument(i, args[i]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to set kernel arguments: {ex.Message}", ex);
             }
         }
 
         private static IntPtr GetQueueFromStream(OneAPIStream stream)
         {
-            // Access private queue field through reflection or internal method
-            // For now, return IntPtr.Zero
-            return IntPtr.Zero;
+            // Use reflection to access the private _queue field
+            var queueField = typeof(OneAPIStream).GetField("_queue", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            return queueField != null ? (IntPtr)queueField.GetValue(stream) : IntPtr.Zero;
         }
 
         /// <summary>
@@ -297,6 +326,20 @@ namespace ILGPU.Backends.OneAPI
             uint numEventsInWaitList,
             IntPtr* eventWaitList,
             IntPtr @event);
+
+        internal static unsafe int EnqueueNDRangeKernel(
+            IntPtr queue,
+            IntPtr kernel,
+            uint dimensions,
+            nuint* globalOffset,
+            nuint* globalSize,
+            nuint* localSize,
+            uint numEvents,
+            IntPtr* events,
+            IntPtr @event)
+        {
+            return clEnqueueNDRangeKernel(queue, kernel, dimensions, globalOffset, globalSize, localSize, numEvents, events, @event);
+        }
 
         [DllImport("OpenCL")]
         internal static unsafe partial int clGetKernelWorkGroupInfo(

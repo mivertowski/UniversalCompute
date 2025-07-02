@@ -439,16 +439,132 @@ namespace ILGPU.Backends.OneAPI
         }
 
         // Intel USM extension functions
+        [DllImport("OpenCL", EntryPoint = "clDeviceMemAllocINTEL")]
+        private static extern IntPtr clDeviceMemAllocINTEL(
+            IntPtr context,
+            IntPtr device,
+            IntPtr properties,
+            nuint size,
+            uint alignment,
+            out int errCodeRet);
+
+        [DllImport("OpenCL", EntryPoint = "clHostMemAllocINTEL")]
+        private static extern IntPtr clHostMemAllocINTEL(
+            IntPtr context,
+            IntPtr properties,
+            nuint size,
+            uint alignment,
+            out int errCodeRet);
+
+        [DllImport("OpenCL", EntryPoint = "clSharedMemAllocINTEL")]
+        private static extern IntPtr clSharedMemAllocINTEL(
+            IntPtr context,
+            IntPtr device,
+            IntPtr properties,
+            nuint size,
+            uint alignment,
+            out int errCodeRet);
+
+        [DllImport("OpenCL", EntryPoint = "clMemFreeINTEL")]
+        private static extern int clMemFreeINTEL(IntPtr context, IntPtr ptr);
+
         internal static IntPtr AllocateUSM(IntPtr context, IntPtr device, long size, USMType type)
         {
-            // This would use clSharedMemAllocINTEL or similar
-            // For now, return IntPtr.Zero
-            return IntPtr.Zero;
+            try
+            {
+                const uint alignment = 32; // 32-byte alignment for optimal performance
+                
+                return type switch
+                {
+                    USMType.Device => AllocateDeviceUSM(context, device, size, alignment),
+                    USMType.Host => AllocateHostUSM(context, size, alignment),
+                    USMType.Shared => AllocateSharedUSM(context, device, size, alignment),
+                    _ => IntPtr.Zero
+                };
+            }
+            catch
+            {
+                // Fall back to regular OpenCL buffer allocation
+                return AllocateBuffer(context, size);
+            }
+        }
+
+        private static IntPtr AllocateDeviceUSM(IntPtr context, IntPtr device, long size, uint alignment)
+        {
+            try
+            {
+                var ptr = clDeviceMemAllocINTEL(
+                    context,
+                    device,
+                    IntPtr.Zero, // properties
+                    (nuint)size,
+                    alignment,
+                    out var errCode);
+
+                return errCode == 0 ? ptr : IntPtr.Zero;
+            }
+            catch
+            {
+                return IntPtr.Zero;
+            }
+        }
+
+        private static IntPtr AllocateHostUSM(IntPtr context, long size, uint alignment)
+        {
+            try
+            {
+                var ptr = clHostMemAllocINTEL(
+                    context,
+                    IntPtr.Zero, // properties
+                    (nuint)size,
+                    alignment,
+                    out var errCode);
+
+                return errCode == 0 ? ptr : IntPtr.Zero;
+            }
+            catch
+            {
+                return IntPtr.Zero;
+            }
+        }
+
+        private static IntPtr AllocateSharedUSM(IntPtr context, IntPtr device, long size, uint alignment)
+        {
+            try
+            {
+                var ptr = clSharedMemAllocINTEL(
+                    context,
+                    device,
+                    IntPtr.Zero, // properties
+                    (nuint)size,
+                    alignment,
+                    out var errCode);
+
+                return errCode == 0 ? ptr : IntPtr.Zero;
+            }
+            catch
+            {
+                return IntPtr.Zero;
+            }
         }
 
         internal static void FreeUSM(IntPtr context, IntPtr ptr)
         {
-            // This would use clMemFreeINTEL or similar
+            try
+            {
+                if (ptr != IntPtr.Zero)
+                {
+                    var result = clMemFreeINTEL(context, ptr);
+                    if (result != 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Warning: clMemFreeINTEL failed with error: {result}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Warning: USM free failed: {ex.Message}");
+            }
         }
     }
 

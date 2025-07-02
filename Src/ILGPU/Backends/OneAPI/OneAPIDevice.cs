@@ -146,6 +146,137 @@ namespace ILGPU.Backends.OneAPI
         /// </summary>
         /// <returns>A string describing the device.</returns>
         public override string ToString() => $"{Name} ({DeviceType}, {Vendor})";
+
+        #region Static Device Discovery
+
+        /// <summary>
+        /// Gets all available OneAPI devices.
+        /// </summary>
+        /// <returns>An array of OneAPI devices.</returns>
+        public static OneAPIDevice[] GetDevices()
+        {
+            try
+            {
+                var devices = new List<OneAPIDevice>();
+                var platforms = Native.OneAPINative.GetPlatforms();
+
+                foreach (var platform in platforms)
+                {
+                    var platformDevices = Native.OneAPINative.GetDevices(platform);
+                    foreach (var device in platformDevices)
+                    {
+                        try
+                        {
+                            devices.Add(new OneAPIDevice(device, platform));
+                        }
+                        catch
+                        {
+                            // Skip devices that cannot be initialized
+                        }
+                    }
+                }
+
+                return devices.ToArray();
+            }
+            catch
+            {
+                return Array.Empty<OneAPIDevice>();
+            }
+        }
+
+        /// <summary>
+        /// Gets OneAPI devices of a specific type.
+        /// </summary>
+        /// <param name="deviceType">The device type to filter by.</param>
+        /// <returns>An array of OneAPI devices of the specified type.</returns>
+        public static OneAPIDevice[] GetDevices(OneAPIDeviceType deviceType)
+        {
+            return GetDevices().Where(d => d.DeviceType == deviceType).ToArray();
+        }
+
+        /// <summary>
+        /// Gets the default OneAPI device (typically the first GPU, then CPU).
+        /// </summary>
+        /// <returns>The default OneAPI device, or null if none available.</returns>
+        public static OneAPIDevice? GetDefaultDevice()
+        {
+            var devices = GetDevices();
+            
+            // Prefer Intel GPUs first
+            var intelGPU = devices.FirstOrDefault(d => d.IsIntelGPU);
+            if (intelGPU != null) return intelGPU;
+            
+            // Then any GPU
+            var anyGPU = devices.FirstOrDefault(d => d.DeviceType == OneAPIDeviceType.GPU);
+            if (anyGPU != null) return anyGPU;
+            
+            // Then Intel CPUs
+            var intelCPU = devices.FirstOrDefault(d => d.IsIntelCPU);
+            if (intelCPU != null) return intelCPU;
+            
+            // Finally any device
+            return devices.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets the best OneAPI device for compute workloads.
+        /// </summary>
+        /// <returns>The best OneAPI device, or null if none available.</returns>
+        public static OneAPIDevice? GetBestDevice()
+        {
+            var devices = GetDevices();
+            
+            // Rank devices by computational capability
+            return devices
+                .Where(d => d.DeviceType == OneAPIDeviceType.GPU || d.DeviceType == OneAPIDeviceType.CPU)
+                .OrderByDescending(d => GetDeviceScore(d))
+                .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets Intel GPU devices only.
+        /// </summary>
+        /// <returns>An array of Intel GPU devices.</returns>
+        public static OneAPIDevice[] GetIntelGPUs()
+        {
+            return GetDevices().Where(d => d.IsIntelGPU).ToArray();
+        }
+
+        /// <summary>
+        /// Calculates a score for device ranking.
+        /// </summary>
+        private static int GetDeviceScore(OneAPIDevice device)
+        {
+            var score = 0;
+            
+            // Prefer Intel devices
+            if (device.Vendor.Contains("Intel", StringComparison.OrdinalIgnoreCase))
+                score += 1000;
+            
+            // GPU gets higher score than CPU
+            if (device.DeviceType == OneAPIDeviceType.GPU)
+                score += 500;
+            else if (device.DeviceType == OneAPIDeviceType.CPU)
+                score += 100;
+            
+            // Architecture-based scoring
+            var architecture = device.GetArchitecture();
+            score += architecture switch
+            {
+                IntelArchitecture.Xe2 => 50,
+                IntelArchitecture.XeHPC => 45,
+                IntelArchitecture.XeHPG => 40,
+                IntelArchitecture.XeHP => 35,
+                IntelArchitecture.XeLP => 30,
+                IntelArchitecture.Gen11 => 20,
+                IntelArchitecture.Gen9 => 10,
+                _ => 0
+            };
+            
+            return score;
+        }
+
+        #endregion
     }
 
     /// <summary>
