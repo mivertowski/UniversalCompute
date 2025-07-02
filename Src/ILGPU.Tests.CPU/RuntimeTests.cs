@@ -94,7 +94,7 @@ namespace ILGPU.Tests.CPU
                 ArrayView<int>>(TestCustomDeviceSetup_ImplicitKernel);
             buff.MemSetToZero();
             implicitKernel(buff.IntExtent, buff.View);
-            var implicitData = buff.GetAsArray1D();
+            var implicitData = buff.GetAsArray();
             for (int i = 0; i < implicitData.Length; ++i)
                 Assert.Equal(implicitData[i], i);
 
@@ -105,7 +105,7 @@ namespace ILGPU.Tests.CPU
             explicitKernel(
                 (numMultiprocessors, numThreadsPerWarp * numWarpsPerMultiprocessor),
                 buff.View);
-            var explicitData = buff.GetAsArray1D();
+            var explicitData = buff.GetAsArray();
             for (int i = 0; i < explicitData.Length; ++i)
                 Assert.Equal(explicitData[i], i);
         }

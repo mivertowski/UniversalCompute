@@ -82,14 +82,14 @@ namespace ILGPU.Core
         /// <inheritdoc/>
         public ReadOnlySpan<T> AsReadOnlySpan()
         {
-            var data = buffer.GetAsArray1D();
+            var data = buffer.GetAsArray();
             return data.AsSpan();
         }
 
         /// <inheritdoc/>
         public Span<T> AsSpan()
         {
-            var data = buffer.GetAsArray1D();
+            var data = buffer.GetAsArray();
             return data.AsSpan();
         }
 
@@ -130,7 +130,7 @@ namespace ILGPU.Core
             if (destination.Length != ElementCount)
                 throw new ArgumentException($"Destination length {destination.Length} doesn't match tensor element count {ElementCount}");
 
-            var data = buffer.GetAsArray1D();
+            var data = buffer.GetAsArray();
             data.AsSpan().CopyTo(destination);
         }
 
@@ -235,13 +235,13 @@ namespace ILGPU.Core
             get
             {
                 var linearIndex = Shape.ComputeLinearIndex(indices);
-                var data = buffer.GetAsArray1D();
+                var data = buffer.GetAsArray();
                 return data[linearIndex];
             }
             set
             {
                 var linearIndex = Shape.ComputeLinearIndex(indices);
-                var data = buffer.GetAsArray1D();
+                var data = buffer.GetAsArray();
                 data[linearIndex] = value;
                 buffer.CopyFromCPU(data);
             }

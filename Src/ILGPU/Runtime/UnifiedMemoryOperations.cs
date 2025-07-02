@@ -197,7 +197,7 @@ namespace ILGPU.Runtime
             stream.Synchronize();
 
             // Get result back to CPU
-            return result.GetAsArray1D()[0];
+            return result.GetAsArray()[0];
         }
 
         /// <summary>

@@ -412,7 +412,7 @@ namespace ILGPU.Tests.CPU
                     kernel(gpu.Accelerator.DefaultStream, (Index1D)chunk.Length, buffer.View, resultBuffer.View);
                     gpu.Accelerator.Synchronize();
                     
-                    return resultBuffer.GetAsArray1D();
+                    return resultBuffer.GetAsArray();
                 }).ConfigureAwait(false);
 
             Assert.Equal(size, result.Length);

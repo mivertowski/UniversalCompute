@@ -344,7 +344,7 @@ namespace ILGPU.Tests.CPU
             accelerator.Synchronize();
             
             // Verify results
-            var data = buffer.GetAsArray1D();
+            var data = buffer.GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 Assert.Equal(i, data[i]);

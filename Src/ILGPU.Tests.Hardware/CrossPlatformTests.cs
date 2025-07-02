@@ -114,7 +114,7 @@ namespace ILGPU.Tests.Hardware
                     
                     // Copy back from device
                     sw.Restart();
-                    var result = deviceBuffer.GetAsArray1D();
+                    var result = deviceBuffer.GetAsArray();
                     sw.Stop();
                     output.WriteLine($"  Copy from device: {sw.ElapsedMilliseconds}ms");
                     
@@ -166,7 +166,7 @@ namespace ILGPU.Tests.Hardware
                         accelerator.Synchronize();
                         
                         // Verify results
-                        var results = buffer.GetAsArray1D();
+                        var results = buffer.GetAsArray();
                         Assert.All(results, val => Assert.Equal(1.0f, val, 5));
                         
                         output.WriteLine($"  ✓ Kernel execution successful");

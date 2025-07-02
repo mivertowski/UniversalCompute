@@ -169,7 +169,7 @@ namespace ILGPU.Tests.Hardware
             d_c.CopyFromCPU(c);
 
             // Copy back and verify
-            var result = d_c.GetAsArray1D();
+            var result = d_c.GetAsArray();
             
             // Assert
             var expected = size * 2.0f;

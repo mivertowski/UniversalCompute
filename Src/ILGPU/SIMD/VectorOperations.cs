@@ -202,7 +202,7 @@ namespace ILGPU.SIMD
                 kernel(left.Length, leftBuffer.View, rightBuffer.View, resultBuffer.View);
                 accelerator.Synchronize();
 
-                var resultArray = resultBuffer.GetAsArray1D();
+                var resultArray = resultBuffer.GetAsArray();
                 resultArray.AsSpan().CopyTo(result);
                 return true;
             }
@@ -240,7 +240,7 @@ namespace ILGPU.SIMD
                 kernel(left.Length, leftBuffer.View, rightBuffer.View, resultBuffer.View);
                 accelerator.Synchronize();
 
-                var resultArray = resultBuffer.GetAsArray1D();
+                var resultArray = resultBuffer.GetAsArray();
                 resultArray.AsSpan().CopyTo(result);
                 return true;
             }
@@ -279,7 +279,7 @@ namespace ILGPU.SIMD
                 kernel(left.Length, leftBuffer.View, rightBuffer.View, resultBuffer.View);
                 accelerator.Synchronize();
 
-                var resultArray = resultBuffer.GetAsArray1D();
+                var resultArray = resultBuffer.GetAsArray();
                 result = resultArray[0];
                 return true;
             }
@@ -319,7 +319,7 @@ namespace ILGPU.SIMD
                 kernel(rows, matrixBuffer.View, vectorBuffer.View, resultBuffer.View, rows, cols);
                 accelerator.Synchronize();
 
-                var resultArray = resultBuffer.GetAsArray1D();
+                var resultArray = resultBuffer.GetAsArray();
                 resultArray.AsSpan().CopyTo(result);
                 return true;
             }
