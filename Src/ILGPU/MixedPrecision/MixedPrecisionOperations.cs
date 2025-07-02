@@ -373,9 +373,8 @@ namespace ILGPU.MixedPrecision
         /// <summary>
         /// Kernel for FP32 to FP16 conversion.
         /// </summary>
-        private static void ConvertFP32ToFP16Kernel(ArrayView<float> source, ArrayView<Half> destination)
+        private static void ConvertFP32ToFP16Kernel(Index1D index, ArrayView<float> source, ArrayView<Half> destination)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < source.Length)
             {
                 destination[index] = (Half)source[index];
@@ -385,9 +384,8 @@ namespace ILGPU.MixedPrecision
         /// <summary>
         /// Kernel for FP16 to FP32 conversion.
         /// </summary>
-        private static void ConvertFP16ToFP32Kernel(ArrayView<Half> source, ArrayView<float> destination)
+        private static void ConvertFP16ToFP32Kernel(Index1D index, ArrayView<Half> source, ArrayView<float> destination)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < source.Length)
             {
                 destination[index] = (float)source[index];
@@ -397,9 +395,8 @@ namespace ILGPU.MixedPrecision
         /// <summary>
         /// Kernel for FP32 to BFloat16 conversion.
         /// </summary>
-        private static void ConvertFP32ToBF16Kernel(ArrayView<float> source, ArrayView<BFloat16> destination)
+        private static void ConvertFP32ToBF16Kernel(Index1D index, ArrayView<float> source, ArrayView<BFloat16> destination)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < source.Length)
             {
                 destination[index] = (BFloat16)source[index];
@@ -410,12 +407,12 @@ namespace ILGPU.MixedPrecision
         /// Kernel for FP32 to INT8 quantization.
         /// </summary>
         private static void QuantizeFP32ToINT8Kernel(
+            Index1D index,
             ArrayView<float> source,
             ArrayView<sbyte> destination,
             float scale,
             sbyte zeroPoint)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < source.Length)
             {
                 var quantized = IntrinsicMath.Round(source[index] / scale) + zeroPoint;
@@ -427,12 +424,12 @@ namespace ILGPU.MixedPrecision
         /// Kernel for INT8 to FP32 dequantization.
         /// </summary>
         private static void DequantizeINT8ToFP32Kernel(
+            Index1D index,
             ArrayView<sbyte> source,
             ArrayView<float> destination,
             float scale,
             sbyte zeroPoint)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < source.Length)
             {
                 destination[index] = (source[index] - zeroPoint) * scale;
@@ -443,6 +440,7 @@ namespace ILGPU.MixedPrecision
         /// Kernel for mixed precision tensor GEMM.
         /// </summary>
         private static void MixedPrecisionTensorGEMMKernel(
+            Index2D index,
             int m, int n, int k,
             float alpha,
             ArrayView2D<Half, Stride2D.DenseX> a, int lda,
@@ -451,8 +449,8 @@ namespace ILGPU.MixedPrecision
             ArrayView2D<float, Stride2D.DenseX> c, int ldc,
             TensorOperations.TensorConfig config)
         {
-            var row = Grid.GlobalIndex.X;
-            var col = Grid.GlobalIndex.Y;
+            var row = index.X;
+            var col = index.Y;
 
             if (row >= m || col >= n) return;
 
@@ -471,6 +469,7 @@ namespace ILGPU.MixedPrecision
         /// Kernel for software mixed precision GEMM.
         /// </summary>
         private static void SoftwareMixedPrecisionGEMMKernel(
+            Index2D index,
             int m, int n, int k,
             float alpha,
             ArrayView2D<Half, Stride2D.DenseX> a, int lda,
@@ -478,8 +477,8 @@ namespace ILGPU.MixedPrecision
             float beta,
             ArrayView2D<float, Stride2D.DenseX> c, int ldc)
         {
-            var row = Grid.GlobalIndex.X;
-            var col = Grid.GlobalIndex.Y;
+            var row = index.X;
+            var col = index.Y;
 
             if (row >= m || col >= n) return;
 
@@ -496,9 +495,8 @@ namespace ILGPU.MixedPrecision
         /// <summary>
         /// Kernel for scaling gradients.
         /// </summary>
-        private static void ScaleGradientsKernel(ArrayView<float> gradients, float lossScale)
+        private static void ScaleGradientsKernel(Index1D index, ArrayView<float> gradients, float lossScale)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < gradients.Length)
             {
                 gradients[index] *= lossScale;
@@ -508,9 +506,8 @@ namespace ILGPU.MixedPrecision
         /// <summary>
         /// Kernel for unscaling gradients.
         /// </summary>
-        private static void UnscaleGradientsKernel(ArrayView<float> gradients, float lossScale)
+        private static void UnscaleGradientsKernel(Index1D index, ArrayView<float> gradients, float lossScale)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < gradients.Length)
             {
                 gradients[index] /= lossScale;
@@ -520,9 +517,8 @@ namespace ILGPU.MixedPrecision
         /// <summary>
         /// Kernel for checking infinite or NaN values.
         /// </summary>
-        private static void CheckInfNaNKernel(ArrayView<float> gradients, ArrayView<int> hasInfNaN)
+        private static void CheckInfNaNKernel(Index1D index, ArrayView<float> gradients, ArrayView<int> hasInfNaN)
         {
-            var index = Grid.GlobalIndex.X;
             if (index < gradients.Length)
             {
                 var value = gradients[index];
