@@ -349,7 +349,7 @@ namespace ILGPU.AI.Memory
                     }
 
                     // Return view of the first block (simplified - would need proper spanning)
-                    return _blocks[i].Cast<T>();
+                    return _blocks[i].AsRawArrayView().Cast<T>();
                 }
             }
 
@@ -367,7 +367,7 @@ namespace ILGPU.AI.Memory
             // This is a simplified implementation
             for (int i = 0; i < _blockCount; i++)
             {
-                if (_blocks[i].NativePtr == memory.BaseView.NativePtr)
+                if (_blocks[i].NativePtr == memory.LoadEffectiveAddressAsPtr())
                 {
                     _blockUsed[i] = false;
                     break;
@@ -441,10 +441,10 @@ namespace ILGPU.AI.Memory
             var nonZeroCount = accelerator.Allocate1D<int>(1);
             var countKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<int>, T, int>(CountNonZeroKernel);
-            countKernel(new Index1D(dense.IntLength), dense, nonZeroCount, threshold, dense.Length);
+            countKernel(new Index1D(dense.Length), dense, nonZeroCount.View, threshold, dense.Length);
 
             accelerator.Synchronize();
-            var count = nonZeroCount.GetAsArray()[0];
+            var count = nonZeroCount.GetAsArray1D()[0];
 
             // Allocate sparse arrays
             var values = accelerator.Allocate1D<T>(count);
@@ -455,15 +455,15 @@ namespace ILGPU.AI.Memory
             var extractKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<T>, ArrayView<int>, ArrayView<int>,
                 T, int, int>(ExtractSparseKernel);
-            extractKernel(new Index1D(dense.IntLength), dense, values, rowIndices, colIndices, threshold, rows, cols);
+            extractKernel(new Index1D(dense.Length), dense, values.View, rowIndices.View, colIndices.View, threshold, rows, cols);
 
             nonZeroCount.Dispose();
 
             return new SparseTensorCOO<T>
             {
-                Values = values,
-                RowIndices = rowIndices,
-                ColIndices = colIndices,
+                Values = values.View,
+                RowIndices = rowIndices.View,
+                ColIndices = colIndices.View,
                 Rows = rows,
                 Cols = cols,
                 NonZeroCount = count
@@ -489,7 +489,7 @@ namespace ILGPU.AI.Memory
             var scatterKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<int>, ArrayView<int>, ArrayView<T>, int>(
                 ScatterSparseKernel);
-            scatterKernel(new Index1D(sparse.Values.IntLength), sparse.Values, sparse.RowIndices, sparse.ColIndices, dense, sparse.Cols);
+            scatterKernel(new Index1D(sparse.Values.Length), sparse.Values, sparse.RowIndices, sparse.ColIndices, dense, sparse.Cols);
         }
 
         /// <summary>
