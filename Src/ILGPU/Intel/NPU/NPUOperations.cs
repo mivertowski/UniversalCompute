@@ -52,8 +52,7 @@ namespace ILGPU.Intel.NPU
             var outputSize = GetTensorSize(config.OutputShape);
 
             // Pin weights for the duration of the operation
-            fixed (float* weightsPtr = weights.SubView(0, (int)weights.Length).AsSpan())
-            {
+            var weightsPtr = (float*)weights.LoadEffectiveAddressAsPtr().ToPointer();
                 // Execute native NPU convolution through OpenVINO
                 NPUNative.ExecuteConvolution(input, output, inputSize, outputSize, context);
                 
@@ -62,7 +61,6 @@ namespace ILGPU.Intel.NPU
                 {
                     ApplyActivation(output, outputSize, config.Activation);
                 }
-            }
         }
 
         /// <summary>
@@ -90,16 +88,12 @@ namespace ILGPU.Intel.NPU
             var intermediate = stackalloc float[(int)Math.Min(intermediateSize, 1024 * 1024)];
 
             // Step 1: Depthwise convolution
-            fixed (float* dwWeights = depthwiseWeights.SubView(0, (int)depthwiseWeights.Length).AsSpan())
-            {
+            var dwWeights = (float*)depthwiseWeights.LoadEffectiveAddressAsPtr().ToPointer();
                 NPUNative.ExecuteConvolution(input, intermediate, inputSize, intermediateSize, context);
-            }
 
             // Step 2: Pointwise convolution (1x1)
-            fixed (float* pwWeights = pointwiseWeights.SubView(0, (int)pointwiseWeights.Length).AsSpan())
-            {
+            var pwWeights = (float*)pointwiseWeights.LoadEffectiveAddressAsPtr().ToPointer();
                 NPUNative.ExecuteConvolution(intermediate, output, intermediateSize, outputSize, context);
-            }
 
             // Apply activation
             if (config.Activation != NPUActivation.None)

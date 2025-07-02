@@ -99,6 +99,21 @@ namespace ILGPU.Intel.NPU
         public IntPtr NativeConfig { get; private set; } = CreateNativeConfig(parameters, capabilities);
 
         /// <summary>
+        /// Gets the input shape.
+        /// </summary>
+        public (int N, int C, int H, int W) InputShape { get; set; }
+
+        /// <summary>
+        /// Gets the output shape.
+        /// </summary>
+        public (int N, int C, int H, int W) OutputShape { get; set; }
+
+        /// <summary>
+        /// Gets the activation function.
+        /// </summary>
+        public NPUActivation Activation { get; set; } = NPUActivation.None;
+
+        /// <summary>
         /// Calculates the output shape for the given input and weights shapes.
         /// </summary>
         /// <param name="inputShape">The input tensor shape.</param>
@@ -172,6 +187,21 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         public IntPtr NativeConfig { get; private set; } = CreateNativeConfig(configuration);
 
+        /// <summary>
+        /// Gets the input shape.
+        /// </summary>
+        public (int N, int C, int H, int W) InputShape { get; set; }
+
+        /// <summary>
+        /// Gets the output shape.
+        /// </summary>
+        public (int N, int C, int H, int W) OutputShape { get; set; }
+
+        /// <summary>
+        /// Gets the activation function.
+        /// </summary>
+        public NPUActivation Activation { get; set; } = NPUActivation.None;
+
         private static IntPtr CreateNativeConfig(MatMulConfiguration configuration) =>
             // Create native matrix multiplication configuration
             IntPtr.Zero;
@@ -220,6 +250,21 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         public IntPtr NativeConfig { get; private set; } = CreateNativeConfig(parameters, capabilities);
 
+        /// <summary>
+        /// Gets the input shape.
+        /// </summary>
+        public (int N, int C, int H, int W) InputShape { get; set; }
+
+        /// <summary>
+        /// Gets the output shape.
+        /// </summary>
+        public (int N, int C, int H, int W) OutputShape { get; set; }
+
+        /// <summary>
+        /// Gets the activation function.
+        /// </summary>
+        public NPUActivation Activation { get; set; } = NPUActivation.None;
+
         private static IntPtr CreateNativeConfig(AttentionParameters parameters, NPUCapabilities capabilities) =>
             // Create native attention configuration
             IntPtr.Zero;
@@ -266,10 +311,7 @@ namespace ILGPU.Intel.NPU
                 throw new ArgumentNullException(nameof(options));
 
             // Create optimized model (copy operations from original model)
-            var optimizedModel = new AppleNeuralNetwork(
-                $"{model.Name}_NPU_Optimized",
-                model.Operations);
-
+            var optimizedModel = new ILGPU.Apple.NeuralEngine.NeuralNetwork();
             // Apply optimizations based on NPU capabilities
             ApplyQuantization(optimizedModel, options);
             ApplyKernelFusion(optimizedModel, options);
@@ -331,7 +373,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load ONNX model - placeholder implementation
-            new("ONNX_Model");
+            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
     }
 
     /// <summary>
@@ -347,7 +389,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load OpenVINO model - placeholder implementation
-            new("OpenVINO_Model");
+            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
     }
 
     /// <summary>
@@ -363,7 +405,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load TensorFlow model - placeholder implementation
-            new("TensorFlow_Model");
+            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
     }
 
     /// <summary>
@@ -379,6 +421,6 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load PyTorch model - placeholder implementation
-            new("PyTorch_Model");
+            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
     }
 }

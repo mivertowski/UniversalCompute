@@ -247,6 +247,31 @@ namespace ILGPU.Intel.NPU
         public int ZeroPoint { get; set; } = 0;
 
         /// <summary>
+        /// Gets or sets the number of input elements.
+        /// </summary>
+        public long InputElements { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of output elements.
+        /// </summary>
+        public long OutputElements { get; set; }
+
+        /// <summary>
+        /// Gets or sets the input quantization scale.
+        /// </summary>
+        public float InputScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// Gets or sets the weight quantization scale.
+        /// </summary>
+        public float WeightScale { get; set; } = 1.0f;
+
+        /// <summary>
+        /// Gets or sets the output dequantization scale.
+        /// </summary>
+        public float OutputScale { get; set; } = 1.0f;
+
+        /// <summary>
         /// Creates a default quantization configuration.
         /// </summary>
         public static NPUQuantizationConfig Default => new();
@@ -316,6 +341,26 @@ namespace ILGPU.Intel.NPU
         /// Gets or sets whether to enable profiling.
         /// </summary>
         public bool EnableProfiling { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the precision mode.
+        /// </summary>
+        public NPUPrecision Precision { get; set; } = NPUPrecision.Float32;
+
+        /// <summary>
+        /// Gets or sets the cache mode.
+        /// </summary>
+        public int CacheMode { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets the input data size.
+        /// </summary>
+        public long InputSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output data size.
+        /// </summary>
+        public long OutputSize { get; set; }
     }
 
     /// <summary>
@@ -400,5 +445,11 @@ namespace ILGPU.Intel.NPU
         /// NWC layout (batch, width, channels).
         /// </summary>
         NWC = 3
+,
+
+        /// <summary>
+        /// Blocked layout for cache optimization.
+        /// </summary>
+        Blocked = 4
     }
 }
