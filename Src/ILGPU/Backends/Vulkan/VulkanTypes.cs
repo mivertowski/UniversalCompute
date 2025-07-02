@@ -764,12 +764,12 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Gets the native buffer pointer.
         /// </summary>
-        public new unsafe void* GetNativePtr() => (void*)_buffer;
+        public unsafe void* GetNativePtr() => (void*)_buffer;
 
         /// <summary>
         /// Copies data from CPU memory to this buffer.
         /// </summary>
-        public new unsafe void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
+        public unsafe void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would map memory and copy
         }
@@ -777,7 +777,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from this buffer to CPU memory.
         /// </summary>
-        public new unsafe void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
+        public unsafe void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would map memory and copy
         }
@@ -785,7 +785,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from another buffer to this buffer.
         /// </summary>
-        public new void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
+        public void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would use vkCmdCopyBuffer
         }
@@ -793,7 +793,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from this buffer to another buffer.
         /// </summary>
-        public new void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
+        public void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would use vkCmdCopyBuffer
         }

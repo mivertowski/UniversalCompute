@@ -290,17 +290,49 @@ namespace ILGPU.Apple.NeuralEngine
 
         #region Private Methods
 
+        /// <summary>
+        /// Gets the ANE accelerator name.
+        /// </summary>
+        public override string Name => $"Apple Neural Engine ({_capabilities.ChipGeneration})";
+
+        /// <summary>
+        /// Gets the maximum grid size for ANE operations.
+        /// </summary>
+        public override Index3D MaxGridSize => new Index3D(_capabilities.MaxTensorWidth, _capabilities.MaxTensorHeight, 1);
+
+        /// <summary>
+        /// Gets the maximum group size for ANE operations.
+        /// </summary>
+        public override Index3D MaxGroupSize => new Index3D(_capabilities.OptimalWorkGroupSize, 1, 1);
+
+        /// <summary>
+        /// Gets the ANE warp size.
+        /// </summary>
+        public override int WarpSize => _capabilities.OptimalWorkGroupSize;
+
+        /// <summary>
+        /// Gets the number of compute units (multiprocessors).
+        /// </summary>
+        public override int NumMultiprocessors => _capabilities.NumComputeUnits;
+
+        /// <summary>
+        /// Gets the maximum shared memory per multiprocessor.
+        /// </summary>
+        public override int MaxSharedMemoryPerMultiprocessor => _capabilities.MaxSharedMemoryPerUnit;
+
+        /// <summary>
+        /// Gets the maximum constant memory.
+        /// </summary>
+        public override int MaxConstantMemory => _capabilities.MaxConstantMemory;
+
+        /// <summary>
+        /// Gets the memory bandwidth.
+        /// </summary>
+        public override long MaxMemoryBandwidth => _capabilities.MemoryBandwidth;
+
         private void InitializeAcceleratorProperties()
         {
-            // Set ANE-specific properties
-            Name = $"Apple Neural Engine ({_capabilities.ChipGeneration})";
-            MaxGridSize = new Index3D(_capabilities.MaxTensorWidth, _capabilities.MaxTensorHeight, 1);
-            MaxGroupSize = new Index3D(_capabilities.OptimalWorkGroupSize, 1, 1);
-            WarpSize = _capabilities.OptimalWorkGroupSize;
-            NumMultiprocessors = _capabilities.NumComputeUnits;
-            MaxSharedMemoryPerMultiprocessor = _capabilities.MaxSharedMemoryPerUnit;
-            MaxConstantMemory = _capabilities.MaxConstantMemory;
-            MaxMemoryBandwidth = _capabilities.MemoryBandwidth;
+            // Properties are now computed via overrides
         }
 
         private void ThrowIfDisposed()

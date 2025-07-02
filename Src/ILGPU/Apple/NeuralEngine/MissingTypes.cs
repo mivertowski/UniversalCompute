@@ -174,6 +174,23 @@ namespace ILGPU.Apple.NeuralEngine
         {
             Dimensions = dims;
         }
+
+        /// <summary>
+        /// Gets the total number of elements in the tensor.
+        /// </summary>
+        public long ElementCount
+        {
+            get
+            {
+                if (Dimensions == null || Dimensions.Length == 0)
+                    return 0;
+
+                long count = 1;
+                foreach (var dim in Dimensions)
+                    count *= dim;
+                return count;
+            }
+        }
     }
 
     /// <summary>

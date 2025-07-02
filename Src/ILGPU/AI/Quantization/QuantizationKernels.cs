@@ -54,10 +54,10 @@ namespace ILGPU.AI.Quantization
             if (index >= input.Length) return;
 
             var value = input[index];
-            var quantized = XMath.Round(value / scale);
+            var quantized = IntrinsicMath.Round(value / scale);
             
             // Clamp to INT8 range [-128, 127]
-            quantized = XMath.Clamp(quantized, -128.0f, 127.0f);
+            quantized = IntrinsicMath.Clamp(quantized, -128.0f, 127.0f);
             
             output[index] = (sbyte)quantized;
         }
@@ -80,10 +80,10 @@ namespace ILGPU.AI.Quantization
             if (index >= input.Length) return;
 
             var value = input[index];
-            var quantized = XMath.Round(value / scale) + zeroPoint;
+            var quantized = IntrinsicMath.Round(value / scale) + zeroPoint;
             
             // Clamp to INT8 range [-128, 127]
-            quantized = XMath.Clamp(quantized, -128.0f, 127.0f);
+            quantized = IntrinsicMath.Clamp(quantized, -128.0f, 127.0f);
             
             output[index] = (sbyte)quantized;
         }
@@ -154,10 +154,10 @@ namespace ILGPU.AI.Quantization
 
             var value = input[index];
             var scale = scales[blockIndex];
-            var quantized = XMath.Round(value / scale);
+            var quantized = IntrinsicMath.Round(value / scale);
             
             // Clamp to INT4 range [-8, 7]
-            quantized = XMath.Clamp(quantized, -8.0f, 7.0f);
+            quantized = IntrinsicMath.Clamp(quantized, -8.0f, 7.0f);
             var int4Value = (sbyte)quantized;
             
             // Pack two INT4 values into one byte
@@ -246,7 +246,7 @@ namespace ILGPU.AI.Quantization
             if (blockIndex >= minValues.Length) return;
 
             var startIndex = blockIndex * blockSize;
-            var endIndex = XMath.Min(startIndex + blockSize, input.Length);
+            var endIndex = IntrinsicMath.Min(startIndex + blockSize, input.Length);
             
             if (startIndex >= input.Length) return;
 
@@ -256,8 +256,8 @@ namespace ILGPU.AI.Quantization
             for (var i = startIndex; i < endIndex; i++)
             {
                 var value = input[i];
-                minVal = XMath.Min(minVal, value);
-                maxVal = XMath.Max(maxVal, value);
+                minVal = IntrinsicMath.Min(minVal, value);
+                maxVal = IntrinsicMath.Max(maxVal, value);
             }
             
             minValues[blockIndex] = minVal;
@@ -300,8 +300,8 @@ namespace ILGPU.AI.Quantization
             
             // Map to [0, 1] then to [-128, 127]
             var normalized = (value - minVal) / range;
-            var quantized = XMath.Round(normalized * 255.0f - 128.0f);
-            quantized = XMath.Clamp(quantized, -128.0f, 127.0f);
+            var quantized = IntrinsicMath.Round(normalized * 255.0f - 128.0f);
+            quantized = IntrinsicMath.Clamp(quantized, -128.0f, 127.0f);
             
             output[index] = (sbyte)quantized;
         }

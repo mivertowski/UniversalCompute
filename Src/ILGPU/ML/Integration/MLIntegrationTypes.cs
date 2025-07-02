@@ -347,15 +347,23 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets performance statistics for all accelerators.
         /// </summary>
-        public static PerformanceAnalysis GetPerformanceStats() => new()
+        public static PerformanceAnalysis GetPerformanceStats()
         {
-            TotalExecutionTimeMs = 1000.0,
-            GpuUtilizationPercent = 85.0,
-            MemoryBandwidthUtilizationPercent = 75.0,
-            ComputeEfficiency = 0.9,
-            BottleneckAnalysis = "Memory bandwidth limited",
-            OptimizationSuggestions = ["Increase batch size", "Optimize memory access patterns"]
-        };
+            var analysis = new PerformanceAnalysis
+            {
+                TotalExecutionTimeMs = 1000.0,
+                GpuUtilizationPercent = 85.0,
+                MemoryBandwidthUtilizationPercent = 75.0,
+                ComputeEfficiency = 0.9,
+                BottleneckAnalysis = "Memory bandwidth limited"
+            };
+            
+            // Add optimization suggestions to the collection
+            analysis.OptimizationSuggestions.Add("Increase batch size");
+            analysis.OptimizationSuggestions.Add("Optimize memory access patterns");
+            
+            return analysis;
+        }
 
         /// <summary>
         /// Executes a computation with ML model.
@@ -569,13 +577,18 @@ namespace ILGPU.ML.Integration
             await Task.Delay(1).ConfigureAwait(false);
             
             // Placeholder implementation
-            return new OptimizedModel
+            var optimizedModel = new OptimizedModel
             {
                 OriginalModel = model,
                 OptimizationApplied = true,
-                OptimizationDetails = ["Graph fusion", "Memory layout optimization"],
                 OptimizedGraph = model as ComputeGraph ?? new ComputeGraph()
             };
+            
+            // Add optimization details to the collection
+            optimizedModel.OptimizationDetails.Add("Graph fusion");
+            optimizedModel.OptimizationDetails.Add("Memory layout optimization");
+            
+            return optimizedModel;
         }
 
         /// <summary>

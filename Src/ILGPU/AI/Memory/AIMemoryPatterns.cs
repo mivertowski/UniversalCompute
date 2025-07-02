@@ -224,9 +224,9 @@ namespace ILGPU.AI.Memory
             int n, int c, int h, int w)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int, int, int, int>(
+                Index1D, ArrayView<float>, ArrayView<float>, int, int, int, int>(
                 TransformNCHWToNHWCKernel);
-            kernel(input, output, n, c, h, w);
+            kernel(new Index1D(n * c * h * w), input, output, n, c, h, w);
         }
 
         /// <summary>
@@ -246,9 +246,9 @@ namespace ILGPU.AI.Memory
             int n, int c, int h, int w)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int, int, int, int>(
+                Index1D, ArrayView<float>, ArrayView<float>, int, int, int, int>(
                 TransformNHWCToNCHWKernel);
-            kernel(input, output, n, c, h, w);
+            kernel(new Index1D(n * c * h * w), input, output, n, c, h, w);
         }
 
         /// <summary>
@@ -269,9 +269,9 @@ namespace ILGPU.AI.Memory
             int tileHeight, int tileWidth)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int, int, int, int>(
+                Index1D, ArrayView<float>, ArrayView<float>, int, int, int, int>(
                 CreateTiledLayoutKernel);
-            kernel(input, output, height, width, tileHeight, tileWidth);
+            kernel(new Index1D(height * width), input, output, height, width, tileHeight, tileWidth);
         }
 
         /// <summary>
@@ -289,9 +289,9 @@ namespace ILGPU.AI.Memory
             int height, int width)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int, int>(
+                Index1D, ArrayView<float>, ArrayView<float>, int, int>(
                 CreateZOrderLayoutKernel);
-            kernel(input, output, height, width);
+            kernel(new Index1D(height * width), input, output, height, width);
         }
 
         #endregion
@@ -312,9 +312,9 @@ namespace ILGPU.AI.Memory
             int prefetchDistance)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<int>, int>(
+                Index1D, ArrayView<float>, ArrayView<int>, int>(
                 PrefetchDataKernel);
-            kernel(data, indices, prefetchDistance);
+            kernel(new Index1D(indices.IntLength), data, indices, prefetchDistance);
         }
 
         /// <summary>
@@ -331,9 +331,9 @@ namespace ILGPU.AI.Memory
             int streamingDistance)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int>(
+                Index1D, ArrayView<float>, ArrayView<float>, int>(
                 StreamingPrefetchKernel);
-            kernel(data, output, streamingDistance);
+            kernel(new Index1D(data.IntLength), data, output, streamingDistance);
         }
 
         #endregion
@@ -357,9 +357,9 @@ namespace ILGPU.AI.Memory
             int blockSize)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int, int, int>(
+                Index1D, ArrayView<float>, ArrayView<float>, int, int, int>(
                 CacheAwareTransposeKernel);
-            kernel(input, output, rows, cols, blockSize);
+            kernel(new Index1D(rows * cols), input, output, rows, cols, blockSize);
         }
 
         /// <summary>
@@ -384,11 +384,12 @@ namespace ILGPU.AI.Memory
             (int H, int W) padding)
         {
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<float>, ArrayView<float>, int, int, int, int,
+                Index1D, ArrayView<float>, ArrayView<float>, int, int, int, int,
                 int, int, int, int, int, int, int>(
                 CacheAwareIm2ColKernel);
 
-            kernel(input, output,
+            var totalElements = inputShape.N * inputShape.C * inputShape.H * inputShape.W;
+            kernel(new Index1D(totalElements), input, output,
                    inputShape.N, inputShape.C, inputShape.H, inputShape.W,
                    kernelShape.H, kernelShape.W,
                    stride.H, stride.W,

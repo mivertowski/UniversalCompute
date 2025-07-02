@@ -440,8 +440,8 @@ namespace ILGPU.AI.Memory
             // Count non-zero elements first
             var nonZeroCount = accelerator.Allocate<int>(1);
             var countKernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<T>, ArrayView<int>, T, int>(CountNonZeroKernel);
-            countKernel(dense, nonZeroCount, threshold, dense.Length);
+                Index1D, ArrayView<T>, ArrayView<int>, T, int>(CountNonZeroKernel);
+            countKernel(new Index1D(dense.IntLength), dense, nonZeroCount, threshold, dense.Length);
 
             accelerator.Synchronize();
             var count = nonZeroCount.GetAsArray1D()[0];
@@ -453,9 +453,9 @@ namespace ILGPU.AI.Memory
 
             // Extract sparse data
             var extractKernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<T>, ArrayView<T>, ArrayView<int>, ArrayView<int>,
+                Index1D, ArrayView<T>, ArrayView<T>, ArrayView<int>, ArrayView<int>,
                 T, int, int>(ExtractSparseKernel);
-            extractKernel(dense, values, rowIndices, colIndices, threshold, rows, cols);
+            extractKernel(new Index1D(dense.IntLength), dense, values, rowIndices, colIndices, threshold, rows, cols);
 
             nonZeroCount.Dispose();
 
@@ -487,9 +487,9 @@ namespace ILGPU.AI.Memory
 
             // Scatter sparse values to dense array
             var scatterKernel = accelerator.LoadAutoGroupedStreamKernel<
-                ArrayView<T>, ArrayView<int>, ArrayView<int>, ArrayView<T>, int>(
+                Index1D, ArrayView<T>, ArrayView<int>, ArrayView<int>, ArrayView<T>, int>(
                 ScatterSparseKernel);
-            scatterKernel(sparse.Values, sparse.RowIndices, sparse.ColIndices, dense, sparse.Cols);
+            scatterKernel(new Index1D(sparse.Values.IntLength), sparse.Values, sparse.RowIndices, sparse.ColIndices, dense, sparse.Cols);
         }
 
         /// <summary>

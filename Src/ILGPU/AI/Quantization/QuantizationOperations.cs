@@ -48,7 +48,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<float>, ArrayView<sbyte>, float>(
                 QuantizationKernels.QuantizeToInt8Symmetric);
 
-            kernel(input.Length, input, output, scale);
+            kernel(new Index1D(input.IntLength), input, output, scale);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<sbyte>, ArrayView<float>, float>(
                 QuantizationKernels.DequantizeFromInt8Symmetric);
 
-            kernel(input.Length, input, output, scale);
+            kernel(new Index1D(input.IntLength), input, output, scale);
         }
 
         #endregion
@@ -100,7 +100,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<float>, ArrayView<sbyte>, float, sbyte>(
                 QuantizationKernels.QuantizeToInt8Asymmetric);
 
-            kernel(input.Length, input, output, scale, zeroPoint);
+            kernel(new Index1D(input.IntLength), input, output, scale, zeroPoint);
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<sbyte>, ArrayView<float>, float, sbyte>(
                 QuantizationKernels.DequantizeFromInt8Asymmetric);
 
-            kernel(input.Length, input, output, scale, zeroPoint);
+            kernel(new Index1D(input.IntLength), input, output, scale, zeroPoint);
         }
 
         #endregion
@@ -158,14 +158,14 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
                 QuantizationKernels.ComputeQuantizationParams);
 
-            paramsKernel(numBlocks, input, minValues.View, maxValues.View, blockSize);
+            paramsKernel(new Index1D(numBlocks), input, minValues.View, maxValues.View, blockSize);
 
             // Perform quantization
             var quantizeKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, ArrayView<sbyte>, ArrayView<float>, ArrayView<float>, int>(
                 QuantizationKernels.DynamicRangeQuantize);
 
-            quantizeKernel(input.Length, input, output, minValues.View, maxValues.View, blockSize);
+            quantizeKernel(new Index1D(input.IntLength), input, output, minValues.View, maxValues.View, blockSize);
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<sbyte>, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
                 QuantizationKernels.DynamicRangeDequantize);
 
-            kernel(input.Length, input, output, minValues, maxValues, blockSize);
+            kernel(new Index1D(input.IntLength), input, output, minValues, maxValues, blockSize);
         }
 
         #endregion
@@ -217,7 +217,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<float>, ArrayView<ushort>>(
                 QuantizationKernels.ConvertToBFloat16);
 
-            kernel(input.Length, input, output);
+            kernel(new Index1D(input.IntLength), input, output);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<ushort>, ArrayView<float>>(
                 QuantizationKernels.ConvertFromBFloat16);
 
-            kernel(input.Length, input, output);
+            kernel(new Index1D(input.IntLength), input, output);
         }
 
         #endregion
@@ -292,7 +292,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<int>, ArrayView<float>, float, float>(
                 QuantizationKernels.ApplyScaleAndBias);
 
-            kernel(input.Length, input, output, scale, bias);
+            kernel(new Index1D(input.IntLength), input, output, scale, bias);
         }
 
         #endregion

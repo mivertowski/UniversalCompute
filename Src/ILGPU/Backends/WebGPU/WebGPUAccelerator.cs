@@ -70,7 +70,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Gets the WebGPU device capabilities.
         /// </summary>
-        public WebGPUCapabilities Capabilities => _capabilities;
+        public new WebGPUCapabilities Capabilities => _capabilities;
 
         /// <summary>
         /// Gets the WebGPU device.

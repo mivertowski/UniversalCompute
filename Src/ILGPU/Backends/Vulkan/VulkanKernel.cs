@@ -55,7 +55,7 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="stream">The accelerator stream.</param>
         /// <param name="extent">The launch extent.</param>
         /// <param name="parameters">The kernel parameters.</param>
-        protected new void LaunchInternal<TIndex>(
+        private void LaunchInternal<TIndex>(
             AcceleratorStream stream,
             TIndex extent,
             KernelParameters parameters)

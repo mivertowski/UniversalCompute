@@ -290,17 +290,49 @@ namespace ILGPU.Intel.NPU
 
         #region Private Methods
 
+        /// <summary>
+        /// Gets the NPU accelerator name.
+        /// </summary>
+        public override string Name => $"Intel NPU ({_capabilities.DeviceName})";
+
+        /// <summary>
+        /// Gets the maximum grid size for NPU operations.
+        /// </summary>
+        public override Index3D MaxGridSize => new Index3D(_capabilities.MaxInputWidth, _capabilities.MaxInputHeight, 1);
+
+        /// <summary>
+        /// Gets the maximum group size for NPU operations.
+        /// </summary>
+        public override Index3D MaxGroupSize => new Index3D(_capabilities.OptimalBatchSize, 1, 1);
+
+        /// <summary>
+        /// Gets the NPU warp size.
+        /// </summary>
+        public override int WarpSize => _capabilities.OptimalBatchSize;
+
+        /// <summary>
+        /// Gets the number of compute units (multiprocessors).
+        /// </summary>
+        public override int NumMultiprocessors => _capabilities.NumComputeUnits;
+
+        /// <summary>
+        /// Gets the maximum shared memory per multiprocessor.
+        /// </summary>
+        public override int MaxSharedMemoryPerMultiprocessor => _capabilities.MaxSharedMemoryPerUnit;
+
+        /// <summary>
+        /// Gets the maximum constant memory.
+        /// </summary>
+        public override int MaxConstantMemory => _capabilities.MaxConstantMemory;
+
+        /// <summary>
+        /// Gets the memory bandwidth.
+        /// </summary>
+        public override long MaxMemoryBandwidth => _capabilities.MemoryBandwidth;
+
         private void InitializeAcceleratorProperties()
         {
-            // Set NPU-specific properties
-            Name = $"Intel NPU ({_capabilities.DeviceName})";
-            MaxGridSize = new Index3D(_capabilities.MaxInputWidth, _capabilities.MaxInputHeight, 1);
-            MaxGroupSize = new Index3D(_capabilities.OptimalBatchSize, 1, 1);
-            WarpSize = _capabilities.OptimalBatchSize;
-            NumMultiprocessors = _capabilities.NumComputeUnits;
-            MaxSharedMemoryPerMultiprocessor = _capabilities.MaxSharedMemoryPerUnit;
-            MaxConstantMemory = _capabilities.MaxConstantMemory;
-            MaxMemoryBandwidth = _capabilities.MemoryBandwidth;
+            // Properties are now computed via overrides
         }
 
         private void ThrowIfDisposed()

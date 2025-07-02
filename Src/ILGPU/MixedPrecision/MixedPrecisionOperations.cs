@@ -161,9 +161,9 @@ namespace ILGPU.MixedPrecision
             if (source.Length != destination.Length)
                 throw new ArgumentException("Source and destination arrays must have the same length");
 
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<float>, ArrayView<Half>>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<Half>>(
                 ConvertFP32ToFP16Kernel);
-            kernel(source, destination);
+            kernel(new Index1D(source.IntLength), source, destination);
         }
 
         /// <summary>
@@ -180,9 +180,9 @@ namespace ILGPU.MixedPrecision
             if (source.Length != destination.Length)
                 throw new ArgumentException("Source and destination arrays must have the same length");
 
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<Half>, ArrayView<float>>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<Half>, ArrayView<float>>(
                 ConvertFP16ToFP32Kernel);
-            kernel(source, destination);
+            kernel(new Index1D(source.IntLength), source, destination);
         }
 
         /// <summary>

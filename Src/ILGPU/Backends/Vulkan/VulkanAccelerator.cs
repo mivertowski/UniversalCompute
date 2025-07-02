@@ -79,7 +79,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Gets the Vulkan device capabilities.
         /// </summary>
-        public VulkanCapabilities Capabilities => _capabilities;
+        public new VulkanCapabilities Capabilities => _capabilities;
 
         /// <summary>
         /// Gets the Vulkan device.

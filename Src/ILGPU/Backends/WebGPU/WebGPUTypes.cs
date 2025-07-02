@@ -787,25 +787,25 @@ namespace ILGPU.Backends.WebGPU
             _usage = WebGPUBufferUsage.Storage;
         }
 
-        public new unsafe void* GetNativePtr() => throw new NotSupportedException("WebGPU buffers don't expose raw pointers");
+        public unsafe void* GetNativePtr() => throw new NotSupportedException("WebGPU buffers don't expose raw pointers");
 
-        public new void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
+        public void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
         {
             // WebGPU buffer operations are asynchronous and handled through the queue
             throw new NotSupportedException("Use WebGPU-specific buffer operations");
         }
 
-        public new void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
+        public void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
         {
             throw new NotSupportedException("Use WebGPU-specific buffer operations");
         }
 
-        public new void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
+        public void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
         {
             throw new NotSupportedException("Use WebGPU-specific buffer operations");
         }
 
-        public new void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
+        public void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
         {
             throw new NotSupportedException("Use WebGPU-specific buffer operations");
         }
