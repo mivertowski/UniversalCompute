@@ -134,6 +134,14 @@ namespace ILGPU.Intel.NPU.Native
                 SupportsDynamicBatching = (DetectNPUGeneration() >= NPUGeneration.NPU3) ? 1 : 0,
                 SupportsOpenVINO = 1, // All Intel NPUs support OpenVINO
                 MemorySize = GetNPUMemorySize()
+                ,
+                ComputeUnits = GetNPUCoreCount(),
+                MemoryBandwidth = 120L * 1024 * 1024 * 1024, // 120 GB/s
+                SupportsBF16 = CheckDataTypeSupport(NPUDataType.BFloat16) ? 1 : 0,
+                SupportsConvolution = 1,
+                SupportsMatMul = 1,
+                SupportsAttention = (DetectNPUGeneration() >= NPUGeneration.NPU3) ? 1 : 0,
+                SupportsSparsity = (DetectNPUGeneration() >= NPUGeneration.NPU4) ? 1 : 0
             };
 
             return capabilities;
@@ -783,6 +791,13 @@ namespace ILGPU.Intel.NPU.Native
         public int SupportsDynamicBatching;
         public int SupportsOpenVINO;
         public ulong MemorySize;
+        public int ComputeUnits;
+        public long MemoryBandwidth;
+        public int SupportsBF16;
+        public int SupportsConvolution;
+        public int SupportsMatMul;
+        public int SupportsAttention;
+        public int SupportsSparsity;
     }
 
     /// <summary>

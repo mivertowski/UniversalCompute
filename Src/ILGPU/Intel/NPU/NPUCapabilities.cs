@@ -99,6 +99,18 @@ namespace ILGPU.Intel.NPU
         public bool SupportsSparsity { get; } = supportsSparsity;
 
         /// <summary>
+        /// Gets the maximum number of concurrent inferences supported.
+        /// </summary>
+        public int MaxConcurrentInferences { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 1,
+            NPUGeneration.NPU2 => 2,
+            NPUGeneration.NPU3 => 4,
+            NPUGeneration.NPU4 => 8,
+            _ => 1
+        };
+
+        /// <summary>
         /// Detects whether Intel NPU is available on the current system.
         /// </summary>
         /// <returns>True if NPU is available; otherwise, false.</returns>
