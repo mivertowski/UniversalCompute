@@ -101,7 +101,7 @@ namespace ILGPU.Apple.NeuralEngine
 
         /// <inheritdoc/>
         public override Accelerator CreateAccelerator(Context context) =>
-            new AppleNeuralEngineAccelerator(context, this);
+            new ANEAccelerator(context, this);
 
         #endregion
 

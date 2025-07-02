@@ -773,7 +773,7 @@ namespace ILGPU.Backends.WebGPU
         private bool _disposed;
 
         internal WebGPUBuffer(JSObject jsBuffer, ulong size, WebGPUBufferUsage usage)
-            : base(null, (long)size, 1)
+            : base(null!, (long)size, 1)
         {
             JSObject = jsBuffer;
             _size = size;

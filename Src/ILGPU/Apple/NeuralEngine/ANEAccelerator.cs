@@ -256,7 +256,8 @@ namespace ILGPU.Apple.NeuralEngine
 
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
         {
-            return new PageLockScope<T>(this, pinned, numElements);
+            // ANE doesn't support page locking, return a no-op implementation
+            return null!; // Return null to indicate no page locking support
         }
 
         public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
@@ -373,11 +374,7 @@ namespace ILGPU.Apple.NeuralEngine
             
             try
             {
-                var device = new Device(
-                    "Apple Neural Engine",
-                    0,
-                    AcceleratorType.CPU); // ANE is CPU-adjacent
-                    
+                var device = AppleNeuralEngineDevice.Default;
                 return new ANEAccelerator(context, device);
             }
             catch
@@ -415,8 +412,8 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         protected override ProfilingMarker AddProfilingMarkerInternal()
         {
-            // ANE doesn't support detailed profiling markers
-            return new ProfilingMarker();
+            // ANE doesn't support detailed profiling markers, return null
+            return null!;
         }
 
         /// <summary>

@@ -414,9 +414,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// <inheritdoc/>
         public override TensorShape CalculateOutputShape(TensorShape inputShape)
         {
-            var batchSize = inputShape[0];
-            var inputHeight = inputShape[2];
-            var inputWidth = inputShape[3];
+            var batchSize = inputShape.Dimensions[0];
+            var inputHeight = inputShape.Dimensions[2];
+            var inputWidth = inputShape.Dimensions[3];
             
             var outputHeight = (inputHeight + 2 * Parameters.Padding.Height - Parameters.KernelSize.Height) / Parameters.Stride.Height + 1;
             var outputWidth = (inputWidth + 2 * Parameters.Padding.Width - Parameters.KernelSize.Width) / Parameters.Stride.Width + 1;
