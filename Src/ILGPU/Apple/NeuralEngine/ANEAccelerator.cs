@@ -80,8 +80,8 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.GetSubView(0, (int)input.Length).AsSpan())
-            fixed (float* outputPtr = output.GetSubView(0, (int)output.Length).AsSpan())
+            fixed (float* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
+            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
             {
                 ANEOperations.ExecuteConvolution(
                     inputPtr, weights, outputPtr, 
@@ -106,9 +106,9 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* aPtr = a.GetSubView(0, (int)a.Length).AsSpan())
-            fixed (float* bPtr = b.GetSubView(0, (int)b.Length).AsSpan())
-            fixed (float* cPtr = c.GetSubView(0, (int)c.Length).AsSpan())
+            fixed (float* aPtr = a.SubView(0, (int)a.Length).AsSpan())
+            fixed (float* bPtr = b.SubView(0, (int)b.Length).AsSpan())
+            fixed (float* cPtr = c.SubView(0, (int)c.Length).AsSpan())
             {
                 ANEOperations.ExecuteMatrixMultiply(
                     aPtr, bPtr, cPtr, m, n, k, _aneContext);
@@ -132,10 +132,10 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* qPtr = queries.GetSubView(0, (int)queries.Length).AsSpan())
-            fixed (float* kPtr = keys.GetSubView(0, (int)keys.Length).AsSpan())
-            fixed (float* vPtr = values.GetSubView(0, (int)values.Length).AsSpan())
-            fixed (float* outPtr = output.GetSubView(0, (int)output.Length).AsSpan())
+            fixed (float* qPtr = queries.SubView(0, (int)queries.Length).AsSpan())
+            fixed (float* kPtr = keys.SubView(0, (int)keys.Length).AsSpan())
+            fixed (float* vPtr = values.SubView(0, (int)values.Length).AsSpan())
+            fixed (float* outPtr = output.SubView(0, (int)output.Length).AsSpan())
             {
                 ANEOperations.ExecuteAttention(
                     qPtr, kPtr, vPtr, outPtr, config, _aneContext);
@@ -155,8 +155,8 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.GetSubView(0, (int)input.Length).AsSpan())
-            fixed (float* outputPtr = output.GetSubView(0, (int)output.Length).AsSpan())
+            fixed (float* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
+            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
             {
                 ANENative.ExecuteCoreMLInference(
                     inputPtr, outputPtr, 
@@ -328,7 +328,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the memory bandwidth.
         /// </summary>
-        public new long MemoryBandwidth => _capabilities.MemoryBandwidth;
+        public long MemoryBandwidth => _capabilities.MemoryBandwidth;
 
         private void InitializeAcceleratorProperties()
         {

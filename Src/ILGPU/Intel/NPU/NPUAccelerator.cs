@@ -328,7 +328,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the memory bandwidth.
         /// </summary>
-        public new long MemoryBandwidth => _capabilities.MemoryBandwidth;
+        public long MemoryBandwidth => _capabilities.MemoryBandwidth;
 
         private void InitializeAcceleratorProperties()
         {

@@ -158,7 +158,7 @@ namespace ILGPU.AI.Quantization
                 Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int>(
                 QuantizationKernels.ComputeQuantizationParams);
 
-            paramsKernel(new Index1D(numBlocks), input, minValues.View, maxValues.View, blockSize);
+            paramsKernel(new Index1D((int)numBlocks), input, minValues.View, maxValues.View, blockSize);
 
             // Perform quantization
             var quantizeKernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -311,7 +311,7 @@ namespace ILGPU.AI.Quantization
             using var absData = accelerator.Allocate1D<float>(data.Length);
             
             // Compute absolute values (simplified - would use kernel for efficiency)
-            var hostData = data.GetAsArray1D();
+            var hostData = data.GetAsArray();
             var maxAbs = 0.0f;
             
             for (int i = 0; i < hostData.Length; i++)
@@ -334,7 +334,7 @@ namespace ILGPU.AI.Quantization
             ArrayView<float> data)
         {
             // Find min and max values (simplified - would use reduction kernels)
-            var hostData = data.GetAsArray1D();
+            var hostData = data.GetAsArray();
             var minVal = float.MaxValue;
             var maxVal = float.MinValue;
             

@@ -100,6 +100,100 @@ namespace ILGPU.Apple.NeuralEngine
         public int MaxBatchSize { get; } = maxBatchSize;
 
         /// <summary>
+        /// Gets the chip generation string.
+        /// </summary>
+        public string ChipGeneration => Generation.ToString();
+
+        /// <summary>
+        /// Gets the maximum tensor width.
+        /// </summary>
+        public int MaxTensorWidth => Generation switch
+        {
+            ANEGeneration.ANE1 => 16384,
+            ANEGeneration.ANE2 => 32768,
+            ANEGeneration.ANE3 => 65536,
+            ANEGeneration.ANE4 => 131072,
+            _ => 8192
+        };
+
+        /// <summary>
+        /// Gets the maximum tensor height.
+        /// </summary>
+        public int MaxTensorHeight => MaxTensorWidth;
+
+        /// <summary>
+        /// Gets the optimal work group size.
+        /// </summary>
+        public int OptimalWorkGroupSize => Generation switch
+        {
+            ANEGeneration.ANE1 => 32,
+            ANEGeneration.ANE2 => 64,
+            ANEGeneration.ANE3 => 128,
+            ANEGeneration.ANE4 => 256,
+            _ => 16
+        };
+
+        /// <summary>
+        /// Gets the number of compute units.
+        /// </summary>
+        public int NumComputeUnits => Generation switch
+        {
+            ANEGeneration.ANE1 => 8,
+            ANEGeneration.ANE2 => 16,
+            ANEGeneration.ANE3 => 24,
+            ANEGeneration.ANE4 => 32,
+            _ => 4
+        };
+
+        /// <summary>
+        /// Gets the maximum shared memory per unit.
+        /// </summary>
+        public int MaxSharedMemoryPerUnit => Generation switch
+        {
+            ANEGeneration.ANE1 => 32768,    // 32KB
+            ANEGeneration.ANE2 => 65536,    // 64KB
+            ANEGeneration.ANE3 => 131072,   // 128KB
+            ANEGeneration.ANE4 => 262144,   // 256KB
+            _ => 16384                      // 16KB
+        };
+
+        /// <summary>
+        /// Gets the maximum constant memory.
+        /// </summary>
+        public int MaxConstantMemory => Generation switch
+        {
+            ANEGeneration.ANE1 => 1048576,   // 1MB
+            ANEGeneration.ANE2 => 2097152,   // 2MB
+            ANEGeneration.ANE3 => 4194304,   // 4MB
+            ANEGeneration.ANE4 => 8388608,   // 8MB
+            _ => 524288                      // 512KB
+        };
+
+        /// <summary>
+        /// Gets the memory bandwidth in bytes per second.
+        /// </summary>
+        public long MemoryBandwidth => Generation switch
+        {
+            ANEGeneration.ANE1 => 34359738368L,    // 32 GB/s
+            ANEGeneration.ANE2 => 68719476736L,    // 64 GB/s
+            ANEGeneration.ANE3 => 137438953472L,   // 128 GB/s
+            ANEGeneration.ANE4 => 274877906944L,   // 256 GB/s
+            _ => 17179869184L                      // 16 GB/s
+        };
+
+        /// <summary>
+        /// Gets the maximum concurrent operations.
+        /// </summary>
+        public int MaxConcurrentOperations => Generation switch
+        {
+            ANEGeneration.ANE1 => 16,
+            ANEGeneration.ANE2 => 32,
+            ANEGeneration.ANE3 => 64,
+            ANEGeneration.ANE4 => 128,
+            _ => 8
+        };
+
+        /// <summary>
         /// Queries the Neural Engine capabilities of the current system.
         /// </summary>
         /// <returns>ANE capabilities structure.</returns>
