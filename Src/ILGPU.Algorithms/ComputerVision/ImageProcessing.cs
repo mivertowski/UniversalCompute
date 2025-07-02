@@ -390,8 +390,8 @@ namespace ILGPU.Algorithms.ComputerVision
                 var g = rgbData[idx + 1];
                 var b = rgbData[idx + 2];
 
-                var max = XMath.Max(XMath.Max(r, g), b);
-                var min = XMath.Min(XMath.Min(r, g), b);
+                var max = IntrinsicMath.Max(IntrinsicMath.Max(r, g), b);
+                var min = IntrinsicMath.Min(IntrinsicMath.Min(r, g), b);
                 var delta = max - min;
 
                 // Hue
@@ -439,7 +439,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 var v = hsvData[idx + 2];
 
                 var c = v * s;
-                var x_val = c * (1 - XMath.Abs((h / 60) % 2 - 1));
+                var x_val = c * (1 - IntrinsicMath.Abs((h / 60) % 2 - 1));
                 var m = v - c;
 
                 float r, g, b;
@@ -532,7 +532,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var idx = y * width + x;
             var gx = gradX[idx];
             var gy = gradY[idx];
-            magnitude[idx] = XMath.Sqrt(gx * gx + gy * gy);
+            magnitude[idx] = IntrinsicMath.Sqrt(gx * gx + gy * gy);
         }
 
         private static void MedianFilterKernel(
@@ -579,8 +579,8 @@ namespace ILGPU.Algorithms.ComputerVision
                 {
                     var ix = (int)(srcX + 0.5f);
                     var iy = (int)(srcY + 0.5f);
-                    ix = XMath.Clamp(ix, 0, inWidth - 1);
-                    iy = XMath.Clamp(iy, 0, inHeight - 1);
+                    ix = IntrinsicMath.Clamp(ix, 0, inWidth - 1);
+                    iy = IntrinsicMath.Clamp(iy, 0, inHeight - 1);
                     value = input[(iy * inWidth + ix) * channels + c];
                 }
                 else // Linear interpolation
@@ -590,8 +590,8 @@ namespace ILGPU.Algorithms.ComputerVision
                     var fx = srcX - ix;
                     var fy = srcY - iy;
 
-                    ix = XMath.Clamp(ix, 0, inWidth - 2);
-                    iy = XMath.Clamp(iy, 0, inHeight - 2);
+                    ix = IntrinsicMath.Clamp(ix, 0, inWidth - 2);
+                    iy = IntrinsicMath.Clamp(iy, 0, inHeight - 2);
 
                     var idx00 = (iy * inWidth + ix) * channels + c;
                     var idx01 = (iy * inWidth + ix + 1) * channels + c;
@@ -720,7 +720,7 @@ namespace ILGPU.Algorithms.ComputerVision
             switch (borderMode)
             {
                 case (int)BorderMode.Replicate:
-                    return XMath.Clamp(coord, 0, size - 1);
+                    return IntrinsicMath.Clamp(coord, 0, size - 1);
                 case (int)BorderMode.Reflect:
                     if (coord < 0) return -coord;
                     if (coord >= size) return 2 * size - coord - 1;

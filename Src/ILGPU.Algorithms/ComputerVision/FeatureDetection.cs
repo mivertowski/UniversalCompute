@@ -477,7 +477,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var det = ixx * iyy - ixy * ixy;
             var discriminant = trace * trace - 4 * det;
 
-            response[x, y] = discriminant >= 0 ? (trace - XMath.Sqrt(discriminant)) * 0.5f : 0;
+            response[x, y] = discriminant >= 0 ? (trace - IntrinsicMath.Sqrt(discriminant)) * 0.5f : 0;
         }
 
         private static void ComputeGradientDirectionKernel(
@@ -496,7 +496,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var gx = gradX[idx];
             var gy = gradY[idx];
 
-            direction[idx] = XMath.Atan2(gy, gx);
+            direction[idx] = IntrinsicMath.Atan2(gy, gx);
         }
 
         private static void NonMaximumSuppressionKernel(
@@ -521,7 +521,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var dir = direction[idx];
 
             // Quantize direction to 0, 45, 90, 135 degrees
-            var angle = dir * 180.0f / XMath.PI;
+            var angle = dir * 180.0f / IntrinsicMath.PI;
             if (angle < 0) angle += 180;
 
             float mag1, mag2;
@@ -626,7 +626,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 var idx = Atomic.Add(ref count[0], 1);
                 if (idx < blobs.Length)
                 {
-                    blobs[idx] = new FeaturePoint(x, y, response, currSigma * XMath.Sqrt(2), 0);
+                    blobs[idx] = new FeaturePoint(x, y, response, currSigma * IntrinsicMath.Sqrt(2), 0);
                 }
             }
         }
@@ -670,7 +670,7 @@ namespace ILGPU.Algorithms.ComputerVision
                     var gaussian = (float)Math.Exp(-r2 / (2 * sigma2));
                     var laplacian = (r2 - 2 * sigma2) / sigma4;
                     
-                    coefficients[y * size + x] = -laplacian * gaussian / (XMath.PI * sigma4);
+                    coefficients[y * size + x] = -laplacian * gaussian / (IntrinsicMath.PI * sigma4);
                 }
             }
 
