@@ -35,6 +35,7 @@ namespace ILGPU.Algorithms.FFT
         /// Cooley-Tukey radix-2 forward FFT kernel.
         /// </summary>
         public static void CooleyTukeyForward1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
@@ -70,6 +71,7 @@ namespace ILGPU.Algorithms.FFT
         /// Cooley-Tukey radix-2 inverse FFT kernel.
         /// </summary>
         public static void CooleyTukeyInverse1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
@@ -105,6 +107,7 @@ namespace ILGPU.Algorithms.FFT
         /// Radix-4 forward FFT kernel.
         /// </summary>
         public static void Radix4Forward1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
@@ -161,6 +164,7 @@ namespace ILGPU.Algorithms.FFT
         /// Radix-4 inverse FFT kernel.
         /// </summary>
         public static void Radix4Inverse1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
@@ -215,6 +219,7 @@ namespace ILGPU.Algorithms.FFT
         /// Mixed-radix forward FFT kernel.
         /// </summary>
         public static void MixedRadixForward1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
@@ -228,6 +233,7 @@ namespace ILGPU.Algorithms.FFT
         /// Mixed-radix inverse FFT kernel.
         /// </summary>
         public static void MixedRadixInverse1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
@@ -240,6 +246,7 @@ namespace ILGPU.Algorithms.FFT
         /// Batched forward 1D FFT kernel.
         /// </summary>
         public static void BatchedForward1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan,
@@ -262,6 +269,7 @@ namespace ILGPU.Algorithms.FFT
         /// Batched inverse 1D FFT kernel.
         /// </summary>
         public static void BatchedInverse1D(
+            Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan,
@@ -287,6 +295,7 @@ namespace ILGPU.Algorithms.FFT
         /// 2D FFT row-wise forward transform.
         /// </summary>
         public static void FFT2DRowForward(
+            Index1D index,
             ArrayView2D<Complex, Stride2D.DenseX> input,
             ArrayView2D<Complex, Stride2D.DenseX> output,
             FFTPlan plan)
@@ -311,6 +320,7 @@ namespace ILGPU.Algorithms.FFT
         /// 2D FFT column-wise forward transform.
         /// </summary>
         public static void FFT2DColumnForward(
+            Index1D index,
             ArrayView2D<Complex, Stride2D.DenseX> input,
             ArrayView2D<Complex, Stride2D.DenseX> output,
             FFTPlan plan)
@@ -344,6 +354,7 @@ namespace ILGPU.Algorithms.FFT
         /// 2D FFT row-wise inverse transform.
         /// </summary>
         public static void FFT2DRowInverse(
+            Index1D index,
             ArrayView2D<Complex, Stride2D.DenseX> input,
             ArrayView2D<Complex, Stride2D.DenseX> output,
             FFTPlan plan)
