@@ -273,7 +273,7 @@ namespace ILGPU.TensorCores
                 Index1D, int, T, ArrayView<T>, ArrayView<T>, T, ArrayView<T>, BatchedGemmParams, TensorConfig>(
                 TensorBatchedGemmKernel);
 
-            kernel(batchCount, alpha, a, b, beta, c, gemmParams, cfg);
+            kernel((int)accelerator.DefaultStream.Length, batchCount, alpha, a, b, beta, c, gemmParams, cfg);
         }
 
         /// <summary>

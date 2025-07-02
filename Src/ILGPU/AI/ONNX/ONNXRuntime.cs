@@ -537,15 +537,13 @@ namespace ILGPU.AI.ONNX
             var dataSize = (ulong)(info.ElementCount * sizeof(float));
             var shape = Array.ConvertAll(info.Shape, x => (long)x);
             
-            fixed (float* dataPtr = data.GetSubView(0, (int)data.Length).AsSpan())
-            {
-                return ONNXNative.CreateTensorWithData(
-                    (IntPtr)dataPtr,
-                    dataSize,
-                    shape,
-                    (ulong)shape.Length,
-                    (int)info.ElementType);
-            }
+            var dataPtr = data.LoadEffectiveAddressAsPtr().ToPointer();
+            return ONNXNative.CreateTensorWithData(
+                dataPtr,
+                dataSize,
+                shape,
+                (ulong)shape.Length,
+                (int)info.ElementType);
         }
 
         private IntPtr CreateEmptyTensor(ONNXTensorInfo info)

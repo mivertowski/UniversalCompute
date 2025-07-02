@@ -211,7 +211,7 @@ namespace ILGPU.AI.Memory
             var layout = DetermineOptimalLayout(operationType, strategy, workloadSize);
             
             // Calculate optimal tile and block sizes
-            var (tileSize, blockSize) = CalculateOptimalSizes(operationType, workloadSize, totalMemoryRequired);
+            var (tileHeight, tileWidth, blockSize) = CalculateOptimalSizes(operationType, workloadSize, totalMemoryRequired);
             
             // Determine memory alignment
             var alignment = CalculateOptimalAlignment(dataTypes, accessPattern);
@@ -221,7 +221,7 @@ namespace ILGPU.AI.Memory
             
             // Estimate performance improvement
             var expectedImprovement = EstimatePerformanceImprovement(
-                operationType, layout, accessPattern, tileSize, blockSize);
+                operationType, layout, accessPattern, (tileHeight, tileWidth), blockSize);
             
             // Calculate confidence based on available data
             var confidence = CalculateConfidence(operationType, workloadSize);
@@ -230,7 +230,7 @@ namespace ILGPU.AI.Memory
             {
                 Layout = layout,
                 AccessPattern = accessPattern,
-                TileSize = tileSize,
+                TileSize = (tileHeight, tileWidth),
                 BlockSize = blockSize,
                 Alignment = alignment,
                 EnablePrefetching = enablePrefetching,

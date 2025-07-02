@@ -415,7 +415,7 @@ namespace ILGPU.MixedPrecision
         {
             if (index < source.Length)
             {
-                var quantized = IntrinsicMath.Round(source[index] / scale) + zeroPoint;
+                var quantized = XMath.Round(source[index] / scale) + zeroPoint;
                 destination[index] = (sbyte)IntrinsicMath.Clamp(quantized, -128, 127);
             }
         }
