@@ -159,16 +159,59 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             try
             {
-                var devices = ROCmDevice.GetDevices();
+                // First check if ROCm runtime is available
+                if (!ROCm.Native.ROCmNative.IsROCmSupported())
+                {
+                    return new ROCmCapabilities
+                    {
+                        IsSupported = false,
+                        ErrorMessage = "ROCm runtime not available"
+                    };
+                }
+
+                // Initialize ROCm and get device count
+                var deviceCount = ROCm.Native.ROCmNative.GetDeviceCountSafe();
+                if (deviceCount == 0)
+                {
+                    return new ROCmCapabilities
+                    {
+                        IsSupported = false,
+                        ErrorMessage = "No ROCm devices found"
+                    };
+                }
+
+                // Get device properties for capability detection
+                long maxMemory = 0;
+                int maxComputeCapability = 0;
+                bool rocBlasAvailable = false;
+                bool rocFFTAvailable = false;
+
+                for (int i = 0; i < deviceCount; i++)
+                {
+                    var props = ROCm.Native.ROCmNative.GetDevicePropertiesSafe(i);
+                    if (props.HasValue)
+                    {
+                        var deviceProps = props.Value;
+                        maxMemory = Math.Max(maxMemory, (long)deviceProps.TotalGlobalMem);
+                        
+                        // Calculate compute capability from architecture
+                        var computeCapability = DetermineComputeCapability(deviceProps);
+                        maxComputeCapability = Math.Max(maxComputeCapability, computeCapability);
+                    }
+                }
+
+                // Check for ROCm library availability
+                rocBlasAvailable = CheckROCBlasAvailability();
+                rocFFTAvailable = CheckROCFFTAvailability();
+
                 return new ROCmCapabilities
                 {
-                    IsSupported = devices.Length > 0,
-                    DeviceCount = devices.Length,
-                    MaxComputeCapability = devices.Length > 0 ? 
-                        devices.Max(d => d.ComputeCapability.Major * 10 + d.ComputeCapability.Minor) : 0,
-                    TotalMemory = devices.Length > 0 ? devices.Max(d => d.MemorySize) : 0,
-                    SupportsROCBLAS = true, // Assume available if ROCm is present
-                    SupportsROCFFT = true,
+                    IsSupported = true,
+                    DeviceCount = deviceCount,
+                    MaxComputeCapability = maxComputeCapability,
+                    TotalMemory = maxMemory,
+                    SupportsROCBLAS = rocBlasAvailable,
+                    SupportsROCFFT = rocFFTAvailable,
                     ErrorMessage = null
                 };
             }
@@ -179,6 +222,98 @@ namespace ILGPU.Runtime.HardwareDetection
                     IsSupported = false,
                     ErrorMessage = ex.Message
                 };
+            }
+        }
+
+        /// <summary>
+        /// Determines compute capability from HIP device properties.
+        /// </summary>
+        private static int DetermineComputeCapability(ROCm.Native.HipDeviceProperties props)
+        {
+            // Map architecture information to compute capability
+            // This is based on the device name and architecture features
+            var deviceName = props.Name?.ToLowerInvariant() ?? "";
+            
+            // RDNA3 (gfx11xx)
+            if (deviceName.Contains("7900") || deviceName.Contains("7800") || deviceName.Contains("7700"))
+                return 113; // RDNA3 generation
+
+            // RDNA2 (gfx10xx)  
+            if (deviceName.Contains("6900") || deviceName.Contains("6800") || deviceName.Contains("6700") || 
+                deviceName.Contains("6600") || deviceName.Contains("6500") || deviceName.Contains("6400"))
+                return 103; // RDNA2 generation
+
+            // RDNA1 (gfx10xx)
+            if (deviceName.Contains("5700") || deviceName.Contains("5600") || deviceName.Contains("5500"))
+                return 101; // RDNA1 generation
+
+            // CDNA2 (MI200 series)
+            if (deviceName.Contains("mi250") || deviceName.Contains("mi210"))
+                return 90; // CDNA2 (gfx90a)
+
+            // CDNA1 (MI100)
+            if (deviceName.Contains("mi100"))
+                return 90; // CDNA1 (gfx908)
+
+            // GCN5 (Vega)
+            if (deviceName.Contains("vega") || deviceName.Contains("radeon vii"))
+                return 90; // GCN5 (gfx906)
+
+            // GCN4 (Polaris, older Vega)
+            if (deviceName.Contains("polaris") || deviceName.Contains("rx 480") || deviceName.Contains("rx 580"))
+                return 80; // GCN4 
+
+            // Conservative fallback
+            return 70; // Minimum supported
+        }
+
+        /// <summary>
+        /// Checks if ROCBlas library is available.
+        /// </summary>
+        private static bool CheckROCBlasAvailability()
+        {
+            try
+            {
+                // Try to detect ROCBlas by checking for library files or environment
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    return System.IO.File.Exists("/opt/rocm/lib/librocblas.so") ||
+                           System.IO.File.Exists("/usr/lib/librocblas.so") ||
+                           Environment.GetEnvironmentVariable("ROCM_PATH") != null;
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return System.IO.File.Exists("C:\\Program Files\\AMD\\ROCm\\bin\\rocblas.dll");
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if ROCFFT library is available.
+        /// </summary>
+        private static bool CheckROCFFTAvailability()
+        {
+            try
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    return System.IO.File.Exists("/opt/rocm/lib/librocfft.so") ||
+                           System.IO.File.Exists("/usr/lib/librocfft.so");
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return System.IO.File.Exists("C:\\Program Files\\AMD\\ROCm\\bin\\rocfft.dll");
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
             }
         }
 
