@@ -23,7 +23,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using ILGPU.Runtime;
-using ILGPU.FFT;
 
 namespace ILGPU.Algorithms.FFT
 {
@@ -36,27 +35,43 @@ namespace ILGPU.Algorithms.FFT
         #region FFT Plans
 
         /// <summary>
+        /// Creates an optimized FFT plan for the specified configuration.
+        /// </summary>
+        /// <param name="accelerator">ILGPU accelerator.</param>
+        /// <param name="config">FFT configuration.</param>
+        /// <returns>FFT plan for efficient repeated transforms.</returns>
+        public static FFTPlan CreatePlan(Accelerator accelerator, FFTConfiguration config)
+        {
+            return FFTPlan.Create(accelerator, config);
+        }
+
+        /// <summary>
         /// Creates an optimized FFT plan for 1D transforms.
         /// </summary>
-        /// <param name="context">ILGPU context.</param>
+        /// <param name="accelerator">ILGPU accelerator.</param>
         /// <param name="length">FFT length.</param>
-        /// <param name="isReal">True for real-to-complex FFTs.</param>
+        /// <param name="algorithm">FFT algorithm to use.</param>
         /// <returns>FFT plan for efficient repeated transforms.</returns>
-        public static FFTPlan1D CreatePlan1D(Context context, int length, bool isReal = false)
+        public static FFTPlan CreatePlan1D(Accelerator accelerator, int length, FFTAlgorithm algorithm = FFTAlgorithm.Auto)
         {
-            return new FFTPlan1D(context, length, isReal);
+            var config = FFTConfiguration.Create1D(length);
+            config.Algorithm = algorithm;
+            return FFTPlan.Create(accelerator, config);
         }
 
         /// <summary>
         /// Creates an optimized FFT plan for 2D transforms.
         /// </summary>
-        /// <param name="context">ILGPU context.</param>
+        /// <param name="accelerator">ILGPU accelerator.</param>
         /// <param name="width">FFT width.</param>
         /// <param name="height">FFT height.</param>
+        /// <param name="algorithm">FFT algorithm to use.</param>
         /// <returns>FFT plan for efficient repeated transforms.</returns>
-        public static FFTPlan2D CreatePlan2D(Context context, int width, int height)
+        public static FFTPlan CreatePlan2D(Accelerator accelerator, int width, int height, FFTAlgorithm algorithm = FFTAlgorithm.Auto)
         {
-            return new FFTPlan2D(context, width, height);
+            var config = FFTConfiguration.Create2D(width, height);
+            config.Algorithm = algorithm;
+            return FFTPlan.Create(accelerator, config);
         }
 
         #endregion

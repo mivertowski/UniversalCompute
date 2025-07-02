@@ -407,7 +407,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <inheritdoc/>
         public override NeuralOperationType Type => NeuralOperationType.Convolution;
         /// <inheritdoc/>
-        public override TensorShape InputShape { get; }
+        public override TensorShape InputShape { get; set; }
         /// <inheritdoc/>
         public ConvolutionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 
@@ -437,7 +437,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <inheritdoc/>
         public override NeuralOperationType Type => NeuralOperationType.Attention;
         /// <inheritdoc/>
-        public override TensorShape InputShape { get; }
+        public override TensorShape InputShape { get; set; }
         /// <inheritdoc/>
         public AttentionParameters Parameters { get; } = parameters ?? throw new ArgumentNullException(nameof(parameters));
 

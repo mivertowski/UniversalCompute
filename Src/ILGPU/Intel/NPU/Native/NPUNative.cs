@@ -795,7 +795,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         public static unsafe void InferenceFloat(
             float* input, float* output,
-            TensorShape inputShape, TensorShape outputShape,
+            Core.TensorShape inputShape, Core.TensorShape outputShape,
             IntPtr context)
         {
             // Real implementation would use OpenVINO Runtime for NPU inference
@@ -817,7 +817,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         public static unsafe void InferenceBF16(
             BFloat16* input, BFloat16* output,
-            TensorShape inputShape, TensorShape outputShape,
+            Core.TensorShape inputShape, Core.TensorShape outputShape,
             IntPtr context)
         {
             // Real implementation would use OpenVINO Runtime for NPU BF16 inference
@@ -839,7 +839,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         public static unsafe void InferenceInt8(
             byte* input, byte* output,
-            TensorShape inputShape, TensorShape outputShape,
+            Core.TensorShape inputShape, Core.TensorShape outputShape,
             IntPtr context)
         {
             // Real implementation would use OpenVINO Runtime for NPU Int8 inference
@@ -861,7 +861,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         public static unsafe void ConvolutionFloat(
             float* input, float* weights, float* output,
-            TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape,
+            Core.TensorShape inputShape, Core.TensorShape weightsShape, Core.TensorShape outputShape,
             IntPtr config)
         {
             // Real implementation would use OpenVINO Runtime for NPU convolution
@@ -938,7 +938,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         public static unsafe void AttentionFloat(
             float* query, float* key, float* value, float* output,
-            TensorShape queryShape, TensorShape keyShape, TensorShape valueShape,
+            Core.TensorShape queryShape, Core.TensorShape keyShape, Core.TensorShape valueShape,
             IntPtr config)
         {
             // Real implementation would use OpenVINO Runtime for NPU attention

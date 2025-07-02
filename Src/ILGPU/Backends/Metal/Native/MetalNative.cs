@@ -356,6 +356,145 @@ namespace ILGPU.Backends.Metal.Native
         }
 
         /// <summary>
+        /// Creates system default Metal device.
+        /// </summary>
+        internal static IntPtr CreateSystemDefaultDevice()
+        {
+            try
+            {
+                if (MTLCreateSystemDefaultDevice())
+                {
+                    // Get the first available device
+                    return MTLCopyAllDevicesGetDevice(0);
+                }
+                return IntPtr.Zero;
+            }
+            catch
+            {
+                return IntPtr.Zero;
+            }
+        }
+
+        /// <summary>
+        /// Copies all available Metal devices.
+        /// </summary>
+        internal static IntPtr[] CopyAllDevices()
+        {
+            try
+            {
+                var deviceCount = GetDeviceCount();
+                var devices = new IntPtr[deviceCount];
+                
+                for (int i = 0; i < deviceCount; i++)
+                {
+                    devices[i] = GetDevice(i);
+                }
+                
+                return devices;
+            }
+            catch
+            {
+                return Array.Empty<IntPtr>();
+            }
+        }
+
+        /// <summary>
+        /// Creates a new command queue.
+        /// </summary>
+        internal static IntPtr NewCommandQueue(IntPtr device)
+        {
+            return MTLDeviceNewCommandQueue(device);
+        }
+
+        /// <summary>
+        /// Releases command queue.
+        /// </summary>
+        internal static void ReleaseCommandQueue(IntPtr commandQueue)
+        {
+            if (commandQueue != IntPtr.Zero)
+                CFRelease(commandQueue);
+        }
+
+        /// <summary>
+        /// Synchronizes command queue.
+        /// </summary>
+        internal static void SynchronizeCommandQueue(IntPtr commandQueue)
+        {
+            // Create a command buffer and wait for completion
+            var commandBuffer = MTLCommandQueueCommandBuffer(commandQueue);
+            if (commandBuffer != IntPtr.Zero)
+            {
+                MTLCommandBufferCommit(commandBuffer);
+                MTLCommandBufferWaitUntilCompleted(commandBuffer);
+                CFRelease(commandBuffer);
+            }
+        }
+
+        /// <summary>
+        /// Allocates Metal buffer memory.
+        /// </summary>
+        internal static IntPtr AllocateMemory(ulong sizeInBytes)
+        {
+            // This would typically be done through the device
+            // For now, return a placeholder
+            return IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// Frees Metal buffer memory.
+        /// </summary>
+        internal static void FreeMemory(IntPtr buffer)
+        {
+            if (buffer != IntPtr.Zero)
+                CFRelease(buffer);
+        }
+
+        /// <summary>
+        /// Creates an MPS Graph.
+        /// </summary>
+        internal static IntPtr CreateMPSGraph(IntPtr device)
+        {
+            // This would create an MPSGraph instance
+            // Placeholder for actual MPS Graph creation
+            return IntPtr.Zero;
+        }
+
+        /// <summary>
+        /// Creates a compute pipeline state.
+        /// </summary>
+        internal static IntPtr CreateComputePipelineState(IntPtr device, string shaderSource)
+        {
+            // Compile shader source and create pipeline state
+            var library = CompileLibrary(device, shaderSource, IntPtr.Zero);
+            if (library == IntPtr.Zero) return IntPtr.Zero;
+
+            // Get the main function (assuming function name is "main0")
+            var functionName = Marshal.StringToHGlobalAnsi("main0");
+            try
+            {
+                var function = MTLLibraryNewFunctionWithName(library, functionName);
+                if (function == IntPtr.Zero) return IntPtr.Zero;
+
+                var pipelineState = MTLDeviceNewComputePipelineStateWithFunction(
+                    device, function, out var error);
+                
+                CFRelease(function);
+                if (error != IntPtr.Zero)
+                {
+                    CFRelease(error);
+                    return IntPtr.Zero;
+                }
+                
+                return pipelineState;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(functionName);
+                CFRelease(library);
+            }
+        }
+
+        /// <summary>
         /// Releases device.
         /// </summary>
         internal static void ReleaseDevice(IntPtr device)

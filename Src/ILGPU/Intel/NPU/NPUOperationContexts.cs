@@ -79,7 +79,7 @@ namespace ILGPU.Intel.NPU
     /// </remarks>
     /// <param name="parameters">The convolution parameters.</param>
     /// <param name="capabilities">The NPU capabilities.</param>
-    internal sealed class NPUConvolutionConfig(ConvolutionParameters parameters, NPUCapabilities capabilities) : IDisposable
+    public sealed class NPUConvolutionConfig(ConvolutionParameters parameters, NPUCapabilities capabilities) : IDisposable
     {
         private bool _disposed;
 
@@ -158,7 +158,7 @@ namespace ILGPU.Intel.NPU
     /// Initializes a new instance of the NPUMatMulConfig class.
     /// </remarks>
     /// <param name="configuration">The matrix multiplication configuration.</param>
-    internal sealed class NPUMatMulConfig(MatMulConfiguration configuration) : IDisposable
+    public sealed class NPUMatMulConfig(MatMulConfiguration configuration) : IDisposable
     {
         private bool _disposed;
 
@@ -201,7 +201,7 @@ namespace ILGPU.Intel.NPU
     /// </remarks>
     /// <param name="parameters">The attention parameters.</param>
     /// <param name="capabilities">The NPU capabilities.</param>
-    internal sealed class NPUAttentionConfig(AttentionParameters parameters, NPUCapabilities capabilities) : IDisposable
+    public sealed class NPUAttentionConfig(AttentionParameters parameters, NPUCapabilities capabilities) : IDisposable
     {
         private bool _disposed;
 
@@ -248,7 +248,7 @@ namespace ILGPU.Intel.NPU
     /// Initializes a new instance of the NPUModelOptimizer class.
     /// </remarks>
     /// <param name="capabilities">The NPU capabilities.</param>
-    internal sealed class NPUModelOptimizer(NPUCapabilities capabilities)
+    public sealed class NPUModelOptimizer(NPUCapabilities capabilities)
     {
         private readonly NPUCapabilities _capabilities = capabilities;
 

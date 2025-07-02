@@ -16,6 +16,8 @@
 // Change License: Apache License, Version 2.0
 
 #if ENABLE_METAL_ACCELERATOR
+using ILGPU.Backends.Metal.Native;
+
 namespace ILGPU.Backends.Metal
 {
     /// <summary>

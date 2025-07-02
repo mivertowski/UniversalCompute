@@ -28,18 +28,18 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Intel Neural Processing Unit (NPU) accelerator for AI inference on Intel Arc and Core processors.
     /// </summary>
-    public sealed class NPUAccelerator : Accelerator
+    public sealed class IntelNPUAccelerator : Accelerator
     {
         private readonly IntPtr _npuContext;
         private readonly NPUCapabilities _capabilities;
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the NPUAccelerator class.
+        /// Initializes a new instance of the IntelNPUAccelerator class.
         /// </summary>
         /// <param name="context">The ILGPU context.</param>
         /// <param name="device">The NPU device.</param>
-        public NPUAccelerator(Context context, Device device)
+        public IntelNPUAccelerator(Context context, Device device)
             : base(context, device)
         {
             if (!NPUNative.IsNPUAvailable())
@@ -58,7 +58,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU capabilities.
         /// </summary>
-        public NPUCapabilities Capabilities => _capabilities;
+        public new NPUCapabilities Capabilities => _capabilities;
 
         /// <summary>
         /// Gets the NPU context handle.
@@ -259,7 +259,7 @@ namespace ILGPU.Intel.NPU
             return new PageLockScope<T>(this, pinned, numElements);
         }
 
-        protected override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
         }
@@ -306,7 +306,7 @@ namespace ILGPU.Intel.NPU
         private void ThrowIfDisposed()
         {
             if (_disposed)
-                throw new ObjectDisposedException(nameof(NPUAccelerator));
+                throw new ObjectDisposedException(nameof(IntelNPUAccelerator));
         }
 
         #endregion
@@ -335,7 +335,7 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         /// <param name="context">The ILGPU context.</param>
         /// <returns>NPU accelerator or null if not available.</returns>
-        public static NPUAccelerator? CreateIfAvailable(Context context)
+        public static IntelNPUAccelerator? CreateIfAvailable(Context context)
         {
             if (!IsAvailable()) return null;
             
@@ -346,7 +346,7 @@ namespace ILGPU.Intel.NPU
                     0,
                     AcceleratorType.CPU); // NPU is CPU-adjacent
                     
-                return new NPUAccelerator(context, device);
+                return new IntelNPUAccelerator(context, device);
             }
             catch
             {
@@ -366,7 +366,7 @@ namespace ILGPU.Intel.NPU
         /// Initializes a new instance of the NPUStream class.
         /// </summary>
         /// <param name="accelerator">The NPU accelerator.</param>
-        public NPUStream(NPUAccelerator accelerator) : base(accelerator)
+        public NPUStream(IntelNPUAccelerator accelerator) : base(accelerator)
         {
         }
 
@@ -375,16 +375,17 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         public override void Synchronize()
         {
-            ((NPUAccelerator)Accelerator).ContextHandle.Let(handle =>
-                NPUNative.Synchronize(handle));
+            var handle = ((IntelNPUAccelerator)Accelerator).ContextHandle;
+            NPUNative.Synchronize(handle);
         }
 
         /// <summary>
-        /// Synchronizes the NPU stream asynchronously.
+        /// Adds a profiling marker to the stream.
         /// </summary>
-        public override Task SynchronizeAsync(CancellationToken cancellationToken = default)
+        protected override ProfilingMarker AddProfilingMarkerInternal()
         {
-            return Task.Run(() => Synchronize(), cancellationToken);
+            // NPU doesn't support detailed profiling markers
+            return new ProfilingMarker();
         }
 
         /// <summary>
@@ -410,7 +411,7 @@ namespace ILGPU.Intel.NPU
         /// <param name="accelerator">The NPU accelerator.</param>
         /// <param name="length">The number of elements.</param>
         /// <param name="elementSize">The size of each element.</param>
-        public NPUBuffer(NPUAccelerator accelerator, long length, int elementSize)
+        public NPUBuffer(IntelNPUAccelerator accelerator, long length, int elementSize)
             : base(accelerator, length, elementSize)
         {
             var sizeInBytes = length * elementSize;
@@ -418,80 +419,81 @@ namespace ILGPU.Intel.NPU
             
             if (_nativePtr == IntPtr.Zero)
                 throw new OutOfMemoryException("Failed to allocate NPU buffer memory");
+                
+            NativePtr = _nativePtr;
         }
 
         /// <summary>
-        /// Gets the native pointer to the buffer data.
+        /// Gets the native pointer to the buffer data as void*.
         /// </summary>
-        public override unsafe void* NativePtr => (void*)_nativePtr;
+        public unsafe void* GetNativePtr() => (void*)_nativePtr;
 
         /// <summary>
-        /// Copies data from CPU memory to this buffer.
+        /// Sets the contents of this buffer to the given byte value.
         /// </summary>
-        public override unsafe void CopyFromCPU(
-            IntPtr source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void MemSet(
+            AcceleratorStream stream,
+            byte value,
+            in ArrayView<byte> targetView)
         {
-            var src = (byte*)source + sourceOffset;
-            var dst = (byte*)_nativePtr + targetOffset;
-            Buffer.MemoryCopy(src, dst, length, length);
-        }
-
-        /// <summary>
-        /// Copies data from this buffer to CPU memory.
-        /// </summary>
-        public override unsafe void CopyToCPU(
-            IntPtr target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
-        {
-            var src = (byte*)_nativePtr + sourceOffset;
-            var dst = (byte*)target + targetOffset;
-            Buffer.MemoryCopy(src, dst, length, length);
+            unsafe
+            {
+                var ptr = (byte*)_nativePtr + targetView.Index;
+                var length = targetView.Length;
+                for (long i = 0; i < length; i++)
+                    ptr[i] = value;
+            }
         }
 
         /// <summary>
         /// Copies data from another buffer to this buffer.
         /// </summary>
-        public override unsafe void CopyFrom(
-            MemoryBuffer source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void CopyFrom(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (source is NPUBuffer npuSource)
+            unsafe
             {
-                var src = (byte*)npuSource._nativePtr + sourceOffset;
-                var dst = (byte*)_nativePtr + targetOffset;
-                Buffer.MemoryCopy(src, dst, length, length);
-            }
-            else
-            {
-                base.CopyFrom(source, sourceOffset, targetOffset, length);
+                var sourceBuffer = sourceView.GetBuffer();
+                if (sourceBuffer is NPUBuffer npuSource)
+                {
+                    var src = (byte*)npuSource._nativePtr + sourceView.Index;
+                    var dst = (byte*)_nativePtr + targetView.Index;
+                    var length = Math.Min(sourceView.Length, targetView.Length);
+                    Buffer.MemoryCopy(src, dst, length, length);
+                }
+                else
+                {
+                    // Fallback to base implementation
+                    base.CopyFrom(stream, sourceView, targetView);
+                }
             }
         }
 
         /// <summary>
         /// Copies data from this buffer to another buffer.
         /// </summary>
-        public override unsafe void CopyTo(
-            MemoryBuffer target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void CopyTo(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (target is NPUBuffer npuTarget)
+            unsafe
             {
-                var src = (byte*)_nativePtr + sourceOffset;
-                var dst = (byte*)npuTarget._nativePtr + targetOffset;
-                Buffer.MemoryCopy(src, dst, length, length);
-            }
-            else
-            {
-                base.CopyTo(target, sourceOffset, targetOffset, length);
+                var targetBuffer = targetView.GetBuffer();
+                if (targetBuffer is NPUBuffer npuTarget)
+                {
+                    var src = (byte*)_nativePtr + sourceView.Index;
+                    var dst = (byte*)npuTarget._nativePtr + targetView.Index;
+                    var length = Math.Min(sourceView.Length, targetView.Length);
+                    Buffer.MemoryCopy(src, dst, length, length);
+                }
+                else
+                {
+                    // Fallback to base implementation
+                    base.CopyTo(stream, sourceView, targetView);
+                }
             }
         }
 

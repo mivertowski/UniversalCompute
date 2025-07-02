@@ -56,7 +56,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the ANE capabilities.
         /// </summary>
-        public ANECapabilities Capabilities => _capabilities;
+        public new ANECapabilities Capabilities => _capabilities;
 
         /// <summary>
         /// Gets the ANE context handle.
@@ -259,7 +259,7 @@ namespace ILGPU.Apple.NeuralEngine
             return new PageLockScope<T>(this, pinned, numElements);
         }
 
-        protected override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by ANE accelerator");
         }
@@ -379,11 +379,12 @@ namespace ILGPU.Apple.NeuralEngine
         }
 
         /// <summary>
-        /// Synchronizes the ANE stream asynchronously.
+        /// Adds a profiling marker to the stream.
         /// </summary>
-        public override Task SynchronizeAsync(CancellationToken cancellationToken = default)
+        protected override ProfilingMarker AddProfilingMarkerInternal()
         {
-            return Task.CompletedTask;
+            // ANE doesn't support detailed profiling markers
+            return new ProfilingMarker();
         }
 
         /// <summary>
@@ -417,80 +418,81 @@ namespace ILGPU.Apple.NeuralEngine
             
             if (_nativePtr == IntPtr.Zero)
                 throw new OutOfMemoryException("Failed to allocate ANE buffer memory");
+                
+            NativePtr = _nativePtr;
         }
 
         /// <summary>
-        /// Gets the native pointer to the buffer data.
+        /// Gets the native pointer to the buffer data as void*.
         /// </summary>
-        public override unsafe void* NativePtr => (void*)_nativePtr;
+        public unsafe void* GetNativePtr() => (void*)_nativePtr;
 
         /// <summary>
-        /// Copies data from CPU memory to this buffer.
+        /// Sets the contents of this buffer to the given byte value.
         /// </summary>
-        public override unsafe void CopyFromCPU(
-            IntPtr source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void MemSet(
+            AcceleratorStream stream,
+            byte value,
+            in ArrayView<byte> targetView)
         {
-            var src = (byte*)source + sourceOffset;
-            var dst = (byte*)_nativePtr + targetOffset;
-            Buffer.MemoryCopy(src, dst, length, length);
-        }
-
-        /// <summary>
-        /// Copies data from this buffer to CPU memory.
-        /// </summary>
-        public override unsafe void CopyToCPU(
-            IntPtr target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
-        {
-            var src = (byte*)_nativePtr + sourceOffset;
-            var dst = (byte*)target + targetOffset;
-            Buffer.MemoryCopy(src, dst, length, length);
+            unsafe
+            {
+                var ptr = (byte*)_nativePtr + targetView.Index;
+                var length = targetView.Length;
+                for (long i = 0; i < length; i++)
+                    ptr[i] = value;
+            }
         }
 
         /// <summary>
         /// Copies data from another buffer to this buffer.
         /// </summary>
-        public override unsafe void CopyFrom(
-            MemoryBuffer source,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void CopyFrom(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (source is ANEBuffer aneSource)
+            unsafe
             {
-                var src = (byte*)aneSource._nativePtr + sourceOffset;
-                var dst = (byte*)_nativePtr + targetOffset;
-                Buffer.MemoryCopy(src, dst, length, length);
-            }
-            else
-            {
-                base.CopyFrom(source, sourceOffset, targetOffset, length);
+                var sourceBuffer = sourceView.GetBuffer();
+                if (sourceBuffer is ANEBuffer aneSource)
+                {
+                    var src = (byte*)aneSource._nativePtr + sourceView.Index;
+                    var dst = (byte*)_nativePtr + targetView.Index;
+                    var length = Math.Min(sourceView.Length, targetView.Length);
+                    Buffer.MemoryCopy(src, dst, length, length);
+                }
+                else
+                {
+                    // Fallback to base implementation
+                    base.CopyFrom(stream, sourceView, targetView);
+                }
             }
         }
 
         /// <summary>
         /// Copies data from this buffer to another buffer.
         /// </summary>
-        public override unsafe void CopyTo(
-            MemoryBuffer target,
-            long sourceOffset,
-            long targetOffset,
-            long length)
+        protected internal override void CopyTo(
+            AcceleratorStream stream,
+            in ArrayView<byte> sourceView,
+            in ArrayView<byte> targetView)
         {
-            if (target is ANEBuffer aneTarget)
+            unsafe
             {
-                var src = (byte*)_nativePtr + sourceOffset;
-                var dst = (byte*)aneTarget._nativePtr + targetOffset;
-                Buffer.MemoryCopy(src, dst, length, length);
-            }
-            else
-            {
-                base.CopyTo(target, sourceOffset, targetOffset, length);
+                var targetBuffer = targetView.GetBuffer();
+                if (targetBuffer is ANEBuffer aneTarget)
+                {
+                    var src = (byte*)_nativePtr + sourceView.Index;
+                    var dst = (byte*)aneTarget._nativePtr + targetView.Index;
+                    var length = Math.Min(sourceView.Length, targetView.Length);
+                    Buffer.MemoryCopy(src, dst, length, length);
+                }
+                else
+                {
+                    // Fallback to base implementation
+                    base.CopyTo(stream, sourceView, targetView);
+                }
             }
         }
 
