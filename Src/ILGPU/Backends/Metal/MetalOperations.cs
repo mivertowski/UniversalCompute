@@ -261,7 +261,7 @@ namespace ILGPU.Backends.Metal
                 // Create input buffers
                 for (int i = 0; i < inputs.Length; i++)
                 {
-                    fixed (float* inputPtr = inputs[i].GetSubView(0, (int)inputs[i].Length).AsSpan())
+                    fixed (float* inputPtr = inputs[i].SubView(0, (int)inputs[i].Length).AsSpan())
                     {
                         inputBuffers[i] = MetalNative.MTLDeviceNewBufferWithBytes(
                             device, (IntPtr)inputPtr, 
@@ -290,7 +290,7 @@ namespace ILGPU.Backends.Metal
                 for (int i = 0; i < outputs.Length; i++)
                 {
                     var resultPtr = MetalNative.MTLBufferContents(outputBuffers[i]);
-                    fixed (float* outputPtr = outputs[i].GetSubView(0, (int)outputs[i].Length).AsSpan())
+                    fixed (float* outputPtr = outputs[i].SubView(0, (int)outputs[i].Length).AsSpan())
                     {
                         Buffer.MemoryCopy((void*)resultPtr, outputPtr, 
                             outputs[i].Length * sizeof(float), 

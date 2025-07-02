@@ -82,8 +82,8 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.GetSubView(0, (int)input.Length).AsSpan())
-            fixed (float* outputPtr = output.GetSubView(0, (int)output.Length).AsSpan())
+            fixed (float* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
+            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
             {
                 NPUOperations.ExecuteConvolution(
                     inputPtr, weights, outputPtr, 
@@ -108,9 +108,9 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (float* aPtr = a.GetSubView(0, (int)a.Length).AsSpan())
-            fixed (float* bPtr = b.GetSubView(0, (int)b.Length).AsSpan())
-            fixed (float* cPtr = c.GetSubView(0, (int)c.Length).AsSpan())
+            fixed (float* aPtr = a.SubView(0, (int)a.Length).AsSpan())
+            fixed (float* bPtr = b.SubView(0, (int)b.Length).AsSpan())
+            fixed (float* cPtr = c.SubView(0, (int)c.Length).AsSpan())
             {
                 NPUOperations.ExecuteMatrixMultiply(
                     aPtr, bPtr, cPtr, m, n, k, _npuContext);
@@ -130,8 +130,8 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.GetSubView(0, (int)input.Length).AsSpan())
-            fixed (float* outputPtr = output.GetSubView(0, (int)output.Length).AsSpan())
+            fixed (float* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
+            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
             {
                 NPUNative.ExecuteOpenVINOInference(
                     inputPtr, outputPtr, 
@@ -155,9 +155,9 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (sbyte* inputPtr = input.GetSubView(0, (int)input.Length).AsSpan())
-            fixed (sbyte* weightsPtr = weights.GetSubView(0, (int)weights.Length).AsSpan())
-            fixed (float* outputPtr = output.GetSubView(0, (int)output.Length).AsSpan())
+            fixed (sbyte* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
+            fixed (sbyte* weightsPtr = weights.SubView(0, (int)weights.Length).AsSpan())
+            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
             {
                 NPUOperations.ExecuteQuantizedInference(
                     inputPtr, weightsPtr, outputPtr, config, _npuContext);

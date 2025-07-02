@@ -549,5 +549,22 @@ namespace ILGPU
         }
 
         #endregion
+
+        #region Methods
+
+        /// <summary>
+        /// Converts this runtime kernel configuration to an array of arguments
+        /// suitable for kernel execution.
+        /// </summary>
+        /// <returns>An array of kernel arguments.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly object[] ToArguments() => new object[]
+        {
+            GridDim,
+            GroupDim,
+            SharedMemoryConfig
+        };
+
+        #endregion
     }
 }

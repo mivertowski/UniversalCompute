@@ -665,7 +665,7 @@ namespace ILGPU.Algorithms.Cryptography
             // Key
             for (int i = 0; i < 8; i++)
             {
-                state[4 + i] = BitConverter.ToUInt32(key.GetSubView(i * 4, 4).ToArray(), 0);
+                state[4 + i] = BitConverter.ToUInt32(key.SubView(i * 4, 4).ToArray(), 0);
             }
 
             // Counter
@@ -674,7 +674,7 @@ namespace ILGPU.Algorithms.Cryptography
             // Nonce
             for (int i = 0; i < 3; i++)
             {
-                state[13 + i] = BitConverter.ToUInt32(nonce.GetSubView(i * 4, 4).ToArray(), 0);
+                state[13 + i] = BitConverter.ToUInt32(nonce.SubView(i * 4, 4).ToArray(), 0);
             }
 
             // ChaCha20 rounds
@@ -708,7 +708,7 @@ namespace ILGPU.Algorithms.Cryptography
             // Initialize state (simplified)
             for (int i = 0; i < 8; i++)
             {
-                state[i] = BitConverter.ToUInt32(key.GetSubView(i * 4, 4).ToArray(), 0);
+                state[i] = BitConverter.ToUInt32(key.SubView(i * 4, 4).ToArray(), 0);
             }
             
             state[8] = (uint)counter;
@@ -716,7 +716,7 @@ namespace ILGPU.Algorithms.Cryptography
             
             for (int i = 0; i < 2; i++)
             {
-                state[10 + i] = BitConverter.ToUInt32(nonce.GetSubView(i * 4, 4).ToArray(), 0);
+                state[10 + i] = BitConverter.ToUInt32(nonce.SubView(i * 4, 4).ToArray(), 0);
             }
 
             // Salsa20 rounds (simplified)

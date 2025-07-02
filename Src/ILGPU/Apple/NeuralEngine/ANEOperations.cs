@@ -52,7 +52,7 @@ namespace ILGPU.Apple.NeuralEngine
             var outputSize = GetTensorSize(config.OutputShape);
 
             // Pin weights for the duration of the operation
-            fixed (float* weightsPtr = weights.GetSubView(0, (int)weights.Length).AsSpan())
+            fixed (float* weightsPtr = weights.SubView(0, (int)weights.Length).AsSpan())
             {
                 // Execute native ANE convolution
                 ANENative.ExecuteConvolution(input, output, inputSize, outputSize, context);
@@ -90,13 +90,13 @@ namespace ILGPU.Apple.NeuralEngine
             var intermediate = stackalloc float[(int)Math.Min(intermediateSize, 1024 * 1024)];
 
             // Step 1: Depthwise convolution
-            fixed (float* dwWeights = depthwiseWeights.GetSubView(0, (int)depthwiseWeights.Length).AsSpan())
+            fixed (float* dwWeights = depthwiseWeights.SubView(0, (int)depthwiseWeights.Length).AsSpan())
             {
                 ANENative.ExecuteConvolution(input, intermediate, inputSize, intermediateSize, context);
             }
 
             // Step 2: Pointwise convolution (1x1)
-            fixed (float* pwWeights = pointwiseWeights.GetSubView(0, (int)pointwiseWeights.Length).AsSpan())
+            fixed (float* pwWeights = pointwiseWeights.SubView(0, (int)pointwiseWeights.Length).AsSpan())
             {
                 ANENative.ExecuteConvolution(intermediate, output, intermediateSize, outputSize, context);
             }
