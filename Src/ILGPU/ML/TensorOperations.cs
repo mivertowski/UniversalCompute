@@ -357,7 +357,7 @@ namespace ILGPU.ML
             else
             {
                 // Implement n-dimensional softmax by flattening and applying along the last dimension
-                int lastDimSize = Shape[^1];
+                int lastDimSize = Shape[Shape.Rank - 1];
                 int batchSize = (int)(Shape.Size / lastDimSize);
                 
                 var kernel = Accelerator.LoadAutoGroupedStreamKernel<

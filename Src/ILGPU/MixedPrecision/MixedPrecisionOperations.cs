@@ -18,6 +18,7 @@
 using ILGPU.Runtime;
 using ILGPU.TensorCores;
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
@@ -199,9 +200,9 @@ namespace ILGPU.MixedPrecision
             if (source.Length != destination.Length)
                 throw new ArgumentException("Source and destination arrays must have the same length");
 
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<float>, ArrayView<BFloat16>>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<BFloat16>>(
                 ConvertFP32ToBF16Kernel);
-            kernel(source, destination);
+            kernel(new Index1D(source.IntLength), source, destination);
         }
 
         /// <summary>
@@ -222,9 +223,9 @@ namespace ILGPU.MixedPrecision
             if (source.Length != destination.Length)
                 throw new ArgumentException("Source and destination arrays must have the same length");
 
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<float>, ArrayView<sbyte>, float, sbyte>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<sbyte>, float, sbyte>(
                 QuantizeFP32ToINT8Kernel);
-            kernel(source, destination, scale, zeroPoint);
+            kernel(new Index1D(source.IntLength), source, destination, scale, zeroPoint);
         }
 
         /// <summary>
@@ -245,9 +246,9 @@ namespace ILGPU.MixedPrecision
             if (source.Length != destination.Length)
                 throw new ArgumentException("Source and destination arrays must have the same length");
 
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<sbyte>, ArrayView<float>, float, sbyte>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<sbyte>, ArrayView<float>, float, sbyte>(
                 DequantizeINT8ToFP32Kernel);
-            kernel(source, destination, scale, zeroPoint);
+            kernel(new Index1D(source.IntLength), source, destination, scale, zeroPoint);
         }
 
         #endregion
@@ -292,25 +293,25 @@ namespace ILGPU.MixedPrecision
                     UseMixedPrecision = true
                 };
 
-                var kernel = accelerator.LoadAutoGroupedStreamKernel<
+                var kernel = accelerator.LoadAutoGroupedStreamKernel<Index2D,
                     int, int, int, float,
                     ArrayView2D<Half, Stride2D.DenseX>, int,
                     ArrayView2D<Half, Stride2D.DenseX>, int,
                     float, ArrayView2D<float, Stride2D.DenseX>, int,
                     TensorOperations.TensorConfig>(MixedPrecisionTensorGEMMKernel);
 
-                kernel(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, tensorConfig);
+                kernel(new Index2D(m, n), m, n, k, alpha, a, lda, b, ldb, beta, c, ldc, tensorConfig);
             }
             else
             {
                 // Fallback to software mixed precision
-                var kernel = accelerator.LoadAutoGroupedStreamKernel<
+                var kernel = accelerator.LoadAutoGroupedStreamKernel<Index2D,
                     int, int, int, float,
                     ArrayView2D<Half, Stride2D.DenseX>, int,
                     ArrayView2D<Half, Stride2D.DenseX>, int,
                     float, ArrayView2D<float, Stride2D.DenseX>, int>(SoftwareMixedPrecisionGEMMKernel);
 
-                kernel(m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
+                kernel(new Index2D(m, n), m, n, k, alpha, a, lda, b, ldb, beta, c, ldc);
             }
         }
 
@@ -329,9 +330,9 @@ namespace ILGPU.MixedPrecision
             ArrayView<float> gradients,
             float lossScale)
         {
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<float>, float>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, float>(
                 ScaleGradientsKernel);
-            kernel(gradients, lossScale);
+            kernel(new Index1D(gradients.IntLength), gradients, lossScale);
         }
 
         /// <summary>
@@ -345,9 +346,9 @@ namespace ILGPU.MixedPrecision
             ArrayView<float> gradients,
             float lossScale)
         {
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<float>, float>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, float>(
                 UnscaleGradientsKernel);
-            kernel(gradients, lossScale);
+            kernel(new Index1D(gradients.IntLength), gradients, lossScale);
         }
 
         /// <summary>
@@ -361,9 +362,9 @@ namespace ILGPU.MixedPrecision
             ArrayView<float> gradients,
             ArrayView<int> hasInfNaN)
         {
-            var kernel = accelerator.LoadAutoGroupedStreamKernel<ArrayView<float>, ArrayView<int>>(
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<int>>(
                 CheckInfNaNKernel);
-            kernel(gradients, hasInfNaN);
+            kernel(new Index1D(gradients.IntLength), gradients, hasInfNaN);
         }
 
         #endregion
