@@ -658,6 +658,7 @@ namespace ILGPU.Algorithms
         /// <param name="paddedLength">The padded length of the input view.</param>
         /// <param name="shift">The bit shift to use.</param>
         internal static void RadixSortKernel1<T, TStride, TOperation, TSpecialization>(
+            Index1D index,
             ArrayView1D<T, TStride> view,
             ArrayView<int> counter,
             SpecializedValue<int> groupSize,
@@ -675,7 +676,7 @@ namespace ILGPU.Algorithms
 
             int gridIdx = Grid.IdxX;
             for (
-                int i = Grid.GlobalIndex.X;
+                int i = index.X;
                 i < paddedLength;
                 i += GridExtensions.GridStrideLoopStride)
             {
@@ -855,6 +856,7 @@ namespace ILGPU.Algorithms
             TOutputStride,
             TOperation,
             TSpecialization>(
+            Index1D index,
             ArrayView1D<T, TInputStride> input,
             ArrayView1D<T, TOutputStride> output,
             ArrayView<int> counter,
@@ -870,7 +872,7 @@ namespace ILGPU.Algorithms
             var gridIdx = Grid.IdxX;
 
             for (
-                int i = Grid.GlobalIndex.X;
+                int i = index.X;
                 i < paddedLength;
                 i += GridExtensions.GridStrideLoopStride)
             {

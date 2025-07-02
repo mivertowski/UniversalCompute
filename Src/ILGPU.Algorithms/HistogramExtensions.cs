@@ -240,6 +240,7 @@ namespace ILGPU.Algorithms
             TBinType,
             TIncrementor,
             TLocator>(
+            Index1D index,
             ArrayView1D<T, TStride> view,
             ArrayView<TBinType> histogram,
             out bool histogramOverflow,
@@ -256,7 +257,7 @@ namespace ILGPU.Algorithms
             var gridIdx = Grid.IdxX;
             var histogramDidOverflow = false;
             for (
-                int i = Grid.GlobalIndex.X;
+                int i = index.X;
                 i < paddedLength;
                 i += GridExtensions.GridStrideLoopStride)
             {
