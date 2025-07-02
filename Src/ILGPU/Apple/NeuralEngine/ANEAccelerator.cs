@@ -293,42 +293,42 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the ANE accelerator name.
         /// </summary>
-        public override string Name => $"Apple Neural Engine ({_capabilities.ChipGeneration})";
+        public new string Name => $"Apple Neural Engine ({_capabilities.ChipGeneration})";
 
         /// <summary>
         /// Gets the maximum grid size for ANE operations.
         /// </summary>
-        public override Index3D MaxGridSize => new Index3D(_capabilities.MaxTensorWidth, _capabilities.MaxTensorHeight, 1);
+        public new Index3D MaxGridSize => new Index3D(_capabilities.MaxTensorWidth, _capabilities.MaxTensorHeight, 1);
 
         /// <summary>
         /// Gets the maximum group size for ANE operations.
         /// </summary>
-        public override Index3D MaxGroupSize => new Index3D(_capabilities.OptimalWorkGroupSize, 1, 1);
+        public new Index3D MaxGroupSize => new Index3D(_capabilities.OptimalWorkGroupSize, 1, 1);
 
         /// <summary>
         /// Gets the ANE warp size.
         /// </summary>
-        public override int WarpSize => _capabilities.OptimalWorkGroupSize;
+        public new int WarpSize => _capabilities.OptimalWorkGroupSize;
 
         /// <summary>
         /// Gets the number of compute units (multiprocessors).
         /// </summary>
-        public override int NumMultiprocessors => _capabilities.NumComputeUnits;
+        public new int NumMultiprocessors => _capabilities.NumComputeUnits;
 
         /// <summary>
         /// Gets the maximum shared memory per multiprocessor.
         /// </summary>
-        public override int MaxSharedMemoryPerMultiprocessor => _capabilities.MaxSharedMemoryPerUnit;
+        public new int MaxSharedMemoryPerGroup => _capabilities.MaxSharedMemoryPerUnit;
 
         /// <summary>
         /// Gets the maximum constant memory.
         /// </summary>
-        public override int MaxConstantMemory => _capabilities.MaxConstantMemory;
+        public new int MaxConstantMemory => _capabilities.MaxConstantMemory;
 
         /// <summary>
         /// Gets the memory bandwidth.
         /// </summary>
-        public override long MaxMemoryBandwidth => _capabilities.MemoryBandwidth;
+        public new long MemoryBandwidth => _capabilities.MemoryBandwidth;
 
         private void InitializeAcceleratorProperties()
         {
