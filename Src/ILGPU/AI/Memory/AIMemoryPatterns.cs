@@ -405,11 +405,11 @@ namespace ILGPU.AI.Memory
         /// Kernel for NCHW to NHWC transformation.
         /// </summary>
         private static void TransformNCHWToNHWCKernel(
+            Index1D index,
             ArrayView<float> input,
             ArrayView<float> output,
             int n, int c, int h, int w)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= n * c * h * w) return;
 
             // Decompose linear index to NCHW coordinates
@@ -430,11 +430,11 @@ namespace ILGPU.AI.Memory
         /// Kernel for NHWC to NCHW transformation.
         /// </summary>
         private static void TransformNHWCToNCHWKernel(
+            Index1D index,
             ArrayView<float> input,
             ArrayView<float> output,
             int n, int c, int h, int w)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= n * h * w * c) return;
 
             // Decompose linear index to NHWC coordinates
@@ -455,12 +455,12 @@ namespace ILGPU.AI.Memory
         /// Kernel for creating tiled memory layout.
         /// </summary>
         private static void CreateTiledLayoutKernel(
+            Index1D index,
             ArrayView<float> input,
             ArrayView<float> output,
             int height, int width,
             int tileHeight, int tileWidth)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= height * width) return;
 
             var row = index / width;
@@ -486,11 +486,11 @@ namespace ILGPU.AI.Memory
         /// Kernel for creating Z-order (Morton order) layout.
         /// </summary>
         private static void CreateZOrderLayoutKernel(
+            Index1D index,
             ArrayView<float> input,
             ArrayView<float> output,
             int height, int width)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= height * width) return;
 
             var row = index / width;
@@ -518,11 +518,11 @@ namespace ILGPU.AI.Memory
         /// Kernel for data prefetching.
         /// </summary>
         private static void PrefetchDataKernel(
+            Index1D index,
             ArrayView<float> data,
             ArrayView<int> indices,
             int prefetchDistance)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= indices.Length) return;
 
             var currentIndex = indices[index];
@@ -543,11 +543,11 @@ namespace ILGPU.AI.Memory
         /// Kernel for streaming prefetch.
         /// </summary>
         private static void StreamingPrefetchKernel(
+            Index1D index,
             ArrayView<float> data,
             ArrayView<float> output,
             int streamingDistance)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= data.Length) return;
 
             // Prefetch future data
@@ -564,12 +564,12 @@ namespace ILGPU.AI.Memory
         /// Cache-aware matrix transpose kernel.
         /// </summary>
         private static void CacheAwareTransposeKernel(
+            Index1D index,
             ArrayView<float> input,
             ArrayView<float> output,
             int rows, int cols,
             int blockSize)
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= rows * cols) return;
 
             var row = index / cols;
@@ -596,6 +596,7 @@ namespace ILGPU.AI.Memory
         /// Cache-aware Im2Col kernel.
         /// </summary>
         private static void CacheAwareIm2ColKernel(
+            Index1D index,
             ArrayView<float> input,
             ArrayView<float> output,
             int n, int c, int h, int w,
@@ -604,7 +605,6 @@ namespace ILGPU.AI.Memory
             int padH, int padW,
             int blockSize)
         {
-            var index = Grid.GlobalIndex.X;
             
             var outputH = (h + 2 * padH - kernelH) / strideH + 1;
             var outputW = (w + 2 * padW - kernelW) / strideW + 1;

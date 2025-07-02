@@ -309,7 +309,7 @@ namespace ILGPU.AI.Memory
             // Pre-allocate all blocks
             for (int i = 0; i < _blockCount; i++)
             {
-                _blocks[i] = _accelerator.Allocate<byte>(_blockSize);
+                _blocks[i] = _accelerator.Allocate1D<byte>(_blockSize);
             }
         }
 
@@ -438,18 +438,18 @@ namespace ILGPU.AI.Memory
             T threshold) where T : unmanaged, IComparable<T>
         {
             // Count non-zero elements first
-            var nonZeroCount = accelerator.Allocate<int>(1);
+            var nonZeroCount = accelerator.Allocate1D<int>(1);
             var countKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<int>, T, int>(CountNonZeroKernel);
             countKernel(new Index1D(dense.IntLength), dense, nonZeroCount, threshold, dense.Length);
 
             accelerator.Synchronize();
-            var count = nonZeroCount.GetAsArray1D()[0];
+            var count = nonZeroCount.GetAsArray()[0];
 
             // Allocate sparse arrays
-            var values = accelerator.Allocate<T>(count);
-            var rowIndices = accelerator.Allocate<int>(count);
-            var colIndices = accelerator.Allocate<int>(count);
+            var values = accelerator.Allocate1D<T>(count);
+            var rowIndices = accelerator.Allocate1D<int>(count);
+            var colIndices = accelerator.Allocate1D<int>(count);
 
             // Extract sparse data
             var extractKernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -523,12 +523,12 @@ namespace ILGPU.AI.Memory
         /// Kernel to count non-zero elements.
         /// </summary>
         private static void CountNonZeroKernel<T>(
+            Index1D index,
             ArrayView<T> data,
             ArrayView<int> count,
             T threshold,
             int length) where T : unmanaged, IComparable<T>
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= length) return;
 
             if (data[index].CompareTo(threshold) != 0)
@@ -541,6 +541,7 @@ namespace ILGPU.AI.Memory
         /// Kernel to extract sparse data in COO format.
         /// </summary>
         private static void ExtractSparseKernel<T>(
+            Index1D index,
             ArrayView<T> dense,
             ArrayView<T> values,
             ArrayView<int> rowIndices,
@@ -548,7 +549,6 @@ namespace ILGPU.AI.Memory
             T threshold,
             int rows, int cols) where T : unmanaged, IComparable<T>
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= dense.Length) return;
 
             var value = dense[index];
@@ -572,13 +572,13 @@ namespace ILGPU.AI.Memory
         /// Kernel to scatter sparse values to dense array.
         /// </summary>
         private static void ScatterSparseKernel<T>(
+            Index1D index,
             ArrayView<T> values,
             ArrayView<int> rowIndices,
             ArrayView<int> colIndices,
             ArrayView<T> dense,
             int cols) where T : unmanaged
         {
-            var index = Grid.GlobalIndex.X;
             if (index >= values.Length) return;
 
             var row = rowIndices[index];

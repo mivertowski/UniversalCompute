@@ -609,7 +609,7 @@ namespace ILGPU.Backends.WebGPU
                 descriptor.SetProperty("usage", (uint)usage);
                 
                 var jsBuffer = _jsDevice.Invoke("createBuffer", descriptor);
-                return new WebGPUBuffer(jsBuffer, size, usage);
+                return new WebGPUBuffer(jsBuffer, size, usage, null!);
             }
 #endif
             throw new InvalidOperationException("Device not available");
@@ -772,8 +772,8 @@ namespace ILGPU.Backends.WebGPU
         private readonly WebGPUBufferUsage _usage;
         private bool _disposed;
 
-        internal WebGPUBuffer(JSObject jsBuffer, ulong size, WebGPUBufferUsage usage)
-            : base(null!, (long)size, 1)
+        internal WebGPUBuffer(JSObject jsBuffer, ulong size, WebGPUBufferUsage usage, Accelerator accelerator)
+            : base(accelerator, (long)size, 1)
         {
             JSObject = jsBuffer;
             _size = size;
