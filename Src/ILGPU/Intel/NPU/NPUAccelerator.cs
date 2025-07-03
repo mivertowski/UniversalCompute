@@ -22,6 +22,8 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using ILGPU.Apple.NeuralEngine;
+using ILGPU.Numerics;
 
 namespace ILGPU.Intel.NPU
 {

@@ -102,6 +102,76 @@ namespace ILGPU.Intel.NPU
         /// Gets the maximum number of concurrent inferences supported.
         /// </summary>
         public int MaxConcurrentInferences { get; } = generation switch
+
+        /// <summary>
+        /// Gets the optimal batch size for NPU operations.
+        /// </summary>
+        public int OptimalBatchSize { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 8,
+            NPUGeneration.NPU2 => 16,
+            NPUGeneration.NPU3 => 32,
+            NPUGeneration.NPU4 => 64,
+            _ => 8
+        };
+
+        /// <summary>
+        /// Gets the maximum input width supported.
+        /// </summary>
+        public int MaxInputWidth { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 2048,
+            NPUGeneration.NPU2 => 4096,
+            NPUGeneration.NPU3 => 8192,
+            NPUGeneration.NPU4 => 16384,
+            _ => 2048
+        };
+
+        /// <summary>
+        /// Gets the maximum input height supported.
+        /// </summary>
+        public int MaxInputHeight { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 2048,
+            NPUGeneration.NPU2 => 4096,
+            NPUGeneration.NPU3 => 8192,
+            NPUGeneration.NPU4 => 16384,
+            _ => 2048
+        };
+
+        /// <summary>
+        /// Gets the number of compute units.
+        /// </summary>
+        public int NumComputeUnits { get; } = computeUnits;
+
+        /// <summary>
+        /// Gets the maximum shared memory per compute unit.
+        /// </summary>
+        public int MaxSharedMemoryPerUnit { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 64 * 1024,
+            NPUGeneration.NPU2 => 128 * 1024,
+            NPUGeneration.NPU3 => 256 * 1024,
+            NPUGeneration.NPU4 => 512 * 1024,
+            _ => 64 * 1024
+        };
+
+        /// <summary>
+        /// Gets the maximum constant memory.
+        /// </summary>
+        public int MaxConstantMemory { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 64 * 1024 * 1024,
+            NPUGeneration.NPU2 => 128 * 1024 * 1024,
+            NPUGeneration.NPU3 => 256 * 1024 * 1024,
+            NPUGeneration.NPU4 => 512 * 1024 * 1024,
+            _ => 64 * 1024 * 1024
+        };
+
+        /// <summary>
+        /// Gets the device name.
+        /// </summary>
+        public string DeviceName { get; } = $"Intel NPU {generation}";
         {
             NPUGeneration.NPU1 => 1,
             NPUGeneration.NPU2 => 2,
@@ -314,6 +384,11 @@ namespace ILGPU.Intel.NPU
         /// Unknown NPU generation.
         /// </summary>
         Unknown = -2,
+
+        /// <summary>
+        /// First generation NPU.
+        /// </summary>
+        NPU1 = 1,
 
         /// <summary>
         /// Second generation NPU (Meteor Lake - Core Ultra).
