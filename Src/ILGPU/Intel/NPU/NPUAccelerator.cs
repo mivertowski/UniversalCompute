@@ -414,12 +414,8 @@ namespace ILGPU.Intel.NPU
             
             try
             {
-                var device = new Device(
-                    "Intel NPU",
-                    0,
-                    AcceleratorType.CPU); // NPU is CPU-adjacent
-                    
-                return new IntelNPUAccelerator(context, device);
+                // TODO: Implement proper NPU device creation - Device is abstract
+                return null;
             }
             catch
             {

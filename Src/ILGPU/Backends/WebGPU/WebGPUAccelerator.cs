@@ -19,6 +19,7 @@ using ILGPU.Backends;
 using ILGPU.Backends.WebGPU;
 using ILGPU.Runtime;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.JavaScript;
 using System.Threading;
 using System.Threading.Tasks;
@@ -198,7 +199,7 @@ namespace ILGPU.Backends.WebGPU
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
-                _capabilities.MaxWorkgroupSize,
+                (int)_capabilities.MaxWorkgroupSize,
                 _capabilities.MaxSharedMemorySize);
             return LoadKernelInternal(compiledKernel);
         }
@@ -340,7 +341,8 @@ namespace ILGPU.Backends.WebGPU
                     ?.GetPropertyAsJSObject("gpu") != null;
 #else
                 // Check for WebGPU implementation in other environments
-                return WebGPUNative.IsWebGPUSupported();
+                // TODO: Implement WebGPUNative.IsWebGPUSupported()
+                return false; // WebGPU native not implemented yet
 #endif
             }
             catch

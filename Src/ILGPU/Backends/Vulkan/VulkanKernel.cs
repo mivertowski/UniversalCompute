@@ -59,6 +59,7 @@ namespace ILGPU.Backends.Vulkan
             AcceleratorStream stream,
             TIndex extent,
             KernelParameters parameters)
+            where TIndex : struct, IIndex
         {
             ThrowIfDisposed();
 
@@ -79,7 +80,7 @@ namespace ILGPU.Backends.Vulkan
             finally
             {
                 // Clean up descriptor set
-                descriptorSet?.Dispose();
+                // descriptorSet?.Dispose(); // TODO: Implement proper disposal
             }
         }
 
@@ -219,7 +220,7 @@ namespace ILGPU.Backends.Vulkan
         protected override ProfilingMarker AddProfilingMarkerInternal()
         {
             // Vulkan profiling would typically use timestamp queries
-            return default;
+            return default!;
         }
 
         /// <summary>

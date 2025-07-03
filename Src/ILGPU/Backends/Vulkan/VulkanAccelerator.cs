@@ -216,7 +216,7 @@ namespace ILGPU.Backends.Vulkan
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
-                _capabilities.MaxWorkgroupSize,
+                (int)_capabilities.MaxWorkgroupSize,
                 _capabilities.MaxSharedMemorySize);
             return LoadKernelInternal(compiledKernel);
         }
@@ -352,14 +352,8 @@ namespace ILGPU.Backends.Vulkan
         /// <returns>True if Vulkan is available; otherwise, false.</returns>
         public static bool IsAvailable()
         {
-            try
-            {
-                return VulkanNative.IsVulkanSupported();
-            }
-            catch
-            {
-                return false;
-            }
+            // TODO: Implement VulkanNative.IsVulkanSupported()
+            return false; // Vulkan not implemented yet
         }
 
         /// <summary>

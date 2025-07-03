@@ -80,13 +80,9 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
-            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
-            {
-                ANEOperations.ExecuteConvolution(
-                    inputPtr, weights, outputPtr, 
-                    config, _aneContext);
-            }
+            // TODO: Implement proper ANE data transfer
+            // ArrayView doesn't support AsSpan - need proper GPU-to-ANE data copy
+            throw new NotSupportedException("ANE convolution not fully implemented");
         }
 
         /// <summary>
@@ -106,13 +102,8 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* aPtr = a.SubView(0, (int)a.Length).AsSpan())
-            fixed (float* bPtr = b.SubView(0, (int)b.Length).AsSpan())
-            fixed (float* cPtr = c.SubView(0, (int)c.Length).AsSpan())
-            {
-                ANEOperations.ExecuteMatrixMultiply(
-                    aPtr, bPtr, cPtr, m, n, k, _aneContext);
-            }
+            // TODO: Implement proper ANE matrix multiplication
+            throw new NotSupportedException("ANE matrix multiplication not fully implemented");
         }
 
         /// <summary>
@@ -132,14 +123,8 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* qPtr = queries.SubView(0, (int)queries.Length).AsSpan())
-            fixed (float* kPtr = keys.SubView(0, (int)keys.Length).AsSpan())
-            fixed (float* vPtr = values.SubView(0, (int)values.Length).AsSpan())
-            fixed (float* outPtr = output.SubView(0, (int)output.Length).AsSpan())
-            {
-                ANEOperations.ExecuteAttention(
-                    qPtr, kPtr, vPtr, outPtr, config, _aneContext);
-            }
+            // TODO: Implement proper ANE attention mechanism
+            throw new NotSupportedException("ANE attention not fully implemented");
         }
 
         /// <summary>
@@ -481,22 +466,8 @@ namespace ILGPU.Apple.NeuralEngine
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            unsafe
-            {
-                var sourceBuffer = sourceView.GetBuffer();
-                if (sourceBuffer is ANEBuffer aneSource)
-                {
-                    var src = (byte*)aneSource._nativePtr + sourceView.Index;
-                    var dst = (byte*)_nativePtr + targetView.Index;
-                    var length = Math.Min(sourceView.Length, targetView.Length);
-                    Buffer.MemoryCopy(src, dst, length, length);
-                }
-                else
-                {
-                    // Fallback to base implementation
-                    base.CopyFrom(stream, sourceView, targetView);
-                }
-            }
+            // TODO: Implement proper buffer access for ANE
+            throw new NotSupportedException("ANE buffer access not implemented");
         }
 
         /// <summary>
@@ -507,22 +478,8 @@ namespace ILGPU.Apple.NeuralEngine
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            unsafe
-            {
-                var targetBuffer = targetView.GetBuffer();
-                if (targetBuffer is ANEBuffer aneTarget)
-                {
-                    var src = (byte*)_nativePtr + sourceView.Index;
-                    var dst = (byte*)aneTarget._nativePtr + targetView.Index;
-                    var length = Math.Min(sourceView.Length, targetView.Length);
-                    Buffer.MemoryCopy(src, dst, length, length);
-                }
-                else
-                {
-                    // Fallback to base implementation
-                    base.CopyTo(stream, sourceView, targetView);
-                }
-            }
+            // TODO: Implement proper buffer access for ANE
+            throw new NotSupportedException("ANE buffer access not implemented");
         }
 
         /// <summary>

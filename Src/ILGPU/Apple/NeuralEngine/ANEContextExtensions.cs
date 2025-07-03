@@ -75,8 +75,10 @@ namespace ILGPU.Apple.NeuralEngine
             var devices = context.GetAppleNeuralEngineDevices();
             if (devices.Count < 1)
                 throw new NotSupportedException("No Apple Neural Engine device available");
-            return devices[0].CreateAccelerator(context) as AppleNeuralEngineAccelerator
-                ?? throw new InvalidOperationException("Failed to create Apple Neural Engine accelerator");
+            var accelerator = devices[0].CreateAccelerator(context);
+            if (accelerator is AppleNeuralEngineAccelerator aneAccelerator)
+                return aneAccelerator;
+            throw new InvalidOperationException("Failed to create Apple Neural Engine accelerator");
         }
 
         #endregion

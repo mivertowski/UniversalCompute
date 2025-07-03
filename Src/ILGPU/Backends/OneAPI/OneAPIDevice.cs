@@ -135,10 +135,8 @@ namespace ILGPU.Backends.OneAPI
                 _ => AcceleratorType.OneAPI
             };
 
-            return new Device(
-                name: Name,
-                acceleratorId: 0, // Will be set by Context
-                acceleratorType: acceleratorType);
+            // TODO: Implement proper Device creation - Device is abstract
+            throw new NotSupportedException("OneAPI device creation not implemented - Device is abstract");
         }
 
         /// <summary>

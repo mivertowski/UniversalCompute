@@ -539,7 +539,7 @@ namespace ILGPU.AI.ONNX
             
             var dataPtr = data.LoadEffectiveAddressAsPtr().ToPointer();
             return ONNXNative.CreateTensorWithData(
-                dataPtr,
+                new IntPtr(dataPtr),
                 dataSize,
                 shape,
                 (ulong)shape.Length,

@@ -350,7 +350,7 @@ namespace ILGPU.Numerics.Hybrid
                 SupportsHybridExecution = cpuAccelerator != null && gpuAccelerator != null,
                 MaxCpuCores = Environment.ProcessorCount,
                 MaxGpuDevices = accelerators.Length,
-                SupportedPrecisions = gpuAccelerator?.GetSupportedTensorPrecisions() ?? [],
+                SupportedPrecisions = gpuAccelerator?.GetSupportedTensorPrecisions().ToList() ?? new List<TensorPrecision>(),
                 GpuMemoryBytes = gpuAccelerator?.MemorySize ?? 0,
                 CpuMemoryBytes = GC.GetTotalMemory(false)
             };

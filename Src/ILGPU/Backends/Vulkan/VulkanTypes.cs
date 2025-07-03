@@ -516,7 +516,7 @@ namespace ILGPU.Backends.Vulkan
         public VulkanBuffer CreateBuffer(ulong size, VulkanBufferUsage usage, VulkanMemoryType memoryType)
         {
             // Simplified implementation
-            return new VulkanBuffer(null, (long)size, 4); // Placeholder
+            return new VulkanBuffer(null!, (long)size, 4); // Placeholder
         }
 
         /// <summary>

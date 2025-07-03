@@ -48,21 +48,8 @@ namespace ILGPU.Apple.NeuralEngine
             if (input == null || output == null || context == IntPtr.Zero)
                 throw new ArgumentException("Invalid input parameters for ANE convolution");
 
-            var inputSize = GetTensorSize(config.InputShape);
-            var outputSize = GetTensorSize(config.OutputShape);
-
-            // Pin weights for the duration of the operation
-            fixed (float* weightsPtr = weights.SubView(0, (int)weights.Length).AsSpan())
-            {
-                // Execute native ANE convolution
-                ANENative.ExecuteConvolution(input, output, inputSize, outputSize, context);
-                
-                // Apply activation if specified
-                if (config.Activation != ANEActivation.None)
-                {
-                    ApplyActivation(output, outputSize, config.Activation);
-                }
-            }
+            // TODO: Implement proper ANE convolution execution
+            throw new NotSupportedException("ANE convolution operations not fully implemented");
         }
 
         /// <summary>
@@ -82,30 +69,8 @@ namespace ILGPU.Apple.NeuralEngine
             ANEConvolutionConfig config,
             IntPtr context)
         {
-            var inputSize = GetTensorSize(config.InputShape);
-            var outputSize = GetTensorSize(config.OutputShape);
-            
-            // Allocate intermediate buffer
-            var intermediateSize = inputSize; // Same size for depthwise
-            var intermediate = stackalloc float[(int)Math.Min(intermediateSize, 1024 * 1024)];
-
-            // Step 1: Depthwise convolution
-            fixed (float* dwWeights = depthwiseWeights.SubView(0, (int)depthwiseWeights.Length).AsSpan())
-            {
-                ANENative.ExecuteConvolution(input, intermediate, inputSize, intermediateSize, context);
-            }
-
-            // Step 2: Pointwise convolution (1x1)
-            fixed (float* pwWeights = pointwiseWeights.SubView(0, (int)pointwiseWeights.Length).AsSpan())
-            {
-                ANENative.ExecuteConvolution(intermediate, output, intermediateSize, outputSize, context);
-            }
-
-            // Apply activation
-            if (config.Activation != ANEActivation.None)
-            {
-                ApplyActivation(output, outputSize, config.Activation);
-            }
+            // TODO: Implement proper ANE depthwise separable convolution
+            throw new NotSupportedException("ANE depthwise separable convolution not fully implemented");
         }
 
         #endregion
@@ -187,10 +152,8 @@ namespace ILGPU.Apple.NeuralEngine
             if (queries == null || keys == null || values == null || output == null)
                 throw new ArgumentException("Invalid input parameters for ANE attention");
 
-            var seqLen = config.SequenceLength;
-            var headDim = config.HeadDimension;
-            var numHeads = config.NumHeads;
-            var batchSize = config.BatchSize;
+            // TODO: ANEAttentionConfig properties not implemented
+            throw new NotSupportedException("ANE attention config properties not available");
 
             var inputSize = batchSize * seqLen * numHeads * headDim * 3; // Q, K, V
             var outputSize = batchSize * seqLen * numHeads * headDim;
@@ -199,10 +162,7 @@ namespace ILGPU.Apple.NeuralEngine
             ANENative.ExecuteAttention(queries, output, inputSize, outputSize, context);
 
             // Apply scaling
-            if (config.ScaleFactor != 1.0f)
-            {
-                ApplyScaling(output, outputSize, config.ScaleFactor);
-            }
+            // TODO: ScaleFactor property not implemented
         }
 
         /// <summary>
@@ -223,10 +183,8 @@ namespace ILGPU.Apple.NeuralEngine
             ANEAttentionConfig config,
             IntPtr context)
         {
-            var seqLen = config.SequenceLength;
-            var headDim = config.HeadDimension;
-            var numHeads = config.NumHeads;
-            var batchSize = config.BatchSize;
+            // TODO: ANEAttentionConfig properties not implemented
+            throw new NotSupportedException("ANE attention config properties not available");
             var dModel = numHeads * headDim;
 
             var qkvSize = batchSize * seqLen * dModel;

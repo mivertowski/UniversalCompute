@@ -41,7 +41,7 @@ namespace ILGPU.Memory.Unified
             get
             {
                 // Default implementation requires GetNativeBuffer to be implemented
-                var nativeBuffer = GetNativeBuffer(null);
+                var nativeBuffer = GetNativeBuffer(default!);
                 return nativeBuffer?.View ?? throw new InvalidOperationException("No native buffer available for view access");
             }
         }
@@ -51,14 +51,14 @@ namespace ILGPU.Memory.Unified
             if (width * height > Length)
                 throw new ArgumentException("2D view dimensions exceed buffer size");
             var view1D = View;
-            return view1D.As2DDenseXView(new LongIndex2D(width, height));
+            return view1D.As2DView(width, height);
         }
         public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth)
         {
             if (width * height * depth > Length)
                 throw new ArgumentException("3D view dimensions exceed buffer size");
             var view1D = View;
-            return view1D.As3DDenseXYView(new LongIndex3D(width, height, depth));
+            return view1D.As3DView(width, height, depth);
         }
         public virtual void CopyFromCPU(ReadOnlySpan<T> source)
         {

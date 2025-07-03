@@ -62,6 +62,7 @@ namespace ILGPU.Backends.WebGPU
             AcceleratorStream stream,
             TIndex extent,
             KernelParameters parameters)
+            where TIndex : struct, IIndex
         {
             ThrowIfDisposed();
 
@@ -175,7 +176,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
             throw new NotSupportedException($"Index type {typeof(TIndex)} not supported");
         }
 
-        private async Task<WebGPUBindGroup> CreateBindGroupAsync(KernelParameters parameters)
+        private Task<WebGPUBindGroup> CreateBindGroupAsync(KernelParameters parameters)
         {
             // This would create a bind group that binds all kernel parameters
             // (buffers, textures, uniform data, etc.) to the compute shader
@@ -187,7 +188,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
             var entries = CreateBindGroupEntries(parameters);
             
             // For now, return a placeholder bind group
-            return _accelerator.CreateBindGroup(layout, entries);
+            return Task.FromResult(_accelerator.CreateBindGroup(layout, entries));
         }
 
         private WebGPUBindGroupEntry[] CreateBindGroupEntries(KernelParameters parameters)
@@ -284,7 +285,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         protected override ProfilingMarker AddProfilingMarkerInternal()
         {
             // WebGPU profiling would typically use performance markers
-            return default;
+            return default!;
         }
 
         /// <summary>
