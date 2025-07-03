@@ -20,6 +20,7 @@
 using ILGPU.Backends;
 using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.AMX.Native;
+using ILGPU.Runtime.CPU;
 using ILGPU.Util;
 using System;
 using System.Collections.Immutable;

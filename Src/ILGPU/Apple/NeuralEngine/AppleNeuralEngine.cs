@@ -87,6 +87,9 @@ namespace ILGPU.Apple.NeuralEngine
 
                 // TODO: TensorShape conversion errors - int[] to TensorShape not supported
                 throw new NotSupportedException("Apple Neural Engine operations not implemented - TensorShape API incompatible");
+#pragma warning disable CS0162 // Unreachable code detected
+                return default(ITensor<T>)!;
+#pragma warning restore CS0162 // Unreachable code detected
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -136,6 +139,9 @@ namespace ILGPU.Apple.NeuralEngine
 
                 // TODO: TensorShape conversion errors - int[] to TensorShape not supported
                 throw new NotSupportedException("Apple Neural Engine convolution not implemented - TensorShape API incompatible");
+#pragma warning disable CS0162 // Unreachable code detected
+                return default(ITensor<float>)!;
+#pragma warning restore CS0162 // Unreachable code detected
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -186,6 +192,9 @@ namespace ILGPU.Apple.NeuralEngine
 
                 // TODO: Implement proper CoreML model loading with ANE capabilities
                 throw new NotSupportedException("CoreML model loading with ANE not fully implemented");
+#pragma warning disable CS0162 // Unreachable code detected
+                return default(CoreMLModel)!;
+#pragma warning restore CS0162 // Unreachable code detected
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -208,6 +217,9 @@ namespace ILGPU.Apple.NeuralEngine
 
                 // TODO: Implement ANE model compiler
                 throw new NotSupportedException("ANE model compiler not implemented");
+#pragma warning disable CS0162 // Unreachable code detected
+                return default(CoreMLModel)!;
+#pragma warning restore CS0162 // Unreachable code detected
             }, cancellationToken).ConfigureAwait(false);
         }
 

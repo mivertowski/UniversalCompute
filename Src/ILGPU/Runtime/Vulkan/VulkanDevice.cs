@@ -257,7 +257,7 @@ namespace ILGPU.Runtime.Vulkan
                 {
                     // Enumerate physical devices
                     uint deviceCount = 0;
-                    result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, IntPtr.Zero);
+                    result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, null);
                     if (result != VkResult.VK_SUCCESS || deviceCount == 0)
                         return Array.Empty<VulkanDevice>();
 

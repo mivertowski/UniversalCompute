@@ -84,13 +84,12 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.LoadEffectiveAddressAsPtr().ToPointer())
-            fixed (float* outputPtr = output.LoadEffectiveAddressAsPtr().ToPointer())
-            {
-                NPUOperations.ExecuteConvolution(
-                    inputPtr, weights, outputPtr, 
-                    config, _npuContext);
-            }
+            var inputPtr = (float*)input.LoadEffectiveAddress();
+            var outputPtr = (float*)output.LoadEffectiveAddress();
+            
+            NPUOperations.ExecuteConvolution(
+                inputPtr, weights, outputPtr, 
+                config, _npuContext);
         }
 
         /// <summary>
@@ -110,13 +109,12 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (float* aPtr = a.LoadEffectiveAddressAsPtr().ToPointer())
-            fixed (float* bPtr = b.LoadEffectiveAddressAsPtr().ToPointer())
-            fixed (float* cPtr = c.LoadEffectiveAddressAsPtr().ToPointer())
-            {
-                NPUOperations.ExecuteMatrixMultiply(
-                    aPtr, bPtr, cPtr, m, n, k, _npuContext);
-            }
+            var aPtr = (float*)a.LoadEffectiveAddress();
+            var bPtr = (float*)b.LoadEffectiveAddress();
+            var cPtr = (float*)c.LoadEffectiveAddress();
+            
+            NPUOperations.ExecuteMatrixMultiply(
+                aPtr, bPtr, cPtr, m, n, k, _npuContext);
         }
 
         /// <summary>
@@ -132,14 +130,13 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.LoadEffectiveAddressAsPtr().ToPointer())
-            fixed (float* outputPtr = output.LoadEffectiveAddressAsPtr().ToPointer())
-            {
-                NPUNative.ExecuteOpenVINOInference(
-                    inputPtr, outputPtr, 
-                    input.Length, output.Length,
-                    model.ModelHandle, _npuContext);
-            }
+            var inputPtr = (float*)input.LoadEffectiveAddress();
+            var outputPtr = (float*)output.LoadEffectiveAddress();
+            
+            NPUNative.ExecuteOpenVINOInference(
+                inputPtr, outputPtr, 
+                input.Length, output.Length,
+                model.ModelHandle, _npuContext);
         }
 
         /// <summary>
@@ -157,13 +154,12 @@ namespace ILGPU.Intel.NPU
         {
             ThrowIfDisposed();
             
-            fixed (sbyte* inputPtr = input.LoadEffectiveAddressAsPtr().ToPointer())
-            fixed (sbyte* weightsPtr = weights.LoadEffectiveAddressAsPtr().ToPointer())
-            fixed (float* outputPtr = output.LoadEffectiveAddressAsPtr().ToPointer())
-            {
-                NPUOperations.ExecuteQuantizedInference(
-                    inputPtr, weightsPtr, outputPtr, config, _npuContext);
-            }
+            var inputPtr = (sbyte*)input.LoadEffectiveAddress();
+            var weightsPtr = (sbyte*)weights.LoadEffectiveAddress();
+            var outputPtr = (float*)output.LoadEffectiveAddress();
+            
+            NPUOperations.ExecuteQuantizedInference(
+                inputPtr, weightsPtr, outputPtr, config, _npuContext);
         }
 
         /// <summary>

@@ -21,8 +21,8 @@ using System;
 using System.Diagnostics;
 #if WINDOWS
 using System.Management;
-#endif
 
+#endif
 namespace ILGPU.Runtime.AMX
 {
     /// <summary>
@@ -249,6 +249,7 @@ namespace ILGPU.Runtime.AMX
                 int maxTurboFrequency = 3600; // Default 3.6 GHz
 
                 // Try to get detailed processor information on Windows
+#if WINDOWS
                 if (OperatingSystem.IsWindows())
                 {
                     try
@@ -298,6 +299,7 @@ namespace ILGPU.Runtime.AMX
                     }
                 }
 
+#endif
                 // Detect AMX capabilities based on processor generation
                 bool supportsBF16 = processorName.Contains("Xeon") || 
                                    processorName.Contains("12th Gen") || 
@@ -349,6 +351,7 @@ namespace ILGPU.Runtime.AMX
         {
             try
             {
+#if WINDOWS
                 if (OperatingSystem.IsWindows())
                 {
                     using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
@@ -359,7 +362,8 @@ namespace ILGPU.Runtime.AMX
                             return Convert.ToInt64(totalMemory);
                     }
                 }
-                else
+#endif
+                if (!OperatingSystem.IsWindows())
                 {
                     // Try to read /proc/meminfo on Linux
                     var meminfo = System.IO.File.ReadAllText("/proc/meminfo");

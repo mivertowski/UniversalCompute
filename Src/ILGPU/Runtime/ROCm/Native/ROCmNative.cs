@@ -352,10 +352,10 @@ namespace ILGPU.Runtime.ROCm.Native
                     0, 0,   // transA, transB (no transpose)
                     m, n, k,
                     1.0f,   // alpha
-                    a, k,   // a, lda
-                    b, n,   // b, ldb  
+                    (IntPtr)a, k,   // a, lda
+                    (IntPtr)b, n,   // b, ldb  
                     0.0f,   // beta
-                    c, n);  // c, ldc
+                    (IntPtr)c, n);  // c, ldc
             }
             catch (DllNotFoundException)
             {

@@ -167,7 +167,7 @@ namespace ILGPU.Core
             if (buffer.Length != shape.ElementCount)
                 throw new ArgumentException("Buffer length must match shape element count");
 
-            var data = buffer.GetAsArray();
+            var data = buffer.GetAsArray1D();
             return TensorFactory.FromArray(buffer.Accelerator, shape, data);
         }
 

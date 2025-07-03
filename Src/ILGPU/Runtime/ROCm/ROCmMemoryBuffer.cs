@@ -116,7 +116,7 @@ namespace ILGPU.Runtime.ROCm
             else
             {
                 // Synchronous fallback
-                SetMemoryToValue(targetView.Index, value, targetView.Length);
+                SetMemoryToValue((nint)targetView.Index, value, (nint)targetView.Length);
             }
         }
 
@@ -148,7 +148,7 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            targetPtr, sourcePtr, (nuint)targetView.Length, 
+                            targetPtr, sourcePtr, (ulong)targetView.Length, 
                             HipMemcpyKind.HostToDevice);
                         ROCmException.ThrowIfFailed(result);
                     }
@@ -204,7 +204,7 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            targetPtr, sourcePtr, (nuint)sourceView.Length,
+                            targetPtr, sourcePtr, (ulong)sourceView.Length,
                             HipMemcpyKind.DeviceToHost);
                         ROCmException.ThrowIfFailed(result);
                     }

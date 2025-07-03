@@ -193,7 +193,7 @@ namespace ILGPU.Runtime.Vulkan
             try
             {
                 uint queueFamilyCount = 0;
-                VulkanNative.GetPhysicalDeviceQueueFamilyProperties(Device.PhysicalDevice, ref queueFamilyCount, IntPtr.Zero);
+                VulkanNative.GetPhysicalDeviceQueueFamilyProperties(Device.PhysicalDevice, ref queueFamilyCount, null);
 
                 if (queueFamilyCount == 0)
                     return 0;
@@ -245,14 +245,14 @@ namespace ILGPU.Runtime.Vulkan
         public MemoryInfo MemoryInfo => new MemoryInfo(
             totalMemory: Device.MemorySize,
             availableMemory: Device.MemorySize, // TODO: Get actual available memory
-            memoryBandwidth: 0L, // TODO: Get actual memory bandwidth
-            cacheSize: 0L, // TODO: Get actual cache size
-            multiProcessorCount: 1, // TODO: Get actual compute unit count
-            supports64BitAtomics: true, // TODO: Check actual capability
-            supportsPageLockedAllocations: false, // TODO: Check actual capability
-            supportsUnifiedVirtualAddressing: false, // TODO: Check actual capability
-            pciBusId: 0, // TODO: Get actual PCI bus ID
-            pciDomainId: 0L); // TODO: Get actual PCI domain ID
+            usedMemory: 0L, // TODO: Calculate used memory
+            maxAllocationSize: Device.MemorySize, // TODO: Get actual max allocation size
+            allocationGranularity: 1, // TODO: Get actual granularity
+            supportsVirtualMemory: false, // TODO: Check actual capability
+            supportsMemoryMapping: false, // TODO: Check actual capability
+            supportsZeroCopy: false, // TODO: Check actual capability
+            cacheLineSize: 64, // TODO: Get actual cache line size
+            memoryBandwidth: 0L); // TODO: Get actual memory bandwidth
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
