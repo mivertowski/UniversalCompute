@@ -36,7 +36,7 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="accelerator">The Vulkan accelerator.</param>
         /// <param name="compiledKernel">The compiled kernel.</param>
         public VulkanKernel(VulkanAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel.Info)
+            : base(accelerator, compiledKernel, null)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
@@ -219,7 +219,7 @@ namespace ILGPU.Backends.Vulkan
         protected override ProfilingMarker AddProfilingMarkerInternal()
         {
             // Vulkan profiling would typically use timestamp queries
-            return ProfilingMarker.Empty;
+            return default;
         }
 
         /// <summary>

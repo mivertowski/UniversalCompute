@@ -441,7 +441,7 @@ namespace ILGPU.AI.Memory
             var nonZeroCount = accelerator.Allocate1D<int>(1);
             var countKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<int>, T, int>(CountNonZeroKernel);
-            countKernel(new Index1D(dense.Length), dense, nonZeroCount.View, threshold, dense.Length);
+            countKernel(new Index1D(dense.IntLength), dense, nonZeroCount.View, threshold, dense.IntLength);
 
             accelerator.Synchronize();
             var count = nonZeroCount.GetAsArray1D()[0];
@@ -455,7 +455,7 @@ namespace ILGPU.AI.Memory
             var extractKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<T>, ArrayView<int>, ArrayView<int>,
                 T, int, int>(ExtractSparseKernel);
-            extractKernel(new Index1D(dense.Length), dense, values.View, rowIndices.View, colIndices.View, threshold, rows, cols);
+            extractKernel(new Index1D(dense.IntLength), dense, values.View, rowIndices.View, colIndices.View, threshold, rows, cols);
 
             nonZeroCount.Dispose();
 
@@ -483,13 +483,14 @@ namespace ILGPU.AI.Memory
             ArrayView<T> dense) where T : unmanaged
         {
             // Clear dense array first
-            accelerator.Initialize(dense, default(T));
+            var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<T>, T>(ClearArrayKernel);
+            clearKernel(new Index1D(dense.IntLength), dense, default(T));
 
             // Scatter sparse values to dense array
             var scatterKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<T>, ArrayView<int>, ArrayView<int>, ArrayView<T>, int>(
                 ScatterSparseKernel);
-            scatterKernel(new Index1D(sparse.Values.Length), sparse.Values, sparse.RowIndices, sparse.ColIndices, dense, sparse.Cols);
+            scatterKernel(new Index1D(sparse.Values.IntLength), sparse.Values, sparse.RowIndices, sparse.ColIndices, dense, sparse.Cols);
         }
 
         /// <summary>
@@ -589,6 +590,15 @@ namespace ILGPU.AI.Memory
             {
                 dense[denseIndex] = values[index];
             }
+        }
+
+        /// <summary>
+        /// Kernel to clear an array with a specific value.
+        /// </summary>
+        private static void ClearArrayKernel<T>(Index1D index, ArrayView<T> array, T value) where T : unmanaged
+        {
+            if (index < array.Length)
+                array[index] = value;
         }
 
         #endregion

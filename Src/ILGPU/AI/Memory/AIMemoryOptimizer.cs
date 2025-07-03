@@ -352,7 +352,7 @@ namespace ILGPU.AI.Memory
             {
                 var elementSize = type == typeof(float) ? 4 :
                                 type == typeof(double) ? 8 :
-                                type == typeof(half) ? 2 :
+                                type == typeof(Half) ? 2 :
                                 type == typeof(int) ? 4 :
                                 type == typeof(byte) ? 1 : 4;
                 
@@ -437,7 +437,7 @@ namespace ILGPU.AI.Memory
             var maxElementSize = dataTypes.Max(t => 
                 t == typeof(double) ? 8 :
                 t == typeof(float) || t == typeof(int) ? 4 :
-                t == typeof(half) ? 2 : 1);
+                t == typeof(Half) ? 2 : 1);
             
             // Increase alignment for certain access patterns
             var baseAlignment = accessPattern switch

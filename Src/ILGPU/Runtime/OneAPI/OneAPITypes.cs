@@ -287,7 +287,7 @@ namespace ILGPU.Runtime.OneAPI
         public OneAPIKernel(
             IntelOneAPIAccelerator accelerator,
             OneAPICompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel)
+            : base(accelerator, compiledKernel, null)
         {
             // Simplified implementation for compatibility
         }

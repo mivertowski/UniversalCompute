@@ -39,7 +39,7 @@ namespace ILGPU.Backends.WebGPU
         /// <param name="accelerator">The WebGPU accelerator.</param>
         /// <param name="compiledKernel">The compiled kernel.</param>
         public WebGPUKernel(WebGPUAccelerator accelerator, CompiledKernel compiledKernel)
-            : base(accelerator, compiledKernel.Info)
+            : base(accelerator, compiledKernel, null)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
@@ -284,7 +284,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         protected override ProfilingMarker AddProfilingMarkerInternal()
         {
             // WebGPU profiling would typically use performance markers
-            return ProfilingMarker.Empty;
+            return default;
         }
 
         /// <summary>
