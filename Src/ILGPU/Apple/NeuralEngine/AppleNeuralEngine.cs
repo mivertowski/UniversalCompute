@@ -325,25 +325,17 @@ namespace ILGPU.Apple.NeuralEngine
         private void ExecuteANEConvolution(ITensor<float> input, ITensor<float> weights, ITensor<float> bias, 
             ITensor<float> result, ANEConvolutionParameters parameters)
         {
-            unsafe
-            {
-                ANENative.ExecuteConvolutionWithBias(
-                    // TODO: Implement proper tensor data pointer access
-                    throw new NotSupportedException("ANE convolution tensor access not implemented");
-                    1000, 1000, 1000, _aneContext);
-            }
+            
+            // TODO: Implement proper tensor data pointer access
+            throw new NotSupportedException("ANE convolution tensor access not implemented");
+            
         }
 
         private void ExecuteANEAttention(ITensor<float> query, ITensor<float> key, ITensor<float> value, 
             ITensor<float> result, ANEAttentionParameters parameters)
         {
-            unsafe
-            {
-                ANENative.ExecuteMultiHeadAttention(
-                    // TODO: Implement proper tensor data pointer access
-                    throw new NotSupportedException("ANE attention tensor access not implemented");
-                    1000, 1000, 1000, _aneContext);
-            }
+            // TODO: Implement proper tensor data pointer access
+            throw new NotSupportedException("ANE attention tensor access not implemented");
         }
 
         private static TensorShape CalculateConvolutionOutputShape(TensorShape inputShape, TensorShape weightsShape, 
