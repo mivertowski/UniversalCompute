@@ -82,10 +82,10 @@ namespace ILGPU.SourceGenerators.Generators
 
             // Check for specific ILGPU types
             var typeName = type.ToDisplayString();
-            if (typeName.Contains("ArrayView") || 
-                typeName.Contains("MemoryBuffer") ||
-                typeName.Contains("Index") ||
-                typeName.Contains("Stride"))
+            if (typeName.IndexOf("ArrayView", StringComparison.Ordinal) >= 0 || 
+                typeName.IndexOf("MemoryBuffer", StringComparison.Ordinal) >= 0 ||
+                typeName.IndexOf("Index", StringComparison.Ordinal) >= 0 ||
+                typeName.IndexOf("Stride", StringComparison.Ordinal) >= 0)
                 return true;
 
             return false;

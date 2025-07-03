@@ -82,7 +82,7 @@ namespace ILGPU.SourceGenerators.Generators
             {
                 var assembly = Assembly.GetExecutingAssembly();
                 var resourcePath = assembly.GetManifestResourceNames()
-                    .FirstOrDefault(name => name.EndsWith(resourceName));
+                    .FirstOrDefault(name => name.EndsWith(resourceName, StringComparison.Ordinal));
 
                 if (resourcePath == null)
                     return null;
@@ -422,9 +422,9 @@ namespace ILGPU.SourceGenerators.Generators
                 
                 if (!string.IsNullOrEmpty(flags))
                 {
-                    if (flags!.Contains("Out"))
+                    if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
                         return $"out {paramName}";
-                    if (flags!.Contains("Ref"))
+                    if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
                         return $"ref {paramName}";
                 }
                 
@@ -491,9 +491,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             if (!string.IsNullOrEmpty(flags))
             {
-                if (flags!.Contains("Out"))
+                if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
                     return $"out {type}";
-                if (flags!.Contains("Ref"))
+                if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
                     return $"ref {type}";
             }
 
@@ -510,9 +510,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             if (!string.IsNullOrEmpty(dllFlags))
             {
-                if (dllFlags!.Contains("In"))
+                if (dllFlags!.IndexOf("In", StringComparison.Ordinal) >= 0)
                     attributes.Add("In");
-                if (dllFlags!.Contains("Out"))
+                if (dllFlags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
                     attributes.Add("Out");
             }
 
@@ -520,9 +520,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             if (!string.IsNullOrEmpty(flags))
             {
-                if (flags!.Contains("Out"))
+                if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
                     return $"{attributeString}out {type}";
-                if (flags!.Contains("Ref"))
+                if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
                     return $"{attributeString}ref {type}";
             }
 
@@ -537,9 +537,9 @@ namespace ILGPU.SourceGenerators.Generators
             // Match the parameter directions from the abstract method declarations
             if (!string.IsNullOrEmpty(flags))
             {
-                if (flags!.Contains("Out"))
+                if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
                     return $"out {type}";
-                if (flags!.Contains("Ref"))
+                if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
                     return $"ref {type}";
             }
 

@@ -235,32 +235,32 @@ namespace ILGPU.Runtime.HardwareDetection
             var deviceName = props.Name?.ToLowerInvariant() ?? "";
             
             // RDNA3 (gfx11xx)
-            if (deviceName.Contains("7900") || deviceName.Contains("7800") || deviceName.Contains("7700"))
+            if (deviceName.Contains("7900", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7800", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7700", StringComparison.OrdinalIgnoreCase))
                 return 113; // RDNA3 generation
 
             // RDNA2 (gfx10xx)  
-            if (deviceName.Contains("6900") || deviceName.Contains("6800") || deviceName.Contains("6700") || 
-                deviceName.Contains("6600") || deviceName.Contains("6500") || deviceName.Contains("6400"))
+            if (deviceName.Contains("6900", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6800", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6700", StringComparison.OrdinalIgnoreCase) || 
+                deviceName.Contains("6600", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6500", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6400", StringComparison.OrdinalIgnoreCase))
                 return 103; // RDNA2 generation
 
             // RDNA1 (gfx10xx)
-            if (deviceName.Contains("5700") || deviceName.Contains("5600") || deviceName.Contains("5500"))
+            if (deviceName.Contains("5700", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("5600", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("5500", StringComparison.OrdinalIgnoreCase))
                 return 101; // RDNA1 generation
 
             // CDNA2 (MI200 series)
-            if (deviceName.Contains("mi250") || deviceName.Contains("mi210"))
+            if (deviceName.Contains("mi250", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("mi210", StringComparison.OrdinalIgnoreCase))
                 return 90; // CDNA2 (gfx90a)
 
             // CDNA1 (MI100)
-            if (deviceName.Contains("mi100"))
+            if (deviceName.Contains("mi100", StringComparison.OrdinalIgnoreCase))
                 return 90; // CDNA1 (gfx908)
 
             // GCN5 (Vega)
-            if (deviceName.Contains("vega") || deviceName.Contains("radeon vii"))
+            if (deviceName.Contains("vega", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("radeon vii", StringComparison.OrdinalIgnoreCase))
                 return 90; // GCN5 (gfx906)
 
             // GCN4 (Polaris, older Vega)
-            if (deviceName.Contains("polaris") || deviceName.Contains("rx 480") || deviceName.Contains("rx 580"))
+            if (deviceName.Contains("polaris", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("rx 480", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("rx 580", StringComparison.OrdinalIgnoreCase))
                 return 80; // GCN4 
 
             // Conservative fallback

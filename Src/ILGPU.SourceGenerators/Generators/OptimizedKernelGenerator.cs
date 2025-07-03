@@ -74,17 +74,17 @@ namespace ILGPU.SourceGenerators.Generators
         private static bool IsPerformanceCriticalAttribute(AttributeSyntax attribute)
         {
             var name = attribute.Name.ToString();
-            return name.Contains("Kernel") ||
-                   name.Contains("Performance") ||
-                   name.Contains("HotPath") ||
-                   name.Contains("Optimize");
+            return name.IndexOf("Kernel", StringComparison.Ordinal) >= 0 ||
+                   name.IndexOf("Performance", StringComparison.Ordinal) >= 0 ||
+                   name.IndexOf("HotPath", StringComparison.Ordinal) >= 0 ||
+                   name.IndexOf("Optimize", StringComparison.Ordinal) >= 0;
         }
 
         private static bool HasParameterSpecializationOpportunities(MethodDeclarationSyntax method)
         {
             // Check for compile-time constant parameters
             return method.ParameterList.Parameters
-                .Any(p => p.Type?.ToString().Contains("const") == true ||
+                .Any(p => p.Type?.ToString().IndexOf("const", StringComparison.Ordinal) >= 0 ||
                          p.Default != null);
         }
 
@@ -151,9 +151,9 @@ namespace ILGPU.SourceGenerators.Generators
                 if (paramType == "int" || paramType == "long")
                 {
                     var paramName = parameter.Identifier.ValueText;
-                    if (paramName.ToLowerInvariant().Contains("size") ||
-                        paramName.ToLowerInvariant().Contains("length") ||
-                        paramName.ToLowerInvariant().Contains("count"))
+                    if (paramName.ToLowerInvariant().IndexOf("size", StringComparison.Ordinal) >= 0 ||
+                        paramName.ToLowerInvariant().IndexOf("length", StringComparison.Ordinal) >= 0 ||
+                        paramName.ToLowerInvariant().IndexOf("count", StringComparison.Ordinal) >= 0)
                     {
                         analysis.SpecializableParameters.Add(paramName);
                     }
@@ -247,14 +247,14 @@ namespace ILGPU.SourceGenerators.Generators
         {
             // Check if access pattern is sequential (i, i+1, i+2, etc.)
             return access.ArgumentList.Arguments.Count == 1 &&
-                   access.ArgumentList.Arguments[0].Expression.ToString().Contains("+");
+                   access.ArgumentList.Arguments[0].Expression.ToString().IndexOf("+", StringComparison.Ordinal) >= 0;
         }
 
         private static bool IsCoalescableAccess(ElementAccessExpressionSyntax access)
         {
             // Check if memory access can be coalesced with others
-            return access.Expression.ToString().Contains("arrayView") ||
-                   access.Expression.ToString().Contains("buffer");
+            return access.Expression.ToString().IndexOf("arrayView", StringComparison.Ordinal) >= 0 ||
+                   access.Expression.ToString().IndexOf("buffer", StringComparison.Ordinal) >= 0;
         }
 
         private static bool IsVectorizable(AssignmentExpressionSyntax assignment)
