@@ -131,12 +131,10 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream && sourceView.Source is ROCmMemoryBuffer sourceBuffer)
+            if (stream is ROCmStream rocmStream)
             {
-                rocmStream.CopyMemoryAsync(
-                    sourceBuffer, this,
-                    sourceView.Index, targetView.Index,
-                    targetView.Length);
+                // TODO: ROCm async copy not implemented - ArrayView.Source property not available
+                throw new NotSupportedException("ROCm async copy operations not implemented");
             }
             else
             {
@@ -150,24 +148,30 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            targetPtr, sourcePtr, (ulong)targetView.Length, 
+                            targetPtr, sourcePtr, (nuint)targetView.Length, 
                             HipMemcpyKind.HostToDevice);
                         ROCmException.ThrowIfFailed(result);
                     }
                     catch (Exception)
                     {
                         // Fall back to unsafe copy
-                        Buffer.MemoryCopy(
-                            sourcePtr.ToPointer(), targetPtr.ToPointer(),
-                            LengthInBytes - targetView.Index, targetView.Length);
+                        unsafe
+                        {
+                            Buffer.MemoryCopy(
+                                (void*)sourcePtr, (void*)targetPtr,
+                                LengthInBytes - targetView.Index, targetView.Length);
+                        }
                     }
                 }
                 else
                 {
                     // Host-to-host copy
-                    Buffer.MemoryCopy(
-                        sourcePtr.ToPointer(), targetPtr.ToPointer(),
-                        LengthInBytes - targetView.Index, targetView.Length);
+                    unsafe
+                    {
+                        Buffer.MemoryCopy(
+                            (void*)sourcePtr, (void*)targetPtr,
+                            LengthInBytes - targetView.Index, targetView.Length);
+                    }
                 }
             }
         }
@@ -183,12 +187,10 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream && targetView.Source is ROCmMemoryBuffer targetBuffer)
+            if (stream is ROCmStream rocmStream)
             {
-                rocmStream.CopyMemoryAsync(
-                    this, targetBuffer,
-                    sourceView.Index, targetView.Index,
-                    sourceView.Length);
+                // TODO: ROCm async copy not implemented - ArrayView.Source property not available
+                throw new NotSupportedException("ROCm async copy operations not implemented");
             }
             else
             {
@@ -202,24 +204,30 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            targetPtr, sourcePtr, (ulong)sourceView.Length,
+                            targetPtr, sourcePtr, (nuint)sourceView.Length,
                             HipMemcpyKind.DeviceToHost);
                         ROCmException.ThrowIfFailed(result);
                     }
                     catch (Exception)
                     {
                         // Fall back to unsafe copy
-                        Buffer.MemoryCopy(
-                            sourcePtr.ToPointer(), targetPtr.ToPointer(),
-                            targetView.Length, sourceView.Length);
+                        unsafe
+                        {
+                            Buffer.MemoryCopy(
+                                (void*)sourcePtr, (void*)targetPtr,
+                                targetView.Length, sourceView.Length);
+                        }
                     }
                 }
                 else
                 {
                     // Host-to-host copy
-                    Buffer.MemoryCopy(
-                        sourcePtr.ToPointer(), targetPtr.ToPointer(),
-                        targetView.Length, sourceView.Length);
+                    unsafe
+                    {
+                        Buffer.MemoryCopy(
+                            (void*)sourcePtr, (void*)targetPtr,
+                            targetView.Length, sourceView.Length);
+                    }
                 }
             }
         }
@@ -230,7 +238,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="offset">The offset in bytes.</param>
         /// <param name="value">The value to set.</param>
         /// <param name="length">The length in bytes.</param>
-        private unsafe void SetMemoryToValue(long offset, byte value, long length)
+        private unsafe void SetMemoryToValue(nint offset, byte value, nint length)
         {
             var ptr = nativePtr + offset;
 
@@ -238,22 +246,22 @@ namespace ILGPU.Runtime.ROCm
             {
                 try
                 {
-                    var result = ROCmNative.Memset(ptr, value, (ulong)length);
+                    var result = ROCmNative.Memset(ptr, value, (nuint)length);
                     ROCmException.ThrowIfFailed(result);
                 }
                 catch (Exception)
                 {
                     // Fall back to CPU memset
-                    var bytePtr = (byte*)ptr.ToPointer();
-                    for (long i = 0; i < length; i++)
+                    var bytePtr = (byte*)ptr;
+                    for (nint i = 0; i < length; i++)
                         bytePtr[i] = value;
                 }
             }
             else
             {
                 // CPU memset for host memory
-                var bytePtr = (byte*)ptr.ToPointer();
-                for (long i = 0; i < length; i++)
+                var bytePtr = (byte*)ptr;
+                for (nint i = 0; i < length; i++)
                     bytePtr[i] = value;
             }
         }

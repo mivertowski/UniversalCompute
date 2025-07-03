@@ -85,11 +85,8 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var outputShape = operation.CalculateOutputShape(input.Shape);
-                var result = TensorFactory.Create<T>(outputShape, ComputeLocation.Npu);
-
-                ExecuteNeuralOperation(operation, input, result);
-                return result;
+                // TODO: TensorShape conversion errors - int[] to TensorShape not supported
+                throw new NotSupportedException("Apple Neural Engine operations not implemented - TensorShape API incompatible");
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -137,11 +134,8 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var outputShape = CalculateConvolutionOutputShape(input.Shape, weights.Shape, parameters);
-                var result = TensorFactory.Create<float>(outputShape, ComputeLocation.Npu);
-
-                ExecuteANEConvolution(input, weights, bias, result, parameters);
-                return result;
+                // TODO: TensorShape conversion errors - int[] to TensorShape not supported
+                throw new NotSupportedException("Apple Neural Engine convolution not implemented - TensorShape API incompatible");
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -192,8 +186,6 @@ namespace ILGPU.Apple.NeuralEngine
 
                 // TODO: Implement proper CoreML model loading with ANE capabilities
                 throw new NotSupportedException("CoreML model loading with ANE not fully implemented");
-
-                return model;
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -216,7 +208,6 @@ namespace ILGPU.Apple.NeuralEngine
 
                 // TODO: Implement ANE model compiler
                 throw new NotSupportedException("ANE model compiler not implemented");
-                return compiler.CompileForNeuralEngine(network, options);
             }, cancellationToken).ConfigureAwait(false);
         }
 
@@ -267,59 +258,14 @@ namespace ILGPU.Apple.NeuralEngine
         private void ExecuteNeuralOperation<T>(NeuralOperation operation, ITensor<T> input, ITensor<T> result)
             where T : unmanaged
         {
-            unsafe
-            {
-                // TODO: Implement proper tensor data access for ANE operations
-                throw new NotSupportedException("ANE neural operations not fully implemented - tensor data access needs implementation");
-
-                // Execute based on operation type
-                switch (operation.Type)
-                {
-                    case NeuralOperationType.Convolution:
-                        if (operation is ConvolutionOperation convOp)
-                        {
-                            ANENative.ExecuteConvolution(
-                                (float*)inputPtr, (float*)resultPtr,
-                                1000, 1000, // Placeholder sizes
-                                _aneContext);
-                        }
-                        break;
-
-                    case NeuralOperationType.MatMul:
-                        ANENative.ExecuteMatMul(
-                            (float*)inputPtr, (float*)resultPtr,
-                            1000, 1000, // Placeholder sizes
-                            _aneContext);
-                        break;
-
-                    case NeuralOperationType.Attention:
-                        if (operation is AttentionOperation attOp)
-                        {
-                            ANENative.ExecuteAttention(
-                                (float*)inputPtr, (float*)resultPtr,
-                                1000, 1000, // Placeholder sizes
-                                _aneContext);
-                        }
-                        break;
-
-                    default:
-                        throw new NotSupportedException($"Neural operation {operation.Type} not supported on ANE");
-                }
-            }
+            // TODO: Implement proper tensor data access for ANE operations
+            throw new NotSupportedException("ANE neural operations not fully implemented - tensor data access needs implementation");
         }
 
         private void ExecuteCoreMLInference(CoreMLModel model, ITensor<float> input, ITensor<float> result)
         {
-            unsafe
-            {
-                // TODO: Implement proper tensor data access for ANE operations
-                throw new NotSupportedException("ANE neural operations not fully implemented - tensor data access needs implementation");
-
-                ANENative.ExecuteCoreMLInference(
-                    (float*)inputPtr, (float*)resultPtr,
-                    1000, 1000, // Placeholder sizes
-                    model.NativeHandle, _aneContext);
-            }
+            // TODO: Implement proper CoreML inference with ANE
+            throw new NotSupportedException("CoreML inference with ANE not fully implemented");
         }
 
         private void ExecuteANEConvolution(ITensor<float> input, ITensor<float> weights, ITensor<float> bias, 

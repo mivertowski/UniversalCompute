@@ -140,14 +140,8 @@ namespace ILGPU.Apple.NeuralEngine
         {
             ThrowIfDisposed();
             
-            fixed (float* inputPtr = input.SubView(0, (int)input.Length).AsSpan())
-            fixed (float* outputPtr = output.SubView(0, (int)output.Length).AsSpan())
-            {
-                ANENative.ExecuteCoreMLInference(
-                    inputPtr, outputPtr, 
-                    input.Length, output.Length,
-                    model.ModelHandle, _aneContext);
-            }
+            // TODO: Implement proper ArrayView to pointer conversion - AsSpan not available
+            throw new NotSupportedException("ANE CoreML inference not implemented - requires proper memory access");
         }
 
         #endregion

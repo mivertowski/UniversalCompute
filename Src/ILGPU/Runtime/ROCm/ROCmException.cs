@@ -93,6 +93,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete("Formatter-based serialization is obsolete")]
         protected ROCmException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

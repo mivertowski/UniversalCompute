@@ -37,7 +37,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// The associated OneAPI accelerator.
         /// </summary>
-        public new IntelOneAPIAccelerator Accelerator => base.Accelerator.AsNotNullCast<IntelOneAPIAccelerator>();
+        public new IntelOneAPIAccelerator Accelerator => (IntelOneAPIAccelerator)base.Accelerator;
 
         /// <summary>
         /// Initializes a new OneAPI stream.

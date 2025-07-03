@@ -86,7 +86,8 @@ namespace ILGPU.Runtime.Vulkan
                 CreateLogicalDevice();
 
                 // Get compute queue
-                VulkanNative.GetDeviceQueue(LogicalDevice, ComputeQueueFamily, 0, out ComputeQueue);
+                VulkanNative.GetDeviceQueue(LogicalDevice, ComputeQueueFamily, 0, out var computeQueue);
+                ComputeQueue = computeQueue;
 
                 // Initialize device properties
                 Init();
@@ -122,7 +123,8 @@ namespace ILGPU.Runtime.Vulkan
 
             try
             {
-                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out Instance);
+                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
+                Instance = instance;
                 VulkanException.ThrowIfFailed(result);
             }
             catch (DllNotFoundException)
@@ -170,7 +172,8 @@ namespace ILGPU.Runtime.Vulkan
                     enabledExtensionCount = 0
                 };
 
-                var result = VulkanNative.CreateDevice(Device.PhysicalDevice, ref deviceCreateInfo, IntPtr.Zero, out LogicalDevice);
+                var result = VulkanNative.CreateDevice(Device.PhysicalDevice, ref deviceCreateInfo, IntPtr.Zero, out var logicalDevice);
+                LogicalDevice = logicalDevice;
                 VulkanException.ThrowIfFailed(result);
             }
             catch (Exception)
@@ -190,7 +193,7 @@ namespace ILGPU.Runtime.Vulkan
             try
             {
                 uint queueFamilyCount = 0;
-                VulkanNative.GetPhysicalDeviceQueueFamilyProperties(Device.PhysicalDevice, ref queueFamilyCount, null);
+                VulkanNative.GetPhysicalDeviceQueueFamilyProperties(Device.PhysicalDevice, ref queueFamilyCount, IntPtr.Zero);
 
                 if (queueFamilyCount == 0)
                     return 0;
@@ -239,7 +242,17 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public MemoryInfo MemoryInfo => new MemoryInfo(Device.MemorySize);
+        public MemoryInfo MemoryInfo => new MemoryInfo(
+            totalMemory: Device.MemorySize,
+            availableMemory: Device.MemorySize, // TODO: Get actual available memory
+            memoryBandwidth: 0L, // TODO: Get actual memory bandwidth
+            cacheSize: 0L, // TODO: Get actual cache size
+            multiProcessorCount: 1, // TODO: Get actual compute unit count
+            supports64BitAtomics: true, // TODO: Check actual capability
+            supportsPageLockedAllocations: false, // TODO: Check actual capability
+            supportsUnifiedVirtualAddressing: false, // TODO: Check actual capability
+            pciBusId: 0, // TODO: Get actual PCI bus ID
+            pciDomainId: 0L); // TODO: Get actual PCI domain ID
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.

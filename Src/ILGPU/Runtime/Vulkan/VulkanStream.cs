@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.Vulkan.Native;
 using ILGPU.Util;
 using System;
@@ -57,7 +58,8 @@ namespace ILGPU.Runtime.Vulkan
                 };
 
                 var result = VulkanNative.CreateCommandPool(
-                    accelerator.LogicalDevice, ref createInfo, IntPtr.Zero, out CommandPool);
+                    accelerator.LogicalDevice, ref createInfo, IntPtr.Zero, out var commandPool);
+                CommandPool = commandPool;
                 VulkanException.ThrowIfFailed(result);
             }
             catch (DllNotFoundException)
@@ -326,14 +328,14 @@ namespace ILGPU.Runtime.Vulkan
         {
             var sourcePtr = sourceView.LoadEffectiveAddress();
             var targetPtr = (byte*)nativePtr + targetView.Index;
-            Buffer.MemoryCopy(sourcePtr.ToPointer(), targetPtr, LengthInBytes - targetView.Index, targetView.Length);
+            Buffer.MemoryCopy((void*)sourcePtr, targetPtr, LengthInBytes - targetView.Index, targetView.Length);
         }
 
         protected internal override unsafe void CopyTo(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
         {
             var sourcePtr = (byte*)nativePtr + sourceView.Index;
             var targetPtr = targetView.LoadEffectiveAddress();
-            Buffer.MemoryCopy(sourcePtr, targetPtr.ToPointer(), targetView.Length, sourceView.Length);
+            Buffer.MemoryCopy(sourcePtr, (void*)targetPtr, targetView.Length, sourceView.Length);
         }
 
         protected override void DisposeAcceleratorObject(bool disposing)
@@ -387,8 +389,8 @@ namespace ILGPU.Runtime.Vulkan
         public byte[] SPIRVBinary { get; }
         public string EntryPointName { get; }
 
-        public VulkanCompiledKernel(Context context, byte[] spirvBinary, string entryPointName, KernelInfo info)
-            : base(context, info, null)
+        public VulkanCompiledKernel(Context context, byte[] spirvBinary, string entryPointName, EntryPoint entryPoint)
+            : base(context, entryPoint, null)
         {
             SPIRVBinary = spirvBinary ?? throw new ArgumentNullException(nameof(spirvBinary));
             EntryPointName = entryPointName ?? throw new ArgumentNullException(nameof(entryPointName));

@@ -154,15 +154,6 @@ namespace ILGPU.Apple.NeuralEngine
 
             // TODO: ANEAttentionConfig properties not implemented
             throw new NotSupportedException("ANE attention config properties not available");
-
-            var inputSize = batchSize * seqLen * numHeads * headDim * 3; // Q, K, V
-            var outputSize = batchSize * seqLen * numHeads * headDim;
-
-            // Execute native attention operation
-            ANENative.ExecuteAttention(queries, output, inputSize, outputSize, context);
-
-            // Apply scaling
-            // TODO: ScaleFactor property not implemented
         }
 
         /// <summary>
@@ -185,26 +176,6 @@ namespace ILGPU.Apple.NeuralEngine
         {
             // TODO: ANEAttentionConfig properties not implemented
             throw new NotSupportedException("ANE attention config properties not available");
-            var dModel = numHeads * headDim;
-
-            var qkvSize = batchSize * seqLen * dModel;
-            
-            // Allocate temporary buffers for Q, K, V projections
-            var queries = stackalloc float[Math.Min(qkvSize, 512 * 1024)];
-            var keys = stackalloc float[Math.Min(qkvSize, 512 * 1024)];
-            var values = stackalloc float[Math.Min(qkvSize, 512 * 1024)];
-            var attentionOutput = stackalloc float[Math.Min(qkvSize, 512 * 1024)];
-
-            // Compute Q, K, V projections
-            ExecuteMatrixMultiply(input, weightQ, queries, batchSize * seqLen, dModel, dModel, context);
-            ExecuteMatrixMultiply(input, weightK, keys, batchSize * seqLen, dModel, dModel, context);
-            ExecuteMatrixMultiply(input, weightV, values, batchSize * seqLen, dModel, dModel, context);
-
-            // Execute attention
-            ExecuteAttention(queries, keys, values, attentionOutput, config, context);
-
-            // Apply output projection
-            ExecuteMatrixMultiply(attentionOutput, weightO, output, batchSize * seqLen, dModel, dModel, context);
         }
 
         #endregion
@@ -230,43 +201,8 @@ namespace ILGPU.Apple.NeuralEngine
             ANETransformerConfig config,
             IntPtr context)
         {
-            var seqLen = config.SequenceLength;
-            var dModel = config.ModelDimension;
-            var batchSize = config.BatchSize;
-            var tensorSize = batchSize * seqLen * dModel;
-
-            // Allocate temporary buffers
-            var temp1 = stackalloc float[Math.Min(tensorSize, 512 * 1024)];
-            var temp2 = stackalloc float[Math.Min(tensorSize, 512 * 1024)];
-
-            // Layer normalization before attention
-            ApplyLayerNorm(input, temp1, layerNormWeights, tensorSize, dModel);
-
-            // Multi-head attention
-            var attentionConfig = new ANEAttentionConfig
-            {
-                BatchSize = batchSize,
-                SequenceLength = seqLen,
-                NumHeads = config.NumAttentionHeads,
-                HeadDimension = dModel / config.NumAttentionHeads,
-                ScaleFactor = 1.0f / MathF.Sqrt(dModel / config.NumAttentionHeads)
-            };
-
-            ExecuteMultiHeadAttention(temp1, attentionWeights, attentionWeights + dModel * dModel,
-                                    attentionWeights + 2 * dModel * dModel, attentionWeights + 3 * dModel * dModel,
-                                    temp2, attentionConfig, context);
-
-            // Residual connection
-            AddTensors(input, temp2, temp1, tensorSize);
-
-            // Layer normalization before FFN
-            ApplyLayerNorm(temp1, temp2, layerNormWeights + 2 * dModel, tensorSize, dModel);
-
-            // Feed-forward network
-            ExecuteFeedForward(temp2, ffnWeights, temp1, batchSize, seqLen, dModel, config.FFNDimension, context);
-
-            // Final residual connection
-            AddTensors(temp1, temp2, output, tensorSize);
+            // TODO: ANEAttentionConfig properties not available
+            throw new NotSupportedException("ANE transformer operations not implemented - config properties unavailable");
         }
 
         #endregion

@@ -243,19 +243,8 @@ namespace ILGPU.Backends.OneAPI
                 codeBuilder.AppendLine("            globalId[2] >= globalRange[2]) return;");
                 codeBuilder.AppendLine();
 
-                // Walk through IR blocks
-                if (entryPoint.Blocks != null && entryPoint.Blocks.Count > 0)
-                {
-                    foreach (var block in entryPoint.Blocks)
-                    {
-                        codeBuilder.AppendLine($"        // Block: {block.Name ?? "unnamed"}");
-                        GenerateBasicBlockOperations(block);
-                    }
-                }
-                else
-                {
-                    GenerateDefaultKernelBody();
-                }
+                // TODO: EntryPoint.Blocks property not available - OneAPI/SYCL backend needs updated IR access
+                throw new NotSupportedException("OneAPI/SYCL code generation not implemented - EntryPoint IR access needs update");
             }
             catch (Exception ex)
             {

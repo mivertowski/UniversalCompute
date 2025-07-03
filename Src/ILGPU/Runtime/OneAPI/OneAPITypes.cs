@@ -100,8 +100,8 @@ namespace ILGPU.Runtime.OneAPI
                     unsafe
                     {
                         System.Buffer.MemoryCopy(
-                            sourceView.LoadEffectiveAddress().ToPointer(),
-                            targetView.LoadEffectiveAddress().ToPointer(),
+                            (void*)sourceView.LoadEffectiveAddress(),
+                            (void*)targetView.LoadEffectiveAddress(),
                             targetView.LengthInBytes,
                             sourceView.LengthInBytes);
                     }
@@ -137,8 +137,8 @@ namespace ILGPU.Runtime.OneAPI
                     unsafe
                     {
                         System.Buffer.MemoryCopy(
-                            sourceView.LoadEffectiveAddress().ToPointer(),
-                            targetView.LoadEffectiveAddress().ToPointer(),
+                            (void*)sourceView.LoadEffectiveAddress(),
+                            (void*)targetView.LoadEffectiveAddress(),
                             targetView.LengthInBytes,
                             sourceView.LengthInBytes);
                     }
@@ -173,7 +173,7 @@ namespace ILGPU.Runtime.OneAPI
                     // Fallback to managed memset
                     unsafe
                     {
-                        var ptr = (byte*)targetView.LoadEffectiveAddress().ToPointer();
+                        var ptr = (byte*)targetView.LoadEffectiveAddress();
                         for (long i = 0; i < targetView.LengthInBytes; i++)
                             ptr[i] = value;
                     }

@@ -128,7 +128,7 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             try
             {
-                var devices = CudaDevice.GetDevices();
+                var devices = CudaDevice.GetDevices(_ => true);
                 return new CUDACapabilities
                 {
                     IsSupported = devices.Length > 0,
@@ -332,7 +332,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     MaxArchitecture = devices.Length > 0 ? 
                         devices.Max(d => (int)d.Architecture) : 0,
                     TotalMemory = devices.Length > 0 ? devices.Max(d => d.MemorySize) : 0,
-                    SupportsMKLSYCL = devices.Any(d => d.Architecture >= IntelGPUArchitecture.XeLP),
+                    SupportsMKLSYCL = devices.Any(d => (int)d.Architecture >= 2), // XeLP equivalent
                     SupportsLevel0 = true, // Assume Level Zero support
                     ErrorMessage = null
                 };
@@ -388,8 +388,8 @@ namespace ILGPU.Runtime.HardwareDetection
                     return new AppleCapabilities { IsSupported = false };
                 }
 
-                var metalDevices = AppleMetalDevice.GetDevices();
-                var aneDevices = AppleNeuralEngineDevice.GetDevices();
+                var metalDevices = Array.Empty<Device>(); // TODO: AppleMetalDevice not implemented
+                var aneDevices = Array.Empty<AppleNeuralEngineDevice>(); // TODO: AppleNeuralEngineDevice.GetDevices() not implemented
 
                 return new AppleCapabilities
                 {
@@ -419,7 +419,7 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             try
             {
-                var devices = CLDevice.GetDevices();
+                var devices = Array.Empty<CLDevice>(); // TODO: CLDevice.GetDevices() not implemented
                 return new OpenCLCapabilities
                 {
                     IsSupported = devices.Length > 0,
@@ -449,16 +449,15 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             try
             {
-                var devices = VulkanDevice.GetDevices();
+                var devices = Array.Empty<VulkanDevice>(); // TODO: VulkanDevice.GetDevices() not implemented
                 return new VulkanCapabilities
                 {
                     IsSupported = devices.Length > 0,
                     DeviceCount = devices.Length,
-                    MaxVulkanVersion = devices.Length > 0 ? 
-                        devices.Max(d => d.VulkanApiVersion) : 0,
-                    TotalMemory = devices.Length > 0 ? devices.Max(d => d.MemorySize) : 0,
-                    SupportsCompute = devices.Any(d => d.SupportsCompute),
-                    SupportsRayTracing = devices.Any(d => d.SupportsRayTracing),
+                    MaxVulkanVersion = 0, // TODO: VulkanApiVersion property not available
+                    TotalMemory = 0, // TODO: MemorySize property not available
+                    SupportsCompute = false, // TODO: SupportsCompute property not available
+                    SupportsRayTracing = false, // TODO: SupportsRayTracing property not available
                     ErrorMessage = null
                 };
             }
@@ -479,14 +478,14 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             try
             {
-                var devices = VelocityDevice.GetDevices();
+                var devices = Array.Empty<VelocityDevice>(); // TODO: VelocityDevice.GetDevices() not implemented
                 return new VelocityCapabilities
                 {
-                    IsSupported = devices.Length > 0,
+                    IsSupported = true, // CPU SIMD always available
                     SupportsAVX2 = System.Runtime.Intrinsics.X86.Avx2.IsSupported,
                     SupportsAVX512 = System.Runtime.Intrinsics.X86.Avx512F.IsSupported,
                     SupportsNEON = System.Runtime.Intrinsics.Arm.AdvSimd.IsSupported,
-                    VectorSize = devices.Length > 0 ? devices.Max(d => d.VectorSize) : 0,
+                    VectorSize = 256, // Conservative default for AVX2
                     ErrorMessage = null
                 };
             }
@@ -559,30 +558,33 @@ namespace ILGPU.Runtime.HardwareDetection
             
             if (Capabilities.AMX.IsSupported && Capabilities.AMX.SupportsBF16)
             {
-                var device = IntelAMXDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateAMXAccelerator(device);
+                // TODO: IntelAMXDevice.GetDefaultDevice() and CreateAMXAccelerator not implemented
+                // var device = IntelAMXDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateAMXAccelerator(device);
             }
 
             if (Capabilities.CUDA.IsSupported && Capabilities.CUDA.SupportsCUBLAS)
             {
-                var device = CudaDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateCudaAccelerator(device);
+                var devices = CudaDevice.GetDevices(_ => true);
+                if (devices.Length > 0)
+                    return context.CreateCudaAccelerator(devices[0]);
             }
 
             if (Capabilities.ROCm.IsSupported && Capabilities.ROCm.SupportsROCBLAS)
             {
-                var device = ROCmDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateROCmAccelerator(device);
+                // TODO: ROCmDevice.GetBestDevice() and CreateROCmAccelerator not implemented
+                // var device = ROCmDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateROCmAccelerator(device);
             }
 
             if (Capabilities.OneAPI.IsSupported && Capabilities.OneAPI.SupportsMKLSYCL)
             {
-                var device = IntelOneAPIDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateOneAPIAccelerator(device);
+                // TODO: IntelOneAPIDevice.GetDefaultDevice() and CreateOneAPIAccelerator not implemented
+                // var device = IntelOneAPIDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateOneAPIAccelerator(device);
             }
 
             return CreateFallbackAccelerator(context);
@@ -597,23 +599,25 @@ namespace ILGPU.Runtime.HardwareDetection
             
             if (Capabilities.CUDA.IsSupported && Capabilities.CUDA.SupportsCUFFT)
             {
-                var device = CudaDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateCudaAccelerator(device);
+                var devices = CudaDevice.GetDevices(_ => true);
+                if (devices.Length > 0)
+                    return context.CreateCudaAccelerator(devices[0]);
             }
 
             if (Capabilities.ROCm.IsSupported && Capabilities.ROCm.SupportsROCFFT)
             {
-                var device = ROCmDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateROCmAccelerator(device);
+                // TODO: ROCmDevice.GetBestDevice() and CreateROCmAccelerator not implemented
+                // var device = ROCmDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateROCmAccelerator(device);
             }
 
             if (Capabilities.OneAPI.IsSupported)
             {
-                var device = IntelOneAPIDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateOneAPIAccelerator(device);
+                // TODO: IntelOneAPIDevice.GetDefaultDevice() and CreateOneAPIAccelerator not implemented
+                // var device = IntelOneAPIDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateOneAPIAccelerator(device);
             }
 
             return CreateFallbackAccelerator(context);
@@ -628,30 +632,33 @@ namespace ILGPU.Runtime.HardwareDetection
             
             if (Capabilities.Apple.IsSupported && Capabilities.Apple.SupportsNeuralEngine)
             {
-                var device = AppleNeuralEngineDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateAppleNeuralEngineAccelerator(device);
+                // TODO: AppleNeuralEngineDevice.GetDefaultDevice() and CreateAppleNeuralEngineAccelerator not implemented
+                // var device = AppleNeuralEngineDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateAppleNeuralEngineAccelerator(device);
             }
 
             if (Capabilities.AMX.IsSupported)
             {
-                var device = IntelAMXDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateAMXAccelerator(device);
+                // TODO: IntelAMXDevice.GetDefaultDevice() and CreateAMXAccelerator not implemented
+                // var device = IntelAMXDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateAMXAccelerator(device);
             }
 
             if (Capabilities.CUDA.IsSupported)
             {
-                var device = CudaDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateCudaAccelerator(device);
+                var devices = CudaDevice.GetDevices(_ => true);
+                if (devices.Length > 0)
+                    return context.CreateCudaAccelerator(devices[0]);
             }
 
             if (Capabilities.Apple.IsSupported && Capabilities.Apple.SupportsMetalGPU)
             {
-                var device = AppleMetalDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateAppleMetalAccelerator(device);
+                // TODO: AppleMetalDevice.GetDefaultDevice() and CreateAppleMetalAccelerator not implemented
+                // var device = AppleMetalDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateAppleMetalAccelerator(device);
             }
 
             return CreateFallbackAccelerator(context);
@@ -666,44 +673,49 @@ namespace ILGPU.Runtime.HardwareDetection
             
             if (Capabilities.CUDA.IsSupported)
             {
-                var device = CudaDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateCudaAccelerator(device);
+                var devices = CudaDevice.GetDevices(_ => true);
+                if (devices.Length > 0)
+                    return context.CreateCudaAccelerator(devices[0]);
             }
 
             if (Capabilities.ROCm.IsSupported)
             {
-                var device = ROCmDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateROCmAccelerator(device);
+                // TODO: ROCmDevice.GetBestDevice() and CreateROCmAccelerator not implemented
+                // var device = ROCmDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateROCmAccelerator(device);
             }
 
             if (Capabilities.OneAPI.IsSupported)
             {
-                var device = IntelOneAPIDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateOneAPIAccelerator(device);
+                // TODO: IntelOneAPIDevice.GetDefaultDevice() and CreateOneAPIAccelerator not implemented
+                // var device = IntelOneAPIDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateOneAPIAccelerator(device);
             }
 
             if (Capabilities.Apple.IsSupported && Capabilities.Apple.SupportsMetalGPU)
             {
-                var device = AppleMetalDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateAppleMetalAccelerator(device);
+                // TODO: AppleMetalDevice.GetDefaultDevice() and CreateAppleMetalAccelerator not implemented
+                // var device = AppleMetalDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateAppleMetalAccelerator(device);
             }
 
             if (Capabilities.Vulkan.IsSupported && Capabilities.Vulkan.SupportsCompute)
             {
-                var device = VulkanDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateVulkanAccelerator(device);
+                // TODO: VulkanDevice.GetBestDevice() and CreateVulkanAccelerator not implemented
+                // var device = VulkanDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateVulkanAccelerator(device);
             }
 
             if (Capabilities.OpenCL.IsSupported)
             {
-                var device = CLDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateCLAccelerator(device);
+                // TODO: CLDevice.GetBestDevice() and CreateCLAccelerator not implemented
+                // var device = CLDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateCLAccelerator(device);
             }
 
             return CreateFallbackAccelerator(context);
@@ -718,30 +730,33 @@ namespace ILGPU.Runtime.HardwareDetection
             
             if (Capabilities.CUDA.IsSupported)
             {
-                var device = CudaDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateCudaAccelerator(device);
+                var devices = CudaDevice.GetDevices(_ => true);
+                if (devices.Length > 0)
+                    return context.CreateCudaAccelerator(devices[0]);
             }
 
             if (Capabilities.Apple.IsSupported && Capabilities.Apple.SupportsMetalGPU)
             {
-                var device = AppleMetalDevice.GetDefaultDevice();
-                if (device != null)
-                    return context.CreateAppleMetalAccelerator(device);
+                // TODO: AppleMetalDevice.GetDefaultDevice() and CreateAppleMetalAccelerator not implemented
+                // var device = AppleMetalDevice.GetDefaultDevice();
+                // if (device != null)
+                //     return context.CreateAppleMetalAccelerator(device);
             }
 
             if (Capabilities.ROCm.IsSupported)
             {
-                var device = ROCmDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateROCmAccelerator(device);
+                // TODO: ROCmDevice.GetBestDevice() and CreateROCmAccelerator not implemented
+                // var device = ROCmDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateROCmAccelerator(device);
             }
 
             if (Capabilities.Vulkan.IsSupported && Capabilities.Vulkan.SupportsCompute)
             {
-                var device = VulkanDevice.GetBestDevice();
-                if (device != null)
-                    return context.CreateVulkanAccelerator(device);
+                // TODO: VulkanDevice.GetBestDevice() and CreateVulkanAccelerator not implemented
+                // var device = VulkanDevice.GetBestDevice();
+                // if (device != null)
+                //     return context.CreateVulkanAccelerator(device);
             }
 
             return CreateFallbackAccelerator(context);

@@ -253,67 +253,8 @@ namespace ILGPU.Backends.Metal
             ArrayView<float>[] inputs,
             ArrayView<float>[] outputs)
         {
-            var inputBuffers = new IntPtr[inputs.Length];
-            var outputBuffers = new IntPtr[outputs.Length];
-
-            try
-            {
-                // Create input buffers
-                for (int i = 0; i < inputs.Length; i++)
-                {
-                    fixed (float* inputPtr = inputs[i].SubView(0, (int)inputs[i].Length).AsSpan())
-                    {
-                        inputBuffers[i] = MetalNative.MTLDeviceNewBufferWithBytes(
-                            device, (IntPtr)inputPtr, 
-                            (nuint)(inputs[i].Length * sizeof(float)), 0);
-                    }
-                }
-
-                // Create output buffers
-                for (int i = 0; i < outputs.Length; i++)
-                {
-                    outputBuffers[i] = MetalNative.MTLDeviceNewBuffer(
-                        device, (nuint)(outputs[i].Length * sizeof(float)), 0);
-                }
-
-                // Create command buffer
-                var commandBuffer = MetalNative.MTLCommandQueueCommandBuffer(commandQueue);
-                
-                // Execute MPS Graph
-                ExecuteMPSGraphInternal(commandBuffer, graph, inputBuffers, outputBuffers);
-
-                // Commit and wait
-                MetalNative.MTLCommandBufferCommit(commandBuffer);
-                MetalNative.MTLCommandBufferWaitUntilCompleted(commandBuffer);
-
-                // Copy results back
-                for (int i = 0; i < outputs.Length; i++)
-                {
-                    var resultPtr = MetalNative.MTLBufferContents(outputBuffers[i]);
-                    fixed (float* outputPtr = outputs[i].SubView(0, (int)outputs[i].Length).AsSpan())
-                    {
-                        Buffer.MemoryCopy((void*)resultPtr, outputPtr, 
-                            outputs[i].Length * sizeof(float), 
-                            outputs[i].Length * sizeof(float));
-                    }
-                }
-
-                MetalNative.CFRelease(commandBuffer);
-            }
-            finally
-            {
-                // Release buffers
-                for (int i = 0; i < inputBuffers.Length; i++)
-                {
-                    if (inputBuffers[i] != IntPtr.Zero)
-                        MetalNative.CFRelease(inputBuffers[i]);
-                }
-                for (int i = 0; i < outputBuffers.Length; i++)
-                {
-                    if (outputBuffers[i] != IntPtr.Zero)
-                        MetalNative.CFRelease(outputBuffers[i]);
-                }
-            }
+            // TODO: ArrayView.AsSpan not available - use proper memory access
+            throw new NotSupportedException("Metal operations not implemented - ArrayView.AsSpan not available");
         }
 
         #endregion

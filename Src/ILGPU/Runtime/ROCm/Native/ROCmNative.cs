@@ -346,7 +346,16 @@ namespace ILGPU.Runtime.ROCm.Native
             try
             {
                 // Try to use ROCBlas for hardware acceleration
-                ExecuteROCBlasMatMulNative(a, b, c, m, k, n, stream);
+                // TODO: ExecuteROCBlasMatMulNative parameters incomplete - requires handle, transpose flags, leading dimensions, alpha/beta
+                ExecuteROCBlasMatMulNative(
+                    stream, // handle 
+                    0, 0,   // transA, transB (no transpose)
+                    m, n, k,
+                    1.0f,   // alpha
+                    a, k,   // a, lda
+                    b, n,   // b, ldb  
+                    0.0f,   // beta
+                    c, n);  // c, ldc
             }
             catch (DllNotFoundException)
             {

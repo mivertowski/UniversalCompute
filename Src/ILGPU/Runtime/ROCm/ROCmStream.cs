@@ -35,7 +35,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// The associated ROCm accelerator.
         /// </summary>
-        public new ROCmAccelerator Accelerator => base.Accelerator.AsNotNullCast<ROCmAccelerator>();
+        public new ROCmAccelerator Accelerator => (ROCmAccelerator)base.Accelerator;
 
         /// <summary>
         /// Initializes a new ROCm stream.

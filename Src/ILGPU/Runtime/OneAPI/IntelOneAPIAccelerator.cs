@@ -94,9 +94,9 @@ namespace ILGPU.Runtime.OneAPI
                 SYCLDevice = device.NativeDevice;
 
                 // Create SYCL context
-                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out var context);
+                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out var syclContext);
                 SYCLException.ThrowIfFailed(result);
-                SYCLContext = context;
+                SYCLContext = syclContext;
 
                 // Create SYCL queue
                 result = SYCLNative.CreateQueue(
@@ -466,7 +466,7 @@ namespace ILGPU.Runtime.OneAPI
                 try
                 {
                     // Use Intel GPU for AI inference acceleration
-                    ExecuteIntelGPUInference(input, output, modelData, stream?.SYCLQueue ?? SYCLQueue);
+                    ExecuteIntelGPUInference(input, output, modelData, stream?.NativeQueue ?? SYCLQueue);
                 }
                 catch (DllNotFoundException)
                 {

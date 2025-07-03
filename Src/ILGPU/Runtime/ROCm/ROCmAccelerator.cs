@@ -84,15 +84,15 @@ namespace ILGPU.Runtime.ROCm
                 ROCmException.ThrowIfFailed(initResult);
 
                 // Set the current device
-                var setDeviceResult = ROCmNative.SetDevice(device.DeviceId);
+                var setDeviceResult = ROCmNative.SetDevice(device.DeviceId.Index);
                 ROCmException.ThrowIfFailed(setDeviceResult);
 
                 // Get device properties to validate the device
-                var propsResult = ROCmNative.GetDeviceProperties(out var deviceProps, device.DeviceId);
+                var propsResult = ROCmNative.GetDeviceProperties(out var deviceProps, device.DeviceId.Index);
                 ROCmException.ThrowIfFailed(propsResult);
 
                 // Store device handle as context (HIP uses implicit context per device)
-                NativePtr = new IntPtr(device.DeviceId); // Real device handle
+                NativePtr = new IntPtr(device.DeviceId.Index); // Real device handle
 
                 // Cache device properties for capability queries
                 DeviceProperties = deviceProps;

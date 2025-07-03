@@ -205,7 +205,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public override DeviceId DeviceId => new DeviceId(DeviceIndex, AcceleratorType.OneAPI);
+        public override DeviceId DeviceId => new DeviceId(0, AcceleratorType.OneAPI); // TODO: Store actual device index
 
         /// <summary>
         /// Creates an accelerator for this device.
