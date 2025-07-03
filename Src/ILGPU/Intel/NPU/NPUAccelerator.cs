@@ -170,9 +170,9 @@ namespace ILGPU.Intel.NPU
         /// Executes a convolution kernel asynchronously on the NPU.
         /// </summary>
         public async Task ExecuteConvolutionKernelAsync<T>(
-            ITensor<T> input,
-            ITensor<T> kernel,
-            ITensor<T> output,
+            ILGPU.Numerics.ITensor<T> input,
+            ILGPU.Numerics.ITensor<T> kernel,
+            ILGPU.Numerics.ITensor<T> output,
             ConvolutionParameters parameters,
             CancellationToken cancellationToken = default)
             where T : unmanaged
@@ -189,10 +189,10 @@ namespace ILGPU.Intel.NPU
         /// Executes an attention kernel asynchronously on the NPU.
         /// </summary>
         public async Task ExecuteAttentionKernelAsync<T>(
-            ITensor<T> query,
-            ITensor<T> key,
-            ITensor<T> value,
-            ITensor<T> output,
+            ILGPU.Numerics.ITensor<T> query,
+            ILGPU.Numerics.ITensor<T> key,
+            ILGPU.Numerics.ITensor<T> value,
+            ILGPU.Numerics.ITensor<T> output,
             AttentionParameters parameters,
             CancellationToken cancellationToken = default)
             where T : unmanaged

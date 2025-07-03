@@ -12,10 +12,13 @@
 using ILGPU.Backends;
 using ILGPU.Frontend.Intrinsic;
 using ILGPU.Resources;
+using ILGPU.TensorCores;
 using ILGPU.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace ILGPU.Runtime
@@ -818,6 +821,72 @@ namespace ILGPU.Runtime
         /// Gets a value indicating whether this accelerator supports memory pools.
         /// </summary>
         public bool SupportsMemoryPools => Device.SupportsMemoryPools;
+
+        /// <summary>
+        /// Gets a value indicating whether this accelerator supports tensor cores.
+        /// </summary>
+        /// <returns>True if tensor cores are supported, false otherwise.</returns>
+        public virtual bool SupportsTensorCores()
+        {
+            return AcceleratorType == AcceleratorType.Cuda ||
+                   AcceleratorType == AcceleratorType.ROCm ||
+                   AcceleratorType == AcceleratorType.IntelAMX ||
+                   AcceleratorType == AcceleratorType.AppleNeuralEngine ||
+                   AcceleratorType == AcceleratorType.IntelNPU;
+        }
+
+        /// <summary>
+        /// Gets the supported tensor precisions for this accelerator.
+        /// </summary>
+        /// <returns>A collection of supported tensor precisions.</returns>
+        public virtual IEnumerable<TensorPrecision> GetSupportedTensorPrecisions()
+        {
+            var precisions = new List<TensorPrecision>();
+            
+            if (!SupportsTensorCores())
+                return precisions;
+            
+            switch (AcceleratorType)
+            {
+                case AcceleratorType.Cuda:
+                    // CUDA tensor cores typically support FP16, BF16, TF32, and newer generations support FP8
+                    precisions.Add(TensorPrecision.FP16);
+                    precisions.Add(TensorPrecision.BF16);
+                    precisions.Add(TensorPrecision.TF32);
+                    precisions.Add(TensorPrecision.INT8);
+                    precisions.Add(TensorPrecision.FP8_E4M3);
+                    precisions.Add(TensorPrecision.FP8_E5M2);
+                    break;
+                    
+                case AcceleratorType.ROCm:
+                    // AMD ROCm supports FP16, BF16
+                    precisions.Add(TensorPrecision.FP16);
+                    precisions.Add(TensorPrecision.BF16);
+                    precisions.Add(TensorPrecision.INT8);
+                    break;
+                    
+                case AcceleratorType.IntelAMX:
+                    // Intel AMX supports BF16, INT8
+                    precisions.Add(TensorPrecision.BF16);
+                    precisions.Add(TensorPrecision.INT8);
+                    break;
+                    
+                case AcceleratorType.AppleNeuralEngine:
+                    // Apple Neural Engine supports FP16, INT8
+                    precisions.Add(TensorPrecision.FP16);
+                    precisions.Add(TensorPrecision.INT8);
+                    break;
+                    
+                case AcceleratorType.IntelNPU:
+                    // Intel NPU supports FP16, BF16, INT8
+                    precisions.Add(TensorPrecision.FP16);
+                    precisions.Add(TensorPrecision.BF16);
+                    precisions.Add(TensorPrecision.INT8);
+                    break;
+            }
+            
+            return precisions;
+        }
 
         /// <summary>
         /// Prints device information to the given text writer.

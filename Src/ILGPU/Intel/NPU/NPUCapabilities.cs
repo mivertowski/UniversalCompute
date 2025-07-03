@@ -102,6 +102,13 @@ namespace ILGPU.Intel.NPU
         /// Gets the maximum number of concurrent inferences supported.
         /// </summary>
         public int MaxConcurrentInferences { get; } = generation switch
+        {
+            NPUGeneration.NPU1 => 4,
+            NPUGeneration.NPU2 => 8,
+            NPUGeneration.NPU3 => 16,
+            NPUGeneration.NPU4 => 32,
+            _ => 4
+        };
 
         /// <summary>
         /// Gets the optimal batch size for NPU operations.
@@ -172,6 +179,11 @@ namespace ILGPU.Intel.NPU
         /// Gets the device name.
         /// </summary>
         public string DeviceName { get; } = $"Intel NPU {generation}";
+
+        /// <summary>
+        /// Gets the number of execution units.
+        /// </summary>
+        public int ExecutionUnits { get; } = generation switch
         {
             NPUGeneration.NPU1 => 1,
             NPUGeneration.NPU2 => 2,

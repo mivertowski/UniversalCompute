@@ -54,7 +54,7 @@ namespace ILGPU.AI.Quantization
             if (index >= input.Length) return;
 
             var value = input[index];
-            var quantized = IntrinsicMath.Floor(0.5f + value / scale);
+            var quantized = IntrinsicMath.CPUOnly.Floor(0.5f + value / scale);
             
             // Clamp to INT8 range [-128, 127]
             quantized = IntrinsicMath.Clamp(quantized, -128.0f, 127.0f);
@@ -80,7 +80,7 @@ namespace ILGPU.AI.Quantization
             if (index >= input.Length) return;
 
             var value = input[index];
-            var quantized = IntrinsicMath.Floor(0.5f + value / scale) + zeroPoint;
+            var quantized = IntrinsicMath.CPUOnly.Floor(0.5f + value / scale) + zeroPoint;
             
             // Clamp to INT8 range [-128, 127]
             quantized = IntrinsicMath.Clamp(quantized, -128.0f, 127.0f);
@@ -154,7 +154,7 @@ namespace ILGPU.AI.Quantization
 
             var value = input[index];
             var scale = scales[blockIndex];
-            var quantized = IntrinsicMath.Floor(0.5f + value / scale);
+            var quantized = IntrinsicMath.CPUOnly.Floor(0.5f + value / scale);
             
             // Clamp to INT4 range [-8, 7]
             quantized = IntrinsicMath.Clamp(quantized, -8.0f, 7.0f);
@@ -300,7 +300,7 @@ namespace ILGPU.AI.Quantization
             
             // Map to [0, 1] then to [-128, 127]
             var normalized = (value - minVal) / range;
-            var quantized = IntrinsicMath.Floor(0.5f + normalized * 255.0f - 128.0f);
+            var quantized = IntrinsicMath.CPUOnly.Floor(0.5f + normalized * 255.0f - 128.0f);
             quantized = IntrinsicMath.Clamp(quantized, -128.0f, 127.0f);
             
             output[index] = (sbyte)quantized;
