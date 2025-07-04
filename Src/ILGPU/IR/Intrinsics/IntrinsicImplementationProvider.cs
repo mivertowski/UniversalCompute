@@ -196,7 +196,7 @@ namespace ILGPU.IR.Intrinsics
             /// <param name="mapping">The current mapping instance.</param>
             /// <returns>True, if the intrinsic could be registered.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool TryRegisterIntrinsic<TResolver>(
+            private readonly bool TryRegisterIntrinsic<TResolver>(
                 TResolver resolver,
                 IntrinsicMapping<TDelegate> mapping)
                 where TResolver : struct, IntrinsicMapping.IGenericArgumentResolver
@@ -249,7 +249,7 @@ namespace ILGPU.IR.Intrinsics
             /// <summary>
             /// Ends the current specialization phase.
             /// </summary>
-            public void Dispose()
+            public readonly void Dispose()
             {
                 codeGenerationPhase.Dispose();
                 contextCodeGenerationPhase.Optimize();

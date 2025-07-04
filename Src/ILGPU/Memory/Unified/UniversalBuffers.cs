@@ -41,7 +41,7 @@ namespace ILGPU.Memory.Unified
             get
             {
                 // Default implementation requires GetNativeBuffer to be implemented
-                var nativeBuffer = GetNativeBuffer(default!);
+                var nativeBuffer = GetNativeBuffer(null);
                 return nativeBuffer?.View ?? throw new InvalidOperationException("No native buffer available for view access");
             }
         }
@@ -50,15 +50,13 @@ namespace ILGPU.Memory.Unified
         {
             if (width * height > Length)
                 throw new ArgumentException("2D view dimensions exceed buffer size");
-            var view1D = View;
-            return view1D.As2DView(width, height);
+            return View.As2DView(width, height);
         }
         public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth)
         {
             if (width * height * depth > Length)
                 throw new ArgumentException("3D view dimensions exceed buffer size");
-            var view1D = View;
-            return view1D.As3DView(width, height, depth);
+            return View.As3DView(width, height, depth);
         }
         public virtual void CopyFromCPU(ReadOnlySpan<T> source)
         {
@@ -80,16 +78,12 @@ namespace ILGPU.Memory.Unified
             view.CopyToCPU(tempArray);
             tempArray.AsSpan().CopyTo(destination);
         }
-        public virtual Task CopyFromCPUAsync(ReadOnlyMemory<T> source)
-        {
+        public virtual Task CopyFromCPUAsync(ReadOnlyMemory<T> source) =>
             // Default async implementation delegates to sync version
-            return Task.Run(() => CopyFromCPU(source.Span));
-        }
-        public virtual Task CopyToCPUAsync(Memory<T> destination)
-        {
+            Task.Run(() => CopyFromCPU(source.Span));
+        public virtual Task CopyToCPUAsync(Memory<T> destination) =>
             // Default async implementation delegates to sync version
-            return Task.Run(() => CopyToCPU(destination.Span));
-        }
+            Task.Run(() => CopyToCPU(destination.Span));
         public virtual void CopyFrom(IUniversalBuffer<T> source)
         {
             if (source == null)
@@ -103,11 +97,9 @@ namespace ILGPU.Memory.Unified
             source.CopyToCPU(tempData);
             CopyFromCPU(tempData);
         }
-        public virtual Task CopyFromAsync(IUniversalBuffer<T> source)
-        {
+        public virtual Task CopyFromAsync(IUniversalBuffer<T> source) =>
             // Default async implementation delegates to sync version
-            return Task.Run(() => CopyFrom(source));
-        }
+            Task.Run(() => CopyFrom(source));
         public virtual void EnsureAvailable(Accelerator accelerator)
         {
             // Default implementation - data is already available if native buffer exists
@@ -116,39 +108,33 @@ namespace ILGPU.Memory.Unified
             if (nativeBuffer == null)
                 throw new InvalidOperationException($"Buffer not available on accelerator {accelerator.Name}");
         }
-        public virtual Task EnsureAvailableAsync(Accelerator accelerator)
-        {
+        public virtual Task EnsureAvailableAsync(Accelerator accelerator) =>
             // Default async implementation delegates to sync version
-            return Task.Run(() => EnsureAvailable(accelerator));
-        }
+            Task.Run(() => EnsureAvailable(accelerator));
         public virtual void Prefetch(Accelerator accelerator)
         {
             // Default implementation is a no-op
             // Derived classes can override for specific prefetching logic
         }
-        public virtual MemoryBuffer1D<T, Stride1D.Dense>? GetNativeBuffer(Accelerator accelerator)
-        {
+        public virtual MemoryBuffer1D<T, Stride1D.Dense>? GetNativeBuffer(Accelerator accelerator) =>
             // Base implementation returns null - derived classes must override
             // This method is the core abstraction for accessing native buffers
-            return null;
-        }
+            null;
         public virtual void InvalidateCache()
         {
             // Default implementation is a no-op
             // Derived classes can override for specific cache invalidation logic
         }
-        public virtual UniversalBufferStats GetStats()
-        {
+        public virtual UniversalBufferStats GetStats() =>
             // Default implementation returns basic stats
-            return new UniversalBufferStats(
-                totalAllocatedBytes: SizeInBytes,
-                migrationCount: 0,
-                totalMigrationTimeMs: 0.0,
-                averageMigrationBandwidthGBps: 0.0,
-                activeCopies: 1,
-                currentLocation: CurrentLocation
-            );
-        }
+            new()
+            {
+                SizeInBytes = SizeInBytes,
+                CurrentLocation = CurrentLocation,
+                Placement = Placement,
+                AccessCount = 0,
+                LastAccessTime = DateTime.UtcNow
+            };
 
         public void Dispose()
         {

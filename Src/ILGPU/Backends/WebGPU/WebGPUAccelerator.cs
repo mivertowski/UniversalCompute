@@ -46,9 +46,6 @@ namespace ILGPU.Backends.WebGPU
     /// </remarks>
     public sealed class WebGPUAccelerator : Accelerator
     {
-        private readonly WebGPUDevice _device;
-        private readonly WebGPUQueue _queue;
-        private readonly WebGPUCapabilities _capabilities;
         private bool _disposed;
 
         /// <summary>
@@ -60,9 +57,9 @@ namespace ILGPU.Backends.WebGPU
         public WebGPUAccelerator(Context context, Device device, WebGPUDevice webgpuDevice)
             : base(context, device)
         {
-            _device = webgpuDevice ?? throw new ArgumentNullException(nameof(webgpuDevice));
-            _queue = _device.GetQueue();
-            _capabilities = WebGPUCapabilities.Query(_device);
+            WebGPUDevice = webgpuDevice ?? throw new ArgumentNullException(nameof(webgpuDevice));
+            Queue = WebGPUDevice.GetQueue();
+            Capabilities = WebGPUCapabilities.Query(WebGPUDevice);
 
             // Initialize accelerator properties
             InitializeAcceleratorProperties();
@@ -71,17 +68,17 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Gets the WebGPU device capabilities.
         /// </summary>
-        public new WebGPUCapabilities Capabilities => _capabilities;
+        public new WebGPUCapabilities Capabilities { get; }
 
         /// <summary>
         /// Gets the WebGPU device.
         /// </summary>
-        public WebGPUDevice WebGPUDevice => _device;
+        public WebGPUDevice WebGPUDevice { get; }
 
         /// <summary>
         /// Gets the WebGPU queue.
         /// </summary>
-        public WebGPUQueue Queue => _queue;
+        public WebGPUQueue Queue { get; }
 
         #region WebGPU Compute Operations
 
@@ -102,7 +99,7 @@ namespace ILGPU.Backends.WebGPU
         {
             ThrowIfDisposed();
 
-            var commandEncoder = _device.CreateCommandEncoder();
+            var commandEncoder = WebGPUDevice.CreateCommandEncoder();
             var passEncoder = commandEncoder.BeginComputePass();
             
             passEncoder.SetPipeline(computePipeline);
@@ -111,7 +108,7 @@ namespace ILGPU.Backends.WebGPU
             passEncoder.End();
 
             var commandBuffer = commandEncoder.Finish();
-            _queue.Submit(commandBuffer);
+            Queue.Submit(commandBuffer);
 
             // Wait for completion
             await WaitForCompletion();
@@ -129,8 +126,8 @@ namespace ILGPU.Backends.WebGPU
         {
             ThrowIfDisposed();
 
-            var shaderModule = _device.CreateShaderModule(wgslSource);
-            return _device.CreateComputePipeline(shaderModule, entryPoint);
+            var shaderModule = WebGPUDevice.CreateShaderModule(wgslSource);
+            return WebGPUDevice.CreateComputePipeline(shaderModule, entryPoint);
         }
 
         /// <summary>
@@ -142,7 +139,7 @@ namespace ILGPU.Backends.WebGPU
         public WebGPUBuffer CreateBuffer(ulong size, WebGPUBufferUsage usage)
         {
             ThrowIfDisposed();
-            return _device.CreateBuffer(size, usage);
+            return WebGPUDevice.CreateBuffer(size, usage);
         }
 
         /// <summary>
@@ -156,27 +153,22 @@ namespace ILGPU.Backends.WebGPU
             WebGPUBindGroupEntry[] entries)
         {
             ThrowIfDisposed();
-            return _device.CreateBindGroup(layout, entries);
+            return WebGPUDevice.CreateBindGroup(layout, entries);
         }
 
         /// <summary>
         /// Waits for all GPU operations to complete.
         /// </summary>
-        private async Task WaitForCompletion()
-        {
+        private async Task WaitForCompletion() =>
             // WebGPU operations are asynchronous by nature
             // This would typically involve waiting for promises to resolve
             await Task.Delay(1); // Minimal delay - real implementation would wait for GPU
-        }
 
         #endregion
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal()
-        {
-            return new WebGPUStream(this);
-        }
+        protected override AcceleratorStream CreateStreamInternal() => new WebGPUStream(this);
 
         protected override void SynchronizeInternal()
         {
@@ -184,23 +176,17 @@ namespace ILGPU.Backends.WebGPU
             // Synchronization is handled through command submission and waiting
         }
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new WebGPUBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new WebGPUBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
-            return new WebGPUKernel(this, compiledKernel);
-        }
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new WebGPUKernel(this, compiledKernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
-                (int)_capabilities.MaxWorkgroupSize,
-                _capabilities.MaxSharedMemorySize);
+                (int)Capabilities.MaxWorkgroupSize,
+                Capabilities.MaxSharedMemorySize);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -210,19 +196,17 @@ namespace ILGPU.Backends.WebGPU
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
-                Math.Min(customGroupSize, (int)_capabilities.MaxWorkgroupSize),
-                _capabilities.MaxSharedMemorySize);
+                Math.Min(customGroupSize, (int)Capabilities.MaxWorkgroupSize),
+                Capabilities.MaxSharedMemorySize);
             return LoadKernelInternal(compiledKernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // WebGPU workgroup estimation based on device limits
-            return (int)(_capabilities.MaxWorkgroupSize / Math.Max(groupSize, 1));
-        }
+            (int)(Capabilities.MaxWorkgroupSize / Math.Max(groupSize, 1));
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -231,7 +215,7 @@ namespace ILGPU.Backends.WebGPU
             out int minGridSize)
         {
             minGridSize = 1;
-            return Math.Min(maxGroupSize, (int)_capabilities.MaxWorkgroupSize);
+            return Math.Min(maxGroupSize, (int)Capabilities.MaxWorkgroupSize);
         }
 
         protected override int EstimateGroupSizeInternal(
@@ -244,19 +228,17 @@ namespace ILGPU.Backends.WebGPU
             
             // Consider shared memory limitations
             var maxGroupsForSharedMemory = dynamicSharedMemorySizeInBytes > 0
-                ? _capabilities.MaxSharedMemorySize / dynamicSharedMemorySizeInBytes
-                : (int)_capabilities.MaxWorkgroupSize;
+                ? Capabilities.MaxSharedMemorySize / dynamicSharedMemorySizeInBytes
+                : (int)Capabilities.MaxWorkgroupSize;
 
             return Math.Min(Math.Min(maxGroupSize, maxGroupsForSharedMemory), 
-                           (int)_capabilities.MaxWorkgroupSize);
+                           (int)Capabilities.MaxWorkgroupSize);
         }
 
-        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator)
-        {
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) =>
             // WebGPU generally doesn't support direct peer access
             // Data transfer happens through the browser's memory management
-            return false;
-        }
+            false;
 
         protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
         {
@@ -268,11 +250,9 @@ namespace ILGPU.Backends.WebGPU
             // WebGPU peer access not supported
         }
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) =>
             // WebGPU doesn't support page locking
-            return null!;
-        }
+            null!;
 
         public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
@@ -300,8 +280,8 @@ namespace ILGPU.Backends.WebGPU
             {
                 if (disposing)
                 {
-                    _queue?.Dispose();
-                    _device?.Dispose();
+                    Queue?.Dispose();
+                    WebGPUDevice?.Dispose();
                 }
                 _disposed = true;
             }

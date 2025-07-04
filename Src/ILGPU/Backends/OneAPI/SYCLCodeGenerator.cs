@@ -350,27 +350,24 @@ namespace ILGPU.Backends.OneAPI
         /// <summary>
         /// Converts ILGPU type to SYCL C++ type.
         /// </summary>
-        private static string GetSYCLType(string typeName)
+        private static string GetSYCLType(string typeName) => typeName.ToUpperInvariant() switch
         {
-            return typeName.ToLowerInvariant() switch
-            {
-                "bool" or "int1" => "bool",
-                "int8" or "sbyte" => "int8_t",
-                "uint8" or "byte" => "uint8_t",
-                "int16" or "short" => "int16_t", 
-                "uint16" or "ushort" => "uint16_t",
-                "int32" or "int" => "int32_t",
-                "uint32" or "uint" => "uint32_t",
-                "int64" or "long" => "int64_t",
-                "uint64" or "ulong" => "uint64_t",
-                "float16" or "half" => "sycl::half",
-                "float32" or "float" => "float",
-                "float64" or "double" => "double",
-                _ when typeName.Contains("*") => "void*", // Pointer types
-                _ when typeName.Contains("[]") => "void*", // Array types  
-                _ => "void*" // Default fallback
-            };
-        }
+            "bool" or "int1" => "bool",
+            "int8" or "sbyte" => "int8_t",
+            "uint8" or "byte" => "uint8_t",
+            "int16" or "short" => "int16_t",
+            "uint16" or "ushort" => "uint16_t",
+            "int32" or "int" => "int32_t",
+            "uint32" or "uint" => "uint32_t",
+            "int64" or "long" => "int64_t",
+            "uint64" or "ulong" => "uint64_t",
+            "float16" or "half" => "sycl::half",
+            "float32" or "float" => "float",
+            "float64" or "double" => "double",
+            _ when typeName.Contains("*") => "void*", // Pointer types
+            _ when typeName.Contains("[]") => "void*", // Array types  
+            _ => "void*" // Default fallback
+        };
 
         /// <summary>
         /// Generates SYCL device functions and utilities.

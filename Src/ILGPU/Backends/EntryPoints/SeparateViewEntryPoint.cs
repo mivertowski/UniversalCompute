@@ -146,13 +146,13 @@ namespace ILGPU.Backends.EntryPoints
                 public int EndIndex { get; }
 
                 /// <summary cref="IEnumerator{T}.Current"/>
-                public ViewParameter Current => EntryPoint.ViewParameters[Index];
+                public readonly ViewParameter Current => EntryPoint.ViewParameters[Index];
 
                 /// <summary cref="IEnumerator.Current"/>
                 object IEnumerator.Current => Current;
 
                 /// <summary cref="IDisposable.Dispose"/>
-                public void Dispose() { }
+                public readonly void Dispose() { }
 
                 /// <summary cref="IEnumerator.MoveNext"/>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]

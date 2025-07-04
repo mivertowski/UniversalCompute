@@ -93,7 +93,6 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete("Formatter-based serialization is obsolete")]
         protected ROCmException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -123,7 +122,6 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.", DiagnosticId = "SYSLIB0051", UrlFormat = "https://aka.ms/dotnet-warnings/{0}")]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -158,60 +156,57 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="errorCode">The error code.</param>
         /// <returns>The error string.</returns>
-        internal static string GetErrorString(HipError errorCode)
+        internal static string GetErrorString(HipError errorCode) => errorCode switch
         {
-            return errorCode switch
-            {
-                HipError.Success => "No error",
-                HipError.ErrorInvalidValue => "Invalid value",
-                HipError.ErrorOutOfMemory => "Out of memory",
-                HipError.ErrorNotInitialized => "ROCm not initialized",
-                HipError.ErrorDeinitialized => "ROCm deinitialized",
-                HipError.ErrorNoDevice => "No ROCm device available",
-                HipError.ErrorInvalidDevice => "Invalid device",
-                HipError.ErrorInvalidImage => "Invalid image",
-                HipError.ErrorInvalidContext => "Invalid context",
-                HipError.ErrorMapFailed => "Memory mapping failed",
-                HipError.ErrorUnmapFailed => "Memory unmapping failed",
-                HipError.ErrorArrayIsMapped => "Array is mapped",
-                HipError.ErrorAlreadyMapped => "Already mapped",
-                HipError.ErrorNoBinaryForGpu => "No binary for GPU",
-                HipError.ErrorAlreadyAcquired => "Already acquired",
-                HipError.ErrorNotMapped => "Not mapped",
-                HipError.ErrorNotMappedAsArray => "Not mapped as array",
-                HipError.ErrorNotMappedAsPointer => "Not mapped as pointer",
-                HipError.ErrorEccUncorrectable => "ECC uncorrectable error",
-                HipError.ErrorUnsupportedLimit => "Unsupported limit",
-                HipError.ErrorContextAlreadyInUse => "Context already in use",
-                HipError.ErrorPeerAccessUnsupported => "Peer access unsupported",
-                HipError.ErrorInvalidPtx => "Invalid PTX",
-                HipError.ErrorInvalidGraphicsContext => "Invalid graphics context",
-                HipError.ErrorNvlinkUncorrectable => "NVLink uncorrectable error",
-                HipError.ErrorJitCompilerNotFound => "JIT compiler not found",
-                HipError.ErrorInvalidSource => "Invalid source",
-                HipError.ErrorFileNotFound => "File not found",
-                HipError.ErrorSharedObjectSymbolNotFound => "Shared object symbol not found",
-                HipError.ErrorSharedObjectInitFailed => "Shared object initialization failed",
-                HipError.ErrorOperatingSystem => "Operating system error",
-                HipError.ErrorInvalidHandle => "Invalid handle",
-                HipError.ErrorNotFound => "Not found",
-                HipError.ErrorNotReady => "Not ready",
-                HipError.ErrorIllegalAddress => "Illegal address",
-                HipError.ErrorLaunchOutOfResources => "Launch out of resources",
-                HipError.ErrorLaunchTimeOut => "Launch timeout",
-                HipError.ErrorPeerAccessAlreadyEnabled => "Peer access already enabled",
-                HipError.ErrorPeerAccessNotEnabled => "Peer access not enabled",
-                HipError.ErrorSetOnActiveProcess => "Set on active process",
-                HipError.ErrorAssert => "Assertion failed",
-                HipError.ErrorHostMemoryAlreadyRegistered => "Host memory already registered",
-                HipError.ErrorHostMemoryNotRegistered => "Host memory not registered",
-                HipError.ErrorLaunchFailure => "Launch failure",
-                HipError.ErrorCooperativeLaunchTooLarge => "Cooperative launch too large",
-                HipError.ErrorNotSupported => "Not supported",
-                HipError.ErrorUnknown => "Unknown error",
-                _ => $"Unknown ROCm error code: {(int)errorCode}"
-            };
-        }
+            HipError.Success => "No error",
+            HipError.ErrorInvalidValue => "Invalid value",
+            HipError.ErrorOutOfMemory => "Out of memory",
+            HipError.ErrorNotInitialized => "ROCm not initialized",
+            HipError.ErrorDeinitialized => "ROCm deinitialized",
+            HipError.ErrorNoDevice => "No ROCm device available",
+            HipError.ErrorInvalidDevice => "Invalid device",
+            HipError.ErrorInvalidImage => "Invalid image",
+            HipError.ErrorInvalidContext => "Invalid context",
+            HipError.ErrorMapFailed => "Memory mapping failed",
+            HipError.ErrorUnmapFailed => "Memory unmapping failed",
+            HipError.ErrorArrayIsMapped => "Array is mapped",
+            HipError.ErrorAlreadyMapped => "Already mapped",
+            HipError.ErrorNoBinaryForGpu => "No binary for GPU",
+            HipError.ErrorAlreadyAcquired => "Already acquired",
+            HipError.ErrorNotMapped => "Not mapped",
+            HipError.ErrorNotMappedAsArray => "Not mapped as array",
+            HipError.ErrorNotMappedAsPointer => "Not mapped as pointer",
+            HipError.ErrorEccUncorrectable => "ECC uncorrectable error",
+            HipError.ErrorUnsupportedLimit => "Unsupported limit",
+            HipError.ErrorContextAlreadyInUse => "Context already in use",
+            HipError.ErrorPeerAccessUnsupported => "Peer access unsupported",
+            HipError.ErrorInvalidPtx => "Invalid PTX",
+            HipError.ErrorInvalidGraphicsContext => "Invalid graphics context",
+            HipError.ErrorNvlinkUncorrectable => "NVLink uncorrectable error",
+            HipError.ErrorJitCompilerNotFound => "JIT compiler not found",
+            HipError.ErrorInvalidSource => "Invalid source",
+            HipError.ErrorFileNotFound => "File not found",
+            HipError.ErrorSharedObjectSymbolNotFound => "Shared object symbol not found",
+            HipError.ErrorSharedObjectInitFailed => "Shared object initialization failed",
+            HipError.ErrorOperatingSystem => "Operating system error",
+            HipError.ErrorInvalidHandle => "Invalid handle",
+            HipError.ErrorNotFound => "Not found",
+            HipError.ErrorNotReady => "Not ready",
+            HipError.ErrorIllegalAddress => "Illegal address",
+            HipError.ErrorLaunchOutOfResources => "Launch out of resources",
+            HipError.ErrorLaunchTimeOut => "Launch timeout",
+            HipError.ErrorPeerAccessAlreadyEnabled => "Peer access already enabled",
+            HipError.ErrorPeerAccessNotEnabled => "Peer access not enabled",
+            HipError.ErrorSetOnActiveProcess => "Set on active process",
+            HipError.ErrorAssert => "Assertion failed",
+            HipError.ErrorHostMemoryAlreadyRegistered => "Host memory already registered",
+            HipError.ErrorHostMemoryNotRegistered => "Host memory not registered",
+            HipError.ErrorLaunchFailure => "Launch failure",
+            HipError.ErrorCooperativeLaunchTooLarge => "Cooperative launch too large",
+            HipError.ErrorNotSupported => "Not supported",
+            HipError.ErrorUnknown => "Unknown error",
+            _ => $"Unknown ROCm error code: {(int)errorCode}"
+        };
 
         #endregion
     }

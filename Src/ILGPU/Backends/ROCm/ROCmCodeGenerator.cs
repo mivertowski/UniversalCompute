@@ -234,21 +234,18 @@ namespace ILGPU.Backends.ROCm
         /// <summary>
         /// Converts basic type to HIP C++ type.
         /// </summary>
-        private static string GetHipType(string typeName)
+        private static string GetHipType(string typeName) => typeName switch
         {
-            return typeName switch
-            {
-                "bool" => "bool",
-                "int8" => "int8_t",
-                "int16" => "int16_t", 
-                "int32" => "int32_t",
-                "int64" => "int64_t",
-                "float16" => "half",
-                "float32" => "float",
-                "float64" => "double",
-                _ => "void*"
-            };
-        }
+            "bool" => "bool",
+            "int8" => "int8_t",
+            "int16" => "int16_t",
+            "int32" => "int32_t",
+            "int64" => "int64_t",
+            "float16" => "half",
+            "float32" => "float",
+            "float64" => "double",
+            _ => "void*"
+        };
 
         #endregion
     }

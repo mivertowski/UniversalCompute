@@ -162,7 +162,7 @@ namespace ILGPU.IR
             #region IDisposable
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             #endregion
         }

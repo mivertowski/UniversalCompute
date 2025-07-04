@@ -189,7 +189,7 @@ namespace ILGPU.IR.Rewriting
             /// Applies the current processing adapter.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Apply(
+            public readonly bool Apply(
                 BasicBlock.Builder blockBuilder,
                 HashSet<Value> converted,
                 Value value)

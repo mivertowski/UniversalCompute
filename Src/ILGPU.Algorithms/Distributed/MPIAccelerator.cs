@@ -27,10 +27,6 @@ namespace ILGPU.Algorithms.Distributed
     /// </summary>
     public sealed class MPIAccelerator : IDisposable
     {
-        private readonly Accelerator _localAccelerator;
-        private readonly MPICommunicator _communicator;
-        private readonly int _rank;
-        private readonly int _size;
         private bool _disposed;
 
         /// <summary>
@@ -40,37 +36,37 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="communicator">MPI communicator.</param>
         public MPIAccelerator(Accelerator localAccelerator, MPICommunicator communicator)
         {
-            _localAccelerator = localAccelerator ?? throw new ArgumentNullException(nameof(localAccelerator));
-            _communicator = communicator ?? throw new ArgumentNullException(nameof(communicator));
+            LocalAccelerator = localAccelerator ?? throw new ArgumentNullException(nameof(localAccelerator));
+            Communicator = communicator ?? throw new ArgumentNullException(nameof(communicator));
             
-            _rank = _communicator.Rank;
-            _size = _communicator.Size;
+            Rank = Communicator.Rank;
+            Size = Communicator.Size;
         }
 
         /// <summary>
         /// Gets the local accelerator for this node.
         /// </summary>
-        public Accelerator LocalAccelerator => _localAccelerator;
+        public Accelerator LocalAccelerator { get; }
 
         /// <summary>
         /// Gets the MPI communicator.
         /// </summary>
-        public MPICommunicator Communicator => _communicator;
+        public MPICommunicator Communicator { get; }
 
         /// <summary>
         /// Gets the MPI rank of this node.
         /// </summary>
-        public int Rank => _rank;
+        public int Rank { get; }
 
         /// <summary>
         /// Gets the total number of MPI processes.
         /// </summary>
-        public int Size => _size;
+        public int Size { get; }
 
         /// <summary>
         /// Gets whether this is the root process (rank 0).
         /// </summary>
-        public bool IsRoot => _rank == 0;
+        public bool IsRoot => Rank == 0;
 
         #region Data Distribution
 
@@ -84,10 +80,10 @@ namespace ILGPU.Algorithms.Distributed
         public void Scatter<T>(ArrayView<T> rootData, ArrayView<T> localBuffer, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            if (localBuffer.Length * _size != rootData.Length && IsRoot)
+            if (localBuffer.Length * Size != rootData.Length && IsRoot)
                 throw new ArgumentException("Root data size must equal local buffer size times number of processes");
 
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             
             if (IsRoot)
             {
@@ -99,7 +95,7 @@ namespace ILGPU.Algorithms.Distributed
                 localBuffer.CopyFrom(localPortion, actualStream);
                 
                 // Send portions to other processes
-                for (int destRank = 1; destRank < _size; destRank++)
+                for (int destRank = 1; destRank < Size; destRank++)
                 {
                     var offset = destRank * elementsPerProcess;
                     var portion = rootData.SubView(offset, elementsPerProcess);
@@ -108,14 +104,14 @@ namespace ILGPU.Algorithms.Distributed
                     var hostBuffer = new T[elementsPerProcess];
                     portion.CopyToCPU(hostBuffer);
                     
-                    _communicator.Send(hostBuffer, destRank, tag: 0);
+                    Communicator.Send(hostBuffer, destRank, tag: 0);
                 }
             }
             else
             {
                 // Non-root processes receive data
                 var hostBuffer = new T[localBuffer.Length];
-                _communicator.Receive(hostBuffer, 0, tag: 0);
+                Communicator.Receive(hostBuffer, 0, tag: 0);
                 
                 // Copy to GPU
                 localBuffer.CopyFromCPU(hostBuffer);
@@ -134,10 +130,10 @@ namespace ILGPU.Algorithms.Distributed
         public void Gather<T>(ArrayView<T> localData, ArrayView<T> rootBuffer, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            if (IsRoot && rootBuffer.Length != localData.Length * _size)
+            if (IsRoot && rootBuffer.Length != localData.Length * Size)
                 throw new ArgumentException("Root buffer size must equal local data size times number of processes");
 
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             
             if (IsRoot)
             {
@@ -150,10 +146,10 @@ namespace ILGPU.Algorithms.Distributed
                 actualStream.Synchronize();
                 
                 // Receive portions from other processes
-                for (int srcRank = 1; srcRank < _size; srcRank++)
+                for (int srcRank = 1; srcRank < Size; srcRank++)
                 {
                     var hostBuffer = new T[elementsPerProcess];
-                    _communicator.Receive(hostBuffer, srcRank, tag: 1);
+                    Communicator.Receive(hostBuffer, srcRank, tag: 1);
                     
                     var offset = srcRank * elementsPerProcess;
                     var portion = rootBuffer.SubView(offset, elementsPerProcess);
@@ -167,7 +163,7 @@ namespace ILGPU.Algorithms.Distributed
                 var hostBuffer = new T[localData.Length];
                 localData.CopyToCPU(hostBuffer);
                 
-                _communicator.Send(hostBuffer, 0, tag: 1);
+                Communicator.Send(hostBuffer, 0, tag: 1);
             }
         }
 
@@ -180,7 +176,7 @@ namespace ILGPU.Algorithms.Distributed
         public void Broadcast<T>(ArrayView<T> data, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             
             if (IsRoot)
             {
@@ -189,16 +185,16 @@ namespace ILGPU.Algorithms.Distributed
                 var hostBuffer = new T[data.Length];
                 data.CopyToCPU(hostBuffer);
                 
-                for (int destRank = 1; destRank < _size; destRank++)
+                for (int destRank = 1; destRank < Size; destRank++)
                 {
-                    _communicator.Send(hostBuffer, destRank, tag: 2);
+                    Communicator.Send(hostBuffer, destRank, tag: 2);
                 }
             }
             else
             {
                 // Non-root processes receive data
                 var hostBuffer = new T[data.Length];
-                _communicator.Receive(hostBuffer, 0, tag: 2);
+                Communicator.Receive(hostBuffer, 0, tag: 2);
                 
                 data.CopyFromCPU(hostBuffer);
             }
@@ -224,7 +220,7 @@ namespace ILGPU.Algorithms.Distributed
             if (localData.Length != result.Length)
                 throw new ArgumentException("Local data and result must have the same length");
 
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             actualStream.Synchronize();
             
             // Copy local data to CPU for MPI operations
@@ -232,7 +228,7 @@ namespace ILGPU.Algorithms.Distributed
             localData.CopyToCPU(hostData);
             
             // Perform MPI all-reduce
-            var reduced = _communicator.AllReduce(hostData, operation);
+            var reduced = Communicator.AllReduce(hostData, operation);
             
             // Copy result back to GPU
             result.CopyFromCPU(reduced);
@@ -250,7 +246,7 @@ namespace ILGPU.Algorithms.Distributed
         public void Reduce<T>(ArrayView<T> localData, ArrayView<T> result, MPIOperation operation, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             actualStream.Synchronize();
             
             // Copy local data to CPU for MPI operations
@@ -263,7 +259,7 @@ namespace ILGPU.Algorithms.Distributed
                     throw new ArgumentException("Local data and result must have the same length");
                 
                 // Perform MPI reduce to root
-                var reduced = _communicator.Reduce(hostData, operation, 0);
+                var reduced = Communicator.Reduce(hostData, operation, 0);
                 
                 // Copy result back to GPU
                 result.CopyFromCPU(reduced);
@@ -271,7 +267,7 @@ namespace ILGPU.Algorithms.Distributed
             else
             {
                 // Non-root processes just participate in reduction
-                _communicator.Reduce(hostData, operation, 0);
+                Communicator.Reduce(hostData, operation, 0);
             }
             
             actualStream.Synchronize();
@@ -290,20 +286,20 @@ namespace ILGPU.Algorithms.Distributed
             if (sendData.Length != recvData.Length)
                 throw new ArgumentException("Send and receive buffers must have the same length");
             
-            if (sendData.Length % _size != 0)
+            if (sendData.Length % Size != 0)
                 throw new ArgumentException("Data size must be multiple of process count");
 
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             actualStream.Synchronize();
             
-            var elementsPerProcess = sendData.Length / _size;
+            var elementsPerProcess = sendData.Length / Size;
             var hostSendBuffer = new T[sendData.Length];
             var hostRecvBuffer = new T[recvData.Length];
             
             sendData.CopyToCPU(hostSendBuffer);
             
             // Perform all-to-all exchange
-            _communicator.AllToAll(hostSendBuffer, hostRecvBuffer, elementsPerProcess);
+            Communicator.AllToAll(hostSendBuffer, hostRecvBuffer, elementsPerProcess);
             
             recvData.CopyFromCPU(hostRecvBuffer);
             actualStream.Synchronize();
@@ -328,7 +324,7 @@ namespace ILGPU.Algorithms.Distributed
             AcceleratorStream? stream = null)
             where TIndex : struct, IIndex
         {
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             
             // Calculate local extent for this process
             var localExtent = CalculateLocalExtent(globalExtent);
@@ -337,7 +333,7 @@ namespace ILGPU.Algorithms.Distributed
             kernel(actualStream, localExtent, parameters);
             
             // Synchronize all processes
-            _communicator.Barrier();
+            Communicator.Barrier();
         }
 
         /// <summary>
@@ -349,8 +345,8 @@ namespace ILGPU.Algorithms.Distributed
             if (globalExtent is Index1D index1D)
             {
                 var totalSize = index1D.Size;
-                var localSize = (totalSize + _size - 1) / _size; // Ceiling division
-                var startOffset = _rank * localSize;
+                var localSize = (totalSize + Size - 1) / Size; // Ceiling division
+                var startOffset = Rank * localSize;
                 var endOffset = Math.Min(startOffset + localSize, totalSize);
                 var actualLocalSize = Math.Max(0, endOffset - startOffset);
                 
@@ -360,8 +356,8 @@ namespace ILGPU.Algorithms.Distributed
             {
                 // Distribute along the Y dimension
                 var totalY = index2D.Y;
-                var localY = (totalY + _size - 1) / _size;
-                var startY = _rank * localY;
+                var localY = (totalY + Size - 1) / Size;
+                var startY = Rank * localY;
                 var endY = Math.Min(startY + localY, totalY);
                 var actualLocalY = Math.Max(0, endY - startY);
                 
@@ -371,8 +367,8 @@ namespace ILGPU.Algorithms.Distributed
             {
                 // Distribute along the Z dimension
                 var totalZ = index3D.Z;
-                var localZ = (totalZ + _size - 1) / _size;
-                var startZ = _rank * localZ;
+                var localZ = (totalZ + Size - 1) / Size;
+                var startZ = Rank * localZ;
                 var endZ = Math.Min(startZ + localZ, totalZ);
                 var actualLocalZ = Math.Max(0, endZ - startZ);
                 
@@ -391,7 +387,7 @@ namespace ILGPU.Algorithms.Distributed
         /// </summary>
         public void Barrier()
         {
-            _communicator.Barrier();
+            Communicator.Barrier();
         }
 
         /// <summary>
@@ -405,13 +401,13 @@ namespace ILGPU.Algorithms.Distributed
         public void Send<T>(ArrayView<T> data, int destRank, int tag = 0, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             actualStream.Synchronize();
             
             var hostBuffer = new T[data.Length];
             data.CopyToCPU(hostBuffer);
             
-            _communicator.Send(hostBuffer, destRank, tag);
+            Communicator.Send(hostBuffer, destRank, tag);
         }
 
         /// <summary>
@@ -426,11 +422,11 @@ namespace ILGPU.Algorithms.Distributed
             where T : unmanaged
         {
             var hostBuffer = new T[data.Length];
-            _communicator.Receive(hostBuffer, srcRank, tag);
+            Communicator.Receive(hostBuffer, srcRank, tag);
             
             data.CopyFromCPU(hostBuffer);
             
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             actualStream.Synchronize();
         }
 
@@ -446,13 +442,13 @@ namespace ILGPU.Algorithms.Distributed
         public async Task<MPIRequest> SendAsync<T>(ArrayView<T> data, int destRank, int tag = 0, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var actualStream = stream ?? _localAccelerator.DefaultStream;
+            var actualStream = stream ?? LocalAccelerator.DefaultStream;
             actualStream.Synchronize();
             
             var hostBuffer = new T[data.Length];
             data.CopyToCPU(hostBuffer);
             
-            return await _communicator.SendAsync(hostBuffer, destRank, tag);
+            return await Communicator.SendAsync(hostBuffer, destRank, tag);
         }
 
         /// <summary>
@@ -467,7 +463,7 @@ namespace ILGPU.Algorithms.Distributed
         public async Task<MPIRequest> ReceiveAsync<T>(ArrayView<T> data, int srcRank, int tag = 0, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var request = await _communicator.ReceiveAsync<T>(data.Length, srcRank, tag);
+            var request = await Communicator.ReceiveAsync<T>(data.Length, srcRank, tag);
             
             // When request completes, copy data to GPU
             _ = Task.Run(async () =>
@@ -476,7 +472,7 @@ namespace ILGPU.Algorithms.Distributed
                 var hostBuffer = request.GetData<T>();
                 data.CopyFromCPU(hostBuffer);
                 
-                var actualStream = stream ?? _localAccelerator.DefaultStream;
+                var actualStream = stream ?? LocalAccelerator.DefaultStream;
                 actualStream.Synchronize();
             });
             
@@ -492,7 +488,7 @@ namespace ILGPU.Algorithms.Distributed
         {
             if (!_disposed)
             {
-                _communicator?.Dispose();
+                Communicator?.Dispose();
                 _disposed = true;
             }
         }

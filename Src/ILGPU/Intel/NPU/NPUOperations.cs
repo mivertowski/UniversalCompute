@@ -212,15 +212,13 @@ namespace ILGPU.Intel.NPU
             float outputScale,
             long inputSize,
             long outputSize,
-            IntPtr context)
-        {
+            IntPtr context) =>
             // Execute mixed precision operation
             NPUNative.ExecuteMixedPrecisionInference(
                 input, weights, output,
                 inputSize, outputSize,
                 inputScale, outputScale,
                 context);
-        }
 
         #endregion
 
@@ -289,30 +287,21 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         /// <param name="context">NPU context.</param>
         /// <param name="optimizations">Optimization flags.</param>
-        public static void EnableOptimizations(IntPtr context, NPUOptimizationFlags optimizations)
-        {
-            NPUNative.SetOptimizationFlags(context, (uint)optimizations);
-        }
+        public static void EnableOptimizations(IntPtr context, NPUOptimizationFlags optimizations) => NPUNative.SetOptimizationFlags(context, (uint)optimizations);
 
         /// <summary>
         /// Sets NPU power management mode.
         /// </summary>
         /// <param name="context">NPU context.</param>
         /// <param name="powerMode">Power management mode.</param>
-        public static void SetPowerMode(IntPtr context, NPUPowerMode powerMode)
-        {
-            NPUNative.SetPowerMode(context, (int)powerMode);
-        }
+        public static void SetPowerMode(IntPtr context, NPUPowerMode powerMode) => NPUNative.SetPowerMode(context, (int)powerMode);
 
         /// <summary>
         /// Enables NPU telemetry and profiling.
         /// </summary>
         /// <param name="context">NPU context.</param>
         /// <param name="enableProfiling">Whether to enable profiling.</param>
-        public static void EnableProfiling(IntPtr context, bool enableProfiling)
-        {
-            NPUNative.EnableProfiling(context, enableProfiling);
-        }
+        public static void EnableProfiling(IntPtr context, bool enableProfiling) => NPUNative.EnableProfiling(context, enableProfiling);
 
         #endregion
 
@@ -321,10 +310,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Calculates the total size of a tensor.
         /// </summary>
-        private static long GetTensorSize((int N, int C, int H, int W) shape)
-        {
-            return (long)shape.N * shape.C * shape.H * shape.W;
-        }
+        private static long GetTensorSize((int N, int C, int H, int W) shape) => (long)shape.N * shape.C * shape.H * shape.W;
 
         /// <summary>
         /// Applies activation function to tensor data.

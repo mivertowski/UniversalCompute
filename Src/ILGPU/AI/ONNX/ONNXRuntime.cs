@@ -128,12 +128,12 @@ namespace ILGPU.AI.ONNX
         /// <summary>
         /// Gets or sets the device ID for GPU execution.
         /// </summary>
-        public int DeviceId { get; set; } = 0;
+        public int DeviceId { get; set; }
 
         /// <summary>
         /// Gets or sets whether to enable profiling.
         /// </summary>
-        public bool EnableProfiling { get; set; } = false;
+        public bool EnableProfiling { get; set; }
 
         /// <summary>
         /// Gets or sets custom execution provider options.
@@ -186,8 +186,6 @@ namespace ILGPU.AI.ONNX
     public sealed class ONNXModel : IDisposable
     {
         private readonly IntPtr _session;
-        private readonly string _modelPath;
-        private readonly ONNXRuntimeConfig _config;
         private readonly Dictionary<string, ONNXTensorInfo> _inputInfo;
         private readonly Dictionary<string, ONNXTensorInfo> _outputInfo;
         private bool _disposed;
@@ -199,13 +197,13 @@ namespace ILGPU.AI.ONNX
         /// <param name="config">Runtime configuration.</param>
         public ONNXModel(string modelPath, ONNXRuntimeConfig? config = null)
         {
-            _modelPath = modelPath ?? throw new ArgumentNullException(nameof(modelPath));
-            _config = config ?? ONNXRuntimeConfig.Default;
+            ModelPath = modelPath ?? throw new ArgumentNullException(nameof(modelPath));
+            Config = config ?? ONNXRuntimeConfig.Default;
             _inputInfo = new Dictionary<string, ONNXTensorInfo>();
             _outputInfo = new Dictionary<string, ONNXTensorInfo>();
 
             // Create ONNX Runtime session
-            _session = CreateSession(modelPath, _config);
+            _session = CreateSession(modelPath, Config);
             if (_session == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to create ONNX Runtime session");
 
@@ -216,12 +214,12 @@ namespace ILGPU.AI.ONNX
         /// <summary>
         /// Gets the model file path.
         /// </summary>
-        public string ModelPath => _modelPath;
+        public string ModelPath { get; }
 
         /// <summary>
         /// Gets the runtime configuration.
         /// </summary>
-        public ONNXRuntimeConfig Config => _config;
+        public ONNXRuntimeConfig Config { get; }
 
         /// <summary>
         /// Gets input tensor information.
@@ -272,10 +270,7 @@ namespace ILGPU.AI.ONNX
         /// </summary>
         /// <param name="inputs">Input tensors.</param>
         /// <returns>Task with output tensors.</returns>
-        public async Task<Dictionary<string, ArrayView<float>>> RunInferenceAsync(Dictionary<string, ArrayView<float>> inputs)
-        {
-            return await Task.Run(() => RunInference(inputs));
-        }
+        public async Task<Dictionary<string, ArrayView<float>>> RunInferenceAsync(Dictionary<string, ArrayView<float>> inputs) => await Task.Run(() => RunInference(inputs));
 
         /// <summary>
         /// Runs batch inference on multiple inputs.
@@ -300,7 +295,7 @@ namespace ILGPU.AI.ONNX
         /// <returns>Profiling data.</returns>
         public ONNXProfilingInfo GetProfilingInfo()
         {
-            if (!_config.EnableProfiling)
+            if (!Config.EnableProfiling)
                 throw new InvalidOperationException("Profiling not enabled");
 
             return QueryProfilingInfo(_session);
@@ -567,21 +562,16 @@ namespace ILGPU.AI.ONNX
             throw new NotImplementedException("Tensor extraction requires proper memory buffer creation");
         }
 
-        private void ReleaseSession(IntPtr session)
-        {
-            ONNXNative.ReleaseSession(session);
-        }
+        private void ReleaseSession(IntPtr session) => ONNXNative.ReleaseSession(session);
 
-        private ONNXProfilingInfo QueryProfilingInfo(IntPtr session)
-        {
+        private ONNXProfilingInfo QueryProfilingInfo(IntPtr session) =>
             // Query profiling information from ONNX Runtime
-            return new ONNXProfilingInfo
+            new()
             {
                 TotalInferenceTime = 0.0,
                 OperatorTimes = new Dictionary<string, double>(),
                 MemoryUsage = 0L
             };
-        }
 
         #endregion
     }

@@ -70,7 +70,7 @@ namespace ILGPU.Runtime
         /// True, if the other specialized value is equal to this value.
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(SpecializedValue<T> other) => Value.Equals(other.Value);
+        public readonly bool Equals(SpecializedValue<T> other) => Value.Equals(other.Value);
 
         #endregion
 
@@ -88,13 +88,13 @@ namespace ILGPU.Runtime
         /// Returns the hash code of this value.
         /// </summary>
         /// <returns>The hash code of this value.</returns>
-        public override int GetHashCode() => Value.GetHashCode();
+        public override readonly int GetHashCode() => Value.GetHashCode();
 
         /// <summary>
         /// Returns the string representation of this value.
         /// </summary>
         /// <returns>The string representation of this value.</returns>
-        public override string? ToString() => Value.ToString();
+        public override readonly string? ToString() => Value.ToString();
 
         #endregion
 

@@ -87,7 +87,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             try
             {
                 // Get total platform count
-                var result = CLApi.GetPlatformIDs(0, IntPtr.Zero, out uint platformCount);
+                var result = CLApi.GetPlatformIDs(0, null, out uint platformCount);
                 if (result != CLError.CL_SUCCESS || platformCount == 0)
                     return Array.Empty<IntPtr>();
 
@@ -141,7 +141,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         private static string GetPlatformInfoString(IntPtr platform, CLPlatformInfoType paramName)
         {
             // Get required size
-            var result = CLApi.GetPlatformInfo(platform, paramName, UIntPtr.Zero, IntPtr.Zero, out var size);
+            var result = CLApi.GetPlatformInfo(platform, paramName, UIntPtr.Zero, null, out var size);
             if (result != CLError.CL_SUCCESS)
                 return string.Empty;
 
@@ -194,7 +194,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             try
             {
                 // Get device count
-                var result = CLApi.GetDeviceIDs(platform, deviceType, 0, IntPtr.Zero, out uint deviceCount);
+                var result = CLApi.GetDeviceIDs(platform, deviceType, 0, null, out uint deviceCount);
                 if (result != CLError.CL_SUCCESS || deviceCount == 0)
                     return Array.Empty<IntPtr>();
 
@@ -283,10 +283,10 @@ namespace ILGPU.Runtime.OpenCL.AMD
             try
             {
                 // Get basic device info
-                info.Name = GetDeviceInfoString(device, (int)CLDeviceInfoType.CL_DEVICE_NAME);
-                info.Vendor = GetDeviceInfoString(device, (int)CLDeviceInfoType.CL_DEVICE_VENDOR);
-                info.Version = GetDeviceInfoString(device, (int)CLDeviceInfoType.CL_DEVICE_VERSION);
-                info.DriverVersion = GetDeviceInfoString(device, (int)CLDeviceInfoType.CL_DRIVER_VERSION);
+                info.Name = GetDeviceInfoString(device, CLDeviceInfoType.CL_DEVICE_NAME);
+                info.Vendor = GetDeviceInfoString(device, CLDeviceInfoType.CL_DEVICE_VENDOR);
+                info.Version = GetDeviceInfoString(device, CLDeviceInfoType.CL_DEVICE_VERSION);
+                info.DriverVersion = GetDeviceInfoString(device, CLDeviceInfoType.CL_DRIVER_VERSION);
 
                 // Get AMD-specific info
                 info.BoardName = GetDeviceInfoString(device, CL_DEVICE_BOARD_NAME_AMD);
@@ -303,11 +303,11 @@ namespace ILGPU.Runtime.OpenCL.AMD
                 info.LocalMemBanks = GetDeviceInfoUInt32(device, CL_DEVICE_LOCAL_MEM_BANKS_AMD);
 
                 // Get standard compute info
-                info.ComputeUnits = GetDeviceInfoUInt32(device, (int)CLDeviceInfoType.CL_DEVICE_MAX_COMPUTE_UNITS);
-                info.MaxWorkGroupSize = GetDeviceInfoUIntPtr(device, (int)CLDeviceInfoType.CL_DEVICE_MAX_WORK_GROUP_SIZE);
-                info.GlobalMemSize = GetDeviceInfoUInt64(device, (int)CLDeviceInfoType.CL_DEVICE_GLOBAL_MEM_SIZE);
-                info.LocalMemSize = GetDeviceInfoUInt64(device, (int)CLDeviceInfoType.CL_DEVICE_LOCAL_MEM_SIZE);
-                info.MaxClockFrequency = GetDeviceInfoUInt32(device, (int)CLDeviceInfoType.CL_DEVICE_MAX_CLOCK_FREQUENCY);
+                info.ComputeUnits = GetDeviceInfoUInt32(device, CLDeviceInfoType.CL_DEVICE_MAX_COMPUTE_UNITS);
+                info.MaxWorkGroupSize = GetDeviceInfoUIntPtr(device, CLDeviceInfoType.CL_DEVICE_MAX_WORK_GROUP_SIZE);
+                info.GlobalMemSize = GetDeviceInfoUInt64(device, CLDeviceInfoType.CL_DEVICE_GLOBAL_MEM_SIZE);
+                info.LocalMemSize = GetDeviceInfoUInt64(device, CLDeviceInfoType.CL_DEVICE_LOCAL_MEM_SIZE);
+                info.MaxClockFrequency = GetDeviceInfoUInt32(device, CLDeviceInfoType.CL_DEVICE_MAX_CLOCK_FREQUENCY);
 
                 return info;
             }
@@ -332,7 +332,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         {
             try
             {
-                var result = CLApi.GetDeviceInfo(device, (CLDeviceInfoType)paramName, UIntPtr.Zero, IntPtr.Zero, out var size);
+                var result = CLApi.GetDeviceInfo(device, (CLDeviceInfoType)paramName, UIntPtr.Zero, null, out var size);
                 if (result != CLError.CL_SUCCESS)
                     return string.Empty;
 
@@ -485,7 +485,7 @@ __kernel void amd_gemm_f32(
 }";
 
             // Create and compile the program
-            var program = CLApi.CreateProgramWithSource(context, 1, new[] { kernelSource }, IntPtr.Zero, out var result);
+            var program = CLApi.CreateProgramWithSource(context, 1, new[] { kernelSource }, null, out var result);
             if (result != CLError.CL_SUCCESS)
                 throw new InvalidOperationException($"Failed to create OpenCL program: {result}");
 
@@ -493,7 +493,7 @@ __kernel void amd_gemm_f32(
             {
                 // Build program with AMD-specific optimizations
                 string buildOptions = "-cl-mad-enable -cl-fast-relaxed-math -cl-unsafe-math-optimizations";
-                result = CLApi.BuildProgram(program, 0, IntPtr.Zero, buildOptions, IntPtr.Zero, IntPtr.Zero);
+                result = CLApi.BuildProgram(program, 0, null, buildOptions, IntPtr.Zero, IntPtr.Zero);
                 if (result != CLError.CL_SUCCESS)
                     throw new InvalidOperationException($"Failed to build OpenCL program: {result}");
 
@@ -513,13 +513,13 @@ __kernel void amd_gemm_f32(
                     CLApi.SetKernelArg(kernel, 5, new UIntPtr(4), ref n);
 
                     // Execute kernel with optimized work group size for AMD GPUs
-                    var globalWorkSize = new UIntPtr[] { new UIntPtr((uint)m), new UIntPtr((uint)n) };
-                    var localWorkSize = new UIntPtr[] { new UIntPtr(16), new UIntPtr(16) }; // 256 work items (16x16)
+                    var globalWorkSize = new UIntPtr[] { new((uint)m), new((uint)n) };
+                    var localWorkSize = new UIntPtr[] { new(16), new(16) }; // 256 work items (16x16)
 
                     result = CLApi.EnqueueNDRangeKernel(
                         commandQueue, kernel, 2,
-                        IntPtr.Zero, globalWorkSize, localWorkSize,
-                        0, IntPtr.Zero, IntPtr.Zero);
+                        null, globalWorkSize, localWorkSize,
+                        0, null, IntPtr.Zero);
 
                     if (result != CLError.CL_SUCCESS)
                         throw new InvalidOperationException($"Failed to execute OpenCL kernel: {result}");
@@ -544,14 +544,12 @@ __kernel void amd_gemm_f32(
         private static void ExecuteStandardOpenCLMatMul(
             IntPtr context, IntPtr commandQueue,
             IntPtr a, IntPtr b, IntPtr c,
-            int m, int k, int n)
-        {
+            int m, int k, int n) =>
             // Basic OpenCL matrix multiplication fallback
             // This would use standard OpenCL without AMD-specific optimizations
-            
+
             // For demonstration, we'll simulate the operation
             System.Threading.Thread.Sleep(1); // Simulate computation
-        }
 
         #endregion
 
@@ -689,10 +687,7 @@ __kernel void amd_gemm_f32(
             return new IntPtr(1);
         }
 
-        public static CLError BuildProgram(IntPtr program, uint numDevices, IntPtr[] deviceList, string options, IntPtr notify, IntPtr userData)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError BuildProgram(IntPtr program, uint numDevices, IntPtr[] deviceList, string options, IntPtr notify, IntPtr userData) => CLError.CL_SUCCESS;
 
         public static IntPtr CreateKernel(IntPtr program, string kernelName, out CLError errorCode)
         {
@@ -700,35 +695,17 @@ __kernel void amd_gemm_f32(
             return new IntPtr(1);
         }
 
-        public static CLError SetKernelArg(IntPtr kernel, uint argIndex, UIntPtr argSize, ref IntPtr argValue)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError SetKernelArg(IntPtr kernel, uint argIndex, UIntPtr argSize, ref IntPtr argValue) => CLError.CL_SUCCESS;
 
-        public static CLError SetKernelArg(IntPtr kernel, uint argIndex, UIntPtr argSize, ref int argValue)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError SetKernelArg(IntPtr kernel, uint argIndex, UIntPtr argSize, ref int argValue) => CLError.CL_SUCCESS;
 
-        public static CLError EnqueueNDRangeKernel(IntPtr commandQueue, IntPtr kernel, uint workDim, UIntPtr[] globalWorkOffset, UIntPtr[] globalWorkSize, UIntPtr[] localWorkSize, uint numEventsInWaitList, IntPtr[] eventWaitList, IntPtr eventOut)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError EnqueueNDRangeKernel(IntPtr commandQueue, IntPtr kernel, uint workDim, UIntPtr[] globalWorkOffset, UIntPtr[] globalWorkSize, UIntPtr[] localWorkSize, uint numEventsInWaitList, IntPtr[] eventWaitList, IntPtr eventOut) => CLError.CL_SUCCESS;
 
-        public static CLError Finish(IntPtr commandQueue)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError Finish(IntPtr commandQueue) => CLError.CL_SUCCESS;
 
-        public static CLError ReleaseKernel(IntPtr kernel)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError ReleaseKernel(IntPtr kernel) => CLError.CL_SUCCESS;
 
-        public static CLError ReleaseProgram(IntPtr program)
-        {
-            return CLError.CL_SUCCESS;
-        }
+        public static CLError ReleaseProgram(IntPtr program) => CLError.CL_SUCCESS;
     }
 
     /// <summary>

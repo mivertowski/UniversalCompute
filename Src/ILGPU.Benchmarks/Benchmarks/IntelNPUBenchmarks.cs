@@ -31,7 +31,7 @@ namespace ILGPU.Benchmarks.Benchmarks;
 [SimpleJob]
 public class IntelNPUBenchmarks : IDisposable
 {
-    private Context? context;
+    private readonly Context? context;
     private Accelerator? ilgpuAccelerator;
     private IntelNPUAccelerator? npuAccelerator;
     private MemoryBuffer1D<float, Stride1D.Dense>? inputBuffer;

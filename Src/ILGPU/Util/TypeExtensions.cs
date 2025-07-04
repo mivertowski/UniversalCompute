@@ -138,7 +138,7 @@ namespace ILGPU.Util
         /// </summary>
         /// <param name="type">The source type.</param>
         /// <returns>The resolved delegate invocation method.</returns>
-        public static MethodInfo? GetDelegateInvokeMethod(this Type type)
+        public static MethodInfo? GetDelegateInvokeMethod([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] this Type type)
         {
             const string InvokeMethodName = "Invoke";
             return !type.IsDelegate()

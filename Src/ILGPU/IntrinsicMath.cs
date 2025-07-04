@@ -591,7 +591,7 @@ namespace ILGPU
             /// Converts the parts into a single ulong value.
             /// </summary>
             /// <returns>The resolved ulong value.</returns>
-            public ulong ToULong() => ((ulong)Upper << 32) | Lower;
+            public readonly ulong ToULong() => ((ulong)Upper << 32) | Lower;
         }
 
         /// <summary>

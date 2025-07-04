@@ -108,7 +108,7 @@ namespace ILGPU.IR.Analyses
                 public AddressSpaceInfo Info { get; }
 
                 /// <summary cref="IEnumerator.Current"/>
-                object IEnumerator.Current => Current;
+                readonly object IEnumerator.Current => Current;
 
                 /// <summary>
                 /// Returns the current address space.
@@ -120,7 +120,7 @@ namespace ILGPU.IR.Analyses
                 #region Methods
 
                 /// <summary cref="IDisposable.Dispose"/>
-                void IDisposable.Dispose() { }
+                readonly void IDisposable.Dispose() { }
 
                 /// <summary cref="IEnumerator.MoveNext"/>
                 public bool MoveNext()

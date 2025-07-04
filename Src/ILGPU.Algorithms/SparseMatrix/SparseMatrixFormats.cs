@@ -28,7 +28,6 @@ namespace ILGPU.Algorithms.SparseMatrix
     public sealed class CSRMatrix<T> : IDisposable
         where T : unmanaged, INumber<T>
     {
-        private readonly Accelerator _accelerator;
         private bool _disposed;
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             int[] colIndices,
             T[] values)
         {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             if (rowPtr.Length != numRows + 1)
                 throw new ArgumentException($"Row pointer array must have length {numRows + 1}");
@@ -60,9 +59,9 @@ namespace ILGPU.Algorithms.SparseMatrix
             NumNonZeros = values.Length;
 
             // Allocate GPU memory and copy data
-            RowPtr = _accelerator.Allocate1D(rowPtr);
-            ColIndices = _accelerator.Allocate1D(colIndices);
-            Values = _accelerator.Allocate1D(values);
+            RowPtr = Accelerator.Allocate1D(rowPtr);
+            ColIndices = Accelerator.Allocate1D(colIndices);
+            Values = Accelerator.Allocate1D(values);
         }
 
         /// <summary>
@@ -98,7 +97,7 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <summary>
         /// Gets the accelerator associated with this matrix.
         /// </summary>
-        public Accelerator Accelerator => _accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <summary>
         /// Creates a CSR matrix from coordinate (COO) format.
@@ -210,16 +209,16 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <returns>Dense matrix.</returns>
         public MemoryBuffer2D<T, Stride2D.DenseX> ToDense(AcceleratorStream? stream = null)
         {
-            var actualStream = stream ?? _accelerator.DefaultStream;
-            var denseMatrix = _accelerator.Allocate2DDenseX<T>(new Index2D(NumRows, NumCols));
+            var actualStream = stream ?? Accelerator.DefaultStream;
+            var denseMatrix = Accelerator.Allocate2DDenseX<T>(new Index2D(NumRows, NumCols));
 
             // Clear the dense matrix
-            var clearKernel = _accelerator.LoadAutoGroupedStreamKernel<
+            var clearKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView2D<T, Stride2D.DenseX>>(ClearDenseMatrixKernel);
             clearKernel(actualStream, new Index2D(NumRows, NumCols), denseMatrix.View);
 
             // Fill from CSR data
-            var fillKernel = _accelerator.LoadAutoGroupedStreamKernel<
+            var fillKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<T>, ArrayView2D<T, Stride2D.DenseX>>(
                 CSRToDenseKernel);
             fillKernel(actualStream, NumRows, RowPtr.View, ColIndices.View, Values.View, denseMatrix.View);
@@ -235,7 +234,7 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <returns>Transposed CSR matrix.</returns>
         public CSRMatrix<T> Transpose(AcceleratorStream? stream = null)
         {
-            var actualStream = stream ?? _accelerator.DefaultStream;
+            var actualStream = stream ?? Accelerator.DefaultStream;
 
             // Copy data to CPU for transposition (could be optimized with GPU algorithms)
             var rowPtrHost = new int[NumRows + 1];
@@ -264,7 +263,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             }
 
             // Convert COO to CSR
-            return FromCOO(_accelerator, NumCols, NumRows, transposeRowIndices, transposeColIndices, transposeValues);
+            return FromCOO(Accelerator, NumCols, NumRows, transposeRowIndices, transposeColIndices, transposeValues);
         }
 
         /// <summary>
@@ -317,7 +316,6 @@ namespace ILGPU.Algorithms.SparseMatrix
     public sealed class CSCMatrix<T> : IDisposable
         where T : unmanaged, INumber<T>
     {
-        private readonly Accelerator _accelerator;
         private bool _disposed;
 
         /// <summary>
@@ -337,7 +335,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             int[] rowIndices,
             T[] values)
         {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             if (colPtr.Length != numCols + 1)
                 throw new ArgumentException($"Column pointer array must have length {numCols + 1}");
@@ -348,9 +346,9 @@ namespace ILGPU.Algorithms.SparseMatrix
             NumCols = numCols;
             NumNonZeros = values.Length;
 
-            ColPtr = _accelerator.Allocate1D(colPtr);
-            RowIndices = _accelerator.Allocate1D(rowIndices);
-            Values = _accelerator.Allocate1D(values);
+            ColPtr = Accelerator.Allocate1D(colPtr);
+            RowIndices = Accelerator.Allocate1D(rowIndices);
+            Values = Accelerator.Allocate1D(values);
         }
 
         /// <summary>
@@ -386,7 +384,7 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <summary>
         /// Gets the accelerator associated with this matrix.
         /// </summary>
-        public Accelerator Accelerator => _accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <summary>
         /// Converts CSC matrix to CSR format.
@@ -420,7 +418,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             }
 
             // Convert COO to CSR
-            return CSRMatrix<T>.FromCOO(_accelerator, NumRows, NumCols, cooRowIndices, cooColIndices, valuesHost);
+            return CSRMatrix<T>.FromCOO(Accelerator, NumRows, NumCols, cooRowIndices, cooColIndices, valuesHost);
         }
 
         /// <summary>
@@ -445,7 +443,6 @@ namespace ILGPU.Algorithms.SparseMatrix
     public sealed class BSRMatrix<T> : IDisposable
         where T : unmanaged, INumber<T>
     {
-        private readonly Accelerator _accelerator;
         private bool _disposed;
 
         /// <summary>
@@ -469,7 +466,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             int[] colIndices,
             T[] values)
         {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             if (rowPtr.Length != numBlockRows + 1)
                 throw new ArgumentException($"Row pointer array must have length {numBlockRows + 1}");
@@ -484,9 +481,9 @@ namespace ILGPU.Algorithms.SparseMatrix
             if (values.Length != expectedValueSize)
                 throw new ArgumentException($"Values array must have length {expectedValueSize}");
 
-            RowPtr = _accelerator.Allocate1D(rowPtr);
-            ColIndices = _accelerator.Allocate1D(colIndices);
-            Values = _accelerator.Allocate1D(values);
+            RowPtr = Accelerator.Allocate1D(rowPtr);
+            ColIndices = Accelerator.Allocate1D(colIndices);
+            Values = Accelerator.Allocate1D(values);
         }
 
         /// <summary>
@@ -542,7 +539,7 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <summary>
         /// Gets the accelerator associated with this matrix.
         /// </summary>
-        public Accelerator Accelerator => _accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <summary>
         /// Converts BSR matrix to CSR format.
@@ -569,16 +566,16 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <returns>Dense matrix.</returns>
         public MemoryBuffer2D<T, Stride2D.DenseX> ToDense(AcceleratorStream? stream = null)
         {
-            var actualStream = stream ?? _accelerator.DefaultStream;
-            var denseMatrix = _accelerator.Allocate2DDenseX<T>(new Index2D(NumRows, NumCols));
+            var actualStream = stream ?? Accelerator.DefaultStream;
+            var denseMatrix = Accelerator.Allocate2DDenseX<T>(new Index2D(NumRows, NumCols));
 
             // Clear the dense matrix
-            var clearKernel = _accelerator.LoadAutoGroupedStreamKernel<
+            var clearKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView2D<T, Stride2D.DenseX>>(ClearDenseMatrixKernel);
             clearKernel(actualStream, new Index2D(NumRows, NumCols), denseMatrix.View);
 
             // Fill from BSR data
-            var fillKernel = _accelerator.LoadAutoGroupedStreamKernel<
+            var fillKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<T>, ArrayView2D<T, Stride2D.DenseX>,
                 int, int>(BSRToDenseKernel);
             fillKernel(actualStream, NumBlockRows, 
@@ -649,7 +646,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             for (int i = 0; i < NumRows; i++)
                 diagonal[i] = T.One;
 
-            return CSRMatrix<T>.CreateDiagonal(_accelerator, diagonal);
+            return CSRMatrix<T>.CreateDiagonal(Accelerator, diagonal);
         }
 
         #endregion

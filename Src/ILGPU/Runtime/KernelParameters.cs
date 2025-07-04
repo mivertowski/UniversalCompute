@@ -48,16 +48,13 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Creates empty kernel parameters.
         /// </summary>
-        public static KernelParameters Empty => new KernelParameters();
+        public static KernelParameters Empty => new();
 
         /// <summary>
         /// Creates kernel parameters from an array of values.
         /// </summary>
         /// <param name="values">Parameter values.</param>
         /// <returns>Kernel parameters instance.</returns>
-        public static KernelParameters Create(params object[] values)
-        {
-            return new KernelParameters { Values = values };
-        }
+        public static KernelParameters Create(params object[] values) => new() { Values = values };
     }
 }

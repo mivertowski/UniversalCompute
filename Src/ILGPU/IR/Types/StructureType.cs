@@ -83,7 +83,7 @@ namespace ILGPU.IR.Types
             /// <summary>
             /// Returns the number of all fields.
             /// </summary>
-            public int Count => allFieldsBuilder.Count;
+            public readonly int Count => allFieldsBuilder.Count;
 
             /// <summary>
             /// The current offset in bytes.
@@ -103,14 +103,14 @@ namespace ILGPU.IR.Types
             /// <summary>
             /// Returns the aligned size based on the current offset and the alignment.
             /// </summary>
-            public int AlignedSize => Alignment < 1 ? 0 : Align(Offset, Alignment);
+            public readonly int AlignedSize => Alignment < 1 ? 0 : Align(Offset, Alignment);
 
             /// <summary>
             /// Returns the field type that corresponds to the given field access.
             /// </summary>
             /// <param name="access">The field access.</param>
             /// <returns>The resolved field type.</returns>
-            public TypeNode this[FieldAccess access] => allFieldsBuilder[access.Index];
+            public readonly TypeNode this[FieldAccess access] => allFieldsBuilder[access.Index];
 
             #endregion
 
@@ -227,7 +227,7 @@ namespace ILGPU.IR.Types
             /// <param name="allTypes">All field types.</param>
             /// <param name="offsets">All field offsets.</param>
             /// <param name="remappedFields">Renumbered field indices.</param>
-            internal void Seal(
+            internal readonly void Seal(
                 out ImmutableArray<TypeNode> types,
                 out ImmutableArray<TypeNode> allTypes,
                 out ImmutableArray<int> offsets,
@@ -291,14 +291,14 @@ namespace ILGPU.IR.Types
             /// <summary>
             /// Returns the current use.
             /// </summary>
-            public (TypeNode, FieldAccess) Current =>
+            public readonly (TypeNode, FieldAccess) Current =>
                 (Type.Fields[index], new FieldAccess(index));
 
             /// <summary cref="IEnumerator.Current"/>
             object IEnumerator.Current => Current;
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             /// <summary cref="IEnumerator.MoveNext"/>
             public bool MoveNext() => ++index < Type.NumFields;
@@ -340,7 +340,7 @@ namespace ILGPU.IR.Types
                 /// <summary>
                 /// Returns the parent structure type.
                 /// </summary>
-                public StructureType Type => enumerator.Type;
+                public readonly StructureType Type => enumerator.Type;
 
                 /// <summary>
                 /// Returns the current use.
@@ -358,7 +358,7 @@ namespace ILGPU.IR.Types
                 object IEnumerator.Current => Current;
 
                 /// <summary cref="IDisposable.Dispose"/>
-                void IDisposable.Dispose() { }
+                readonly void IDisposable.Dispose() { }
 
                 /// <summary cref="IEnumerator.MoveNext"/>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -513,7 +513,7 @@ namespace ILGPU.IR.Types
                 /// </summary>
                 /// <param name="first">The first part.</param>
                 /// <param name="second">The second part.</param>
-                internal void Split(out Entry first, out Entry second)
+                internal readonly void Split(out Entry first, out Entry second)
                 {
                     Type.Assert(Count > 1);
                     int firstCount = Count >> 1 + Count % 2;

@@ -72,7 +72,7 @@ namespace ILGPU.Backends.PTX
             /// Appends the given address space
             /// </summary>
             /// <param name="addressSpace">The address space.</param>
-            public void AppendAddressSpace(MemoryAddressSpace addressSpace)
+            public readonly void AppendAddressSpace(MemoryAddressSpace addressSpace)
             {
                 switch (addressSpace)
                 {
@@ -108,7 +108,7 @@ namespace ILGPU.Backends.PTX
             /// Appends the given command postfix.
             /// </summary>
             /// <param name="suffix">The postfix.</param>
-            public void AppendSuffix(string suffix)
+            public readonly void AppendSuffix(string suffix)
             {
                 stringBuilder.Append('.');
                 stringBuilder.Append(suffix);
@@ -327,7 +327,7 @@ namespace ILGPU.Backends.PTX
             /// Appends an offset computation.
             /// </summary>
             /// <param name="offset">The constant offset in bytes.</param>
-            public void AppendOffset(int offset)
+            public readonly void AppendOffset(int offset)
             {
                 if (offset < 1)
                     return;
@@ -391,7 +391,7 @@ namespace ILGPU.Backends.PTX
             /// Appends the given string without modification.
             /// </summary>
             /// <param name="value">The string value.</param>
-            public void AppendRawString(string value) =>
+            public readonly void AppendRawString(string value) =>
                 stringBuilder.Append(value);
 
             #endregion
@@ -399,7 +399,7 @@ namespace ILGPU.Backends.PTX
             #region IDisposable
 
             /// <summary cref="IDisposable.Dispose"/>
-            public void Dispose()
+            public readonly void Dispose()
             {
                 stringBuilder.Append(commandTerminator);
                 stringBuilder.AppendLine();

@@ -31,7 +31,6 @@ namespace ILGPU.Runtime.OneAPI
     public sealed class OneAPIMemoryBuffer : MemoryBuffer
     {
         private readonly IntelOneAPIAccelerator accelerator;
-        private readonly IntPtr nativePtr;
 #pragma warning disable CS0414 // Field is assigned but its value is never used
         private bool disposed;
 #pragma warning restore CS0414
@@ -53,15 +52,15 @@ namespace ILGPU.Runtime.OneAPI
             var totalSize = new UIntPtr((ulong)(length * elementSize));
             try
             {
-                nativePtr = SYCLNative.MallocDevice(
+                NativePtr = SYCLNative.MallocDevice(
                     totalSize, 
                     accelerator.DeviceHandle, 
                     accelerator.ContextHandle);
                 
-                if (nativePtr == IntPtr.Zero)
+                if (NativePtr == IntPtr.Zero)
                 {
                     // Fallback to shared memory
-                    nativePtr = SYCLNative.MallocShared(
+                    NativePtr = SYCLNative.MallocShared(
                         totalSize, 
                         accelerator.DeviceHandle, 
                         accelerator.ContextHandle);
@@ -70,14 +69,14 @@ namespace ILGPU.Runtime.OneAPI
             catch
             {
                 // Fallback: allocate dummy memory
-                nativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((IntPtr)(length * elementSize));
+                NativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((IntPtr)(length * elementSize));
             }
         }
 
         /// <summary>
         /// Gets the native memory pointer.
         /// </summary>
-        public new IntPtr NativePtr => nativePtr;
+        public new IntPtr NativePtr { get; }
 
         /// <summary>
         /// Copies data from source view to target view.
@@ -193,18 +192,18 @@ namespace ILGPU.Runtime.OneAPI
         /// </summary>
         protected override void DisposeAcceleratorObject(bool disposing)
         {
-            if (!disposed && disposing && nativePtr != IntPtr.Zero)
+            if (!disposed && disposing && NativePtr != IntPtr.Zero)
             {
                 try
                 {
-                    SYCLNative.Free(nativePtr, accelerator.ContextHandle);
+                    SYCLNative.Free(NativePtr, accelerator.ContextHandle);
                 }
                 catch
                 {
                     // Fallback: free managed memory
                     try
                     {
-                        System.Runtime.InteropServices.Marshal.FreeHGlobal(nativePtr);
+                        System.Runtime.InteropServices.Marshal.FreeHGlobal(NativePtr);
                     }
                     catch
                     {
@@ -299,9 +298,6 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Disposes this kernel.
         /// </summary>
-        protected override void DisposeAcceleratorObject(bool disposing)
-        {
-            disposed = true;
-        }
+        protected override void DisposeAcceleratorObject(bool disposing) => disposed = true;
     }
 }

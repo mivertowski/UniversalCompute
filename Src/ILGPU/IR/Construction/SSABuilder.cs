@@ -98,7 +98,7 @@ namespace ILGPU.IR.Construction
             /// <param name="targetMarkerValue">
             /// The target marker value reference.
             /// </param>
-            public void Apply(ref int targetMarkerValue) =>
+            public readonly void Apply(ref int targetMarkerValue) =>
                 targetMarkerValue = MarkerValue;
         }
 

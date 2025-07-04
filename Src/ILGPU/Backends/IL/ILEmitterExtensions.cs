@@ -15,6 +15,7 @@ using ILGPU.IR.Values;
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Backends.IL
 {
@@ -170,7 +171,7 @@ namespace ILGPU.Backends.IL
         /// <param name="type">The managed structure type.</param>
         /// <param name="fieldIndex">The internal field index.</param>
         /// <returns>The corresponding field info.</returns>
-        public static FieldInfo GetFieldInfo(Type type, int fieldIndex)
+        public static FieldInfo GetFieldInfo([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type type, int fieldIndex)
         {
             var fieldName = StructureType.GetFieldName(fieldIndex);
             return type.GetField(fieldName).AsNotNull();

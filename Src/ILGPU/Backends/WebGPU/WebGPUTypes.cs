@@ -324,10 +324,9 @@ namespace ILGPU.Backends.WebGPU
         /// </summary>
         /// <param name="device">WebGPU device.</param>
         /// <returns>WebGPU capabilities.</returns>
-        public static WebGPUCapabilities Query(WebGPUDevice device)
-        {
+        public static WebGPUCapabilities Query(WebGPUDevice device) =>
             // Default WebGPU limits as per specification
-            return new WebGPUCapabilities
+            new()
             {
                 MaxBufferSize = 268_435_456, // 256 MB
                 MaxTextureDimension1D = 8192,
@@ -359,7 +358,6 @@ namespace ILGPU.Backends.WebGPU
                 MaxComputeWorkgroupsPerDimension = 65535,
                 EstimatedMemoryBandwidth = 100.0 // Conservative estimate for web environments
             };
-        }
     }
 
     /// <summary>
@@ -401,7 +399,7 @@ namespace ILGPU.Backends.WebGPU
                 var options = JSHost.GlobalThis.GetPropertyAsJSObject("Object").Invoke("create", JSHost.GlobalThis.GetPropertyAsJSObject("Object"));
                 if (powerPreference != WebGPUPowerPreference.Undefined)
                 {
-                    options.SetProperty("powerPreference", powerPreference.ToString().ToLowerInvariant());
+                    options.SetProperty("powerPreference", powerPreference.ToString().ToUpperInvariant());
                 }
 
                 // Request adapter
@@ -483,16 +481,13 @@ namespace ILGPU.Backends.WebGPU
             };
         }
 
-        private static WebGPUAdapterType ParseAdapterType(string? adapterType)
+        private static WebGPUAdapterType ParseAdapterType(string? adapterType) => adapterType?.ToUpperInvariant() switch
         {
-            return adapterType?.ToLowerInvariant() switch
-            {
-                "discrete-gpu" => WebGPUAdapterType.DiscreteGPU,
-                "integrated-gpu" => WebGPUAdapterType.IntegratedGPU,
-                "cpu" => WebGPUAdapterType.CPU,
-                _ => WebGPUAdapterType.Unknown
-            };
-        }
+            "discrete-gpu" => WebGPUAdapterType.DiscreteGPU,
+            "integrated-gpu" => WebGPUAdapterType.IntegratedGPU,
+            "cpu" => WebGPUAdapterType.CPU,
+            _ => WebGPUAdapterType.Unknown
+        };
 
         /// <summary>
         /// Disposes the WebGPU adapter.
@@ -789,41 +784,21 @@ namespace ILGPU.Backends.WebGPU
 
         public unsafe void* GetNativePtr() => throw new NotSupportedException("WebGPU buffers don't expose raw pointers");
 
-        public void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
-        {
+        public void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length) =>
             // WebGPU buffer operations are asynchronous and handled through the queue
             throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
 
-        public void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
-        {
-            throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
+        public void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length) => throw new NotSupportedException("Use WebGPU-specific buffer operations");
 
-        public void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
-        {
-            throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
+        public void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length) => throw new NotSupportedException("Use WebGPU-specific buffer operations");
 
-        public void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
-        {
-            throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
+        public void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length) => throw new NotSupportedException("Use WebGPU-specific buffer operations");
 
-        protected internal override void MemSet(AcceleratorStream stream, byte value, in ArrayView<byte> targetView)
-        {
-            throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
+        protected internal override void MemSet(AcceleratorStream stream, byte value, in ArrayView<byte> targetView) => throw new NotSupportedException("Use WebGPU-specific buffer operations");
 
-        protected internal override void CopyFrom(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
-        {
-            throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
+        protected internal override void CopyFrom(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView) => throw new NotSupportedException("Use WebGPU-specific buffer operations");
 
-        protected internal override void CopyTo(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
-        {
-            throw new NotSupportedException("Use WebGPU-specific buffer operations");
-        }
+        protected internal override void CopyTo(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView) => throw new NotSupportedException("Use WebGPU-specific buffer operations");
 
         protected override void DisposeAcceleratorObject(bool disposing)
         {

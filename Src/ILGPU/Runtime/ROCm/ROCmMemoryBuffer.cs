@@ -35,11 +35,6 @@ namespace ILGPU.Runtime.ROCm
         private IntPtr nativePtr;
 
         /// <summary>
-        /// True if this buffer was allocated using HIP APIs.
-        /// </summary>
-        private readonly bool isNativeAllocation;
-
-        /// <summary>
         /// Gets the associated ROCm accelerator.
         /// </summary>
         public new ROCmAccelerator Accelerator => base.Accelerator.AsNotNullCast<ROCmAccelerator>();
@@ -61,25 +56,25 @@ namespace ILGPU.Runtime.ROCm
                 // Try to allocate using HIP
                 var result = ROCmNative.Malloc(out nativePtr, (ulong)LengthInBytes);
                 ROCmException.ThrowIfFailed(result);
-                isNativeAllocation = true;
+                IsNativeAllocation = true;
             }
             catch (DllNotFoundException)
             {
                 // Fall back to host memory allocation
                 nativePtr = Marshal.AllocHGlobal(new IntPtr(LengthInBytes));
-                isNativeAllocation = false;
+                IsNativeAllocation = false;
             }
             catch (EntryPointNotFoundException)
             {
                 // Fall back to host memory allocation
                 nativePtr = Marshal.AllocHGlobal(new IntPtr(LengthInBytes));
-                isNativeAllocation = false;
+                IsNativeAllocation = false;
             }
             catch (ROCmException)
             {
                 // Fall back to host memory allocation on any ROCm error
                 nativePtr = Marshal.AllocHGlobal(new IntPtr(LengthInBytes));
-                isNativeAllocation = false;
+                IsNativeAllocation = false;
             }
 
             NativePtr = nativePtr;
@@ -92,7 +87,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets whether this buffer uses native HIP allocation.
         /// </summary>
-        public bool IsNativeAllocation => isNativeAllocation;
+        public bool IsNativeAllocation { get; }
 
         #endregion
 
@@ -116,7 +111,7 @@ namespace ILGPU.Runtime.ROCm
             else
             {
                 // Synchronous fallback
-                SetMemoryToValue((nint)targetView.Index, value, (nint)targetView.Length);
+                SetMemoryToValue(targetView.Index, value, targetView.Length);
             }
         }
 
@@ -131,10 +126,12 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream)
+            if (stream is ROCmStream rocmStream && sourceView.Source is ROCmMemoryBuffer sourceBuffer)
             {
-                // TODO: ROCm async copy not implemented - ArrayView.Source property not available
-                throw new NotSupportedException("ROCm async copy operations not implemented");
+                rocmStream.CopyMemoryAsync(
+                    sourceBuffer, this,
+                    sourceView.Index, targetView.Index,
+                    targetView.Length);
             }
             else
             {
@@ -142,7 +139,7 @@ namespace ILGPU.Runtime.ROCm
                 var sourcePtr = sourceView.LoadEffectiveAddress();
                 var targetPtr = nativePtr + targetView.Index;
 
-                if (isNativeAllocation)
+                if (IsNativeAllocation)
                 {
                     // Copy from host to device
                     try
@@ -155,23 +152,17 @@ namespace ILGPU.Runtime.ROCm
                     catch (Exception)
                     {
                         // Fall back to unsafe copy
-                        unsafe
-                        {
-                            Buffer.MemoryCopy(
-                                (void*)sourcePtr, (void*)targetPtr,
-                                LengthInBytes - targetView.Index, targetView.Length);
-                        }
+                        Buffer.MemoryCopy(
+                            sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                            LengthInBytes - targetView.Index, targetView.Length);
                     }
                 }
                 else
                 {
                     // Host-to-host copy
-                    unsafe
-                    {
-                        Buffer.MemoryCopy(
-                            (void*)sourcePtr, (void*)targetPtr,
-                            LengthInBytes - targetView.Index, targetView.Length);
-                    }
+                    Buffer.MemoryCopy(
+                        sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                        LengthInBytes - targetView.Index, targetView.Length);
                 }
             }
         }
@@ -187,10 +178,12 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream)
+            if (stream is ROCmStream rocmStream && targetView.Source is ROCmMemoryBuffer targetBuffer)
             {
-                // TODO: ROCm async copy not implemented - ArrayView.Source property not available
-                throw new NotSupportedException("ROCm async copy operations not implemented");
+                rocmStream.CopyMemoryAsync(
+                    this, targetBuffer,
+                    sourceView.Index, targetView.Index,
+                    sourceView.Length);
             }
             else
             {
@@ -198,7 +191,7 @@ namespace ILGPU.Runtime.ROCm
                 var sourcePtr = nativePtr + sourceView.Index;
                 var targetPtr = targetView.LoadEffectiveAddress();
 
-                if (isNativeAllocation)
+                if (IsNativeAllocation)
                 {
                     // Copy from device to host
                     try
@@ -211,23 +204,17 @@ namespace ILGPU.Runtime.ROCm
                     catch (Exception)
                     {
                         // Fall back to unsafe copy
-                        unsafe
-                        {
-                            Buffer.MemoryCopy(
-                                (void*)sourcePtr, (void*)targetPtr,
-                                targetView.Length, sourceView.Length);
-                        }
+                        Buffer.MemoryCopy(
+                            sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                            targetView.Length, sourceView.Length);
                     }
                 }
                 else
                 {
                     // Host-to-host copy
-                    unsafe
-                    {
-                        Buffer.MemoryCopy(
-                            (void*)sourcePtr, (void*)targetPtr,
-                            targetView.Length, sourceView.Length);
-                    }
+                    Buffer.MemoryCopy(
+                        sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                        targetView.Length, sourceView.Length);
                 }
             }
         }
@@ -238,30 +225,30 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="offset">The offset in bytes.</param>
         /// <param name="value">The value to set.</param>
         /// <param name="length">The length in bytes.</param>
-        private unsafe void SetMemoryToValue(nint offset, byte value, nint length)
+        private unsafe void SetMemoryToValue(long offset, byte value, long length)
         {
             var ptr = nativePtr + offset;
 
-            if (isNativeAllocation)
+            if (IsNativeAllocation)
             {
                 try
                 {
-                    var result = ROCmNative.Memset(ptr, value, (nuint)length);
+                    var result = ROCmNative.Memset(ptr, value, (ulong)length);
                     ROCmException.ThrowIfFailed(result);
                 }
                 catch (Exception)
                 {
                     // Fall back to CPU memset
-                    var bytePtr = (byte*)ptr;
-                    for (nint i = 0; i < length; i++)
+                    var bytePtr = (byte*)ptr.ToPointer();
+                    for (long i = 0; i < length; i++)
                         bytePtr[i] = value;
                 }
             }
             else
             {
                 // CPU memset for host memory
-                var bytePtr = (byte*)ptr;
-                for (nint i = 0; i < length; i++)
+                var bytePtr = (byte*)ptr.ToPointer();
+                for (long i = 0; i < length; i++)
                     bytePtr[i] = value;
             }
         }
@@ -278,7 +265,7 @@ namespace ILGPU.Runtime.ROCm
         {
             if (disposing && nativePtr != IntPtr.Zero)
             {
-                if (isNativeAllocation)
+                if (IsNativeAllocation)
                 {
                     try
                     {

@@ -16,10 +16,8 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
-using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.AMX.Native;
 using System;
-using System.Collections.Generic;
 using static ILGPU.Runtime.AMX.Native.AMXNative;
 
 namespace ILGPU.Runtime.AMX
@@ -133,10 +131,7 @@ namespace ILGPU.Runtime.AMX
         internal unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
-            AMXDataType dataType)
-        {
-            Accelerator.ExecuteMatMul(a, b, c, m, k, n, dataType, this);
-        }
+            AMXDataType dataType) => Accelerator.ExecuteMatMul(a, b, c, m, k, n, dataType, this);
 
         /// <summary>
         /// Loads data into an AMX tile.
@@ -371,11 +366,11 @@ namespace ILGPU.Runtime.AMX
     /// </summary>
     public class AMXCompiledKernel : CompiledKernel
     {
-        public IReadOnlyList<byte> NativeCode { get; }
+        public byte[] NativeCode { get; }
         public string FunctionName { get; }
 
-        public AMXCompiledKernel(Context context, EntryPoint entryPoint, byte[] nativeCode, string functionName, KernelInfo? info)
-            : base(context, entryPoint, info)
+        public AMXCompiledKernel(Context context, byte[] nativeCode, string functionName, KernelInfo info)
+            : base(context, entryPoint: null, info)
         {
             NativeCode = nativeCode ?? throw new ArgumentNullException(nameof(nativeCode));
             FunctionName = functionName ?? throw new ArgumentNullException(nameof(functionName));

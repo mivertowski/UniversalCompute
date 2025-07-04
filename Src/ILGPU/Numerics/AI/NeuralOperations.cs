@@ -386,11 +386,9 @@ namespace ILGPU.Numerics.AI
             Configuration = configuration;
         }
 
-        public override TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
+        public override TensorShape CalculateOutputShape(TensorShape inputShape) =>
             // Simplified calculation for demonstration
-            return new TensorShape(inputShape[0], Configuration.N);
-        }
+            new(inputShape[0], Configuration.N);
     }
 
     /// <summary>
@@ -410,10 +408,8 @@ namespace ILGPU.Numerics.AI
             Parameters = parameters;
         }
 
-        public override TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
+        public override TensorShape CalculateOutputShape(TensorShape inputShape) =>
             // Attention typically preserves sequence length
-            return inputShape;
-        }
+            inputShape;
     }
 }

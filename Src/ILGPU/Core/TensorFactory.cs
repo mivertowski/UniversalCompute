@@ -72,7 +72,7 @@ namespace ILGPU.Core
             where T : unmanaged
         {
             var tensor = new UnifiedTensor<T>(accelerator, shape);
-            tensor.Fill(default(T));
+            tensor.Fill(default);
             return tensor;
         }
 
@@ -148,7 +148,9 @@ namespace ILGPU.Core
             for (long i = 0; i < shape.ElementCount; i++)
             {
                 // Generate random value between 0 and 1
+#pragma warning disable CA5394 // Do not use insecure randomness
                 var randomValue = random.NextDouble();
+#pragma warning restore CA5394 // Do not use insecure randomness
                 data[i] = T.CreateChecked(randomValue);
             }
             
@@ -175,8 +177,12 @@ namespace ILGPU.Core
             // Use Box-Muller transform for normal distribution
             for (long i = 0; i < shape.ElementCount; i += 2)
             {
+#pragma warning disable CA5394 // Do not use insecure randomness
                 var u1 = random.NextDouble();
+#pragma warning restore CA5394 // Do not use insecure randomness
+#pragma warning disable CA5394 // Do not use insecure randomness
                 var u2 = random.NextDouble();
+#pragma warning restore CA5394 // Do not use insecure randomness
                 
                 var z0 = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
                 var z1 = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);

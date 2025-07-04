@@ -13,6 +13,7 @@ using ILGPU.Backends.EntryPoints;
 using ILGPU.Resources;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -271,7 +272,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Checks if the index type has the specified property.
         /// </summary>
-        private static bool HasIndexProperty(Type indexType, string propertyName) => indexType.GetProperty(
+        private static bool HasIndexProperty([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type indexType, string propertyName) => indexType.GetProperty(
                 propertyName,
                 BindingFlags.Public | BindingFlags.Instance) != null;
 

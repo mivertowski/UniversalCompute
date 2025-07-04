@@ -25,7 +25,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
     /// </summary>
     public sealed class CSRGraph : IDisposable
     {
-        private readonly Accelerator _accelerator;
         private bool _disposed;
 
         /// <summary>
@@ -45,7 +44,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             int[] colIndices,
             float[]? values = null)
         {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             if (rowPtr.Length != numVertices + 1)
                 throw new ArgumentException($"Row pointer array must have length {numVertices + 1}");
@@ -58,12 +57,12 @@ namespace ILGPU.Algorithms.GraphAnalytics
             NumEdges = numEdges;
             
             // Allocate GPU memory and copy data
-            RowPtr = _accelerator.Allocate1D(rowPtr);
-            ColIndices = _accelerator.Allocate1D(colIndices);
+            RowPtr = Accelerator.Allocate1D(rowPtr);
+            ColIndices = Accelerator.Allocate1D(colIndices);
             
             if (values != null)
             {
-                Values = _accelerator.Allocate1D(values);
+                Values = Accelerator.Allocate1D(values);
                 IsWeighted = true;
             }
             else
@@ -106,7 +105,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
         /// <summary>
         /// Gets the accelerator associated with this graph.
         /// </summary>
-        public Accelerator Accelerator => _accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <summary>
         /// Creates a CSR graph from an edge list.
@@ -208,7 +207,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                 }
             }
             
-            return FromEdgeList(_accelerator, NumVertices, edges.ToArray(), weights?.ToArray());
+            return FromEdgeList(Accelerator, NumVertices, edges.ToArray(), weights?.ToArray());
         }
 
         /// <summary>
@@ -217,13 +216,13 @@ namespace ILGPU.Algorithms.GraphAnalytics
         /// <returns>Array containing the degree of each vertex.</returns>
         public MemoryBuffer1D<int, Stride1D.Dense> GetDegrees()
         {
-            var degrees = _accelerator.Allocate1D<int>(NumVertices);
+            var degrees = Accelerator.Allocate1D<int>(NumVertices);
             
-            var kernel = _accelerator.LoadAutoGroupedStreamKernel<
+            var kernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>>(GetDegreesKernel);
             
-            kernel(_accelerator.DefaultStream, NumVertices, RowPtr.View, degrees.View);
-            _accelerator.DefaultStream.Synchronize();
+            kernel(Accelerator.DefaultStream, NumVertices, RowPtr.View, degrees.View);
+            Accelerator.DefaultStream.Synchronize();
             
             return degrees;
         }
@@ -289,7 +288,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                 }
             }
             
-            return new CSRGraph(_accelerator, NumVertices, NumEdges, transposeRowPtr, transposeColIndices, transposeValues);
+            return new CSRGraph(Accelerator, NumVertices, NumEdges, transposeRowPtr, transposeColIndices, transposeValues);
         }
 
         /// <summary>

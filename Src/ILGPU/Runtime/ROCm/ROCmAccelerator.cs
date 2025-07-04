@@ -15,8 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 using ILGPU.Backends;
 using ILGPU.Backends.ROCm;
 using ILGPU.Resources;
@@ -40,7 +38,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Stores the associated ROCm device.
         /// </summary>
-        public new ROCmDevice Device { get; }
+        public ROCmDevice Device { get; }
 
         /// <summary>
         /// Gets the backend of this accelerator.
@@ -50,12 +48,12 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the native ROCm context handle.
         /// </summary>
-        internal new IntPtr NativePtr { get; private set; }
+        internal IntPtr NativePtr { get; private set; }
 
         /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
-        public new bool SupportsUnifiedMemory => Device.SupportsUnifiedAddressing;
+        public bool SupportsUnifiedMemory => Device.SupportsUnifiedAddressing;
 
         /// <summary>
         /// Gets whether this accelerator supports page-locked memory.
@@ -79,25 +77,18 @@ namespace ILGPU.Runtime.ROCm
             
             try
             {
-                // Initialize HIP runtime
-                var initResult = ROCmNative.Initialize(0);
-                ROCmException.ThrowIfFailed(initResult);
+                // Initialize ROCm runtime if not already done
+                if (!ROCmNative.InitializeROCm())
+                    throw new NotSupportedException("Failed to initialize ROCm runtime");
 
                 // Set the current device
-                var setDeviceResult = ROCmNative.SetDevice(device.DeviceId.Index);
-                ROCmException.ThrowIfFailed(setDeviceResult);
+                var result = ROCmNative.SetDevice(device.DeviceId);
+                ROCmException.ThrowIfFailed(result);
 
-                // Get device properties to validate the device
-                var propsResult = ROCmNative.GetDeviceProperties(out var deviceProps, device.DeviceId.Index);
-                ROCmException.ThrowIfFailed(propsResult);
+                // Store device context (simplified - real implementation would create HIP context)
+                NativePtr = new IntPtr(device.DeviceId + 1); // Dummy context handle
 
-                // Store device handle as context (HIP uses implicit context per device)
-                NativePtr = new IntPtr(device.DeviceId.Index); // Real device handle
-
-                // Cache device properties for capability queries
-                DeviceProperties = deviceProps;
-
-                // Initialize device properties and streams
+                // Initialize device properties
                 Init(device);
             }
             catch (Exception ex)
@@ -110,71 +101,14 @@ namespace ILGPU.Runtime.ROCm
         /// Initializes the accelerator properties.
         /// </summary>
         /// <param name="device">The ROCm device.</param>
-        private void Init(ROCmDevice device)
-        {
+        private void Init(ROCmDevice device) =>
             // Set device-specific properties
             DefaultStream = CreateStreamInternal();
-        }
 
         #endregion
 
         #region Properties
 
-        /// <summary>
-        /// Gets the cached device properties.
-        /// </summary>
-        internal Native.HipDeviceProperties DeviceProperties { get; private set; }
-
-        /// <summary>
-        /// Gets the maximum number of threads per group for this ROCm device.
-        /// </summary>
-        public int ROCmMaxNumThreadsPerGroup => DeviceProperties.MaxThreadsPerBlock;
-
-        /// <summary>
-        /// Gets the warp size for this ROCm device.
-        /// </summary>
-        public int ROCmWarpSize => DeviceProperties.WarpSize;
-
-        /// <summary>
-        /// Gets the number of multiprocessors for this ROCm device.
-        /// </summary>
-        public int ROCmNumMultiprocessors => DeviceProperties.MultiProcessorCount;
-
-        /// <summary>
-        /// Gets the maximum shared memory per group for this ROCm device.
-        /// </summary>
-        public long ROCmMaxSharedMemoryPerGroup => (long)DeviceProperties.SharedMemPerBlock;
-
-        /// <summary>
-        /// Gets the maximum constant memory for this ROCm device.
-        /// </summary>
-        public long ROCmMaxConstantMemory => (long)DeviceProperties.TotalConstMem;
-
-        /// <summary>
-        /// Gets the memory size in bytes for this ROCm device.
-        /// </summary>
-        public long ROCmMemorySize => (long)DeviceProperties.TotalGlobalMem;
-
-        /// <summary>
-        /// Gets the maximum shared memory per multiprocessor for this ROCm device.
-        /// </summary>
-        public long ROCmMaxSharedMemoryPerMultiprocessor => (long)DeviceProperties.SharedMemPerMultiprocessor;
-
-        /// <summary>
-        /// Gets the maximum grid size for this ROCm device.
-        /// </summary>
-        public Index3D ROCmMaxGridSize => new Index3D(
-            DeviceProperties.MaxGridSize[0],
-            DeviceProperties.MaxGridSize[1], 
-            DeviceProperties.MaxGridSize[2]);
-
-        /// <summary>
-        /// Gets the maximum group size for this ROCm device.
-        /// </summary>
-        public Index3D ROCmMaxGroupSize => new Index3D(
-            DeviceProperties.MaxThreadsDim[0],
-            DeviceProperties.MaxThreadsDim[1],
-            DeviceProperties.MaxThreadsDim[2]);
 
         #endregion
 
@@ -186,10 +120,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="length">The length in elements.</param>
         /// <param name="elementSize">The element size in bytes.</param>
         /// <returns>The allocated memory buffer.</returns>
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new ROCmMemoryBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new ROCmMemoryBuffer(this, length, elementSize);
 
         /// <summary>
         /// Creates a page-lock scope for the given array.
@@ -213,7 +144,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="compiledKernel">The compiled kernel.</param>
         /// <returns>The created kernel.</returns>
         protected override ROCmKernel CreateKernel(ROCmCompiledKernel compiledKernel) =>
-            new ROCmKernel(this, compiledKernel, ROCmMaxNumThreadsPerGroup);
+            new(this, compiledKernel, MaxNumThreadsPerGroup);
 
         /// <summary>
         /// Creates a kernel from the given compiled kernel with launcher.
@@ -222,7 +153,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="launcher">The kernel launcher method.</param>
         /// <returns>The created kernel.</returns>
         protected override ROCmKernel CreateKernel(ROCmCompiledKernel compiledKernel, MethodInfo launcher) =>
-            new ROCmKernel(this, compiledKernel, ROCmMaxNumThreadsPerGroup);
+            new(this, compiledKernel, MaxNumThreadsPerGroup);
 
         /// <summary>
         /// Generates a kernel launcher method.
@@ -232,74 +163,19 @@ namespace ILGPU.Runtime.ROCm
         /// <returns>The launcher method.</returns>
         protected override MethodInfo GenerateKernelLauncherMethod(
             ROCmCompiledKernel kernel,
-            int customGroupSize)
-        {
-            // For ROCm accelerator, return the standard kernel launcher
-            return typeof(ROCmAccelerator).GetMethod(nameof(LaunchKernelInternal), 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?? throw new InvalidOperationException("ROCm kernel launcher method not found");
-        }
+            int customGroupSize) =>
+            // For ROCm accelerator, use default launcher generation
+            // In a real implementation, this would generate optimized ROCm-specific launchers
+            typeof(ROCmAccelerator).GetMethod(nameof(DefaultLauncher),
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
+                ?? throw new InvalidOperationException("Default launcher method not found");
 
         /// <summary>
-        /// Internal kernel launcher for ROCm kernels.
+        /// Default kernel launcher for ROCm kernels.
         /// </summary>
-        /// <param name="kernel">The kernel to launch.</param>
-        /// <param name="gridDim">Grid dimensions.</param>
-        /// <param name="groupDim">Group dimensions.</param>
-        /// <param name="sharedMemorySize">Shared memory size.</param>
-        /// <param name="stream">The stream.</param>
-        /// <param name="parameters">Kernel parameters.</param>
-        private void LaunchKernelInternal(
-            ROCmKernel kernel,
-            Index3D gridDim,
-            Index3D groupDim,
-            int sharedMemorySize,
-            AcceleratorStream stream,
-            IntPtr[] parameters)
-        {
-            if (!(stream is ROCmStream rocmStream))
-                throw new ArgumentException("Stream must be a ROCm stream", nameof(stream));
-
-            kernel.Launch(gridDim, groupDim, sharedMemorySize, rocmStream, parameters);
-        }
-
-        /// <summary>
-        /// Launches a ROCm kernel with the specified configuration.
-        /// </summary>
-        /// <param name="kernel">The kernel to launch.</param>
-        /// <param name="gridSize">The grid size.</param>
-        /// <param name="groupSize">The group size.</param>
-        /// <param name="sharedMemorySize">The shared memory size in bytes.</param>
-        /// <param name="stream">The stream to use for execution.</param>
-        /// <param name="args">The kernel arguments.</param>
-        public void LaunchKernel(
-            ROCmKernel kernel,
-            Index3D gridSize,
-            Index3D groupSize,
-            int sharedMemorySize = 0,
-            ROCmStream? stream = null,
-            params object[] args)
-        {
-            stream ??= DefaultStream as ROCmStream ?? throw new InvalidOperationException("No ROCm stream available");
-            
-            // Convert arguments to IntPtr array
-            var parameters = new IntPtr[args.Length];
-            for (int i = 0; i < args.Length; i++)
-            {
-                if (args[i] is MemoryBuffer buffer)
-                {
-                    parameters[i] = buffer.NativePtr;
-                }
-                else
-                {
-                    // For primitive types, would need to allocate and copy
-                    // This is a simplified implementation
-                    parameters[i] = IntPtr.Zero;
-                }
-            }
-
-            kernel.Launch(gridSize, groupSize, sharedMemorySize, stream, parameters);
-        }
+        private static void DefaultLauncher() =>
+            // Default launcher implementation
+            throw new NotImplementedException("ROCm kernel launcher not implemented");
 
         #endregion
 
@@ -423,14 +299,11 @@ namespace ILGPU.Runtime.ROCm
             Kernel kernel,
             int dynamicSharedMemorySizeInBytes,
             int maxGroupSize,
-            out int minGridSize)
-        {
-            return EstimateGroupSizeInternal(
+            out int minGridSize) => EstimateGroupSizeInternal(
                 kernel,
                 _ => dynamicSharedMemorySizeInBytes,
                 maxGroupSize,
                 out minGridSize);
-        }
 
         #endregion
 

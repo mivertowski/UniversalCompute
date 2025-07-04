@@ -232,7 +232,7 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             // Map architecture information to compute capability
             // This is based on the device name and architecture features
-            var deviceName = props.Name?.ToLowerInvariant() ?? "";
+            var deviceName = props.Name?.ToUpperInvariant() ?? "";
             
             // RDNA3 (gfx11xx)
             if (deviceName.Contains("7900", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7800", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7700", StringComparison.OrdinalIgnoreCase))
@@ -502,27 +502,24 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <summary>
         /// Creates fallback capabilities when detection fails.
         /// </summary>
-        private static HardwareCapabilities CreateFallbackCapabilities()
+        private static HardwareCapabilities CreateFallbackCapabilities() => new()
         {
-            return new HardwareCapabilities
+            CUDA = new CUDACapabilities { IsSupported = false },
+            ROCm = new ROCmCapabilities { IsSupported = false },
+            OneAPI = new OneAPICapabilities { IsSupported = false },
+            AMX = new AMXCapabilities { IsSupported = false },
+            Apple = new AppleCapabilities { IsSupported = false },
+            OpenCL = new OpenCLCapabilities { IsSupported = false },
+            Vulkan = new VulkanCapabilities { IsSupported = false },
+            Velocity = new VelocityCapabilities
             {
-                CUDA = new CUDACapabilities { IsSupported = false },
-                ROCm = new ROCmCapabilities { IsSupported = false },
-                OneAPI = new OneAPICapabilities { IsSupported = false },
-                AMX = new AMXCapabilities { IsSupported = false },
-                Apple = new AppleCapabilities { IsSupported = false },
-                OpenCL = new OpenCLCapabilities { IsSupported = false },
-                Vulkan = new VulkanCapabilities { IsSupported = false },
-                Velocity = new VelocityCapabilities 
-                { 
-                    IsSupported = true, // CPU always available as fallback
-                    SupportsAVX2 = false,
-                    SupportsAVX512 = false,
-                    SupportsNEON = false,
-                    VectorSize = 128 // Conservative default
-                }
-            };
-        }
+                IsSupported = true, // CPU always available as fallback
+                SupportsAVX2 = false,
+                SupportsAVX512 = false,
+                SupportsNEON = false,
+                VectorSize = 128 // Conservative default
+            }
+        };
 
         #endregion
 

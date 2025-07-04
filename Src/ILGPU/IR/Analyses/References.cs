@@ -66,7 +66,7 @@ namespace ILGPU.IR.Analyses
             void IEnumerator.Reset() => throw new InvalidOperationException();
 
             /// <summary cref="IDisposable.Dispose" />
-            public void Dispose() { }
+            public readonly void Dispose() { }
 
             #endregion
         }

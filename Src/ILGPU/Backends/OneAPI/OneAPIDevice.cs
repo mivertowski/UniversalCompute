@@ -105,7 +105,7 @@ namespace ILGPU.Backends.OneAPI
                 return IntelArchitecture.Unknown;
 
             // Detect Intel GPU architecture based on device name
-            var nameLower = Name.ToLowerInvariant();
+            var nameLower = Name.ToUpperInvariant();
             
             if (nameLower.Contains("xe-lp") || nameLower.Contains("gen12"))
                 return IntelArchitecture.XeLP;

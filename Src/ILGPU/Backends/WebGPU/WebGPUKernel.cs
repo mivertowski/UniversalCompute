@@ -30,7 +30,6 @@ namespace ILGPU.Backends.WebGPU
     public sealed class WebGPUKernel : Kernel
     {
         private readonly WebGPUAccelerator _accelerator;
-        private readonly WebGPUComputePipeline _pipeline;
         private bool _disposed;
 
         /// <summary>
@@ -44,13 +43,13 @@ namespace ILGPU.Backends.WebGPU
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             // Create compute pipeline from compiled kernel
-            _pipeline = CreateComputePipeline(compiledKernel);
+            Pipeline = CreateComputePipeline(compiledKernel);
         }
 
         /// <summary>
         /// Gets the WebGPU compute pipeline.
         /// </summary>
-        public WebGPUComputePipeline Pipeline => _pipeline;
+        public WebGPUComputePipeline Pipeline { get; }
 
         /// <summary>
         /// Launches the kernel with the specified parameters.
@@ -88,7 +87,7 @@ namespace ILGPU.Backends.WebGPU
             try
             {
                 // Dispatch compute work
-                await _accelerator.DispatchComputeAsync(_pipeline, bindGroup, workgroupCountX, workgroupCountY, workgroupCountZ);
+                await _accelerator.DispatchComputeAsync(Pipeline, bindGroup, workgroupCountX, workgroupCountY, workgroupCountZ);
             }
             finally
             {
@@ -106,17 +105,16 @@ namespace ILGPU.Backends.WebGPU
             return _accelerator.CreateComputePipeline(wgslSource, "main");
         }
 
-        private string CompileToWGSL(CompiledKernel compiledKernel)
-        {
+        private string CompileToWGSL(CompiledKernel compiledKernel) =>
             // This would contain the actual compilation from ILGPU IR to WGSL
             // For now, return a placeholder WGSL compute shader
-            
+
             // Real implementation would:
             // 1. Take the ILGPU IR from compiledKernel
             // 2. Transform it to WGSL using ILGPU's backend system
             // 3. Return the compiled WGSL source code
-            
-            return @"
+
+            @"
 @group(0) @binding(0) var<storage, read_write> data: array<f32>;
 
 @compute @workgroup_size(64)
@@ -130,7 +128,6 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     data[index] = data[index] * 2.0;
 }
 ";
-        }
 
         private (uint workgroupCountX, uint workgroupCountY, uint workgroupCountZ) CalculateWorkgroupConfiguration<TIndex>(TIndex extent)
             where TIndex : struct, IIndex
@@ -234,7 +231,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
             {
                 if (disposing)
                 {
-                    _pipeline?.Dispose();
+                    Pipeline?.Dispose();
                 }
                 _disposed = true;
             }
@@ -273,20 +270,16 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         /// <summary>
         /// Synchronizes the stream asynchronously.
         /// </summary>
-        public new async Task SynchronizeAsync(CancellationToken cancellationToken = default)
-        {
+        public new async Task SynchronizeAsync(CancellationToken cancellationToken = default) =>
             // WebGPU's natural async nature makes this the preferred synchronization method
             await Task.Run(Synchronize, cancellationToken);
-        }
 
         /// <summary>
         /// Adds a profiling marker to the stream.
         /// </summary>
-        protected override ProfilingMarker AddProfilingMarkerInternal()
-        {
+        protected override ProfilingMarker AddProfilingMarkerInternal() =>
             // WebGPU profiling would typically use performance markers
-            return default!;
-        }
+            default!;
 
         /// <summary>
         /// Disposes the WebGPU stream.

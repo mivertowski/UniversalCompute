@@ -147,7 +147,7 @@ namespace ILGPU.Tests
         {
             public int Value;
 
-            public int Count
+            public readonly int Count
             {
                 [MethodImpl(MethodImplOptions.NoInlining)]
                 get => Value + 1;

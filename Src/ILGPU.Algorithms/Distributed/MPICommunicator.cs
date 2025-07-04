@@ -144,8 +144,6 @@ namespace ILGPU.Algorithms.Distributed
     public sealed class MPICommunicator : IDisposable
     {
         private IntPtr _communicator;
-        private readonly int _rank;
-        private readonly int _size;
         private bool _disposed;
 
         /// <summary>
@@ -154,19 +152,19 @@ namespace ILGPU.Algorithms.Distributed
         private MPICommunicator(IntPtr communicator, int rank, int size)
         {
             _communicator = communicator;
-            _rank = rank;
-            _size = size;
+            Rank = rank;
+            Size = size;
         }
 
         /// <summary>
         /// Gets the rank of this process.
         /// </summary>
-        public int Rank => _rank;
+        public int Rank { get; }
 
         /// <summary>
         /// Gets the total number of processes.
         /// </summary>
-        public int Size => _size;
+        public int Size { get; }
 
         /// <summary>
         /// Creates the world communicator (all processes).
@@ -441,7 +439,7 @@ namespace ILGPU.Algorithms.Distributed
             var sendPtr = IntPtr.Zero;
             GCHandle? sendHandle = null;
             
-            if (_rank == rootRank && sendData != null)
+            if (Rank == rootRank && sendData != null)
             {
                 sendHandle = GCHandle.Alloc(sendData, GCHandleType.Pinned);
                 sendPtr = sendHandle.Value.AddrOfPinnedObject();
@@ -477,7 +475,7 @@ namespace ILGPU.Algorithms.Distributed
             var recvPtr = IntPtr.Zero;
             GCHandle? recvHandle = null;
             
-            if (_rank == rootRank && recvData != null)
+            if (Rank == rootRank && recvData != null)
             {
                 recvHandle = GCHandle.Alloc(recvData, GCHandleType.Pinned);
                 recvPtr = recvHandle.Value.AddrOfPinnedObject();

@@ -182,7 +182,7 @@ namespace ILGPU.Backends
                 #region Methods
 
                 /// <summary cref="IDisposable.Dispose"/>
-                void IDisposable.Dispose() { }
+                readonly void IDisposable.Dispose() { }
 
                 /// <summary cref="IEnumerator.MoveNext"/>
                 public bool MoveNext()

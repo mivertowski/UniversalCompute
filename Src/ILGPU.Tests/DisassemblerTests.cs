@@ -33,15 +33,15 @@ namespace ILGPU.Tests
 
         internal struct IdentityImpl : IPrefixOffsetFunc, IXunitSerializable
         {
-            public int Apply(int value)
+            public readonly int Apply(int value)
             {
                 return value;
             }
 
 
-            public void Serialize(IXunitSerializationInfo info) { }
+            public readonly void Serialize(IXunitSerializationInfo info) { }
 
-            public void Deserialize(IXunitSerializationInfo info) { }
+            public readonly void Deserialize(IXunitSerializationInfo info) { }
         }
 
         public static TheoryData<object> PrefixOffsetsData => new()
@@ -55,7 +55,7 @@ namespace ILGPU.Tests
             where TFunc : struct, IPrefixOffsetFunc
         {
             TFunc func = default;
-            data[index] = func.Apply(Group.IsFirstThread ? default : default(int));
+            data[index] = func.Apply(Group.IsFirstThread ? default : default);
         }
 
         [Theory]

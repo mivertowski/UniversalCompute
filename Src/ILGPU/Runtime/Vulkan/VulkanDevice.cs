@@ -68,7 +68,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum compute work group count.
         /// </summary>
-        public Index3D MaxWorkGroupCount => new Index3D(
+        public Index3D MaxWorkGroupCount => new(
             (int)Properties.limits.maxComputeWorkGroupCount0,
             (int)Properties.limits.maxComputeWorkGroupCount1,
             (int)Properties.limits.maxComputeWorkGroupCount2);
@@ -76,7 +76,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum compute work group size.
         /// </summary>
-        public Index3D MaxWorkGroupSize => new Index3D(
+        public Index3D MaxWorkGroupSize => new(
             (int)Properties.limits.maxComputeWorkGroupSize0,
             (int)Properties.limits.maxComputeWorkGroupSize1,
             (int)Properties.limits.maxComputeWorkGroupSize2);
@@ -89,7 +89,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets whether this device supports unified memory.
         /// </summary>
-        public new bool SupportsUnifiedMemory => DeviceType == VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
+        public bool SupportsUnifiedMemory => DeviceType == VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
 
         internal VulkanDevice(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties properties)
         {
@@ -104,12 +104,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public new string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
+        public string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
 
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public new long MemorySize
+        public long MemorySize
         {
             get
             {
@@ -126,37 +126,37 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public new Index3D MaxGridSize => MaxWorkGroupCount;
+        public Index3D MaxGridSize => MaxWorkGroupCount;
 
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public new Index3D MaxGroupSize => MaxWorkGroupSize;
+        public Index3D MaxGroupSize => MaxWorkGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public new int MaxNumThreadsPerGroup => (int)MaxWorkGroupInvocations;
+        public int MaxNumThreadsPerGroup => (int)MaxWorkGroupInvocations;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => 32 * 1024; // 32KB typical
+        public long MaxSharedMemoryPerGroup => 32 * 1024; // 32KB typical
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory => 64 * 1024; // 64KB typical
+        public long MaxConstantMemory => 64 * 1024; // 64KB typical
 
         /// <summary>
         /// Gets the warp/subgroup size.
         /// </summary>
-        public new int WarpSize
+        public int WarpSize
         {
             get
             {
@@ -174,7 +174,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the number of multiprocessors/compute units.
         /// </summary>
-        public new int NumMultiprocessors
+        public int NumMultiprocessors
         {
             get
             {
@@ -207,7 +207,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public override DeviceId DeviceId => new DeviceId(DeviceID, AcceleratorType.Vulkan);
+        public override DeviceId DeviceId => new(DeviceID, AcceleratorType.Vulkan);
 
         /// <summary>
         /// Creates an accelerator for this device.
@@ -328,49 +328,40 @@ namespace ILGPU.Runtime.Vulkan
         /// Gets the vendor name from vendor ID.
         /// </summary>
         /// <returns>Vendor name.</returns>
-        private string GetVendorName()
+        private string GetVendorName() => VendorID switch
         {
-            return VendorID switch
-            {
-                0x10DE => "NVIDIA",
-                0x1002 => "AMD",
-                0x8086 => "Intel",
-                0x5143 => "Qualcomm",
-                0x1010 => "ImgTec",
-                0x13B5 => "ARM",
-                _ => $"Unknown (0x{VendorID:X4})"
-            };
-        }
+            0x10DE => "NVIDIA",
+            0x1002 => "AMD",
+            0x8086 => "Intel",
+            0x5143 => "Qualcomm",
+            0x1010 => "ImgTec",
+            0x13B5 => "ARM",
+            _ => $"Unknown (0x{VendorID:X4})"
+        };
 
         /// <summary>
         /// Gets the device type description.
         /// </summary>
         /// <returns>Device type description.</returns>
-        public string GetDeviceTypeDescription()
+        public string GetDeviceTypeDescription() => DeviceType switch
         {
-            return DeviceType switch
-            {
-                VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU => "Discrete GPU",
-                VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU => "Integrated GPU",
-                VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU => "Virtual GPU",
-                VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_CPU => "CPU",
-                _ => "Other"
-            };
-        }
+            VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU => "Discrete GPU",
+            VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU => "Integrated GPU",
+            VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU => "Virtual GPU",
+            VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_CPU => "CPU",
+            _ => "Other"
+        };
 
         /// <summary>
         /// Gets a human-readable string of device capabilities.
         /// </summary>
         /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString()
-        {
-            return $"API {(APIVersion >> 22)}.{(APIVersion >> 12) & 0x3FF}, " +
+        public string GetCapabilitiesString() => $"API {(APIVersion >> 22)}.{(APIVersion >> 12) & 0x3FF}, " +
                    $"Driver 0x{DriverVersion:X8}, " +
                    $"{NumMultiprocessors} CUs, " +
                    $"Subgroup {WarpSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
                    $"{GetDeviceTypeDescription()}";
-        }
 
         #endregion
 

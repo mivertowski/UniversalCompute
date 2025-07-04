@@ -459,11 +459,9 @@ namespace ILGPU.Runtime.Vulkan.Native
         /// Enumerates available instance extensions.
         /// </summary>
         /// <returns>Array of extension names.</returns>
-        internal static string[] EnumerateInstanceExtensions()
-        {
+        internal static string[] EnumerateInstanceExtensions() =>
             // Simplified implementation - would enumerate actual extensions
-            return new[] { "VK_EXT_debug_utils", "VK_KHR_surface" };
-        }
+            new[] { "VK_EXT_debug_utils", "VK_KHR_surface" };
 
         /// <summary>
         /// Initializes Vulkan compute context.
@@ -548,12 +546,10 @@ namespace ILGPU.Runtime.Vulkan.Native
         /// </summary>
         private static unsafe void ExecuteVulkanComputeMatMul(
             void* a, void* b, void* c,
-            int m, int k, int n)
-        {
+            int m, int k, int n) =>
             // This would implement actual Vulkan compute shader execution
             // For now, simulate the operation
             System.Threading.Thread.Sleep(1); // Simulate GPU computation
-        }
 
         /// <summary>
         /// CPU fallback for matrix multiplication.

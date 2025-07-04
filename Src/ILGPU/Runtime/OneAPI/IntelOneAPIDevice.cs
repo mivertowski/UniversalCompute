@@ -93,7 +93,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets whether the device supports unified memory.
         /// </summary>
-        public new bool SupportsUnifiedMemory => DeviceInfo.SupportsUnifiedMemory;
+        public bool SupportsUnifiedMemory => DeviceInfo.SupportsUnifiedMemory;
 
         /// <summary>
         /// Gets whether this is a discrete GPU.
@@ -113,22 +113,22 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public new string Name => DeviceInfo.Name ?? $"Intel GPU Device";
+        public string Name => DeviceInfo.Name ?? $"Intel GPU Device";
 
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public new long MemorySize => (long)DeviceInfo.GlobalMemSize;
+        public long MemorySize => (long)DeviceInfo.GlobalMemSize;
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public new Index3D MaxGridSize
+        public Index3D MaxGridSize
         {
             get
             {
@@ -150,7 +150,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public new Index3D MaxGroupSize
+        public Index3D MaxGroupSize
         {
             get
             {
@@ -162,17 +162,17 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public new int MaxNumThreadsPerGroup => (int)DeviceInfo.MaxWorkGroupSize;
+        public int MaxNumThreadsPerGroup => (int)DeviceInfo.MaxWorkGroupSize;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => (long)DeviceInfo.LocalMemSize;
+        public long MaxSharedMemoryPerGroup => (long)DeviceInfo.LocalMemSize;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory
+        public long MaxConstantMemory
         {
             get
             {
@@ -190,12 +190,12 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
         /// </summary>
-        public new int WarpSize => SubgroupSize > 0 ? SubgroupSize : GetDefaultSubgroupSize();
+        public int WarpSize => SubgroupSize > 0 ? SubgroupSize : GetDefaultSubgroupSize();
 
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public new int NumMultiprocessors => ComputeUnits;
+        public int NumMultiprocessors => ComputeUnits;
 
         /// <summary>
         /// Gets the device vendor.
@@ -205,7 +205,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public override DeviceId DeviceId => new DeviceId(0, AcceleratorType.OneAPI); // TODO: Store actual device index
+        public override DeviceId DeviceId => new(DeviceIndex, AcceleratorType.OneAPI);
 
         /// <summary>
         /// Creates an accelerator for this device.
@@ -325,26 +325,23 @@ namespace ILGPU.Runtime.OneAPI
         /// Gets fallback device information.
         /// </summary>
         /// <returns>Fallback device information.</returns>
-        private static IntelGPUDeviceInfo GetFallbackDeviceInfo()
+        private static IntelGPUDeviceInfo GetFallbackDeviceInfo() => new()
         {
-            return new IntelGPUDeviceInfo
-            {
-                Name = "Intel GPU",
-                Vendor = "Intel",
-                Version = "SYCL 2024",
-                DriverVersion = "100.0.0.0",
-                Architecture = IntelGPUArchitecture.XeLP,
-                ComputeUnits = 96, // Typical Iris Xe
-                MaxWorkGroupSize = 512,
-                GlobalMemSize = 8UL * 1024 * 1024 * 1024, // 8GB
-                LocalMemSize = 65536, // 64KB
-                MaxClockFrequency = 1300, // 1.3 GHz
-                SubgroupSize = 16,
-                SupportsFloat64 = false,
-                SupportsInt64 = true,
-                SupportsUnifiedMemory = true
-            };
-        }
+            Name = "Intel GPU",
+            Vendor = "Intel",
+            Version = "SYCL 2024",
+            DriverVersion = "100.0.0.0",
+            Architecture = IntelGPUArchitecture.XeLP,
+            ComputeUnits = 96, // Typical Iris Xe
+            MaxWorkGroupSize = 512,
+            GlobalMemSize = 8UL * 1024 * 1024 * 1024, // 8GB
+            LocalMemSize = 65536, // 64KB
+            MaxClockFrequency = 1300, // 1.3 GHz
+            SubgroupSize = 16,
+            SupportsFloat64 = false,
+            SupportsInt64 = true,
+            SupportsUnifiedMemory = true
+        };
 
         /// <summary>
         /// Checks if the device supports double precision.
@@ -370,66 +367,54 @@ namespace ILGPU.Runtime.OneAPI
         /// </summary>
         /// <param name="architecture">Intel GPU architecture.</param>
         /// <returns>Subgroup size.</returns>
-        private static uint DetectSubgroupSize(IntelGPUArchitecture architecture)
+        private static uint DetectSubgroupSize(IntelGPUArchitecture architecture) => architecture switch
         {
-            return architecture switch
-            {
-                IntelGPUArchitecture.XeHPC => 32, // Xe-HPC uses 32-wide SIMD
-                IntelGPUArchitecture.XeHPG => 16, // Intel Arc uses 16-wide SIMD
-                IntelGPUArchitecture.XeLP => 16,  // Iris Xe uses 16-wide SIMD
-                IntelGPUArchitecture.Gen11 => 8,  // Gen11 uses 8-wide SIMD
-                IntelGPUArchitecture.Gen9 => 8,   // Gen9 uses 8-wide SIMD
-                _ => 16 // Default to 16
-            };
-        }
+            IntelGPUArchitecture.XeHPC => 32, // Xe-HPC uses 32-wide SIMD
+            IntelGPUArchitecture.XeHPG => 16, // Intel Arc uses 16-wide SIMD
+            IntelGPUArchitecture.XeLP => 16,  // Iris Xe uses 16-wide SIMD
+            IntelGPUArchitecture.Gen11 => 8,  // Gen11 uses 8-wide SIMD
+            IntelGPUArchitecture.Gen9 => 8,   // Gen9 uses 8-wide SIMD
+            _ => 16 // Default to 16
+        };
 
         /// <summary>
         /// Gets default subgroup size if not detected.
         /// </summary>
         /// <returns>Default subgroup size.</returns>
-        private int GetDefaultSubgroupSize()
+        private int GetDefaultSubgroupSize() => Architecture switch
         {
-            return Architecture switch
-            {
-                IntelGPUArchitecture.XeHPC => 32,
-                IntelGPUArchitecture.XeHPG => 16,
-                IntelGPUArchitecture.XeLP => 16,
-                _ => 16
-            };
-        }
+            IntelGPUArchitecture.XeHPC => 32,
+            IntelGPUArchitecture.XeHPG => 16,
+            IntelGPUArchitecture.XeLP => 16,
+            _ => 16
+        };
 
         /// <summary>
         /// Gets the architecture description.
         /// </summary>
         /// <returns>Architecture description.</returns>
-        public string GetArchitectureDescription()
+        public string GetArchitectureDescription() => Architecture switch
         {
-            return Architecture switch
-            {
-                IntelGPUArchitecture.XeHPC => "Xe-HPC (Data Center)",
-                IntelGPUArchitecture.XeHPG => "Xe-HPG (Intel Arc)",
-                IntelGPUArchitecture.XeLP => "Xe-LP (Iris Xe)",
-                IntelGPUArchitecture.Gen11 => "Gen11 (UHD Graphics)",
-                IntelGPUArchitecture.Gen9 => "Gen9 (HD Graphics)",
-                IntelGPUArchitecture.Xe2 => "Xe2 (Future)",
-                _ => "Unknown Intel GPU"
-            };
-        }
+            IntelGPUArchitecture.XeHPC => "Xe-HPC (Data Center)",
+            IntelGPUArchitecture.XeHPG => "Xe-HPG (Intel Arc)",
+            IntelGPUArchitecture.XeLP => "Xe-LP (Iris Xe)",
+            IntelGPUArchitecture.Gen11 => "Gen11 (UHD Graphics)",
+            IntelGPUArchitecture.Gen9 => "Gen9 (HD Graphics)",
+            IntelGPUArchitecture.Xe2 => "Xe2 (Future)",
+            _ => "Unknown Intel GPU"
+        };
 
         /// <summary>
         /// Gets a human-readable string of device capabilities.
         /// </summary>
         /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString()
-        {
-            return $"{GetArchitectureDescription()}, " +
+        public string GetCapabilitiesString() => $"{GetArchitectureDescription()}, " +
                    $"{ComputeUnits} EUs, " +
                    $"Subgroup {WarpSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
                    $"{ClockRate} MHz, " +
                    $"FP64: {SupportsFloat64}, " +
                    $"Unified: {SupportsUnifiedMemory}";
-        }
 
         #endregion
 

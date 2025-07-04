@@ -129,7 +129,7 @@ namespace ILGPU.IR
                 object IEnumerator.Current => Current;
 
                 /// <summary cref="IDisposable.Dispose"/>
-                public void Dispose() { }
+                public readonly void Dispose() { }
 
                 /// <summary cref="IEnumerator.MoveNext"/>
                 public bool MoveNext() => enumerator.MoveNext();

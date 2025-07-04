@@ -94,11 +94,11 @@ namespace ILGPU.Tests
     [Serializable]
     internal struct EmptyStruct : IXunitSerializable, IEquatable<EmptyStruct>
     {
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
 
-        public bool Equals(EmptyStruct other)
+        public readonly bool Equals(EmptyStruct other)
         {
             return true;
         }
@@ -110,7 +110,7 @@ namespace ILGPU.Tests
         }
 
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return 0;
         }
@@ -123,11 +123,11 @@ namespace ILGPU.Tests
     internal struct NoHashCodeStruct : IXunitSerializable, IEquatable<NoHashCodeStruct>
 #pragma warning restore CS0659 // Type does not override Object.GetHashCode()
     {
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
 
-        public bool Equals(NoHashCodeStruct other)
+        public readonly bool Equals(NoHashCodeStruct other)
         {
             return true;
         }
@@ -163,19 +163,19 @@ namespace ILGPU.Tests
             Val1 = info.GetValue<T2>(nameof(Val1));
         }
 
-        public void Serialize(IXunitSerializationInfo info)
+        public readonly void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(Val0), Val0);
             info.AddValue(nameof(Val1), Val1);
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(Val0, Val1);
         }
 
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"{Val0}, {Val1}";
         }
@@ -198,7 +198,7 @@ namespace ILGPU.Tests
             W = info.GetValue<int>(nameof(W));
         }
 
-        public void Serialize(IXunitSerializationInfo info)
+        public readonly void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(X), X);
             info.AddValue(nameof(Y), Y);
@@ -206,7 +206,7 @@ namespace ILGPU.Tests
             info.AddValue(nameof(W), W);
         }
 
-        public bool Equals(TestStruct other)
+        public readonly bool Equals(TestStruct other)
         {
             return X == other.X &&
             Y == other.Y &&
@@ -221,7 +221,7 @@ namespace ILGPU.Tests
         }
 
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(X, Y, Z, W);
         }
@@ -238,7 +238,7 @@ namespace ILGPU.Tests
 
         T IValueStructure<T>.NestedValue
         {
-            get => Val1;
+            readonly get => Val1;
             set => Val1 = value;
         }
 
@@ -249,20 +249,20 @@ namespace ILGPU.Tests
             Val2 = info.GetValue<short>(nameof(Val2));
         }
 
-        public void Serialize(IXunitSerializationInfo info)
+        public readonly void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(Val0), Val0);
             info.AddValue(nameof(Val1), Val1);
             info.AddValue(nameof(Val2), Val2);
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(Val0, Val1, Val2);
         }
 
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"{Val0}, {Val1}, {Val2}";
         }
@@ -280,25 +280,25 @@ namespace ILGPU.Tests
 
         public byte Val0
         {
-            get => data.Val0;
+            readonly get => data.Val0;
             set => data.Val0 = value;
         }
 
         public T Val1
         {
-            get => data.Val1;
+            readonly get => data.Val1;
             set => data.Val1 = value;
         }
 
         public short Val2
         {
-            get => data.Val2;
+            readonly get => data.Val2;
             set => data.Val2 = value;
         }
 
         T IValueStructure<T>.NestedValue
         {
-            get => data.Val1;
+            readonly get => data.Val1;
             set => data.Val1 = value;
         }
 
@@ -352,7 +352,7 @@ namespace ILGPU.Tests
 
         T2 IValueStructure<T2>.NestedValue
         {
-            get => Val2;
+            readonly get => Val2;
             set => Val2 = value;
         }
 
@@ -363,20 +363,20 @@ namespace ILGPU.Tests
             Val2 = info.GetValue<T2>(nameof(Val2));
         }
 
-        public void Serialize(IXunitSerializationInfo info)
+        public readonly void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(Val0), Val0);
             info.AddValue(nameof(Val1), Val1);
             info.AddValue(nameof(Val2), Val2);
         }
 
-        public override int GetHashCode()
+        public override readonly int GetHashCode()
         {
             return HashCode.Combine(Val0, Val1, Val2);
         }
 
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"{Val0}, {Val1}, {Val2}";
         }
@@ -395,25 +395,25 @@ namespace ILGPU.Tests
 
         public T1 Val0
         {
-            get => data.Val0;
+            readonly get => data.Val0;
             set => data.Val0 = value;
         }
 
         public ushort Val1
         {
-            get => data.Val1;
+            readonly get => data.Val1;
             set => data.Val1 = value;
         }
 
         public T2 Val2
         {
-            get => data.Val2;
+            readonly get => data.Val2;
             set => data.Val2 = value;
         }
 
         T2 IValueStructure<T2>.NestedValue
         {
-            get => data.Val2;
+            readonly get => data.Val2;
             set => data.Val2 = value;
         }
 
@@ -501,11 +501,11 @@ namespace ILGPU.Tests
             };
         }
 
-        public T Val0 => Value.Val0;
+        public readonly T Val0 => Value.Val0;
 
-        public T Val1 => Value.Val2.Val2.Val2.Val0;
+        public readonly T Val1 => Value.Val2.Val2.Val2.Val0;
 
-        public T Val2 => Value.Val2.Val2.Val2.Val2;
+        public readonly T Val2 => Value.Val2.Val2.Val2.Val2;
 
         public void Deserialize(IXunitSerializationInfo info)
         {
@@ -531,7 +531,7 @@ namespace ILGPU.Tests
         }
 
 
-        public void Serialize(IXunitSerializationInfo info)
+        public readonly void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(Data), Data);
         }
@@ -549,7 +549,7 @@ namespace ILGPU.Tests
         }
 
 
-        public void Serialize(IXunitSerializationInfo info)
+        public readonly void Serialize(IXunitSerializationInfo info)
         {
             info.AddValue(nameof(Data), Data);
         }
@@ -647,11 +647,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length0 : ILength
     {
-        public int Length => 0;
+        public readonly int Length => 0;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -659,11 +659,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length1 : ILength
     {
-        public int Length => 1;
+        public readonly int Length => 1;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -671,11 +671,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length2 : ILength
     {
-        public int Length => 2;
+        public readonly int Length => 2;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -683,11 +683,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length31 : ILength
     {
-        public int Length => 31;
+        public readonly int Length => 31;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -695,11 +695,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length32 : ILength
     {
-        public int Length => 32;
+        public readonly int Length => 32;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -707,11 +707,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length33 : ILength
     {
-        public int Length => 33;
+        public readonly int Length => 33;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -719,11 +719,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length65 : ILength
     {
-        public int Length => 65;
+        public readonly int Length => 65;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     /// <summary>
@@ -731,11 +731,11 @@ namespace ILGPU.Tests
     /// </summary>
     internal struct Length127 : ILength
     {
-        public int Length => 127;
+        public readonly int Length => 127;
 
-        public void Deserialize(IXunitSerializationInfo info) { }
+        public readonly void Deserialize(IXunitSerializationInfo info) { }
 
-        public void Serialize(IXunitSerializationInfo info) { }
+        public readonly void Serialize(IXunitSerializationInfo info) { }
     }
 
     #endregion

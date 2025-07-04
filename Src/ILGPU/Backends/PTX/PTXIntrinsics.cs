@@ -15,6 +15,7 @@ using ILGPU.IR.Values;
 using ILGPU.Runtime.Cuda;
 using ILGPU.Util;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -117,7 +118,7 @@ namespace ILGPU.Backends.PTX
         /// <param name="types">The parameter types.</param>
         /// <returns>The resolved intrinsic representation.</returns>
         private static PTXIntrinsic CreateMathIntrinsic(
-            Type baseType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type baseType,
             string name,
             params Type[] types)
         {

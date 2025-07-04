@@ -221,12 +221,12 @@ namespace ILGPU.Runtime
             /// <summary>
             /// Returns 0.
             /// </summary>
-            public int GroupSize => 0;
+            public readonly int GroupSize => 0;
 
             /// <summary>
             /// Loads an explicitly grouped kernel.
             /// </summary>
-            public Kernel LoadKernel(
+            public readonly Kernel LoadKernel(
                 Accelerator accelerator,
                 CompiledKernel compiledKernel,
                 out KernelInfo? kernelInfo)
@@ -258,7 +258,7 @@ namespace ILGPU.Runtime
             /// <summary>
             /// Loads an implicitly grouped kernel.
             /// </summary>
-            public Kernel LoadKernel(
+            public readonly Kernel LoadKernel(
                 Accelerator accelerator,
                 CompiledKernel compiledKernel,
                 out KernelInfo? kernelInfo) =>
@@ -275,12 +275,12 @@ namespace ILGPU.Runtime
         private struct AutoKernelLoader : IKernelLoader
         {
             /// <summary cref="IKernelLoader.GroupSize"/>
-            public int GroupSize => -1;
+            public readonly int GroupSize => -1;
 
             /// <summary>
             /// Loads an automatically grouped kernel.
             /// </summary>
-            public Kernel LoadKernel(
+            public readonly Kernel LoadKernel(
                 Accelerator accelerator,
                 CompiledKernel compiledKernel,
                 out KernelInfo? kernelInfo) =>

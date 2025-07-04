@@ -83,7 +83,7 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the current IR context.
         /// </summary>
-        public IRContext Context => CodeGenerator.Context;
+        public readonly IRContext Context => CodeGenerator.Context;
 
         /// <summary>
         /// Returns the current context properties.
@@ -93,12 +93,12 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the current type context.
         /// </summary>
-        public IRTypeContext TypeContext => CodeGenerator.TypeContext;
+        public readonly IRTypeContext TypeContext => CodeGenerator.TypeContext;
 
         /// <summary>
         /// Returns the current IR builder.
         /// </summary>
-        public IRBuilder Builder => Block.Builder;
+        public readonly IRBuilder Builder => Block.Builder;
 
         /// <summary>
         /// Represents the caller method.
@@ -113,7 +113,7 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the associated module.
         /// </summary>
-        public Module Module => Method.Module;
+        public readonly Module Module => Method.Module;
 
         /// <summary>
         /// Returns the call arguments.
@@ -124,14 +124,14 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Returns the number of arguments.
         /// </summary>
-        public int NumArguments => Arguments.Count;
+        public readonly int NumArguments => Arguments.Count;
 
         /// <summary>
         /// Returns the argument with the given index.
         /// </summary>
         /// <param name="index">The argument index.</param>
         /// <returns>The argument with the given index.</returns>
-        public ref ValueReference this[int index] => ref Arguments[index];
+        public readonly ref ValueReference this[int index] => ref Arguments[index];
 
         #endregion
 
@@ -140,20 +140,20 @@ namespace ILGPU.Frontend
         /// <summary>
         /// Formats an error message to include specific exception information.
         /// </summary>
-        public string FormatErrorMessage(string message) =>
+        public readonly string FormatErrorMessage(string message) =>
             Location.FormatErrorMessage(message);
 
         /// <summary>
         /// Returns the generic arguments of the used method.
         /// </summary>
         /// <returns>The generic arguments of the used method.</returns>
-        public Type[] GetMethodGenericArguments() => Method.GetGenericArguments();
+        public readonly Type[] GetMethodGenericArguments() => Method.GetGenericArguments();
 
         /// <summary>
         /// Returns the generic arguments of the used method.
         /// </summary>
         /// <returns>The generic arguments of the used method.</returns>
-        public Type[] GetTypeGenericArguments() =>
+        public readonly Type[] GetTypeGenericArguments() =>
             Method.DeclaringType.AsNotNull().GetGenericArguments();
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="methodBase">The method to declare.</param>
         /// <returns>The declared method reference.</returns>
-        public Method DeclareMethod(MethodBase methodBase) =>
+        public readonly Method DeclareMethod(MethodBase methodBase) =>
             methodBase != null
             ? CodeGenerator.DeclareMethod(methodBase)
             : throw Location.GetArgumentNullException(nameof(methodBase));
@@ -174,7 +174,7 @@ namespace ILGPU.Frontend
         /// Returns the string representation of this invocation context.
         /// </summary>
         /// <returns>The string representation of this invocation context.</returns>
-        public override string ToString()
+        public override readonly string ToString()
         {
             var builder = new StringBuilder();
             builder.Append(Method.Name);

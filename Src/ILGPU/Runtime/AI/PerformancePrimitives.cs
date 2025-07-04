@@ -837,7 +837,7 @@ namespace ILGPU.Runtime.AI
                                                                                        {
                                                                                            for (int ow = 0; ow < outWidth; ow++)
                                                                                            {
-                                                                                               T sum = default(T);
+                                                                                               T sum = default;
 
                                                                                                for (int kh = 0; kh < kernelHeight; kh++)
                                                                                                {

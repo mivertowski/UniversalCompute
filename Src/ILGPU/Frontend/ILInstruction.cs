@@ -535,7 +535,7 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="other">The other object.</param>
         /// <returns>True, if the current object is equal to the given one.</returns>
-        public bool Equals(ILInstructionFlagsContext other) =>
+        public readonly bool Equals(ILInstructionFlagsContext other) =>
             other == this;
 
         #endregion
@@ -547,20 +547,20 @@ namespace ILGPU.Frontend
         /// </summary>
         /// <param name="obj">The other object.</param>
         /// <returns>True, if the current object is equal to the given one.</returns>
-        public override bool Equals(object? obj) =>
+        public override readonly bool Equals(object? obj) =>
             obj is ILInstructionFlagsContext context && context == this;
 
         /// <summary>
         /// Returns the hash code of this flags.
         /// </summary>
         /// <returns>The hash code.</returns>
-        public override int GetHashCode() => Flags.GetHashCode();
+        public override readonly int GetHashCode() => Flags.GetHashCode();
 
         /// <summary>
         /// Returns the string representation of this flags.
         /// </summary>
         /// <returns>The string representation.</returns>
-        public override string ToString() =>
+        public override readonly string ToString() =>
             Argument == null
             ? $"{Flags}"
             : $"{Flags} [{Argument}]";

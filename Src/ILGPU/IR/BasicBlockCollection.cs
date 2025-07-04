@@ -59,7 +59,7 @@ namespace ILGPU.IR
         {
             private static TOrder GetOrder() => default;
 
-            private ImmutableArray<BasicBlock> blocks;
+            private readonly ImmutableArray<BasicBlock> blocks;
             private TraversalEnumerationState state;
 
             internal Enumerator(ImmutableArray<BasicBlock> blockArray)
@@ -71,13 +71,13 @@ namespace ILGPU.IR
             /// <summary>
             /// Returns the current basic block.
             /// </summary>
-            public BasicBlock Current => blocks[state.Index];
+            public readonly BasicBlock Current => blocks[state.Index];
 
             /// <summary cref="IEnumerator.Current"/>
             object IEnumerator.Current => Current;
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             /// <summary cref="IEnumerator.MoveNext"/>
             public bool MoveNext() => GetOrder().MoveNext(blocks, ref state);
@@ -126,7 +126,7 @@ namespace ILGPU.IR
                 object IEnumerator.Current => Current;
 
                 /// <summary cref="IDisposable.Dispose"/>
-                void IDisposable.Dispose() { }
+                readonly void IDisposable.Dispose() { }
 
                 /// <summary cref="IEnumerator.MoveNext"/>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]

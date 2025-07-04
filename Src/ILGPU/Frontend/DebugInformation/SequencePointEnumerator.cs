@@ -61,7 +61,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// Returns true if the current enumerator state points to a valid sequence
         /// point.
         /// </summary>
-        public bool IsValid =>
+        public readonly bool IsValid =>
             currentPoint >= 0 && currentPoint < SequencePoints.Length;
 
         /// <summary>

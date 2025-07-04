@@ -161,7 +161,7 @@ public static class HardwareDetection
             }
 
             // Basic detection based on processor information
-            var processorName = GetProcessorName().ToLowerInvariant();
+            var processorName = GetProcessorName().ToUpperInvariant();
             if (processorName.Contains("core ultra") || processorName.Contains("meteor lake") || 
                 processorName.Contains("arrow lake") || processorName.Contains("lunar lake"))
             {
@@ -301,7 +301,7 @@ public static class HardwareDetection
         {
             // Use reflection to access internal CPUID if available
             // For now, use a conservative approach based on known AMX processors
-            var processorName = GetProcessorName().ToLowerInvariant();
+            var processorName = GetProcessorName().ToUpperInvariant();
             return processorName.Contains("xeon") && 
                    (processorName.Contains("sapphire rapids") || processorName.Contains("granite rapids")) ||
                    processorName.Contains("13th gen") || processorName.Contains("14th gen");
@@ -352,7 +352,7 @@ public static class HardwareDetection
         // Detect ANE generation based on processor (simplified)
         try
         {
-            var processorInfo = GetProcessorName().ToLowerInvariant();
+            var processorInfo = GetProcessorName().ToUpperInvariant();
             if (processorInfo.Contains("m3")) return "ANE 3.0";
             if (processorInfo.Contains("m2")) return "ANE 2.0";
             if (processorInfo.Contains("m1")) return "ANE 1.0";

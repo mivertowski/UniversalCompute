@@ -251,16 +251,13 @@ namespace ILGPU.Intel.AMX
         public static AMXTileConfiguration CreateConfiguration(
             AMXDataType dataType,
             int rows = 16,
-            int cols = 16)
-        {
-            return new AMXTileConfiguration
+            int cols = 16) => new()
             {
                 DataType = dataType,
                 TileRows = rows,
                 TileColumns = cols,
                 Tiles = new AMXTileDescriptor[8] // AMX supports up to 8 tiles
             };
-        }
 
         #endregion
     }

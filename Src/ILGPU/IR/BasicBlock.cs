@@ -216,7 +216,7 @@ namespace ILGPU.IR
             /// <summary>
             /// Returns the current node.
             /// </summary>
-            public ValueEntry Current => new(index, values[index]);
+            public readonly ValueEntry Current => new(index, values[index]);
 
             /// <summary cref="IEnumerator.Current"/>
             object IEnumerator.Current => Current;
@@ -226,7 +226,7 @@ namespace ILGPU.IR
             #region Methods
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             /// <summary cref="IEnumerator.MoveNext"/>
             public bool MoveNext() => ++index < values.Count;

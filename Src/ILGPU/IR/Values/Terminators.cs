@@ -673,7 +673,7 @@ namespace ILGPU.IR.Values
             /// <summary>
             /// The number of arguments.
             /// </summary>
-            public int Count => builder.Count;
+            public readonly int Count => builder.Count;
 
             #endregion
 
@@ -864,7 +864,7 @@ namespace ILGPU.IR.Values
             /// <summary>
             /// The number of arguments.
             /// </summary>
-            public int Count => builder.Count;
+            public readonly int Count => builder.Count;
 
             #endregion
 

@@ -32,8 +32,6 @@ namespace ILGPU.Intel.NPU
     /// </summary>
     public sealed class IntelNPUAccelerator : Accelerator
     {
-        private readonly IntPtr _npuContext;
-        private readonly NPUCapabilities _capabilities;
         private bool _disposed;
 
         /// <summary>
@@ -47,11 +45,11 @@ namespace ILGPU.Intel.NPU
             if (!NPUNative.IsNPUAvailable())
                 throw new NotSupportedException("Intel NPU not available on this device");
 
-            _npuContext = NPUNative.CreateContext();
-            if (_npuContext == IntPtr.Zero)
+            ContextHandle = NPUNative.CreateContext();
+            if (ContextHandle == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to create Intel NPU context");
 
-            _capabilities = NPUCapabilities.Query();
+            Capabilities = NPUCapabilities.Query();
             
             // Initialize accelerator properties
             InitializeAcceleratorProperties();
@@ -60,12 +58,12 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU capabilities.
         /// </summary>
-        public new NPUCapabilities Capabilities => _capabilities;
+        public new NPUCapabilities Capabilities { get; }
 
         /// <summary>
         /// Gets the NPU context handle.
         /// </summary>
-        internal IntPtr ContextHandle => _npuContext;
+        internal IntPtr ContextHandle { get; }
 
         #region AI/ML Operations
 
@@ -89,7 +87,7 @@ namespace ILGPU.Intel.NPU
             
             NPUOperations.ExecuteConvolution(
                 inputPtr, weights, outputPtr, 
-                config, _npuContext);
+                config, ContextHandle);
         }
 
         /// <summary>
@@ -114,7 +112,7 @@ namespace ILGPU.Intel.NPU
             var cPtr = (float*)c.LoadEffectiveAddress();
             
             NPUOperations.ExecuteMatrixMultiply(
-                aPtr, bPtr, cPtr, m, n, k, _npuContext);
+                aPtr, bPtr, cPtr, m, n, k, ContextHandle);
         }
 
         /// <summary>
@@ -136,7 +134,7 @@ namespace ILGPU.Intel.NPU
             NPUNative.ExecuteOpenVINOInference(
                 inputPtr, outputPtr, 
                 input.Length, output.Length,
-                model.ModelHandle, _npuContext);
+                model.ModelHandle, ContextHandle);
         }
 
         /// <summary>
@@ -159,7 +157,7 @@ namespace ILGPU.Intel.NPU
             var outputPtr = (float*)output.LoadEffectiveAddress();
             
             NPUOperations.ExecuteQuantizedInference(
-                inputPtr, weightsPtr, outputPtr, config, _npuContext);
+                inputPtr, weightsPtr, outputPtr, config, ContextHandle);
         }
 
         /// <summary>
@@ -171,15 +169,12 @@ namespace ILGPU.Intel.NPU
             ILGPU.Numerics.ITensor<T> output,
             ConvolutionParameters parameters,
             CancellationToken cancellationToken = default)
-            where T : unmanaged
-        {
-            await Task.Run(() =>
-            {
-                // Execute convolution on NPU
-                // This is a simplified implementation - real implementation would use OpenVINO
-                DefaultStream.Synchronize();
-            }, cancellationToken).ConfigureAwait(false);
-        }
+            where T : unmanaged => await Task.Run(() =>
+                                            {
+                                                // Execute convolution on NPU
+                                                // This is a simplified implementation - real implementation would use OpenVINO
+                                                DefaultStream.Synchronize();
+                                            }, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Executes an attention kernel asynchronously on the NPU.
@@ -191,42 +186,28 @@ namespace ILGPU.Intel.NPU
             ILGPU.Numerics.ITensor<T> output,
             AttentionParameters parameters,
             CancellationToken cancellationToken = default)
-            where T : unmanaged
-        {
-            await Task.Run(() =>
-            {
-                // Execute attention on NPU
-                // This is a simplified implementation - real implementation would use OpenVINO
-                DefaultStream.Synchronize();
-            }, cancellationToken).ConfigureAwait(false);
-        }
+            where T : unmanaged => await Task.Run(() =>
+                                            {
+                                                // Execute attention on NPU
+                                                // This is a simplified implementation - real implementation would use OpenVINO
+                                                DefaultStream.Synchronize();
+                                            }, cancellationToken).ConfigureAwait(false);
 
         #endregion
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal()
-        {
-            return new NPUStream(this);
-        }
+        protected override AcceleratorStream CreateStreamInternal() => new NPUStream(this);
 
-        protected override void SynchronizeInternal()
-        {
-            NPUNative.Synchronize(_npuContext);
-        }
+        protected override void SynchronizeInternal() => NPUNative.Synchronize(ContextHandle);
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new NPUBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new NPUBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) =>
             // NPU uses specialized operations rather than general kernels
             throw new NotSupportedException(
                 "Intel NPU does not support general kernel loading. " +
                 "Use specialized NPU operations instead.");
-        }
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
@@ -248,11 +229,9 @@ namespace ILGPU.Intel.NPU
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // NPU has different architecture, return a conservative estimate
-            return _capabilities.MaxConcurrentInferences;
-        }
+            Capabilities.MaxConcurrentInferences;
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -261,7 +240,7 @@ namespace ILGPU.Intel.NPU
             out int minGridSize)
         {
             minGridSize = 1;
-            return Math.Min(maxGroupSize, _capabilities.OptimalBatchSize);
+            return Math.Min(maxGroupSize, Capabilities.OptimalBatchSize);
         }
 
         protected override int EstimateGroupSizeInternal(
@@ -271,15 +250,13 @@ namespace ILGPU.Intel.NPU
             out int minGridSize)
         {
             minGridSize = 1;
-            return Math.Min(maxGroupSize, _capabilities.OptimalBatchSize);
+            return Math.Min(maxGroupSize, Capabilities.OptimalBatchSize);
         }
 
-        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator)
-        {
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) =>
             // NPU typically shares memory with CPU and GPU through shared system memory
-            return otherAccelerator.AcceleratorType == AcceleratorType.CPU ||
+            otherAccelerator.AcceleratorType == AcceleratorType.CPU ||
                    otherAccelerator.AcceleratorType == AcceleratorType.OpenCL;
-        }
 
         protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
         {
@@ -291,15 +268,9 @@ namespace ILGPU.Intel.NPU
             // NPU peer access is managed by the driver
         }
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
-            return new NullPageLockScope<T>(this, pinned, numElements);
-        }
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) => new NullPageLockScope<T>(this, pinned, numElements);
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
-        }
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by NPU accelerator");
 
         protected override void OnBind()
         {
@@ -315,9 +286,9 @@ namespace ILGPU.Intel.NPU
         {
             if (!_disposed)
             {
-                if (disposing && _npuContext != IntPtr.Zero)
+                if (disposing && ContextHandle != IntPtr.Zero)
                 {
-                    NPUNative.ReleaseContext(_npuContext);
+                    NPUNative.ReleaseContext(ContextHandle);
                 }
                 _disposed = true;
             }
@@ -330,42 +301,42 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the NPU accelerator name.
         /// </summary>
-        public new string Name => $"Intel NPU ({_capabilities.DeviceName})";
+        public new string Name => $"Intel NPU ({Capabilities.DeviceName})";
 
         /// <summary>
         /// Gets the maximum grid size for NPU operations.
         /// </summary>
-        public new Index3D MaxGridSize => new Index3D(_capabilities.MaxInputWidth, _capabilities.MaxInputHeight, 1);
+        public new Index3D MaxGridSize => new(Capabilities.MaxInputWidth, Capabilities.MaxInputHeight, 1);
 
         /// <summary>
         /// Gets the maximum group size for NPU operations.
         /// </summary>
-        public new Index3D MaxGroupSize => new Index3D(_capabilities.OptimalBatchSize, 1, 1);
+        public new Index3D MaxGroupSize => new(Capabilities.OptimalBatchSize, 1, 1);
 
         /// <summary>
         /// Gets the NPU warp size.
         /// </summary>
-        public new int WarpSize => _capabilities.OptimalBatchSize;
+        public new int WarpSize => Capabilities.OptimalBatchSize;
 
         /// <summary>
         /// Gets the number of compute units (multiprocessors).
         /// </summary>
-        public new int NumMultiprocessors => _capabilities.NumComputeUnits;
+        public new int NumMultiprocessors => Capabilities.NumComputeUnits;
 
         /// <summary>
         /// Gets the maximum shared memory per multiprocessor.
         /// </summary>
-        public new int MaxSharedMemoryPerGroup => _capabilities.MaxSharedMemoryPerUnit;
+        public new int MaxSharedMemoryPerGroup => Capabilities.MaxSharedMemoryPerUnit;
 
         /// <summary>
         /// Gets the maximum constant memory.
         /// </summary>
-        public new int MaxConstantMemory => _capabilities.MaxConstantMemory;
+        public new int MaxConstantMemory => Capabilities.MaxConstantMemory;
 
         /// <summary>
         /// Gets the memory bandwidth.
         /// </summary>
-        public long MemoryBandwidth => (long)_capabilities.MemoryBandwidth;
+        public long MemoryBandwidth => (long)Capabilities.MemoryBandwidth;
 
         private void InitializeAcceleratorProperties()
         {
@@ -447,11 +418,9 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Adds a profiling marker to the stream.
         /// </summary>
-        protected override ProfilingMarker AddProfilingMarkerInternal()
-        {
+        protected override ProfilingMarker AddProfilingMarkerInternal() =>
             // NPU doesn't support detailed profiling markers
-            return null!;
-        }
+            null!;
 
         /// <summary>
         /// Disposes the NPU stream.

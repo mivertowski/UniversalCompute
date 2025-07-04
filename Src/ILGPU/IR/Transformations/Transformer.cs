@@ -121,7 +121,7 @@ namespace ILGPU.IR.Transformations
             /// Adds the given transformation to the manager.
             /// </summary>
             /// <param name="transformation">The transformation to add.</param>
-            public void Add(Transformation transformation) =>
+            public readonly void Add(Transformation transformation) =>
                 builder.Add(transformation
                     ?? throw new ArgumentNullException(nameof(transformation)));
 
@@ -129,7 +129,7 @@ namespace ILGPU.IR.Transformations
             /// Converts this builder to an immutable array.
             /// </summary>
             /// <returns>The immutable transformation array.</returns>
-            public Transformer ToTransformer()
+            public readonly Transformer ToTransformer()
             {
                 var transformations = builder.ToImmutable();
                 return new Transformer(Configuration, transformations);

@@ -75,7 +75,7 @@ namespace ILGPU.Backends.OpenCL
             /// <summary>
             /// Returns the associated kernel type.
             /// </summary>
-            public string GetParameterType(Parameter parameter) =>
+            public readonly string GetParameterType(Parameter parameter) =>
                 Parent.KernelTypeGenerator[parameter];
 
             /// <summary>

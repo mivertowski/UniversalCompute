@@ -179,10 +179,9 @@ namespace ILGPU.Backends.ROCm
         /// Determines the target ROCm architecture.
         /// </summary>
         /// <returns>The target architecture string.</returns>
-        private string DetermineTargetArchitecture()
-        {
+        private string DetermineTargetArchitecture() =>
             // Map instruction set to ROCm architecture
-            return instructionSet.Architecture switch
+            instructionSet.Architecture switch
             {
                 ROCmArchitecture.GCN3 => "gfx803", // Fiji, Polaris
                 ROCmArchitecture.GCN4 => "gfx900", // Vega
@@ -195,7 +194,6 @@ namespace ILGPU.Backends.ROCm
                 ROCmArchitecture.CDNA3 => "gfx942", // MI300
                 _ => "gfx900" // Default to Vega
             };
-        }
 
         /// <summary>
         /// Creates a binary containing the source code for debugging purposes.

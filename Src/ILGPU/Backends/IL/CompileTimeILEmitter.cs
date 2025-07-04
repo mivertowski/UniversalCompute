@@ -209,7 +209,7 @@ namespace ILGPU.Backends.IL
         public void Emit(OpCode opCode)
         {
             // Convert OpCodes to equivalent C# expressions
-            switch (opCode.Name?.ToLowerInvariant())
+            switch (opCode.Name?.ToUpperInvariant())
             {
                 case "add":
                     sourceBuilder.Append(" + ");
@@ -261,7 +261,7 @@ namespace ILGPU.Backends.IL
         {
             var compileTimeLabel = labels[label.Index];
             
-            switch (opCode.Name?.ToLowerInvariant())
+            switch (opCode.Name?.ToUpperInvariant())
             {
                 case "br":
                     EmitLine($"goto {compileTimeLabel.Name};");
@@ -281,7 +281,7 @@ namespace ILGPU.Backends.IL
         /// <summary cref="IILEmitter.Emit(OpCode, Type)"/>
         public void Emit(OpCode opCode, Type type)
         {
-            switch (opCode.Name?.ToLowerInvariant())
+            switch (opCode.Name?.ToUpperInvariant())
             {
                 case "castclass":
                     sourceBuilder.Append($"({GetTypeString(type)})");
@@ -307,7 +307,7 @@ namespace ILGPU.Backends.IL
         /// <summary cref="IILEmitter.Emit(OpCode, FieldInfo)"/>
         public void Emit(OpCode opCode, FieldInfo field)
         {
-            switch (opCode.Name?.ToLowerInvariant())
+            switch (opCode.Name?.ToUpperInvariant())
             {
                 case "ldfld":
                     sourceBuilder.Append($".{field.Name}");

@@ -237,7 +237,7 @@ namespace ILGPU.AI.Memory
         /// <summary>
         /// Sparsity ratio (0.0 = dense, 1.0 = empty).
         /// </summary>
-        public float Sparsity => 1.0f - (float)NonZeroCount / (Rows * Cols);
+        public readonly float Sparsity => 1.0f - (float)NonZeroCount / (Rows * Cols);
     }
 
     /// <summary>
@@ -285,9 +285,9 @@ namespace ILGPU.AI.Memory
         private readonly Accelerator _accelerator;
         private readonly int _blockSize;
         private readonly int _alignment;
-        private MemoryBuffer[] _blocks;
-        private bool[] _blockUsed;
-        private int _blockCount;
+        private readonly MemoryBuffer[] _blocks;
+        private readonly bool[] _blockUsed;
+        private readonly int _blockCount;
         private bool _disposed;
 
         /// <summary>
@@ -410,7 +410,7 @@ namespace ILGPU.AI.Memory
             string operationType,
             int elementSize)
         {
-            var format = operationType.ToLowerInvariant() switch
+            var format = operationType.ToUpperInvariant() switch
             {
                 "convolution" => TensorFormat.NCHW, // Better for convolution
                 "attention" => TensorFormat.NLC,    // Better for transformers
@@ -484,7 +484,7 @@ namespace ILGPU.AI.Memory
         {
             // Clear dense array first
             var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<T>, T>(ClearArrayKernel);
-            clearKernel(new Index1D(dense.IntLength), dense, default(T));
+            clearKernel(new Index1D(dense.IntLength), dense, default);
 
             // Scatter sparse values to dense array
             var scatterKernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -504,9 +504,7 @@ namespace ILGPU.AI.Memory
         /// <returns>Memory layout configuration.</returns>
         public static AIMemoryConfig CreateAttentionLayout(
             Accelerator accelerator,
-            int batchSize, int seqLength, int numHeads, int headDim)
-        {
-            return new AIMemoryConfig
+            int batchSize, int seqLength, int numHeads, int headDim) => new()
             {
                 Layout = AIMemoryLayout.RowMajor, // Better for matrix operations
                 AccessPattern = AIAccessPattern.Strided, // Attention has strided access
@@ -516,7 +514,6 @@ namespace ILGPU.AI.Memory
                 AlignMemory = true,
                 MemoryAlignment = 64 // Optimize for cache lines
             };
-        }
 
         #region Kernel Implementations
 

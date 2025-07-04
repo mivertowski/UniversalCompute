@@ -53,7 +53,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the compute capability as a combined version.
         /// </summary>
-        public Version ComputeCapability => new Version(ComputeCapabilityMajor, ComputeCapabilityMinor);
+        public Version ComputeCapability => new(ComputeCapabilityMajor, ComputeCapabilityMinor);
 
         /// <summary>
         /// Gets the GPU architecture name.
@@ -73,17 +73,17 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the warp size (wavefront size on AMD).
         /// </summary>
-        public new int WarpSize => Properties.WarpSize;
+        public int WarpSize => Properties.WarpSize;
 
         /// <summary>
         /// Gets the maximum shared memory per block.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => (long)Properties.SharedMemPerBlock;
+        public long MaxSharedMemoryPerGroup => (long)Properties.SharedMemPerBlock;
 
         /// <summary>
         /// Gets the maximum constant memory size.
         /// </summary>
-        public new long MaxConstantMemory => (long)Properties.TotalConstMem;
+        public long MaxConstantMemory => (long)Properties.TotalConstMem;
 
         /// <summary>
         /// Gets the clock rate in KHz.
@@ -151,7 +151,9 @@ namespace ILGPU.Runtime.ROCm
             MaxGridSize = new Index3D(Properties.MaxGridSize[0], Properties.MaxGridSize[1], Properties.MaxGridSize[2]);
             MaxGroupSize = new Index3D(Properties.MaxThreadsDim[0], Properties.MaxThreadsDim[1], Properties.MaxThreadsDim[2]);
             MaxNumThreadsPerGroup = Properties.MaxThreadsPerBlock;
-            // MaxSharedMemoryPerGroup, MaxConstantMemory, and WarpSize are computed properties
+            MaxSharedMemoryPerGroup = Properties.SharedMemPerBlock;
+            MaxConstantMemory = Properties.TotalConstMem;
+            WarpSize = Properties.WarpSize;
             NumMultiprocessors = Properties.MultiProcessorCount;
             MaxNumThreadsPerMultiprocessor = Properties.MaxThreadsPerMultiProcessor;
             
@@ -165,7 +167,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public override DeviceId DeviceId => new DeviceId(ROCmDeviceId, AcceleratorType.ROCm);
+        public override DeviceId DeviceId => new(ROCmDeviceId, AcceleratorType.ROCm);
 
 
         /// <summary>
@@ -259,24 +261,21 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="major">Major version.</param>
         /// <param name="minor">Minor version.</param>
         /// <returns>Architecture name.</returns>
-        private static string GetArchitectureName(int major, int minor)
+        private static string GetArchitectureName(int major, int minor) => major switch
         {
-            return major switch
+            6 => "GCN 3.0 (Fiji/Polaris)",
+            7 => "GCN 4.0 (Vega)",
+            8 => "GCN 5.0 (Vega II)",
+            9 => minor switch
             {
-                6 => "GCN 3.0 (Fiji/Polaris)",
-                7 => "GCN 4.0 (Vega)",
-                8 => "GCN 5.0 (Vega II)",
-                9 => minor switch
-                {
-                    0 => "RDNA 1.0 (Navi 10)",
-                    _ => "RDNA 1.x"
-                },
-                10 => "RDNA 2.0 (Navi 2x)",
-                11 => "RDNA 3.0 (Navi 3x)",
-                12 => "RDNA 4.0 (Navi 4x)",
-                _ => $"Unknown ({major}.{minor})"
-            };
-        }
+                0 => "RDNA 1.0 (Navi 10)",
+                _ => "RDNA 1.x"
+            },
+            10 => "RDNA 2.0 (Navi 2x)",
+            11 => "RDNA 3.0 (Navi 3x)",
+            12 => "RDNA 4.0 (Navi 4x)",
+            _ => $"Unknown ({major}.{minor})"
+        };
 
         /// <summary>
         /// Determines if this is a discrete GPU.
@@ -288,13 +287,10 @@ namespace ILGPU.Runtime.ROCm
         /// Gets a human-readable string of device capabilities.
         /// </summary>
         /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString()
-        {
-            return $"Compute {ComputeCapability}, {MultiprocessorCount} CUs, " +
+        public string GetCapabilitiesString() => $"Compute {ComputeCapability}, {MultiprocessorCount} CUs, " +
                    $"{MaxThreadsPerMultiprocessor} threads/CU, " +
                    $"Warp {WarpSize}, {MemorySize / (1024 * 1024)} MB, " +
                    $"{ClockRate / 1000} MHz, {Architecture}";
-        }
 
         #endregion
 

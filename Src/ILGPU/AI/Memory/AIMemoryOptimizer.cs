@@ -158,7 +158,7 @@ namespace ILGPU.AI.Memory
         private readonly Accelerator _accelerator;
         private readonly Dictionary<string, MemoryStats> _operationStats;
         private readonly Dictionary<string, OptimizationRecommendation> _recommendations;
-        private long _totalMemoryBudget;
+        private readonly long _totalMemoryBudget;
         private float _memoryUtilizationTarget;
 
         /// <summary>
@@ -284,20 +284,14 @@ namespace ILGPU.AI.Memory
         /// </summary>
         /// <param name="operationType">Type of operation.</param>
         /// <param name="stats">Memory statistics.</param>
-        public void UpdateStats(string operationType, MemoryStats stats)
-        {
-            _operationStats[operationType] = stats;
-        }
+        public void UpdateStats(string operationType, MemoryStats stats) => _operationStats[operationType] = stats;
 
         /// <summary>
         /// Gets memory statistics for the specified operation.
         /// </summary>
         /// <param name="operationType">Type of operation.</param>
         /// <returns>Memory statistics if available.</returns>
-        public MemoryStats? GetStats(string operationType)
-        {
-            return _operationStats.TryGetValue(operationType, out var stats) ? stats : null;
-        }
+        public MemoryStats? GetStats(string operationType) => _operationStats.TryGetValue(operationType, out var stats) ? stats : null;
 
         /// <summary>
         /// Optimizes memory layout for multiple operations simultaneously.
@@ -361,24 +355,21 @@ namespace ILGPU.AI.Memory
             return totalSize;
         }
 
-        private AIAccessPattern DetermineOptimalAccessPattern(string operationType, long workloadSize)
+        private AIAccessPattern DetermineOptimalAccessPattern(string operationType, long workloadSize) => operationType.ToUpperInvariant() switch
         {
-            return operationType.ToLowerInvariant() switch
-            {
-                "convolution" => AIAccessPattern.Tiled,
-                "matmul" => AIAccessPattern.Blocked,
-                "attention" => AIAccessPattern.Strided,
-                "elementwise" => AIAccessPattern.Sequential,
-                "reduction" => AIAccessPattern.Streaming,
-                "sparse" => AIAccessPattern.GatherScatter,
-                _ => workloadSize > 1000000 ? AIAccessPattern.Blocked : AIAccessPattern.Sequential
-            };
-        }
+            "convolution" => AIAccessPattern.Tiled,
+            "matmul" => AIAccessPattern.Blocked,
+            "attention" => AIAccessPattern.Strided,
+            "elementwise" => AIAccessPattern.Sequential,
+            "reduction" => AIAccessPattern.Streaming,
+            "sparse" => AIAccessPattern.GatherScatter,
+            _ => workloadSize > 1000000 ? AIAccessPattern.Blocked : AIAccessPattern.Sequential
+        };
 
         private AIMemoryLayout DetermineOptimalLayout(string operationType, OptimizationStrategy strategy, long workloadSize)
         {
             // Base layout on operation type
-            var baseLayout = operationType.ToLowerInvariant() switch
+            var baseLayout = operationType.ToUpperInvariant() switch
             {
                 "convolution" => AIMemoryLayout.Tiled,
                 "matmul" => AIMemoryLayout.Blocked,
@@ -409,7 +400,7 @@ namespace ILGPU.AI.Memory
             tileSize = Math.Max(8, Math.Min(64, tileSize));
             tileSize = 1 << (int)Math.Log2(tileSize);
             
-            return operationType.ToLowerInvariant() switch
+            return operationType.ToUpperInvariant() switch
             {
                 "convolution" => (Math.Min(tileSize, 16), Math.Min(tileSize, 16)),
                 "matmul" => (tileSize, tileSize),
@@ -489,7 +480,7 @@ namespace ILGPU.AI.Memory
         private float CalculateConfidence(string operationType, long workloadSize)
         {
             // Higher confidence for well-known operation types and sizes
-            var operationConfidence = operationType.ToLowerInvariant() switch
+            var operationConfidence = operationType.ToUpperInvariant() switch
             {
                 "convolution" or "matmul" or "attention" => 0.9f,
                 "elementwise" or "reduction" => 0.8f,

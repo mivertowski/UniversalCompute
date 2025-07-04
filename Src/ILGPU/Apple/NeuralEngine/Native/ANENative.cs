@@ -359,12 +359,10 @@ namespace ILGPU.Apple.NeuralEngine.Native
         /// <summary>
         /// Creates a Core ML model for convolution operation.
         /// </summary>
-        private static IntPtr CreateCoreMLConvolutionModel(TensorShape inputShape, TensorShape outputShape, object parameters)
-        {
+        private static IntPtr CreateCoreMLConvolutionModel(TensorShape inputShape, TensorShape outputShape, object parameters) =>
             // In a real implementation, this would create a Core ML model for the convolution
             // For now, return a dummy handle that will be used for acceleration detection
-            return new IntPtr(0x12345678); // Dummy model handle
-        }
+            new(0x12345678); // Dummy model handle
 
         /// <summary>
         /// Releases a Core ML model handle.
@@ -409,14 +407,12 @@ namespace ILGPU.Apple.NeuralEngine.Native
         private static unsafe void ExecuteCoreMLMatMul(
             float* input, float* result,
             TensorShape inputShape, TensorShape outputShape,
-            IntPtr context)
-        {
+            IntPtr context) =>
             // Use Core ML matrix multiplication primitive
             ANENative.ExecuteMatMul(
                 input, result,
                 inputShape.ElementCount, outputShape.ElementCount,
                 context);
-        }
 
         /// <summary>
         /// CPU fallback implementation for matrix multiplication.
@@ -468,14 +464,12 @@ namespace ILGPU.Apple.NeuralEngine.Native
         private static unsafe void ExecuteCoreMLAttention(
             float* input, float* result,
             TensorShape inputShape, TensorShape outputShape,
-            object parameters, IntPtr context)
-        {
+            object parameters, IntPtr context) =>
             // Use Core ML attention primitive
             ANENative.ExecuteAttention(
                 input, result,
                 inputShape.ElementCount, outputShape.ElementCount,
                 context);
-        }
 
         /// <summary>
         /// CPU fallback implementation for attention mechanism.
@@ -552,14 +546,12 @@ namespace ILGPU.Apple.NeuralEngine.Native
         private static unsafe void ExecuteCoreMLConvolutionWithBias(
             float* input, float* weights, float* bias, float* result,
             TensorShape inputShape, TensorShape weightsShape, TensorShape outputShape,
-            ANEConvolutionParameters parameters, IntPtr context)
-        {
+            ANEConvolutionParameters parameters, IntPtr context) =>
             // Use Core ML convolution with bias primitive
             ANENative.ExecuteConvolutionWithBias(
                 input, weights, bias, result,
                 inputShape.ElementCount, weightsShape.ElementCount, outputShape.ElementCount,
                 context);
-        }
 
         /// <summary>
         /// CPU fallback implementation for convolution with bias.
@@ -619,14 +611,12 @@ namespace ILGPU.Apple.NeuralEngine.Native
         private static unsafe void ExecuteCoreMLMultiHeadAttention(
             float* query, float* key, float* value, float* result,
             TensorShape queryShape, TensorShape keyShape, TensorShape valueShape,
-            ANEAttentionParameters parameters, IntPtr context)
-        {
+            ANEAttentionParameters parameters, IntPtr context) =>
             // Use Core ML multi-head attention primitive
             ANENative.ExecuteMultiHeadAttention(
                 query, key, value, result,
                 queryShape.ElementCount, keyShape.ElementCount, valueShape.ElementCount,
                 context);
-        }
 
         /// <summary>
         /// CPU fallback implementation for multi-head attention.

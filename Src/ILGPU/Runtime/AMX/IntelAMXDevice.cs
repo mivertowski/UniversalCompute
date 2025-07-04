@@ -21,8 +21,8 @@ using System;
 using System.Diagnostics;
 #if WINDOWS
 using System.Management;
-
 #endif
+
 namespace ILGPU.Runtime.AMX
 {
     /// <summary>
@@ -112,22 +112,22 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public new string Name => $"Intel AMX ({ProcessorName})";
+        public string Name => $"Intel AMX ({ProcessorName})";
 
         /// <summary>
         /// Gets the total device memory in bytes (system RAM).
         /// </summary>
-        public new long MemorySize => GetSystemMemorySize();
+        public long MemorySize => GetSystemMemorySize();
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
+        public AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public new Index3D MaxGridSize
+        public Index3D MaxGridSize
         {
             get
             {
@@ -140,7 +140,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public new Index3D MaxGroupSize
+        public Index3D MaxGroupSize
         {
             get
             {
@@ -152,17 +152,17 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public new int MaxNumThreadsPerGroup => MaxTileSize * MaxTileSize;
+        public int MaxNumThreadsPerGroup => MaxTileSize * MaxTileSize;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => CacheSize / NumCores; // L3 cache per core
+        public long MaxSharedMemoryPerGroup => CacheSize / NumCores; // L3 cache per core
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory => CacheSize; // Use cache as constant memory
+        public long MaxConstantMemory => CacheSize; // Use cache as constant memory
 
         /// <summary>
         /// Gets the device vendor.
@@ -172,7 +172,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public override DeviceId DeviceId => new DeviceId(0, AcceleratorType.CPU);
+        public override DeviceId DeviceId => new(0, AcceleratorType.CPU);
 
         /// <summary>
         /// Creates an accelerator for this device.
@@ -249,7 +249,6 @@ namespace ILGPU.Runtime.AMX
                 int maxTurboFrequency = 3600; // Default 3.6 GHz
 
                 // Try to get detailed processor information on Windows
-#if WINDOWS
                 if (OperatingSystem.IsWindows())
                 {
                     try
@@ -299,7 +298,6 @@ namespace ILGPU.Runtime.AMX
                     }
                 }
 
-#endif
                 // Detect AMX capabilities based on processor generation
                 bool supportsBF16 = processorName.Contains("Xeon") || 
                                    processorName.Contains("12th Gen") || 
@@ -329,9 +327,7 @@ namespace ILGPU.Runtime.AMX
         /// Creates a fallback AMX device with conservative settings.
         /// </summary>
         /// <returns>Fallback Intel AMX device.</returns>
-        private static IntelAMXDevice CreateFallbackDevice()
-        {
-            return new IntelAMXDevice(
+        private static IntelAMXDevice CreateFallbackDevice() => new(
                 "Intel Processor with AMX",
                 false, // Conservative: no BF16
                 true,  // INT8 support
@@ -341,7 +337,6 @@ namespace ILGPU.Runtime.AMX
                 2400, // 2.4 GHz base
                 3600  // 3.6 GHz turbo
             );
-        }
 
         /// <summary>
         /// Gets the system memory size.
@@ -351,7 +346,6 @@ namespace ILGPU.Runtime.AMX
         {
             try
             {
-#if WINDOWS
                 if (OperatingSystem.IsWindows())
                 {
                     using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
@@ -362,8 +356,7 @@ namespace ILGPU.Runtime.AMX
                             return Convert.ToInt64(totalMemory);
                     }
                 }
-#endif
-                if (!OperatingSystem.IsWindows())
+                else
                 {
                     // Try to read /proc/meminfo on Linux
                     var meminfo = System.IO.File.ReadAllText("/proc/meminfo");
@@ -392,9 +385,7 @@ namespace ILGPU.Runtime.AMX
         /// Gets a human-readable string of device capabilities.
         /// </summary>
         /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString()
-        {
-            return $"{ProcessorName}, " +
+        public string GetCapabilitiesString() => $"{ProcessorName}, " +
                    $"{NumCores} cores, " +
                    $"Tiles {TileCount}x{MaxTileSize}x{MaxTileSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
@@ -402,7 +393,6 @@ namespace ILGPU.Runtime.AMX
                    $"BF16: {SupportsBF16}, " +
                    $"INT8: {SupportsINT8}, " +
                    $"Mixed: {SupportsMixedPrecision}";
-        }
 
         #endregion
 

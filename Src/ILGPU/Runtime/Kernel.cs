@@ -167,8 +167,8 @@ namespace ILGPU.Runtime
         private static MethodInfo CreateSpecializedLauncherMethod<TDelegate>(
             RuntimeSystem runtimeSystem,
             in EntryPointDescription entry,
-            Type keyStruct,
-            Type cacheType)
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type keyStruct,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type cacheType)
             where TDelegate : Delegate
         {
             var specializedParameters = entry.Parameters.SpecializedParameters;

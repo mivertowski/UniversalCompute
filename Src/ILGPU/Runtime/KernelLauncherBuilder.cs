@@ -15,6 +15,7 @@ using ILGPU.Resources;
 using ILGPU.Util;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
@@ -43,7 +44,7 @@ namespace ILGPU.Runtime
         /// A callback to manipulate the loaded index of a given dimension.
         /// </param>
         private static void EmitLoadDimensions<TEmitter>(
-            Type indexType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] Type indexType,
             in TEmitter emitter,
             Action loadIdx,
             Action<int> manipulateIdx)

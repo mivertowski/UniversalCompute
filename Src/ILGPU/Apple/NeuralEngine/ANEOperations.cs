@@ -67,11 +67,9 @@ namespace ILGPU.Apple.NeuralEngine
             ArrayView<float> pointwiseWeights,
             float* output,
             ANEConvolutionConfig config,
-            IntPtr context)
-        {
+            IntPtr context) =>
             // TODO: Implement proper ANE depthwise separable convolution
             throw new NotSupportedException("ANE depthwise separable convolution not fully implemented");
-        }
 
         #endregion
 
@@ -172,11 +170,9 @@ namespace ILGPU.Apple.NeuralEngine
             float* weightQ, float* weightK, float* weightV, float* weightO,
             float* output,
             ANEAttentionConfig config,
-            IntPtr context)
-        {
+            IntPtr context) =>
             // TODO: ANEAttentionConfig properties not implemented
             throw new NotSupportedException("ANE attention config properties not available");
-        }
 
         #endregion
 
@@ -199,11 +195,9 @@ namespace ILGPU.Apple.NeuralEngine
             float* layerNormWeights,
             float* output,
             ANETransformerConfig config,
-            IntPtr context)
-        {
+            IntPtr context) =>
             // TODO: ANEAttentionConfig properties not available
             throw new NotSupportedException("ANE transformer operations not implemented - config properties unavailable");
-        }
 
         #endregion
 
@@ -212,10 +206,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Calculates the total size of a tensor.
         /// </summary>
-        private static long GetTensorSize((int N, int C, int H, int W) shape)
-        {
-            return (long)shape.N * shape.C * shape.H * shape.W;
-        }
+        private static long GetTensorSize((int N, int C, int H, int W) shape) => (long)shape.N * shape.C * shape.H * shape.W;
 
         /// <summary>
         /// Applies activation function to tensor data.

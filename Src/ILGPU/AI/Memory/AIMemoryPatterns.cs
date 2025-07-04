@@ -678,9 +678,7 @@ namespace ILGPU.AI.Memory
         public static float EstimateBandwidthUtilization(
             AIAccessPattern pattern,
             long dataSize,
-            int cacheLineSize)
-        {
-            return pattern switch
+            int cacheLineSize) => pattern switch
             {
                 AIAccessPattern.Sequential => 0.95f, // Very high utilization
                 AIAccessPattern.Strided => 0.7f,     // Good utilization
@@ -691,7 +689,6 @@ namespace ILGPU.AI.Memory
                 AIAccessPattern.GatherScatter => 0.4f, // Poor utilization
                 _ => 0.5f
             };
-        }
 
         #endregion
     }

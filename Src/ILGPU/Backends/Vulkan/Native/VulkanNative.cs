@@ -596,19 +596,14 @@ namespace ILGPU.Backends.Vulkan.Native
         /// Gets Vulkan API version.
         /// </summary>
         /// <returns>Vulkan API version.</returns>
-        internal static uint GetApiVersion()
-        {
+        internal static uint GetApiVersion() =>
             // Vulkan 1.1 minimum required for compute
-            return MakeVersion(1, 1, 0);
-        }
+            MakeVersion(1, 1, 0);
 
         /// <summary>
         /// Creates a Vulkan version number.
         /// </summary>
-        private static uint MakeVersion(uint major, uint minor, uint patch)
-        {
-            return (major << 22) | (minor << 12) | patch;
-        }
+        private static uint MakeVersion(uint major, uint minor, uint patch) => (major << 22) | (minor << 12) | patch;
 
         #endregion
     }

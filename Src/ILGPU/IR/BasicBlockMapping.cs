@@ -205,7 +205,7 @@ namespace ILGPU.IR
         /// <param name="block">The basic block.</param>
         /// <returns>True, whether the block has been removed.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Remove(BasicBlock block)
+        public readonly bool Remove(BasicBlock block)
         {
             block.Assert(block.Method == Method && block.BlockIndex >= 0);
             int bucketIndex = ComputeBucketIndex(block.BlockIndex, out ulong bitMask);
@@ -231,7 +231,7 @@ namespace ILGPU.IR
         /// Removes all elements from this set.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear()
+        public readonly void Clear()
         {
             Array.Clear(visited, 0, visited.Length);
             AssertCleared();
@@ -341,14 +341,14 @@ namespace ILGPU.IR
         /// Returns an enumerator to enumerator all actual (not replaced) parameters.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        IEnumerator<BasicBlock> IEnumerable<BasicBlock>.GetEnumerator() =>
+        readonly IEnumerator<BasicBlock> IEnumerable<BasicBlock>.GetEnumerator() =>
             GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator to enumerator all actual (not replaced) parameters.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
     }
@@ -418,13 +418,13 @@ namespace ILGPU.IR
             /// <summary>
             /// Returns the current basic block.
             /// </summary>
-            public (BasicBlock, T) Current => values[index];
+            public readonly (BasicBlock, T) Current => values[index];
 
             /// <summary cref="IEnumerator.Current"/>
             object IEnumerator.Current => Current;
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             /// <summary cref="IEnumerator.MoveNext"/>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -640,7 +640,7 @@ namespace ILGPU.IR
         /// <param name="value">The stored value (if any).</param>
         /// <returns>True, if the block could be found.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetValue(BasicBlock block, [NotNullWhen(true)] out T? value)
+        public readonly bool TryGetValue(BasicBlock block, [NotNullWhen(true)] out T? value)
         {
             value = default;
             int index = block.BlockIndex;
@@ -674,7 +674,7 @@ namespace ILGPU.IR
         /// <typeparam name="TOther">The other element type.</typeparam>
         /// <param name="valueProvider">The value provider to map the values.</param>
         /// <returns>The created block mapping.</returns>
-        public BasicBlockMap<TOther> Remap<TOther>(Func<T, TOther> valueProvider)
+        public readonly BasicBlockMap<TOther> Remap<TOther>(Func<T, TOther> valueProvider)
         {
             var result = new BasicBlockMap<TOther>(EntryBlock, values.Length);
             for (int i = 0, e = values.Length; i < e; ++i)
@@ -718,14 +718,14 @@ namespace ILGPU.IR
         /// Returns an enumerator to enumerator all actual (not replaced) parameters.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        IEnumerator<(BasicBlock, T)> IEnumerable<(BasicBlock, T)>.GetEnumerator() =>
+        readonly IEnumerator<(BasicBlock, T)> IEnumerable<(BasicBlock, T)>.GetEnumerator() =>
             GetEnumerator();
 
         /// <summary>
         /// Returns an enumerator to enumerator all actual (not replaced) parameters.
         /// </summary>
         /// <returns>The enumerator.</returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
     }

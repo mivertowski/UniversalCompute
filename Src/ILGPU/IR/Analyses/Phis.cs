@@ -112,7 +112,7 @@ namespace ILGPU.IR.Analyses
             /// Seals the current builder and creates a <see cref="Phis"/> instance.
             /// </summary>
             /// <returns>The created <see cref="Phis"/> instance.</returns>
-            public Phis Seal() => new(Method, phiValues.AsReadOnlySpan());
+            public readonly Phis Seal() => new(Method, phiValues.AsReadOnlySpan());
 
             #endregion
         }

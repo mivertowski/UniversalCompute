@@ -161,7 +161,7 @@ namespace ILGPU.IR.Intrinsics
             /// </summary>
             /// <param name="kind">The matcher kind.</param>
             /// <returns>The resolved intrinsic matcher.</returns>
-            public IntrinsicMatcher<ImplementationEntry> this[
+            public readonly IntrinsicMatcher<ImplementationEntry> this[
                 IntrinsicMatcher.MatcherKind kind] =>
                 matchers[(int)kind];
 
@@ -176,7 +176,7 @@ namespace ILGPU.IR.Intrinsics
             /// <typeparam name="TTransformer">The transformer type to use.</typeparam>
             /// <param name="transformer">The transformer instance.</param>
             /// <param name="otherMatchers">The other matchers (target array).</param>
-            public void TransformTo<TOther, TTransformer>(
+            public readonly void TransformTo<TOther, TTransformer>(
                 TTransformer transformer,
                 IntrinsicMatcher<TOther>[] otherMatchers)
                 where TOther : class, IIntrinsicImplementation

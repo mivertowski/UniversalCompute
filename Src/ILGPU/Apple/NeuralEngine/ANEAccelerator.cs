@@ -28,8 +28,6 @@ namespace ILGPU.Apple.NeuralEngine
     /// </summary>
     public sealed class ANEAccelerator : Accelerator
     {
-        private readonly IntPtr _aneContext;
-        private readonly ANECapabilities _capabilities;
         private bool _disposed;
 
         /// <summary>
@@ -43,11 +41,11 @@ namespace ILGPU.Apple.NeuralEngine
             if (!ANENative.IsNeuralEngineAvailable())
                 throw new NotSupportedException("Apple Neural Engine not available on this device");
 
-            _aneContext = ANENative.CreateContext();
-            if (_aneContext == IntPtr.Zero)
+            ContextHandle = ANENative.CreateContext();
+            if (ContextHandle == IntPtr.Zero)
                 throw new InvalidOperationException("Failed to create Apple Neural Engine context");
 
-            _capabilities = ANECapabilities.Query();
+            Capabilities = ANECapabilities.Query();
             
             // Initialize accelerator properties
             InitializeAcceleratorProperties();
@@ -56,12 +54,12 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the ANE capabilities.
         /// </summary>
-        public new ANECapabilities Capabilities => _capabilities;
+        public new ANECapabilities Capabilities { get; }
 
         /// <summary>
         /// Gets the ANE context handle.
         /// </summary>
-        internal IntPtr ContextHandle => _aneContext;
+        internal IntPtr ContextHandle { get; }
 
         #region AI/ML Operations
 
@@ -148,28 +146,20 @@ namespace ILGPU.Apple.NeuralEngine
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal()
-        {
-            return new ANEStream(this);
-        }
+        protected override AcceleratorStream CreateStreamInternal() => new ANEStream(this);
 
         protected override void SynchronizeInternal()
         {
             // ANE operations are synchronous by default
         }
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new ANEBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new ANEBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) =>
             // ANE uses specialized operations rather than general kernels
             throw new NotSupportedException(
                 "Apple Neural Engine does not support general kernel loading. " +
                 "Use specialized ANE operations instead.");
-        }
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
@@ -191,11 +181,9 @@ namespace ILGPU.Apple.NeuralEngine
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // ANE has different architecture, return a conservative estimate
-            return _capabilities.MaxConcurrentOperations;
-        }
+            Capabilities.MaxConcurrentOperations;
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -204,7 +192,7 @@ namespace ILGPU.Apple.NeuralEngine
             out int minGridSize)
         {
             minGridSize = 1;
-            return Math.Min(maxGroupSize, _capabilities.OptimalWorkGroupSize);
+            return Math.Min(maxGroupSize, Capabilities.OptimalWorkGroupSize);
         }
 
         protected override int EstimateGroupSizeInternal(
@@ -214,14 +202,12 @@ namespace ILGPU.Apple.NeuralEngine
             out int minGridSize)
         {
             minGridSize = 1;
-            return Math.Min(maxGroupSize, _capabilities.OptimalWorkGroupSize);
+            return Math.Min(maxGroupSize, Capabilities.OptimalWorkGroupSize);
         }
 
-        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator)
-        {
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) =>
             // ANE typically shares memory with CPU
-            return otherAccelerator.AcceleratorType == AcceleratorType.CPU;
-        }
+            otherAccelerator.AcceleratorType == AcceleratorType.CPU;
 
         protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
         {
@@ -233,16 +219,11 @@ namespace ILGPU.Apple.NeuralEngine
             // ANE peer access is managed by the OS
         }
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) =>
             // ANE doesn't support page locking, return a no-op implementation
-            return null!; // Return null to indicate no page locking support
-        }
+            null!; // Return null to indicate no page locking support
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by ANE accelerator");
-        }
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by ANE accelerator");
 
         protected override void OnBind()
         {
@@ -258,9 +239,9 @@ namespace ILGPU.Apple.NeuralEngine
         {
             if (!_disposed)
             {
-                if (disposing && _aneContext != IntPtr.Zero)
+                if (disposing && ContextHandle != IntPtr.Zero)
                 {
-                    ANENative.ReleaseContext(_aneContext);
+                    ANENative.ReleaseContext(ContextHandle);
                 }
                 _disposed = true;
             }
@@ -273,42 +254,42 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the ANE accelerator name.
         /// </summary>
-        public new string Name => $"Apple Neural Engine ({_capabilities.ChipGeneration})";
+        public new string Name => $"Apple Neural Engine ({Capabilities.ChipGeneration})";
 
         /// <summary>
         /// Gets the maximum grid size for ANE operations.
         /// </summary>
-        public new Index3D MaxGridSize => new Index3D(_capabilities.MaxTensorWidth, _capabilities.MaxTensorHeight, 1);
+        public new Index3D MaxGridSize => new(Capabilities.MaxTensorWidth, Capabilities.MaxTensorHeight, 1);
 
         /// <summary>
         /// Gets the maximum group size for ANE operations.
         /// </summary>
-        public new Index3D MaxGroupSize => new Index3D(_capabilities.OptimalWorkGroupSize, 1, 1);
+        public new Index3D MaxGroupSize => new(Capabilities.OptimalWorkGroupSize, 1, 1);
 
         /// <summary>
         /// Gets the ANE warp size.
         /// </summary>
-        public new int WarpSize => _capabilities.OptimalWorkGroupSize;
+        public new int WarpSize => Capabilities.OptimalWorkGroupSize;
 
         /// <summary>
         /// Gets the number of compute units (multiprocessors).
         /// </summary>
-        public new int NumMultiprocessors => _capabilities.NumComputeUnits;
+        public new int NumMultiprocessors => Capabilities.NumComputeUnits;
 
         /// <summary>
         /// Gets the maximum shared memory per multiprocessor.
         /// </summary>
-        public new int MaxSharedMemoryPerGroup => _capabilities.MaxSharedMemoryPerUnit;
+        public new int MaxSharedMemoryPerGroup => Capabilities.MaxSharedMemoryPerUnit;
 
         /// <summary>
         /// Gets the maximum constant memory.
         /// </summary>
-        public new int MaxConstantMemory => _capabilities.MaxConstantMemory;
+        public new int MaxConstantMemory => Capabilities.MaxConstantMemory;
 
         /// <summary>
         /// Gets the memory bandwidth.
         /// </summary>
-        public long MemoryBandwidth => _capabilities.MemoryBandwidth;
+        public long MemoryBandwidth => Capabilities.MemoryBandwidth;
 
         private void InitializeAcceleratorProperties()
         {
@@ -389,11 +370,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Adds a profiling marker to the stream.
         /// </summary>
-        protected override ProfilingMarker AddProfilingMarkerInternal()
-        {
+        protected override ProfilingMarker AddProfilingMarkerInternal() =>
             // ANE doesn't support detailed profiling markers, return null
-            return null!;
-        }
+            null!;
 
         /// <summary>
         /// Disposes the ANE stream.
@@ -458,11 +437,9 @@ namespace ILGPU.Apple.NeuralEngine
         protected internal override void CopyFrom(
             AcceleratorStream stream,
             in ArrayView<byte> sourceView,
-            in ArrayView<byte> targetView)
-        {
+            in ArrayView<byte> targetView) =>
             // TODO: Implement proper buffer access for ANE
             throw new NotSupportedException("ANE buffer access not implemented");
-        }
 
         /// <summary>
         /// Copies data from this buffer to another buffer.
@@ -470,11 +447,9 @@ namespace ILGPU.Apple.NeuralEngine
         protected internal override void CopyTo(
             AcceleratorStream stream,
             in ArrayView<byte> sourceView,
-            in ArrayView<byte> targetView)
-        {
+            in ArrayView<byte> targetView) =>
             // TODO: Implement proper buffer access for ANE
             throw new NotSupportedException("ANE buffer access not implemented");
-        }
 
         /// <summary>
         /// Disposes the ANE buffer.

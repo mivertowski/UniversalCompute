@@ -109,7 +109,7 @@ namespace ILGPU.Tests.CPU
                 sumKernel(1, buffer.View, resultBuffer.View);
                 accelerator.Synchronize();
 
-                var result = resultBuffer.GetAsArray();
+                var result = resultBuffer.GetAsArray1D();
                 var expectedSum = size * (size + 1) / 2; // Sum of 1 to n
                 
                 Assert.True(Math.Abs(result[0] - expectedSum) < 0.001f,
@@ -150,7 +150,7 @@ namespace ILGPU.Tests.CPU
             scanKernel(size, buffer.View, resultBuffer.View);
             accelerator.Synchronize();
 
-            var result = resultBuffer.GetAsArray();
+            var result = resultBuffer.GetAsArray1D();
             
             // Verify prefix scan results
             for (int i = 0; i < size; i++)
@@ -170,7 +170,9 @@ namespace ILGPU.Tests.CPU
 
             var size = 32;
             var random = new Random(42);
+#pragma warning disable CA5394 // Do not use insecure randomness
             var data = Enumerable.Range(0, size).Select(_ => random.Next(1, 100)).Select(x => (float)x).ToArray();
+#pragma warning restore CA5394 // Do not use insecure randomness
 
             using var buffer = accelerator.Allocate1D<float>(size);
             buffer.CopyFromCPU(data);
@@ -197,7 +199,7 @@ namespace ILGPU.Tests.CPU
             sortKernel(1, buffer.View);
             accelerator.Synchronize();
 
-            var result = buffer.GetAsArray();
+            var result = buffer.GetAsArray1D();
             
             // Verify sorting
             for (int i = 1; i < result.Length; i++)
@@ -232,7 +234,7 @@ namespace ILGPU.Tests.CPU
             mapKernel(size, inputBuffer.View, outputBuffer.View);
             accelerator.Synchronize();
 
-            var result = outputBuffer.GetAsArray();
+            var result = outputBuffer.GetAsArray1D();
             
             // Verify map operation
             for (int i = 0; i < size; i++)
@@ -288,7 +290,7 @@ namespace ILGPU.Tests.CPU
             compactKernel(1, inputBuffer.View, maskBuffer.View, outputBuffer.View);
             accelerator.Synchronize();
 
-            var result = outputBuffer.GetAsArray();
+            var result = outputBuffer.GetAsArray1D();
             var expectedCount = size / 2; // Half should be even
             
             // Verify first few filtered elements are even
@@ -346,7 +348,7 @@ namespace ILGPU.Tests.CPU
             matmulKernel(new Index2D(M, N), bufferA.View, bufferB.View, bufferC.View, M, K, N);
             accelerator.Synchronize();
 
-            var result = bufferC.GetAsArray();
+            var result = bufferC.GetAsArray1D();
             
             // Verify matrix multiplication results (basic sanity check)
             Assert.True(result.Length == M * N);
@@ -389,7 +391,7 @@ namespace ILGPU.Tests.CPU
             dotProductKernel(1, buffer1.View, buffer2.View, resultBuffer.View);
             accelerator.Synchronize();
 
-            var result = resultBuffer.GetAsArray();
+            var result = resultBuffer.GetAsArray1D();
             
             // Verify dot product
             var expectedDotProduct = vector1.Zip(vector2, (a, b) => a * b).Sum();
@@ -427,7 +429,7 @@ namespace ILGPU.Tests.CPU
             initKernel(size, buffer.View);
             accelerator.Synchronize();
 
-            var result = buffer.GetAsArray();
+            var result = buffer.GetAsArray1D();
 
             // Verify different regions have expected patterns
             Assert.True(result[0] == 1.0f);
@@ -463,7 +465,7 @@ namespace ILGPU.Tests.CPU
             atomicKernel(numThreads, counterBuffer.View);
             accelerator.Synchronize();
 
-            var result = counterBuffer.GetAsArray();
+            var result = counterBuffer.GetAsArray1D();
             var expectedTotal = numThreads * incrementsPerThread;
             
             // In CPU mode, we expect the full count

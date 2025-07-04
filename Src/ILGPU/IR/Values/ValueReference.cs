@@ -83,7 +83,7 @@ namespace ILGPU.IR.Values
         /// <summary>
         /// Returns true if the reference points to a valid node.
         /// </summary>
-        public bool IsValid => DirectTarget != null;
+        public readonly bool IsValid => DirectTarget != null;
 
         /// <summary>
         /// Returns true if the direct target has been replaced.
@@ -202,7 +202,7 @@ namespace ILGPU.IR.Values
         /// </summary>
         /// <param name="other">The other reference.</param>
         /// <returns>True, if the given reference points to the same node.</returns>
-        public bool Equals(ValueReference other) => this == other;
+        public readonly bool Equals(ValueReference other) => this == other;
 
         #endregion
 
@@ -221,7 +221,7 @@ namespace ILGPU.IR.Values
         /// Returns the hash code of the directly associated node.
         /// </summary>
         /// <returns>The hash code of the directly associated node</returns>
-        public override int GetHashCode() => DirectTarget.GetHashCode();
+        public override readonly int GetHashCode() => DirectTarget.GetHashCode();
 
         /// <summary>
         /// Returns the string representation of this reference.

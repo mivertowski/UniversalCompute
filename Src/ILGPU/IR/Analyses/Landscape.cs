@@ -168,7 +168,7 @@ namespace ILGPU.IR.Analyses
             /// <summary>
             /// Returns the current function entry.
             /// </summary>
-            public Entry Current => Landscape.postOrder[index];
+            public readonly Entry Current => Landscape.postOrder[index];
 
             /// <summary cref="IEnumerator.Current" />
             object IEnumerator.Current => Current;
@@ -184,7 +184,7 @@ namespace ILGPU.IR.Analyses
             void IEnumerator.Reset() => throw new InvalidOperationException();
 
             /// <summary cref="IDisposable.Dispose" />
-            public void Dispose() { }
+            public readonly void Dispose() { }
 
             #endregion
         }

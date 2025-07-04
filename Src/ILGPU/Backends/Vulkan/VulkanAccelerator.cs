@@ -47,10 +47,6 @@ namespace ILGPU.Backends.Vulkan
     /// </remarks>
     public sealed class VulkanAccelerator : Accelerator
     {
-        private readonly VulkanDevice _device;
-        private readonly VulkanInstance _instance;
-        private readonly VulkanCapabilities _capabilities;
-        private readonly VulkanQueue _computeQueue;
         private bool _disposed;
 
         /// <summary>
@@ -63,14 +59,14 @@ namespace ILGPU.Backends.Vulkan
         public VulkanAccelerator(Context context, Device device, VulkanInstance vulkanInstance, VulkanDevice vulkanDevice)
             : base(context, device)
         {
-            _instance = vulkanInstance ?? throw new ArgumentNullException(nameof(vulkanInstance));
-            _device = vulkanDevice ?? throw new ArgumentNullException(nameof(vulkanDevice));
+            VulkanInstance = vulkanInstance ?? throw new ArgumentNullException(nameof(vulkanInstance));
+            VulkanDevice = vulkanDevice ?? throw new ArgumentNullException(nameof(vulkanDevice));
 
             // Query device capabilities
-            _capabilities = VulkanCapabilities.Query(_device.Handle);
+            Capabilities = VulkanCapabilities.Query(VulkanDevice.Handle);
 
             // Get compute queue
-            _computeQueue = _device.GetQueue(VulkanQueueType.Compute, 0);
+            ComputeQueue = VulkanDevice.GetQueue(VulkanQueueType.Compute, 0);
 
             // Initialize accelerator properties
             InitializeAcceleratorProperties();
@@ -79,22 +75,22 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Gets the Vulkan device capabilities.
         /// </summary>
-        public new VulkanCapabilities Capabilities => _capabilities;
+        public new VulkanCapabilities Capabilities { get; }
 
         /// <summary>
         /// Gets the Vulkan device.
         /// </summary>
-        public VulkanDevice VulkanDevice => _device;
+        public VulkanDevice VulkanDevice { get; }
 
         /// <summary>
         /// Gets the Vulkan instance.
         /// </summary>
-        public VulkanInstance VulkanInstance => _instance;
+        public VulkanInstance VulkanInstance { get; }
 
         /// <summary>
         /// Gets the compute queue.
         /// </summary>
-        public VulkanQueue ComputeQueue => _computeQueue;
+        public VulkanQueue ComputeQueue { get; }
 
         #region Vulkan Compute Operations
 
@@ -115,15 +111,15 @@ namespace ILGPU.Backends.Vulkan
         {
             ThrowIfDisposed();
 
-            using var commandBuffer = _device.CreateCommandBuffer();
+            using var commandBuffer = VulkanDevice.CreateCommandBuffer();
             commandBuffer.Begin();
             commandBuffer.BindComputePipeline(pipeline);
             commandBuffer.BindDescriptorSets(descriptorSet);
             commandBuffer.Dispatch(groupCountX, groupCountY, groupCountZ);
             commandBuffer.End();
 
-            _computeQueue.Submit(commandBuffer);
-            _computeQueue.WaitIdle();
+            ComputeQueue.Submit(commandBuffer);
+            ComputeQueue.WaitIdle();
         }
 
         /// <summary>
@@ -135,10 +131,7 @@ namespace ILGPU.Backends.Vulkan
             uint groupCountX,
             uint groupCountY = 1,
             uint groupCountZ = 1,
-            CancellationToken cancellationToken = default)
-        {
-            await Task.Run(() => DispatchCompute(pipeline, descriptorSet, groupCountX, groupCountY, groupCountZ), cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => await Task.Run(() => DispatchCompute(pipeline, descriptorSet, groupCountX, groupCountY, groupCountZ), cancellationToken);
 
         /// <summary>
         /// Creates a compute pipeline from SPIR-V bytecode.
@@ -154,10 +147,10 @@ namespace ILGPU.Backends.Vulkan
         {
             ThrowIfDisposed();
 
-            var shaderModule = _device.CreateShaderModule(spirvBytecode);
-            var pipelineLayout = _device.CreateComputePipelineLayout(pushConstantSize);
+            var shaderModule = VulkanDevice.CreateShaderModule(spirvBytecode);
+            var pipelineLayout = VulkanDevice.CreateComputePipelineLayout(pushConstantSize);
             
-            return _device.CreateComputePipeline(shaderModule, pipelineLayout, entryPoint);
+            return VulkanDevice.CreateComputePipeline(shaderModule, pipelineLayout, entryPoint);
         }
 
         /// <summary>
@@ -173,7 +166,7 @@ namespace ILGPU.Backends.Vulkan
             VulkanMemoryType memoryType = VulkanMemoryType.DeviceLocal)
         {
             ThrowIfDisposed();
-            return _device.CreateBuffer(size, usage, memoryType);
+            return VulkanDevice.CreateBuffer(size, usage, memoryType);
         }
 
         /// <summary>
@@ -184,40 +177,28 @@ namespace ILGPU.Backends.Vulkan
         public VulkanDescriptorSet CreateDescriptorSet(VulkanDescriptorSetLayout layout)
         {
             ThrowIfDisposed();
-            return _device.CreateDescriptorSet(layout);
+            return VulkanDevice.CreateDescriptorSet(layout);
         }
 
         #endregion
 
         #region Accelerator Implementation
 
-        protected override AcceleratorStream CreateStreamInternal()
-        {
-            return new VulkanStream(this);
-        }
+        protected override AcceleratorStream CreateStreamInternal() => new VulkanStream(this);
 
-        protected override void SynchronizeInternal()
-        {
-            _computeQueue.WaitIdle();
-        }
+        protected override void SynchronizeInternal() => ComputeQueue.WaitIdle();
 
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new VulkanBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new VulkanBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel)
-        {
-            return new VulkanKernel(this, compiledKernel);
-        }
+        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new VulkanKernel(this, compiledKernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
             CompiledKernel compiledKernel,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
-                (int)_capabilities.MaxWorkgroupSize,
-                _capabilities.MaxSharedMemorySize);
+                (int)Capabilities.MaxWorkgroupSize,
+                Capabilities.MaxSharedMemorySize);
             return LoadKernelInternal(compiledKernel);
         }
 
@@ -227,19 +208,17 @@ namespace ILGPU.Backends.Vulkan
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
-                Math.Min(customGroupSize, (int)_capabilities.MaxWorkgroupSize),
-                _capabilities.MaxSharedMemorySize);
+                Math.Min(customGroupSize, (int)Capabilities.MaxWorkgroupSize),
+                Capabilities.MaxSharedMemorySize);
             return LoadKernelInternal(compiledKernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // Vulkan uses subgroups - estimate based on device properties
-            return (int)(_capabilities.MaxWorkgroupSize / Math.Max(groupSize, 1));
-        }
+            (int)(Capabilities.MaxWorkgroupSize / Math.Max(groupSize, 1));
 
         protected override int EstimateGroupSizeInternal(
             Kernel kernel,
@@ -248,7 +227,7 @@ namespace ILGPU.Backends.Vulkan
             out int minGridSize)
         {
             minGridSize = 1;
-            return Math.Min(maxGroupSize, (int)_capabilities.MaxWorkgroupSize);
+            return Math.Min(maxGroupSize, (int)Capabilities.MaxWorkgroupSize);
         }
 
         protected override int EstimateGroupSizeInternal(
@@ -261,20 +240,18 @@ namespace ILGPU.Backends.Vulkan
             
             // Consider shared memory limitations
             var maxGroupsForSharedMemory = dynamicSharedMemorySizeInBytes > 0
-                ? _capabilities.MaxSharedMemorySize / dynamicSharedMemorySizeInBytes
-                : (int)_capabilities.MaxWorkgroupSize;
+                ? Capabilities.MaxSharedMemorySize / dynamicSharedMemorySizeInBytes
+                : (int)Capabilities.MaxWorkgroupSize;
 
             return Math.Min(Math.Min(maxGroupSize, maxGroupsForSharedMemory), 
-                           (int)_capabilities.MaxWorkgroupSize);
+                           (int)Capabilities.MaxWorkgroupSize);
         }
 
-        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator)
-        {
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) =>
             // Vulkan supports device-to-device memory transfer on some implementations
-            return otherAccelerator is VulkanAccelerator otherVulkan &&
-                   _capabilities.SupportsDeviceCoherentMemory &&
-                   otherVulkan._capabilities.SupportsDeviceCoherentMemory;
-        }
+            otherAccelerator is VulkanAccelerator otherVulkan &&
+                   Capabilities.SupportsDeviceCoherentMemory &&
+                   otherVulkan.Capabilities.SupportsDeviceCoherentMemory;
 
         protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
         {
@@ -286,11 +263,9 @@ namespace ILGPU.Backends.Vulkan
             // Vulkan peer access is managed through memory allocation
         }
 
-        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
-        {
+        protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements) =>
             // Vulkan doesn't support page locking
-            return null!;
-        }
+            null!;
 
         public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
         {
@@ -318,9 +293,9 @@ namespace ILGPU.Backends.Vulkan
             {
                 if (disposing)
                 {
-                    _computeQueue?.Dispose();
-                    _device?.Dispose();
-                    _instance?.Dispose();
+                    ComputeQueue?.Dispose();
+                    VulkanDevice?.Dispose();
+                    VulkanInstance?.Dispose();
                 }
                 _disposed = true;
             }
@@ -350,11 +325,9 @@ namespace ILGPU.Backends.Vulkan
         /// Checks if Vulkan is available on this system.
         /// </summary>
         /// <returns>True if Vulkan is available; otherwise, false.</returns>
-        public static bool IsAvailable()
-        {
+        public static bool IsAvailable() =>
             // TODO: Implement VulkanNative.IsVulkanSupported()
-            return false; // Vulkan not implemented yet
-        }
+            false; // Vulkan not implemented yet
 
         /// <summary>
         /// Creates a Vulkan accelerator if available.

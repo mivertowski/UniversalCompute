@@ -35,8 +35,6 @@ namespace ILGPU.Algorithms.FFT
     public sealed class FFT<T> where T : unmanaged, INumber<T>
     {
         private readonly Accelerator _accelerator;
-        private readonly FFTConfiguration _config;
-        private readonly FFTPlan _plan;
         private bool _disposed;
 
         /// <summary>
@@ -47,21 +45,21 @@ namespace ILGPU.Algorithms.FFT
         public FFT(Accelerator accelerator, FFTConfiguration config)
         {
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            Configuration = config ?? throw new ArgumentNullException(nameof(config));
             
             // Create FFT plan based on configuration
-            _plan = FFTPlan.Create(accelerator, config);
+            Plan = FFTPlan.Create(accelerator, config);
         }
 
         /// <summary>
         /// Gets the FFT configuration.
         /// </summary>
-        public FFTConfiguration Configuration => _config;
+        public FFTConfiguration Configuration { get; }
 
         /// <summary>
         /// Gets the FFT plan.
         /// </summary>
-        public FFTPlan Plan => _plan;
+        public FFTPlan Plan { get; }
 
         #region 1D FFT
 
@@ -77,12 +75,12 @@ namespace ILGPU.Algorithms.FFT
             AcceleratorStream? stream = null)
         {
             ThrowIfDisposed();
-            ValidateArguments(input, output, _config.Size);
+            ValidateArguments(input, output, Configuration.Size);
 
             var kernel = GetFFT1DKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, _plan);
+            kernel(actualStream, input, output, Plan);
             actualStream.Synchronize();
         }
 
@@ -98,17 +96,17 @@ namespace ILGPU.Algorithms.FFT
             AcceleratorStream? stream = null)
         {
             ThrowIfDisposed();
-            ValidateArguments(input, output, _config.Size);
+            ValidateArguments(input, output, Configuration.Size);
 
             var kernel = GetFFT1DKernel(FFTDirection.Inverse);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, _plan);
+            kernel(actualStream, input, output, Plan);
             
             // Normalize by 1/N for inverse transform
             var normalizeKernel = _accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<Complex>, float>(FFTKernels.Normalize);
-            normalizeKernel(actualStream, output.Length, output, 1.0f / _config.Size);
+            normalizeKernel(actualStream, output.Length, output, 1.0f / Configuration.Size);
             
             actualStream.Synchronize();
         }
@@ -127,12 +125,12 @@ namespace ILGPU.Algorithms.FFT
             AcceleratorStream? stream = null)
         {
             ThrowIfDisposed();
-            ValidateArguments(input, output, _config.Size * batchSize);
+            ValidateArguments(input, output, Configuration.Size * batchSize);
 
             var kernel = GetBatchedFFT1DKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, _plan, batchSize);
+            kernel(actualStream, input, output, Plan, batchSize);
             actualStream.Synchronize();
         }
 
@@ -158,11 +156,11 @@ namespace ILGPU.Algorithms.FFT
 
             // Perform row-wise FFT
             var rowKernel = GetFFT2DRowKernel(FFTDirection.Forward);
-            rowKernel(actualStream, input, output, _plan);
+            rowKernel(actualStream, input, output, Plan);
 
             // Perform column-wise FFT
             var colKernel = GetFFT2DColumnKernel(FFTDirection.Forward);
-            colKernel(actualStream, output, output, _plan);
+            colKernel(actualStream, output, output, Plan);
 
             actualStream.Synchronize();
         }
@@ -185,11 +183,11 @@ namespace ILGPU.Algorithms.FFT
 
             // Perform column-wise inverse FFT
             var colKernel = GetFFT2DColumnKernel(FFTDirection.Inverse);
-            colKernel(actualStream, input, output, _plan);
+            colKernel(actualStream, input, output, Plan);
 
             // Perform row-wise inverse FFT
             var rowKernel = GetFFT2DRowKernel(FFTDirection.Inverse);
-            rowKernel(actualStream, output, output, _plan);
+            rowKernel(actualStream, output, output, Plan);
 
             // Normalize by 1/(width*height)
             var normalizeKernel = _accelerator.LoadAutoGroupedStreamKernel<
@@ -222,15 +220,15 @@ namespace ILGPU.Algorithms.FFT
 
             // Perform FFT along X dimension
             var xKernel = GetFFT3DKernelX(FFTDirection.Forward);
-            xKernel(actualStream, input, output, _plan);
+            xKernel(actualStream, input, output, Plan);
 
             // Perform FFT along Y dimension
             var yKernel = GetFFT3DKernelY(FFTDirection.Forward);
-            yKernel(actualStream, output, output, _plan);
+            yKernel(actualStream, output, output, Plan);
 
             // Perform FFT along Z dimension
             var zKernel = GetFFT3DKernelZ(FFTDirection.Forward);
-            zKernel(actualStream, output, output, _plan);
+            zKernel(actualStream, output, output, Plan);
 
             actualStream.Synchronize();
         }
@@ -252,16 +250,16 @@ namespace ILGPU.Algorithms.FFT
         {
             ThrowIfDisposed();
             
-            if (input.Length != _config.Size)
-                throw new ArgumentException($"Input size must be {_config.Size}", nameof(input));
+            if (input.Length != Configuration.Size)
+                throw new ArgumentException($"Input size must be {Configuration.Size}", nameof(input));
             
-            if (output.Length != _config.Size / 2 + 1)
-                throw new ArgumentException($"Output size must be {_config.Size / 2 + 1}", nameof(output));
+            if (output.Length != Configuration.Size / 2 + 1)
+                throw new ArgumentException($"Output size must be {Configuration.Size / 2 + 1}", nameof(output));
 
             var kernel = GetRealFFTKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, _plan);
+            kernel(actualStream, input, output, Plan);
             actualStream.Synchronize();
         }
 
@@ -278,16 +276,16 @@ namespace ILGPU.Algorithms.FFT
         {
             ThrowIfDisposed();
             
-            if (input.Length != _config.Size / 2 + 1)
-                throw new ArgumentException($"Input size must be {_config.Size / 2 + 1}", nameof(input));
+            if (input.Length != Configuration.Size / 2 + 1)
+                throw new ArgumentException($"Input size must be {Configuration.Size / 2 + 1}", nameof(input));
             
-            if (output.Length != _config.Size)
-                throw new ArgumentException($"Output size must be {_config.Size}", nameof(output));
+            if (output.Length != Configuration.Size)
+                throw new ArgumentException($"Output size must be {Configuration.Size}", nameof(output));
 
             var kernel = GetRealFFTKernel(FFTDirection.Inverse);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, _plan);
+            kernel(actualStream, input, output, Plan);
             actualStream.Synchronize();
         }
 
@@ -311,7 +309,7 @@ namespace ILGPU.Algorithms.FFT
             if (input.IntExtent != output.IntExtent)
                 throw new ArgumentException("Input and output dimensions must match");
             
-            if (_config.Dimensions != FFTDimensions.TwoD)
+            if (Configuration.Dimensions != FFTDimensions.TwoD)
                 throw new InvalidOperationException("FFT configured for different dimensions");
         }
 
@@ -322,14 +320,14 @@ namespace ILGPU.Algorithms.FFT
             if (input.IntExtent != output.IntExtent)
                 throw new ArgumentException("Input and output dimensions must match");
             
-            if (_config.Dimensions != FFTDimensions.ThreeD)
+            if (Configuration.Dimensions != FFTDimensions.ThreeD)
                 throw new InvalidOperationException("FFT configured for different dimensions");
         }
 
         private Action<AcceleratorStream, ArrayView<Complex>, ArrayView<Complex>, FFTPlan> 
             GetFFT1DKernel(FFTDirection direction)
         {
-            return _config.Algorithm switch
+            return Configuration.Algorithm switch
             {
                 FFTAlgorithm.Radix2 => _accelerator.LoadStreamKernel<
                     ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
@@ -445,7 +443,7 @@ namespace ILGPU.Algorithms.FFT
         {
             if (!_disposed)
             {
-                _plan?.Dispose();
+                Plan?.Dispose();
                 _disposed = true;
             }
         }

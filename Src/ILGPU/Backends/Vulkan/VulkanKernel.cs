@@ -27,7 +27,6 @@ namespace ILGPU.Backends.Vulkan
     public sealed class VulkanKernel : Kernel
     {
         private readonly VulkanAccelerator _accelerator;
-        private readonly VulkanComputePipeline _pipeline;
         private bool _disposed;
 
         /// <summary>
@@ -41,13 +40,13 @@ namespace ILGPU.Backends.Vulkan
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             // Create compute pipeline from compiled kernel
-            _pipeline = CreateComputePipeline(compiledKernel);
+            Pipeline = CreateComputePipeline(compiledKernel);
         }
 
         /// <summary>
         /// Gets the Vulkan compute pipeline.
         /// </summary>
-        public VulkanComputePipeline Pipeline => _pipeline;
+        public VulkanComputePipeline Pipeline { get; }
 
         /// <summary>
         /// Launches the kernel with the specified parameters.
@@ -75,7 +74,7 @@ namespace ILGPU.Backends.Vulkan
             try
             {
                 // Dispatch compute work
-                _accelerator.DispatchCompute(_pipeline, descriptorSet, groupCountX, groupCountY, groupCountZ);
+                _accelerator.DispatchCompute(Pipeline, descriptorSet, groupCountX, groupCountY, groupCountZ);
             }
             finally
             {
@@ -93,18 +92,16 @@ namespace ILGPU.Backends.Vulkan
             return _accelerator.CreateComputePipeline(spirvBytecode, "main", 0);
         }
 
-        private byte[] CompileToSpirV(CompiledKernel compiledKernel)
-        {
+        private byte[] CompileToSpirV(CompiledKernel compiledKernel) =>
             // This would contain the actual compilation from ILGPU IR to SPIR-V
             // For now, return a placeholder SPIR-V bytecode
-            
+
             // Real implementation would:
             // 1. Take the ILGPU IR from compiledKernel
             // 2. Transform it to SPIR-V using ILGPU's backend system
             // 3. Return the compiled SPIR-V bytecode
-            
-            return Array.Empty<byte>(); // Placeholder
-        }
+
+            Array.Empty<byte>(); // Placeholder
 
         private (uint groupCountX, uint groupCountY, uint groupCountZ) CalculateWorkgroupConfiguration<TIndex>(TIndex extent)
             where TIndex : struct, IIndex
@@ -201,27 +198,19 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Synchronizes the stream.
         /// </summary>
-        public override void Synchronize()
-        {
-            _accelerator.ComputeQueue.WaitIdle();
-        }
+        public override void Synchronize() => _accelerator.ComputeQueue.WaitIdle();
 
         /// <summary>
         /// Synchronizes the stream asynchronously.
         /// </summary>
-        public new System.Threading.Tasks.Task SynchronizeAsync(System.Threading.CancellationToken cancellationToken = default)
-        {
-            return System.Threading.Tasks.Task.Run(Synchronize, cancellationToken);
-        }
+        public new System.Threading.Tasks.Task SynchronizeAsync(System.Threading.CancellationToken cancellationToken = default) => System.Threading.Tasks.Task.Run(Synchronize, cancellationToken);
 
         /// <summary>
         /// Adds a profiling marker to the stream.
         /// </summary>
-        protected override ProfilingMarker AddProfilingMarkerInternal()
-        {
+        protected override ProfilingMarker AddProfilingMarkerInternal() =>
             // Vulkan profiling would typically use timestamp queries
-            return default!;
-        }
+            default!;
 
         /// <summary>
         /// Disposes the Vulkan stream.

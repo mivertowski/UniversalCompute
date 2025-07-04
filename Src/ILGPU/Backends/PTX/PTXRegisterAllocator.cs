@@ -159,7 +159,7 @@ namespace ILGPU.Backends.PTX
         private static string ResolveDeviceConstantValue(HardwareRegister register) =>
             ((DeviceConstantDimension3D)register.RegisterValue)
                 .ToString()
-                .ToLowerInvariant();
+                .ToUpperInvariant();
 
         /// <summary>
         /// Returns the string representation of the given hardware register.

@@ -151,9 +151,9 @@ namespace ILGPU.SourceGenerators.Generators
                 if (paramType == "int" || paramType == "long")
                 {
                     var paramName = parameter.Identifier.ValueText;
-                    if (paramName.ToLowerInvariant().IndexOf("size", StringComparison.Ordinal) >= 0 ||
-                        paramName.ToLowerInvariant().IndexOf("length", StringComparison.Ordinal) >= 0 ||
-                        paramName.ToLowerInvariant().IndexOf("count", StringComparison.Ordinal) >= 0)
+                    if (paramName.ToUpperInvariant().IndexOf("size", StringComparison.Ordinal) >= 0 ||
+                        paramName.ToUpperInvariant().IndexOf("length", StringComparison.Ordinal) >= 0 ||
+                        paramName.ToUpperInvariant().IndexOf("count", StringComparison.Ordinal) >= 0)
                     {
                         analysis.SpecializableParameters.Add(paramName);
                     }

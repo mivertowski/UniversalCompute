@@ -205,7 +205,7 @@ namespace ILGPU.Tests
             public int Value1;
             public int Value2;
 
-            public bool Equals(Nested other)
+            public readonly bool Equals(Nested other)
             {
                 return Value1.Equals(other.Value1) &&
                 Value2.Equals(other.Value2);

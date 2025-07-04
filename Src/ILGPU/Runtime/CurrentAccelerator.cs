@@ -105,7 +105,7 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Returns true if an old accelerator has to be recovered.
         /// </summary>
-        public bool IsRecoverable => OldAccelerator != null;
+        public readonly bool IsRecoverable => OldAccelerator != null;
 
         #endregion
 
@@ -134,7 +134,7 @@ namespace ILGPU.Runtime
         /// <returns>
         /// True, if the given binding is equal to the current binding.
         /// </returns>
-        public bool Equals(ScopedAcceleratorBinding other) => this == other;
+        public readonly bool Equals(ScopedAcceleratorBinding other) => this == other;
 
         #endregion
 
@@ -166,14 +166,14 @@ namespace ILGPU.Runtime
         /// Returns the hash code of this binding.
         /// </summary>
         /// <returns>The hash code of this binding.</returns>
-        public override int GetHashCode() =>
+        public override readonly int GetHashCode() =>
             OldAccelerator?.GetHashCode() ?? 0;
 
         /// <summary>
         /// Returns the string representation of this binding.
         /// </summary>
         /// <returns>The string representation of this binding.</returns>
-        public override string ToString() =>
+        public override readonly string ToString() =>
             OldAccelerator?.ToString() ?? "<NoBinding>";
 
         #endregion

@@ -306,7 +306,7 @@ namespace ILGPU.IR.Values
             /// <summary>
             /// The number of dimensions.
             /// </summary>
-            public int Count => builder.Count;
+            public readonly int Count => builder.Count;
 
             #endregion
 

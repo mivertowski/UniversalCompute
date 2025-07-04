@@ -15,12 +15,9 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 using ILGPU.Backends;
 using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.AMX.Native;
-using ILGPU.Runtime.CPU;
 using ILGPU.Util;
 using System;
 using System.Collections.Immutable;
@@ -39,7 +36,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// The associated Intel AMX device.
         /// </summary>
-        public new IntelAMXDevice Device { get; }
+        public IntelAMXDevice Device { get; }
 
         /// <summary>
         /// Gets whether this accelerator supports BF16 operations.
@@ -94,10 +91,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Initializes the accelerator properties.
         /// </summary>
-        private void Init()
-        {
-            DefaultStream = CreateStreamInternal();
-        }
+        private void Init() => DefaultStream = CreateStreamInternal();
 
         #endregion
 
@@ -106,37 +100,37 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.CPU;
+        public AcceleratorType AcceleratorType => AcceleratorType.CPU;
 
         /// <summary>
         /// Gets the accelerator name.
         /// </summary>
-        public new string Name => $"Intel AMX ({Device.ProcessorName})";
+        public string Name => $"Intel AMX ({Device.ProcessorName})";
 
         /// <summary>
         /// Gets the memory size in bytes.
         /// </summary>
-        public new long MemorySize => Device.MemorySize;
+        public long MemorySize => Device.MemorySize;
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public new Index3D MaxGridSize => Device.MaxGridSize;
+        public Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public new Index3D MaxGroupSize => Device.MaxGroupSize;
+        public Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the warp size.
         /// </summary>
-        public new int WarpSize => 1; // AMX operates on single thread
+        public int WarpSize => 1; // AMX operates on single thread
 
         /// <summary>
         /// Gets the number of multiprocessors.
         /// </summary>
-        public new int NumMultiprocessors => Device.NumCores;
+        public int NumMultiprocessors => Device.NumCores;
 
         #endregion
 
@@ -169,10 +163,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="length">The length in elements.</param>
         /// <param name="elementSize">The element size in bytes.</param>
         /// <returns>The allocated memory buffer.</returns>
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new AMXMemoryBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new AMXMemoryBuffer(this, length, elementSize);
 
         /// <summary>
         /// Creates a page-lock scope for the given array.
@@ -198,24 +189,19 @@ namespace ILGPU.Runtime.AMX
         /// <returns>The kernel launcher method.</returns>
         protected override MethodInfo GenerateKernelLauncherMethod(
             AMXCompiledKernel kernel,
-            int customGroupSize)
-        {
+            int customGroupSize) =>
             // For AMX accelerator, use default launcher generation
             // In a real implementation, this would generate optimized AMX-specific launchers
-            return typeof(IntelAMXAccelerator).GetMethod(nameof(DefaultLauncher), 
+            typeof(IntelAMXAccelerator).GetMethod(nameof(DefaultLauncher),
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static)
                 ?? throw new InvalidOperationException("Default launcher method not found");
-        }
 
         /// <summary>
         /// Default kernel launcher for AMX kernels.
         /// </summary>
-        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        private static void DefaultLauncher()
-        {
-            // Default launcher implementation - this is a placeholder for future AMX kernel execution
+        private static void DefaultLauncher() =>
+            // Default launcher implementation
             throw new NotImplementedException("AMX kernel launcher not implemented");
-        }
 
         /// <summary>
         /// Creates a kernel from the given compiled kernel.
@@ -223,7 +209,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="compiledKernel">The compiled kernel.</param>
         /// <returns>The created kernel.</returns>
         protected override AMXKernel CreateKernel(AMXCompiledKernel compiledKernel) =>
-            new AMXKernel(this, compiledKernel);
+            new(this, compiledKernel);
 
         /// <summary>
         /// Creates a kernel from the given compiled kernel with launcher method.
@@ -232,7 +218,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="launcher">The launcher method.</param>
         /// <returns>The created kernel.</returns>
         protected override AMXKernel CreateKernel(AMXCompiledKernel compiledKernel, MethodInfo launcher) =>
-            new AMXKernel(this, compiledKernel);
+            new(this, compiledKernel);
 
         #endregion
 
@@ -262,11 +248,9 @@ namespace ILGPU.Runtime.AMX
         /// </summary>
         /// <param name="otherAccelerator">The other accelerator.</param>
         /// <returns>True if peer access is possible.</returns>
-        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator)
-        {
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) =>
             // AMX can access CPU memory directly
-            return otherAccelerator is IntelAMXAccelerator || otherAccelerator is CPUAccelerator;
-        }
+            otherAccelerator is IntelAMXAccelerator || otherAccelerator is CPUAccelerator;
 
         /// <summary>
         /// Enables peer access to the given accelerator.
@@ -296,11 +280,9 @@ namespace ILGPU.Runtime.AMX
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // For AMX, each core can handle one group at a time
-            return 1;
-        }
+            1;
 
         /// <summary>
         /// Estimates the group size for the given kernel.
@@ -322,14 +304,11 @@ namespace ILGPU.Runtime.AMX
             Kernel kernel,
             int dynamicSharedMemorySizeInBytes,
             int maxGroupSize,
-            out int minGridSize)
-        {
-            return EstimateGroupSizeInternal(
+            out int minGridSize) => EstimateGroupSizeInternal(
                 kernel,
                 _ => dynamicSharedMemorySizeInBytes,
                 maxGroupSize,
                 out minGridSize);
-        }
 
         #endregion
 
@@ -397,10 +376,7 @@ namespace ILGPU.Runtime.AMX
         public void ExecuteBF16MatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
-            AMXStream? stream = null)
-        {
-            ExecuteMatMul(a, b, c, m, k, n, AMXDataType.BF16, stream);
-        }
+            AMXStream? stream = null) => ExecuteMatMul(a, b, c, m, k, n, AMXDataType.BF16, stream);
 
         /// <summary>
         /// Executes INT8 matrix multiplication with AMX acceleration.
@@ -415,10 +391,7 @@ namespace ILGPU.Runtime.AMX
         public void ExecuteINT8MatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
-            AMXStream? stream = null)
-        {
-            ExecuteMatMul(a, b, c, m, k, n, AMXDataType.INT8, stream);
-        }
+            AMXStream? stream = null) => ExecuteMatMul(a, b, c, m, k, n, AMXDataType.INT8, stream);
 
         /// <summary>
         /// Executes AI inference acceleration using AMX tiles.
@@ -435,22 +408,19 @@ namespace ILGPU.Runtime.AMX
             IntPtr input, IntPtr weights, IntPtr output,
             int batchSize, int inputSize, int outputSize,
             AMXDataType dataType,
-            AMXStream? stream = null)
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    // Execute matrix multiplication for neural network layer
-                    ExecuteMatMul(input, weights, output, 
-                        batchSize, inputSize, outputSize, dataType, stream);
-                }
-                catch (Exception ex)
-                {
-                    throw new AMXException("Failed to execute AI inference with AMX", ex);
-                }
-            });
-        }
+            AMXStream? stream = null) => await Task.Run(() =>
+                                                  {
+                                                      try
+                                                      {
+                                                          // Execute matrix multiplication for neural network layer
+                                                          ExecuteMatMul(input, weights, output,
+                                                              batchSize, inputSize, outputSize, dataType, stream);
+                                                      }
+                                                      catch (Exception ex)
+                                                      {
+                                                          throw new AMXException("Failed to execute AI inference with AMX", ex);
+                                                      }
+                                                  });
 
         #endregion
 

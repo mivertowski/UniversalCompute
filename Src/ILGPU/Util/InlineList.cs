@@ -333,7 +333,7 @@ namespace ILGPU.Util
         /// <summary>
         /// Reverses all items in this list.
         /// </summary>
-        public void Reverse() => Array.Reverse(items);
+        public readonly void Reverse() => Array.Reverse(items);
 
         /// <summary>
         /// Moves the current items to the given target list.

@@ -251,23 +251,19 @@ namespace ILGPU.Backends.Metal
             IntPtr commandQueue,
             IntPtr graph,
             ArrayView<float>[] inputs,
-            ArrayView<float>[] outputs)
-        {
+            ArrayView<float>[] outputs) =>
             // TODO: ArrayView.AsSpan not available - use proper memory access
             throw new NotSupportedException("Metal operations not implemented - ArrayView.AsSpan not available");
-        }
 
         #endregion
 
         #region Private Helper Methods
 
-        private static IntPtr CreateMPSMatrixMultiplication(IntPtr device, int m, int n, int k)
-        {
+        private static IntPtr CreateMPSMatrixMultiplication(IntPtr device, int m, int n, int k) =>
             // Create MPS matrix multiplication descriptor
             // This is a simplified placeholder - real implementation would use
             // MPSMatrixMultiplication class from MetalPerformanceShaders framework
-            return IntPtr.Zero; // Placeholder
-        }
+            IntPtr.Zero; // Placeholder
 
         private static void ExecuteMPSMatrixMultiplication(
             IntPtr commandBuffer, IntPtr kernel,
@@ -279,13 +275,11 @@ namespace ILGPU.Backends.Metal
             // operation into the command buffer
         }
 
-        private static IntPtr CreateMPSConvolution(IntPtr device, MetalConvolutionConfig config)
-        {
+        private static IntPtr CreateMPSConvolution(IntPtr device, MetalConvolutionConfig config) =>
             // Create MPS convolution descriptor
             // This would set up the convolution parameters including
             // kernel size, stride, padding, etc.
-            return IntPtr.Zero; // Placeholder
-        }
+            IntPtr.Zero; // Placeholder
 
         private static void ExecuteMPSConvolution(
             IntPtr commandBuffer, IntPtr kernel,

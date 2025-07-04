@@ -480,17 +480,17 @@ namespace ILGPU.IR.Transformations
             /// <summary>
             /// Returns the parent method builder.
             /// </summary>
-            private Method.Builder Builder => Mover.Builder;
+            private readonly Method.Builder Builder => Mover.Builder;
 
             /// <summary>
             /// Returns the parent dominators.
             /// </summary>
-            private Dominators Dominators => Mover.Dominators;
+            private readonly Dominators Dominators => Mover.Dominators;
 
             /// <summary>
             /// Returns true if the given value has been placed.
             /// </summary>
-            public bool IsPlaced(Value value) => placed.Contains(value);
+            public readonly bool IsPlaced(Value value) => placed.Contains(value);
 
             /// <summary>
             /// Places this value and all of its dependencies recursively.
@@ -580,7 +580,7 @@ namespace ILGPU.IR.Transformations
             /// <param name="value">The value to be placed.</param>
             /// <returns>True, if the value could be placed.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool CanPlace(Value value)
+            private readonly bool CanPlace(Value value)
             {
                 // Check of all of its uses
                 foreach (Value use in value.Uses)

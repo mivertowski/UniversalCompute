@@ -95,7 +95,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends a target declaration.
             /// </summary>
             /// <param name="target">The target declaration.</param>
-            internal void AppendDeclaration(Variable target)
+            internal readonly void AppendDeclaration(Variable target)
             {
                 var variableType = CodeGenerator.GetVariableType(target);
                 variableBuilder.Append('\t');
@@ -158,7 +158,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends an indexer.
             /// </summary>
             /// <param name="indexer">The indexer expression.</param>
-            public void AppendIndexer(string indexer)
+            public readonly void AppendIndexer(string indexer)
             {
                 stringBuilder.Append('[');
                 stringBuilder.Append(indexer);
@@ -176,7 +176,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends an unsafe cast expression.
             /// </summary>
             /// <param name="typeExpression">The type expression.</param>
-            public void AppendCast(string typeExpression)
+            public readonly void AppendCast(string typeExpression)
             {
                 stringBuilder.Append('(');
                 stringBuilder.Append(typeExpression);
@@ -229,7 +229,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends the given raw command.
             /// </summary>
             /// <param name="command">The command to append.</param>
-            public void AppendCommand(char command)
+            public readonly void AppendCommand(char command)
             {
                 stringBuilder.Append(' ');
                 stringBuilder.Append(command);
@@ -240,7 +240,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends the given raw command.
             /// </summary>
             /// <param name="command">The command to append.</param>
-            public void AppendCommand(string command)
+            public readonly void AppendCommand(string command)
             {
                 stringBuilder.Append(' ');
                 stringBuilder.Append(command);
@@ -251,7 +251,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends the specified field name.
             /// </summary>
             /// <param name="fieldIndex">The field index.</param>
-            private void AppendFieldName(int fieldIndex)
+            private readonly void AppendFieldName(int fieldIndex)
             {
                 var fieldName = CLTypeGenerator.GetFieldName(fieldIndex);
                 stringBuilder.Append(fieldName);
@@ -301,13 +301,13 @@ namespace ILGPU.Backends.OpenCL
             /// <summary>
             /// Opens a parenthesis.
             /// </summary>
-            public void OpenParen() =>
+            public readonly void OpenParen() =>
                 stringBuilder.Append('(');
 
             /// <summary>
             /// Closes a parenthesis.
             /// </summary>
-            public void CloseParen() =>
+            public readonly void CloseParen() =>
                 stringBuilder.Append(')');
 
             /// <summary>
@@ -460,7 +460,7 @@ namespace ILGPU.Backends.OpenCL
             /// Append the given operation.
             /// </summary>
             /// <param name="operation">The operation to append.</param>
-            public void AppendOperation(RawString operation) =>
+            public readonly void AppendOperation(RawString operation) =>
                 stringBuilder.Append(operation.Value);
 
             /// <summary>
@@ -584,21 +584,21 @@ namespace ILGPU.Backends.OpenCL
             /// Appends a constant.
             /// </summary>
             /// <param name="value">The constant to append.</param>
-            public void AppendConstant(long value) =>
+            public readonly void AppendConstant(long value) =>
                 stringBuilder.Append(value);
 
             /// <summary>
             /// Appends a constant.
             /// </summary>
             /// <param name="value">The constant to append.</param>
-            public void AppendConstant(ulong value) =>
+            public readonly void AppendConstant(ulong value) =>
                 stringBuilder.Append(value);
 
             /// <summary>
             /// Appends a constant.
             /// </summary>
             /// <param name="value">The constant to append.</param>
-            public void AppendConstant(float value)
+            public readonly void AppendConstant(float value)
             {
                 if (float.IsNaN(value))
                 {
@@ -635,7 +635,7 @@ namespace ILGPU.Backends.OpenCL
             /// Appends a constant.
             /// </summary>
             /// <param name="value">The constant to append.</param>
-            public void AppendConstant(double value)
+            public readonly void AppendConstant(double value)
             {
                 if (double.IsNaN(value))
                 {
@@ -659,7 +659,7 @@ namespace ILGPU.Backends.OpenCL
             /// <summary>
             /// Finishes the current statement.
             /// </summary>
-            public void Finish() => stringBuilder.AppendLine(";");
+            public readonly void Finish() => stringBuilder.AppendLine(";");
 
             #endregion
 

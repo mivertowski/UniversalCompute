@@ -77,7 +77,7 @@ namespace ILGPU.Backends.SeparateViews
         /// </summary>
         /// <param name="implType">The view implementation type.</param>
         /// <returns>The resolved field.</returns>
-        public static FieldInfo GetIndexField(Type implType) =>
+        public static FieldInfo GetIndexField([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type implType) =>
             implType.GetField(nameof(Index)).AsNotNull();
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace ILGPU.Backends.SeparateViews
         /// </summary>
         /// <param name="implType">The view implementation type.</param>
         /// <returns>The resolved field.</returns>
-        public static FieldInfo GetLengthField(Type implType) =>
+        public static FieldInfo GetLengthField([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type implType) =>
             implType.GetField(nameof(Length)).AsNotNull();
 
         #endregion

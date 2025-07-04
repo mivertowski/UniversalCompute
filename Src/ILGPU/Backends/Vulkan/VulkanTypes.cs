@@ -248,17 +248,15 @@ namespace ILGPU.Backends.Vulkan
             return capabilities;
         }
 
-        private static double EstimateMemoryBandwidth(uint vendorId, uint deviceId)
-        {
+        private static double EstimateMemoryBandwidth(uint vendorId, uint deviceId) =>
             // Rough estimates based on known GPU families
-            return vendorId switch
+            vendorId switch
             {
                 0x10DE => 500.0, // NVIDIA - varies widely (100-1000+ GB/s)
                 0x1002 => 400.0, // AMD - varies widely (200-1600+ GB/s)
                 0x8086 => 100.0, // Intel - typically lower bandwidth
                 _ => 200.0       // Generic estimate
             };
-        }
     }
 
     /// <summary>
@@ -297,18 +295,17 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanInstance : IDisposable
     {
-        private readonly IntPtr _handle;
         private bool _disposed;
 
         internal VulkanInstance(IntPtr handle)
         {
-            _handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
         /// Gets the native Vulkan instance handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
 
         /// <summary>
         /// Creates a new Vulkan instance.
@@ -331,7 +328,7 @@ namespace ILGPU.Backends.Vulkan
         public VulkanPhysicalDevice[] EnumeratePhysicalDevices()
         {
             uint deviceCount = 0;
-            var result = VulkanNative.vkEnumeratePhysicalDevices(_handle, ref deviceCount, IntPtr.Zero);
+            var result = VulkanNative.vkEnumeratePhysicalDevices(Handle, ref deviceCount, IntPtr.Zero);
             if (result != VkResult.Success || deviceCount == 0)
                 return Array.Empty<VulkanPhysicalDevice>();
 
@@ -339,7 +336,7 @@ namespace ILGPU.Backends.Vulkan
             var devicesPtr = Marshal.AllocHGlobal((int)(deviceCount * IntPtr.Size));
             try
             {
-                result = VulkanNative.vkEnumeratePhysicalDevices(_handle, ref deviceCount, devicesPtr);
+                result = VulkanNative.vkEnumeratePhysicalDevices(Handle, ref deviceCount, devicesPtr);
                 if (result != VkResult.Success)
                     return Array.Empty<VulkanPhysicalDevice>();
 
@@ -366,9 +363,9 @@ namespace ILGPU.Backends.Vulkan
         {
             if (!_disposed)
             {
-                if (_handle != IntPtr.Zero)
+                if (Handle != IntPtr.Zero)
                 {
-                    VulkanNative.vkDestroyInstance(_handle, IntPtr.Zero);
+                    VulkanNative.vkDestroyInstance(Handle, IntPtr.Zero);
                 }
                 _disposed = true;
             }
@@ -380,17 +377,15 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanPhysicalDevice
     {
-        private readonly IntPtr _handle;
-
         internal VulkanPhysicalDevice(IntPtr handle)
         {
-            _handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
         /// Gets the native physical device handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
 
         /// <summary>
         /// Gets the device name.
@@ -399,7 +394,7 @@ namespace ILGPU.Backends.Vulkan
         {
             get
             {
-                VulkanNative.vkGetPhysicalDeviceProperties(_handle, out var properties);
+                VulkanNative.vkGetPhysicalDeviceProperties(Handle, out var properties);
                 unsafe
                 {
                     var nameBytes = new byte[256];
@@ -416,7 +411,7 @@ namespace ILGPU.Backends.Vulkan
         public VulkanDevice CreateLogicalDevice()
         {
             // Create minimal device for compute
-            var result = VulkanNative.vkCreateDevice(_handle, IntPtr.Zero, IntPtr.Zero, out var device);
+            var result = VulkanNative.vkCreateDevice(Handle, IntPtr.Zero, IntPtr.Zero, out var device);
             if (result != VkResult.Success || device == IntPtr.Zero)
                 throw new InvalidOperationException($"Failed to create Vulkan logical device: {result}");
 
@@ -429,25 +424,23 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanDevice : IDisposable
     {
-        private readonly IntPtr _handle;
-        private readonly string _name;
         private bool _disposed;
 
         internal VulkanDevice(IntPtr handle, string name)
         {
-            _handle = handle;
-            _name = name;
+            Handle = handle;
+            Name = name;
         }
 
         /// <summary>
         /// Gets the native device handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
 
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public string Name => _name;
+        public string Name { get; }
 
         /// <summary>
         /// Gets a queue from the device.
@@ -457,7 +450,7 @@ namespace ILGPU.Backends.Vulkan
         /// <returns>Vulkan queue.</returns>
         public VulkanQueue GetQueue(VulkanQueueType queueType, uint queueIndex)
         {
-            VulkanNative.vkGetDeviceQueue(_handle, 0, queueIndex, out var queue); // Simplified - would find proper queue family
+            VulkanNative.vkGetDeviceQueue(Handle, 0, queueIndex, out var queue); // Simplified - would find proper queue family
             return new VulkanQueue(queue);
         }
 
@@ -465,33 +458,27 @@ namespace ILGPU.Backends.Vulkan
         /// Creates a command buffer.
         /// </summary>
         /// <returns>Vulkan command buffer.</returns>
-        public VulkanCommandBuffer CreateCommandBuffer()
-        {
+        public VulkanCommandBuffer CreateCommandBuffer() =>
             // Simplified implementation - would create command pool first
-            return new VulkanCommandBuffer(IntPtr.Zero);
-        }
+            new(IntPtr.Zero);
 
         /// <summary>
         /// Creates a shader module from SPIR-V bytecode.
         /// </summary>
         /// <param name="spirvBytecode">SPIR-V bytecode.</param>
         /// <returns>Shader module handle.</returns>
-        public IntPtr CreateShaderModule(byte[] spirvBytecode)
-        {
+        public IntPtr CreateShaderModule(byte[] spirvBytecode) =>
             // Simplified implementation
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Creates a compute pipeline layout.
         /// </summary>
         /// <param name="pushConstantSize">Push constant size.</param>
         /// <returns>Pipeline layout handle.</returns>
-        public IntPtr CreateComputePipelineLayout(uint pushConstantSize)
-        {
+        public IntPtr CreateComputePipelineLayout(uint pushConstantSize) =>
             // Simplified implementation
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Creates a compute pipeline.
@@ -500,11 +487,9 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="pipelineLayout">Pipeline layout handle.</param>
         /// <param name="entryPoint">Entry point name.</param>
         /// <returns>Vulkan compute pipeline.</returns>
-        public VulkanComputePipeline CreateComputePipeline(IntPtr shaderModule, IntPtr pipelineLayout, string entryPoint)
-        {
+        public VulkanComputePipeline CreateComputePipeline(IntPtr shaderModule, IntPtr pipelineLayout, string entryPoint) =>
             // Simplified implementation
-            return new VulkanComputePipeline(IntPtr.Zero);
-        }
+            new(IntPtr.Zero);
 
         /// <summary>
         /// Creates a buffer.
@@ -513,44 +498,36 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="usage">Buffer usage.</param>
         /// <param name="memoryType">Memory type.</param>
         /// <returns>Vulkan buffer.</returns>
-        public VulkanBuffer CreateBuffer(ulong size, VulkanBufferUsage usage, VulkanMemoryType memoryType)
-        {
+        public VulkanBuffer CreateBuffer(ulong size, VulkanBufferUsage usage, VulkanMemoryType memoryType) =>
             // Simplified implementation
-            return new VulkanBuffer(null!, (long)size, 4); // Placeholder
-        }
+            new(null!, (long)size, 4); // Placeholder
 
         /// <summary>
         /// Creates a descriptor set.
         /// </summary>
         /// <param name="layout">Descriptor set layout.</param>
         /// <returns>Vulkan descriptor set.</returns>
-        public VulkanDescriptorSet CreateDescriptorSet(VulkanDescriptorSetLayout layout)
-        {
+        public VulkanDescriptorSet CreateDescriptorSet(VulkanDescriptorSetLayout layout) =>
             // Simplified implementation
-            return new VulkanDescriptorSet(IntPtr.Zero);
-        }
+            new(IntPtr.Zero);
 
         /// <summary>
         /// Creates a ray tracing pipeline.
         /// </summary>
         /// <param name="shaderStages">Shader stages.</param>
         /// <returns>Ray tracing pipeline handle.</returns>
-        public IntPtr CreateRayTracingPipeline(VulkanShaderStage[] shaderStages)
-        {
+        public IntPtr CreateRayTracingPipeline(VulkanShaderStage[] shaderStages) =>
             // Simplified implementation for ray tracing
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Creates an acceleration structure.
         /// </summary>
         /// <param name="geometryData">Geometry data.</param>
         /// <returns>Acceleration structure handle.</returns>
-        public IntPtr CreateAccelerationStructure(VulkanGeometryData geometryData)
-        {
+        public IntPtr CreateAccelerationStructure(VulkanGeometryData geometryData) =>
             // Simplified implementation for acceleration structures
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Disposes the Vulkan device.
@@ -559,9 +536,9 @@ namespace ILGPU.Backends.Vulkan
         {
             if (!_disposed)
             {
-                if (_handle != IntPtr.Zero)
+                if (Handle != IntPtr.Zero)
                 {
-                    VulkanNative.vkDestroyDevice(_handle, IntPtr.Zero);
+                    VulkanNative.vkDestroyDevice(Handle, IntPtr.Zero);
                 }
                 _disposed = true;
             }
@@ -573,17 +550,15 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanQueue : IDisposable
     {
-        private readonly IntPtr _handle;
-
         internal VulkanQueue(IntPtr handle)
         {
-            _handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
         /// Gets the native queue handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
 
         /// <summary>
         /// Submits a command buffer to the queue.
@@ -591,7 +566,7 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="commandBuffer">Command buffer to submit.</param>
         public void Submit(VulkanCommandBuffer commandBuffer)
         {
-            var result = VulkanNative.vkQueueSubmit(_handle, 1, IntPtr.Zero, IntPtr.Zero); // Simplified
+            var result = VulkanNative.vkQueueSubmit(Handle, 1, IntPtr.Zero, IntPtr.Zero); // Simplified
             if (result != VkResult.Success)
                 throw new InvalidOperationException($"Failed to submit command buffer: {result}");
         }
@@ -601,7 +576,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         public void WaitIdle()
         {
-            var result = VulkanNative.vkQueueWaitIdle(_handle);
+            var result = VulkanNative.vkQueueWaitIdle(Handle);
             if (result != VkResult.Success)
                 throw new InvalidOperationException($"Failed to wait for queue idle: {result}");
         }
@@ -620,24 +595,22 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanCommandBuffer : IDisposable
     {
-        private readonly IntPtr _handle;
-
         internal VulkanCommandBuffer(IntPtr handle)
         {
-            _handle = handle;
+            NativeBuffer = handle;
         }
 
         /// <summary>
         /// Gets the native command buffer handle.
         /// </summary>
-        public IntPtr NativeBuffer => _handle;
+        public IntPtr NativeBuffer { get; }
 
         /// <summary>
         /// Begins recording commands.
         /// </summary>
         public void Begin()
         {
-            var result = VulkanNative.vkBeginCommandBuffer(_handle, IntPtr.Zero);
+            var result = VulkanNative.vkBeginCommandBuffer(NativeBuffer, IntPtr.Zero);
             if (result != VkResult.Success)
                 throw new InvalidOperationException($"Failed to begin command buffer: {result}");
         }
@@ -647,7 +620,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         public void End()
         {
-            var result = VulkanNative.vkEndCommandBuffer(_handle);
+            var result = VulkanNative.vkEndCommandBuffer(NativeBuffer);
             if (result != VkResult.Success)
                 throw new InvalidOperationException($"Failed to end command buffer: {result}");
         }
@@ -656,19 +629,13 @@ namespace ILGPU.Backends.Vulkan
         /// Binds a compute pipeline.
         /// </summary>
         /// <param name="pipeline">Compute pipeline.</param>
-        public void BindComputePipeline(VulkanComputePipeline pipeline)
-        {
-            VulkanNative.vkCmdBindPipeline(_handle, 1, pipeline.Handle); // VK_PIPELINE_BIND_POINT_COMPUTE = 1
-        }
+        public void BindComputePipeline(VulkanComputePipeline pipeline) => VulkanNative.vkCmdBindPipeline(NativeBuffer, 1, pipeline.Handle); // VK_PIPELINE_BIND_POINT_COMPUTE = 1
 
         /// <summary>
         /// Binds descriptor sets.
         /// </summary>
         /// <param name="descriptorSet">Descriptor set.</param>
-        public void BindDescriptorSets(VulkanDescriptorSet descriptorSet)
-        {
-            VulkanNative.vkCmdBindDescriptorSets(_handle, 1, IntPtr.Zero, 0, 1, IntPtr.Zero, 0, IntPtr.Zero); // Simplified
-        }
+        public void BindDescriptorSets(VulkanDescriptorSet descriptorSet) => VulkanNative.vkCmdBindDescriptorSets(NativeBuffer, 1, IntPtr.Zero, 0, 1, IntPtr.Zero, 0, IntPtr.Zero); // Simplified
 
         /// <summary>
         /// Dispatches compute work.
@@ -676,10 +643,7 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="groupCountX">Workgroups in X.</param>
         /// <param name="groupCountY">Workgroups in Y.</param>
         /// <param name="groupCountZ">Workgroups in Z.</param>
-        public void Dispatch(uint groupCountX, uint groupCountY, uint groupCountZ)
-        {
-            VulkanNative.vkCmdDispatch(_handle, groupCountX, groupCountY, groupCountZ);
-        }
+        public void Dispatch(uint groupCountX, uint groupCountY, uint groupCountZ) => VulkanNative.vkCmdDispatch(NativeBuffer, groupCountX, groupCountY, groupCountZ);
 
         /// <summary>
         /// Disposes the command buffer.
@@ -695,17 +659,15 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanComputePipeline
     {
-        private readonly IntPtr _handle;
-
         internal VulkanComputePipeline(IntPtr handle)
         {
-            _handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
         /// Gets the native pipeline handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
     }
 
     /// <summary>
@@ -713,17 +675,15 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanDescriptorSet
     {
-        private readonly IntPtr _handle;
-
         internal VulkanDescriptorSet(IntPtr handle)
         {
-            _handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
         /// Gets the native descriptor set handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
     }
 
     /// <summary>
@@ -731,17 +691,15 @@ namespace ILGPU.Backends.Vulkan
     /// </summary>
     public sealed class VulkanDescriptorSetLayout
     {
-        private readonly IntPtr _handle;
-
         internal VulkanDescriptorSetLayout(IntPtr handle)
         {
-            _handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
         /// Gets the native descriptor set layout handle.
         /// </summary>
-        public IntPtr Handle => _handle;
+        public IntPtr Handle { get; }
     }
 
     /// <summary>

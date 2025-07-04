@@ -127,22 +127,19 @@ namespace ILGPU.Backends.ROCm
         /// </summary>
         /// <param name="gfxTarget">The GFX target (e.g., "gfx900").</param>
         /// <returns>The instruction set.</returns>
-        public static ROCmInstructionSet FromGfxTarget(string gfxTarget)
+        public static ROCmInstructionSet FromGfxTarget(string gfxTarget) => gfxTarget switch
         {
-            return gfxTarget switch
-            {
-                "gfx803" => new ROCmInstructionSet(ROCmArchitecture.GCN3, 8, 0, 3),
-                "gfx900" => new ROCmInstructionSet(ROCmArchitecture.GCN4, 9, 0, 0),
-                "gfx906" => new ROCmInstructionSet(ROCmArchitecture.GCN5, 9, 0, 6),
-                "gfx908" => new ROCmInstructionSet(ROCmArchitecture.CDNA1, 9, 0, 8),
-                "gfx90a" => new ROCmInstructionSet(ROCmArchitecture.CDNA2, 9, 0, 10),
-                "gfx942" => new ROCmInstructionSet(ROCmArchitecture.CDNA3, 9, 4, 2),
-                "gfx1010" => new ROCmInstructionSet(ROCmArchitecture.RDNA1, 10, 1, 0),
-                "gfx1030" => new ROCmInstructionSet(ROCmArchitecture.RDNA2, 10, 3, 0),
-                "gfx1100" => new ROCmInstructionSet(ROCmArchitecture.RDNA3, 11, 0, 0),
-                _ => new ROCmInstructionSet(ROCmArchitecture.Unknown, 0, 0, 0)
-            };
-        }
+            "gfx803" => new ROCmInstructionSet(ROCmArchitecture.GCN3, 8, 0, 3),
+            "gfx900" => new ROCmInstructionSet(ROCmArchitecture.GCN4, 9, 0, 0),
+            "gfx906" => new ROCmInstructionSet(ROCmArchitecture.GCN5, 9, 0, 6),
+            "gfx908" => new ROCmInstructionSet(ROCmArchitecture.CDNA1, 9, 0, 8),
+            "gfx90a" => new ROCmInstructionSet(ROCmArchitecture.CDNA2, 9, 0, 10),
+            "gfx942" => new ROCmInstructionSet(ROCmArchitecture.CDNA3, 9, 4, 2),
+            "gfx1010" => new ROCmInstructionSet(ROCmArchitecture.RDNA1, 10, 1, 0),
+            "gfx1030" => new ROCmInstructionSet(ROCmArchitecture.RDNA2, 10, 3, 0),
+            "gfx1100" => new ROCmInstructionSet(ROCmArchitecture.RDNA3, 11, 0, 0),
+            _ => new ROCmInstructionSet(ROCmArchitecture.Unknown, 0, 0, 0)
+        };
     }
 
     /// <summary>
@@ -300,21 +297,18 @@ namespace ILGPU.Backends.ROCm
         /// </summary>
         /// <param name="precision">The precision to check.</param>
         /// <returns>True if supported; otherwise, false.</returns>
-        public bool SupportsPrecision(ROCmPrecision precision)
+        public bool SupportsPrecision(ROCmPrecision precision) => precision switch
         {
-            return precision switch
-            {
-                ROCmPrecision.FP32 => true,
-                ROCmPrecision.FP64 => true, // Most ROCm devices support FP64
-                ROCmPrecision.FP16 => SupportsFP16,
-                ROCmPrecision.PackedFP16 => SupportsPackedFP16,
-                ROCmPrecision.INT8 => SupportsINT8,
-                ROCmPrecision.INT16 => true,
-                ROCmPrecision.INT32 => true,
-                ROCmPrecision.INT64 => true,
-                _ => false
-            };
-        }
+            ROCmPrecision.FP32 => true,
+            ROCmPrecision.FP64 => true, // Most ROCm devices support FP64
+            ROCmPrecision.FP16 => SupportsFP16,
+            ROCmPrecision.PackedFP16 => SupportsPackedFP16,
+            ROCmPrecision.INT8 => SupportsINT8,
+            ROCmPrecision.INT16 => true,
+            ROCmPrecision.INT32 => true,
+            ROCmPrecision.INT64 => true,
+            _ => false
+        };
     }
 
     /// <summary>

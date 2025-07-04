@@ -228,7 +228,7 @@ namespace ILGPU.Backends.PTX
             builder.Append(".version ");
             builder.AppendLine(InstructionSet.ToString());
             builder.Append(".target ");
-            builder.Append(Architecture.ToString().ToLowerInvariant());
+            builder.Append(Architecture.ToString().ToUpperInvariant());
             if (useDebugInfo)
                 builder.AppendLine(", debug");
             else

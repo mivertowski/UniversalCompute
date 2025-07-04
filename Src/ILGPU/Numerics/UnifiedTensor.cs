@@ -709,19 +709,25 @@ namespace ILGPU.Numerics
             {
                 var floatSpan = MemoryMarshal.Cast<T, float>(span);
                 for (int i = 0; i < floatSpan.Length; i++)
+#pragma warning disable CA5394 // Do not use insecure randomness
                     floatSpan[i] = rng.NextSingle();
+#pragma warning restore CA5394 // Do not use insecure randomness
             }
             else if (typeof(T) == typeof(double))
             {
                 var doubleSpan = MemoryMarshal.Cast<T, double>(span);
                 for (int i = 0; i < doubleSpan.Length; i++)
+#pragma warning disable CA5394 // Do not use insecure randomness
                     doubleSpan[i] = rng.NextDouble();
+#pragma warning restore CA5394 // Do not use insecure randomness
             }
             else
             {
                 // Generic fallback
                 for (int i = 0; i < span.Length; i++)
+#pragma warning disable CA5394 // Do not use insecure randomness
                     span[i] = T.CreateTruncating(rng.NextDouble());
+#pragma warning restore CA5394 // Do not use insecure randomness
             }
 
             return tensor;

@@ -299,7 +299,7 @@ namespace ILGPU.Runtime
         /// Initializes a new instance of the GpuKernelException class.
         /// </summary>
         public GpuKernelException()
-            : this("A kernel execution error occurred.", "Unknown", default(KernelConfig))
+            : this("A kernel execution error occurred.", "Unknown", default)
         {
         }
 
@@ -308,7 +308,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public GpuKernelException(string message)
-            : this(message, "Unknown", default(KernelConfig))
+            : this(message, "Unknown", default)
         {
         }
 
@@ -321,7 +321,7 @@ namespace ILGPU.Runtime
             : base(message, innerException)
         {
             KernelName = "Unknown";
-            LaunchConfig = default(KernelConfig);
+            LaunchConfig = default;
             Context["KernelName"] = KernelName;
             Context["LaunchConfig"] = LaunchConfig.ToString()!;
         }
@@ -388,7 +388,7 @@ namespace ILGPU.Runtime
         /// Initializes a new instance of the GpuDeviceException class.
         /// </summary>
         public GpuDeviceException()
-            : base("A device error occurred.", GpuErrorCode.DeviceError, default(DeviceErrorInfo))
+            : base("A device error occurred.", GpuErrorCode.DeviceError, default)
         {
             NativeErrorCode = 0;
         }
@@ -398,7 +398,7 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="message">The message that describes the error.</param>
         public GpuDeviceException(string message)
-            : base(message, GpuErrorCode.DeviceError, default(DeviceErrorInfo))
+            : base(message, GpuErrorCode.DeviceError, default)
         {
             NativeErrorCode = 0;
         }

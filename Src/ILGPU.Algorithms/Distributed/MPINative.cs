@@ -295,7 +295,7 @@ namespace ILGPU.Algorithms.Distributed
 
         #region Public Interface
 
-        private static bool _initialized = false;
+        private static bool _initialized;
         private static IntPtr _worldCommunicator = IntPtr.Zero;
 
         /// <summary>

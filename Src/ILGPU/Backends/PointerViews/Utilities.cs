@@ -68,7 +68,7 @@ namespace ILGPU.Backends.PointerViews
         /// </summary>
         /// <param name="implType">The view implementation type.</param>
         /// <returns>The resolved field.</returns>
-        public static FieldInfo GetPtrField(Type implType) =>
+        public static FieldInfo GetPtrField([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type implType) =>
             implType.GetField(nameof(ViewImplementation<int>.Ptr)).ThrowIfNull();
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace ILGPU.Backends.PointerViews
         /// </summary>
         /// <param name="implType">The view implementation type.</param>
         /// <returns>The resolved field.</returns>
-        public static FieldInfo GetLengthField(Type implType) =>
+        public static FieldInfo GetLengthField([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type implType) =>
             implType.GetField(nameof(ViewImplementation<int>.Length)).ThrowIfNull();
 
         /// <summary>

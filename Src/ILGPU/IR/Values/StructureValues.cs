@@ -771,7 +771,7 @@ namespace ILGPU.IR.Values
             /// <summary>
             /// The number of field values.
             /// </summary>
-            public int Count => builder.Count;
+            public readonly int Count => builder.Count;
 
             /// <summary>
             /// Returns the value that corresponds to the given field access.
@@ -780,7 +780,7 @@ namespace ILGPU.IR.Values
             /// <returns>The resolved field type.</returns>
             public ValueReference this[FieldAccess access]
             {
-                get => builder[access.Index];
+                readonly get => builder[access.Index];
                 set
                 {
                     Location.Assert(!value.Type.IsStructureType);
@@ -900,7 +900,7 @@ namespace ILGPU.IR.Values
             /// <summary>
             /// The number of field values.
             /// </summary>
-            public int Count => builder.Count;
+            public readonly int Count => builder.Count;
 
             /// <summary>
             /// Returns the value that corresponds to the given field access.
@@ -909,7 +909,7 @@ namespace ILGPU.IR.Values
             /// <returns>The resolved field type.</returns>
             public ValueReference this[FieldAccess access]
             {
-                get => builder[access.Index];
+                readonly get => builder[access.Index];
                 set => builder[access.Index] = value;
             }
 
@@ -945,7 +945,7 @@ namespace ILGPU.IR.Values
                 // Create a new structure type that corresponds to all value types
                 var typeBuilder = IRBuilder.CreateStructureType(Count);
                 foreach (var value in builder)
-                    typeBuilder.Add(value.Type.AsNotNull());
+                    typeBuilder.Add(value.Type);
                 builder.MoveTo(ref values);
                 return typeBuilder.Seal().As<StructureType>(Location);
             }
@@ -1213,7 +1213,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            ObjectValue.Type.AsNotNull();
+            ObjectValue.Type;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(

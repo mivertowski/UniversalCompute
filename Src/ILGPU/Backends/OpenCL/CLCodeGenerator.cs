@@ -194,7 +194,7 @@ VariableAllocator.Variable variable,
         private readonly string labelPrefix;
 
         private StringBuilder prefixBuilder = new();
-        private StringBuilder suffixBuilder = new();
+        private readonly StringBuilder suffixBuilder = new();
 
         /// <summary>
         /// Constructs a new code generator.

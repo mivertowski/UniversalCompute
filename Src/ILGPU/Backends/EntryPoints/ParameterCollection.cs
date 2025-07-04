@@ -58,7 +58,7 @@ namespace ILGPU.Backends.EntryPoints
             object IEnumerator.Current => Current;
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             /// <summary cref="IEnumerator.MoveNext"/>
             public bool MoveNext() => enumerator.MoveNext();

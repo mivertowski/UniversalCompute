@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -124,8 +125,8 @@ namespace ILGPU.Frontend.Intrinsic
         /// <param name="required">Indicates if the mapping is optional.</param>
         /// <param name="paramTypes">The parameter types of both functions.</param>
         private static void AddRemapping(
-            Type sourceType,
-            Type targetType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type sourceType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)] Type targetType,
             string functionName,
             bool required,
             params Type[] paramTypes)

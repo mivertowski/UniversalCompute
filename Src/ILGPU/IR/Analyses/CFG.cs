@@ -289,7 +289,7 @@ namespace ILGPU.IR.Analyses
             object IEnumerator.Current => Current;
 
             /// <summary cref="IDisposable.Dispose"/>
-            void IDisposable.Dispose() { }
+            readonly void IDisposable.Dispose() { }
 
             /// <summary cref="IEnumerator.MoveNext"/>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

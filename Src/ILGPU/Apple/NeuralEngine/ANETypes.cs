@@ -146,12 +146,12 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets or sets whether to use causal masking.
         /// </summary>
-        public bool UseCausalMask { get; set; } = false;
+        public bool UseCausalMask { get; set; }
 
         /// <summary>
         /// Gets or sets the dropout probability.
         /// </summary>
-        public float DropoutRate { get; set; } = 0.0f;
+        public float DropoutRate { get; set; }
 
         /// <summary>
         /// Gets or sets the precision for the operation.
@@ -169,7 +169,6 @@ namespace ILGPU.Apple.NeuralEngine
     /// </summary>
     public sealed class ANECoreMLModel : IDisposable
     {
-        private IntPtr _modelHandle;
         private bool _disposed;
 
         /// <summary>
@@ -178,13 +177,13 @@ namespace ILGPU.Apple.NeuralEngine
         /// <param name="modelHandle">Native model handle.</param>
         internal ANECoreMLModel(IntPtr modelHandle)
         {
-            _modelHandle = modelHandle;
+            ModelHandle = modelHandle;
         }
 
         /// <summary>
         /// Gets the native model handle.
         /// </summary>
-        internal IntPtr ModelHandle => _modelHandle;
+        internal IntPtr ModelHandle { get; private set; }
 
         /// <summary>
         /// Disposes the model.
@@ -193,10 +192,10 @@ namespace ILGPU.Apple.NeuralEngine
         {
             if (!_disposed)
             {
-                if (_modelHandle != IntPtr.Zero)
+                if (ModelHandle != IntPtr.Zero)
                 {
                     // Release native model handle
-                    _modelHandle = IntPtr.Zero;
+                    ModelHandle = IntPtr.Zero;
                 }
                 _disposed = true;
             }

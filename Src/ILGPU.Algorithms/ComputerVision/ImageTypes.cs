@@ -81,7 +81,6 @@ namespace ILGPU.Algorithms.ComputerVision
     /// <typeparam name="T">Pixel data type.</typeparam>
     public sealed class Image<T> : IDisposable where T : unmanaged
     {
-        private readonly Accelerator _accelerator;
         private bool _disposed;
 
         /// <summary>
@@ -94,7 +93,7 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <param name="data">Optional initial pixel data.</param>
         public Image(Accelerator accelerator, int width, int height, int channels, T[]? data = null)
         {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             
             if (width <= 0) throw new ArgumentException("Width must be positive", nameof(width));
             if (height <= 0) throw new ArgumentException("Height must be positive", nameof(height));
@@ -109,11 +108,11 @@ namespace ILGPU.Algorithms.ComputerVision
             {
                 if (data.Length != totalPixels)
                     throw new ArgumentException($"Data array must have {totalPixels} elements");
-                Data = _accelerator.Allocate1D(data);
+                Data = Accelerator.Allocate1D(data);
             }
             else
             {
-                Data = _accelerator.Allocate1D<T>(totalPixels);
+                Data = Accelerator.Allocate1D<T>(totalPixels);
             }
         }
 
@@ -150,7 +149,7 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <summary>
         /// Gets the accelerator associated with this image.
         /// </summary>
-        public Accelerator Accelerator => _accelerator;
+        public Accelerator Accelerator { get; }
 
         /// <summary>
         /// Creates a view of the image data as a 2D array (for single-channel images).
@@ -217,8 +216,8 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <returns>Copied image.</returns>
         public Image<T> Clone(AcceleratorStream? stream = null)
         {
-            var actualStream = stream ?? _accelerator.DefaultStream;
-            var cloned = new Image<T>(_accelerator, Width, Height, Channels);
+            var actualStream = stream ?? Accelerator.DefaultStream;
+            var cloned = new Image<T>(Accelerator, Width, Height, Channels);
             Data.View.CopyTo(cloned.Data.View, actualStream);
             actualStream.Synchronize();
             return cloned;

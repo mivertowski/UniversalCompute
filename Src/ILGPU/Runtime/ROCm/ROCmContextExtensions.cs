@@ -65,8 +65,7 @@ namespace ILGPU.Runtime.ROCm
             {
                 if (predicate(device))
                 {
-                    // TODO: Context.Builder.Accelerators property not available
-                    throw new NotSupportedException("ROCm accelerator registration not implemented - Context.Builder API changed");
+                    builder.Accelerators.Add(new ROCmAcceleratorBuilder(device));
                 }
             }
 
@@ -192,11 +191,7 @@ namespace ILGPU.Runtime.ROCm
         public static Backend CreateROCmBackend(
             this Context context,
             ROCmInstructionSet instruction,
-            ROCmCapabilities capabilities)
-        {
-            // TODO: ROCmBackend class not available
-            throw new NotSupportedException("ROCm backend creation not implemented - ROCmBackend class missing");
-        }
+            ROCmCapabilities capabilities) => new ROCmBackend(context, instruction, capabilities);
     }
 
     /// <summary>

@@ -15,10 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 using ILGPU.Backends;
-using ILGPU.IR.Analyses;
 using ILGPU.Runtime.Vulkan.Native;
 using ILGPU.Util;
 using System;
@@ -36,7 +33,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// The associated Vulkan device.
         /// </summary>
-        public new VulkanDevice Device { get; }
+        public VulkanDevice Device { get; }
 
         /// <summary>
         /// The native Vulkan instance handle.
@@ -61,7 +58,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
-        public new bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
+        public bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
 
         /// <summary>
         /// Initializes a new Vulkan accelerator.
@@ -86,8 +83,7 @@ namespace ILGPU.Runtime.Vulkan
                 CreateLogicalDevice();
 
                 // Get compute queue
-                VulkanNative.GetDeviceQueue(LogicalDevice, ComputeQueueFamily, 0, out var computeQueue);
-                ComputeQueue = computeQueue;
+                VulkanNative.GetDeviceQueue(LogicalDevice, ComputeQueueFamily, 0, out ComputeQueue);
 
                 // Initialize device properties
                 Init();
@@ -123,8 +119,7 @@ namespace ILGPU.Runtime.Vulkan
 
             try
             {
-                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
-                Instance = instance;
+                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out Instance);
                 VulkanException.ThrowIfFailed(result);
             }
             catch (DllNotFoundException)
@@ -172,8 +167,7 @@ namespace ILGPU.Runtime.Vulkan
                     enabledExtensionCount = 0
                 };
 
-                var result = VulkanNative.CreateDevice(Device.PhysicalDevice, ref deviceCreateInfo, IntPtr.Zero, out var logicalDevice);
-                LogicalDevice = logicalDevice;
+                var result = VulkanNative.CreateDevice(Device.PhysicalDevice, ref deviceCreateInfo, IntPtr.Zero, out LogicalDevice);
                 VulkanException.ThrowIfFailed(result);
             }
             catch (Exception)
@@ -219,11 +213,9 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Initializes the accelerator properties.
         /// </summary>
-        private void Init()
-        {
+        private void Init() =>
             // Set device-specific properties
             DefaultStream = CreateStreamInternal();
-        }
 
         #endregion
 
@@ -232,62 +224,52 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the name of this accelerator.
         /// </summary>
-        public new string Name => Device.Name;
+        public string Name => Device.Name;
 
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public MemoryInfo MemoryInfo => new MemoryInfo(
-            totalMemory: Device.MemorySize,
-            availableMemory: Device.MemorySize, // TODO: Get actual available memory
-            usedMemory: 0L, // TODO: Calculate used memory
-            maxAllocationSize: Device.MemorySize, // TODO: Get actual max allocation size
-            allocationGranularity: 1, // TODO: Get actual granularity
-            supportsVirtualMemory: false, // TODO: Check actual capability
-            supportsMemoryMapping: false, // TODO: Check actual capability
-            supportsZeroCopy: false, // TODO: Check actual capability
-            cacheLineSize: 64, // TODO: Get actual cache line size
-            memoryBandwidth: 0L); // TODO: Get actual memory bandwidth
+        public MemoryInfo MemoryInfo => new(Device.MemorySize);
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
         /// </summary>
-        public new Index3D MaxGridSize => Device.MaxGridSize;
+        public Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size supported by this accelerator.
         /// </summary>
-        public new Index3D MaxGroupSize => Device.MaxGroupSize;
+        public Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public new int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory => Device.MaxConstantMemory;
+        public long MaxConstantMemory => Device.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Vulkan).
         /// </summary>
-        public new int WarpSize => Device.WarpSize;
+        public int WarpSize => Device.WarpSize;
 
         /// <summary>
         /// Gets the number of multiprocessors (shader engines).
         /// </summary>
-        public new int NumMultiprocessors => Device.NumMultiprocessors;
+        public int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 
@@ -299,10 +281,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <param name="length">The length in elements.</param>
         /// <param name="elementSize">The element size in bytes.</param>
         /// <returns>The allocated memory buffer.</returns>
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new VulkanMemoryBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new VulkanMemoryBuffer(this, length, elementSize);
 
         /// <summary>
         /// Creates a page-lock scope for the given array.
@@ -380,29 +359,21 @@ namespace ILGPU.Runtime.Vulkan
         /// </summary>
         /// <param name="otherAccelerator">The other accelerator.</param>
         /// <returns>True if peer access is possible.</returns>
-        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator)
-        {
+        protected override bool CanAccessPeerInternal(Accelerator otherAccelerator) =>
             // Vulkan doesn't have direct peer access like CUDA
-            return false;
-        }
+            false;
 
         /// <summary>
         /// Enables peer access to the given accelerator.
         /// </summary>
         /// <param name="otherAccelerator">The other accelerator.</param>
-        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("Vulkan does not support peer access");
-        }
+        protected override void EnablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("Vulkan does not support peer access");
 
         /// <summary>
         /// Disables peer access to the given accelerator.
         /// </summary>
         /// <param name="otherAccelerator">The other accelerator.</param>
-        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator)
-        {
-            throw new NotSupportedException("Vulkan does not support peer access");
-        }
+        protected override void DisablePeerAccessInternal(Accelerator otherAccelerator) => throw new NotSupportedException("Vulkan does not support peer access");
 
         #endregion
 
@@ -414,11 +385,9 @@ namespace ILGPU.Runtime.Vulkan
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
             Kernel kernel,
             int groupSize,
-            int dynamicSharedMemorySizeInBytes)
-        {
+            int dynamicSharedMemorySizeInBytes) =>
             // Conservative estimation for Vulkan compute
-            return Math.Max(1, Device.MaxNumThreadsPerGroup / groupSize);
-        }
+            Math.Max(1, Device.MaxNumThreadsPerGroup / groupSize);
 
         /// <summary>
         /// Estimates the group size for the given kernel.
@@ -449,14 +418,11 @@ namespace ILGPU.Runtime.Vulkan
             Kernel kernel,
             int dynamicSharedMemorySizeInBytes,
             int maxGroupSize,
-            out int minGridSize)
-        {
-            return EstimateGroupSizeInternal(
+            out int minGridSize) => EstimateGroupSizeInternal(
                 kernel,
                 _ => dynamicSharedMemorySizeInBytes,
                 maxGroupSize,
                 out minGridSize);
-        }
 
         #endregion
 

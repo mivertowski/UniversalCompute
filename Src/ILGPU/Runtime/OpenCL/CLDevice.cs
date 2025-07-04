@@ -413,7 +413,7 @@ namespace ILGPU.Runtime.OpenCL
             var extensionString = CurrentAPI.GetDeviceInfo(
                 OpenCLDeviceId,
                 CLDeviceInfoType.CL_DEVICE_EXTENSIONS);
-            foreach (var extension in extensionString.ToLowerInvariant().Split(' '))
+            foreach (var extension in extensionString.ToUpperInvariant().Split(' '))
                 extensionSet.Add(extension);
             Extensions = extensionSet.ToImmutableArray();
         }

@@ -395,7 +395,7 @@ namespace ILGPU.IR.Values
         /// <summary cref="Node.ToPrefixString"/>
         [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase")]
         protected override string ToPrefixString() =>
-            "const.str." + Encoding.EncodingName.ToLowerInvariant();
+            "const.str." + Encoding.EncodingName.ToUpperInvariant();
 
         /// <summary cref="Value.ToArgString"/>
         protected override string ToArgString() => String;

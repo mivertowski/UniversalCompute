@@ -15,10 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 using ILGPU.Backends;
-using ILGPU.IR.Analyses;
 using ILGPU.Runtime.OneAPI.Native;
 using ILGPU.Util;
 using System;
@@ -37,7 +34,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// The associated Intel GPU device.
         /// </summary>
-        public new IntelOneAPIDevice Device { get; }
+        public IntelOneAPIDevice Device { get; }
 
         /// <summary>
         /// The native SYCL context handle.
@@ -67,7 +64,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
-        public new bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
+        public bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
 
         /// <summary>
         /// Gets whether this accelerator supports Intel MKL SYCL.
@@ -94,17 +91,15 @@ namespace ILGPU.Runtime.OneAPI
                 SYCLDevice = device.NativeDevice;
 
                 // Create SYCL context
-                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out var syclContext);
+                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out SYCLContext);
                 SYCLException.ThrowIfFailed(result);
-                SYCLContext = syclContext;
 
                 // Create SYCL queue
                 result = SYCLNative.CreateQueue(
                     SYCLContext, 
                     SYCLDevice, 
                     SYCLQueueProperties.ProfilingEnable, 
-                    out var queue);
-                SYCLQueue = queue;
+                    out SYCLQueue);
                 SYCLException.ThrowIfFailed(result);
 
                 // Initialize device properties
@@ -119,11 +114,9 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Initializes the accelerator properties.
         /// </summary>
-        private void Init()
-        {
+        private void Init() =>
             // Set device-specific properties
             DefaultStream = CreateStreamInternal();
-        }
 
         #endregion
 
@@ -132,57 +125,52 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the name of this accelerator.
         /// </summary>
-        public new string Name => Device.Name;
+        public string Name => Device.Name;
 
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public MemoryInfo MemoryInfo => new MemoryInfo(
-            Device.MemorySize, 
-            Device.MemorySize, // Assume available = total for simple case
-            0, // Used memory
-            Device.MemorySize // Max allocation size
-        );
+        public MemoryInfo MemoryInfo => new(Device.MemorySize);
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
         /// </summary>
-        public new Index3D MaxGridSize => Device.MaxGridSize;
+        public Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size supported by this accelerator.
         /// </summary>
-        public new Index3D MaxGroupSize => Device.MaxGroupSize;
+        public Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public new int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory => Device.MaxConstantMemory;
+        public long MaxConstantMemory => Device.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
         /// </summary>
-        public new int WarpSize => Device.WarpSize;
+        public int WarpSize => Device.WarpSize;
 
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public new int NumMultiprocessors => Device.NumMultiprocessors;
+        public int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 
@@ -194,10 +182,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <param name="length">The length in elements.</param>
         /// <param name="elementSize">The element size in bytes.</param>
         /// <returns>The allocated memory buffer.</returns>
-        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize)
-        {
-            return new OneAPIMemoryBuffer(this, length, elementSize);
-        }
+        protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new SYCLMemoryBuffer(this, length, elementSize);
 
         /// <summary>
         /// Creates a page-lock scope for the given array.
@@ -209,7 +194,7 @@ namespace ILGPU.Runtime.OneAPI
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(
             IntPtr pinned,
             long numElements) =>
-            new OneAPIPageLockScope<T>(this, pinned, numElements);
+            new SYCLPageLockScope<T>(this, pinned, numElements);
 
         #endregion
 
@@ -221,7 +206,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <param name="kernel">The kernel to load.</param>
         /// <returns>The loaded kernel.</returns>
         protected override Kernel LoadKernelInternal(CompiledKernel kernel) =>
-            new OneAPIKernel(this, kernel as OneAPICompiledKernel ?? throw new ArgumentException("Invalid kernel type"));
+            new SYCLKernel(this, kernel as SYCLCompiledKernel ?? throw new ArgumentException("Invalid kernel type"));
 
         /// <summary>
         /// Loads an auto-grouped kernel.
@@ -386,14 +371,11 @@ namespace ILGPU.Runtime.OneAPI
             Kernel kernel,
             int dynamicSharedMemorySizeInBytes,
             int maxGroupSize,
-            out int minGridSize)
-        {
-            return EstimateGroupSizeInternal(
+            out int minGridSize) => EstimateGroupSizeInternal(
                 kernel,
                 _ => dynamicSharedMemorySizeInBytes,
                 maxGroupSize,
                 out minGridSize);
-        }
 
         #endregion
 
@@ -457,37 +439,32 @@ namespace ILGPU.Runtime.OneAPI
         /// <param name="modelData">Model binary data.</param>
         /// <param name="stream">SYCL stream.</param>
         public async Task ExecuteAIInferenceAsync(
-            IntPtr input, IntPtr output, 
+            IntPtr input, IntPtr output,
             byte[] modelData,
-            OneAPIStream? stream = null)
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    // Use Intel GPU for AI inference acceleration
-                    ExecuteIntelGPUInference(input, output, modelData, stream?.NativeQueue ?? SYCLQueue);
-                }
-                catch (DllNotFoundException)
-                {
-                    throw new NotSupportedException("Intel AI acceleration libraries not found. Install Intel Extension for PyTorch or OpenVINO.");
-                }
-                catch (EntryPointNotFoundException)
-                {
-                    throw new NotSupportedException("Intel AI acceleration functions not found. Check OneAPI AI toolkit installation.");
-                }
-            });
-        }
+            OneAPIStream? stream = null) => await Task.Run(() =>
+                                                     {
+                                                         try
+                                                         {
+                                                             // Use Intel GPU for AI inference acceleration
+                                                             ExecuteIntelGPUInference(input, output, modelData, stream?.SYCLQueue ?? SYCLQueue);
+                                                         }
+                                                         catch (DllNotFoundException)
+                                                         {
+                                                             throw new NotSupportedException("Intel AI acceleration libraries not found. Install Intel Extension for PyTorch or OpenVINO.");
+                                                         }
+                                                         catch (EntryPointNotFoundException)
+                                                         {
+                                                             throw new NotSupportedException("Intel AI acceleration functions not found. Check OneAPI AI toolkit installation.");
+                                                         }
+                                                     });
 
         /// <summary>
         /// Placeholder for Intel GPU AI inference.
         /// </summary>
-        private void ExecuteIntelGPUInference(IntPtr input, IntPtr output, byte[] modelData, IntPtr queue)
-        {
+        private void ExecuteIntelGPUInference(IntPtr input, IntPtr output, byte[] modelData, IntPtr queue) =>
             // This would integrate with Intel Extension for PyTorch or OpenVINO
             // For demonstration, simulate the operation
             System.Threading.Thread.Sleep(1); // Simulate AI inference
-        }
 
         #endregion
 
@@ -561,7 +538,6 @@ namespace ILGPU.Runtime.OneAPI
     /// </summary>
     public class SYCLException : AcceleratorException
     {
-        public SYCLException() { }
         public SYCLException(string message) : base(message) { }
         public SYCLException(string message, Exception innerException) : base(message, innerException) { }
 

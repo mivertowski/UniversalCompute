@@ -72,11 +72,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         /// <param name="inputShape">Input tensor shape.</param>
         /// <returns>Output tensor shape.</returns>
-        public static int[] GetOutputShape(int[] inputShape)
-        {
+        public static int[] GetOutputShape(int[] inputShape) =>
             // Stub implementation - return same shape
-            return inputShape;
-        }
+            inputShape;
 
         /// <summary>
         /// Disposes the model.
@@ -103,10 +101,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <param name="shape">Tensor shape.</param>
         /// <param name="location">Compute location.</param>
         /// <returns>Created tensor.</returns>
-        public static ITensor<T> Create<T>(int[] shape, ComputeLocation location) where T : unmanaged
-        {
-            return new SimpleTensor<T>(shape);
-        }
+        public static ITensor<T> Create<T>(int[] shape, ComputeLocation location) where T : unmanaged => new SimpleTensor<T>(shape);
     }
 
     /// <summary>
@@ -218,10 +213,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         /// <param name="inputShape">Input tensor shape.</param>
         /// <returns>Output tensor shape.</returns>
-        public virtual TensorShape CalculateOutputShape(TensorShape inputShape)
-        {
-            return inputShape;
-        }
+        public virtual TensorShape CalculateOutputShape(TensorShape inputShape) => inputShape;
     }
 
     /// <summary>
@@ -275,7 +267,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Use causal mask.
         /// </summary>
-        public bool UseCausalMask { get; set; } = false;
+        public bool UseCausalMask { get; set; }
     }
 
     /// <summary>
@@ -291,7 +283,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Enable quantization.
         /// </summary>
-        public bool EnableQuantization { get; set; } = false;
+        public bool EnableQuantization { get; set; }
 
         /// <summary>
         /// Target TOPS.
@@ -312,7 +304,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Enable debugging.
         /// </summary>
-        public bool EnableDebugging { get; set; } = false;
+        public bool EnableDebugging { get; set; }
 
         /// <summary>
         /// Target architecture.
@@ -383,12 +375,12 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Whether to transpose matrix A.
         /// </summary>
-        public bool TransposeA { get; set; } = false;
+        public bool TransposeA { get; set; }
 
         /// <summary>
         /// Whether to transpose matrix B.
         /// </summary>
-        public bool TransposeB { get; set; } = false;
+        public bool TransposeB { get; set; }
     }
 
     /// <summary>
