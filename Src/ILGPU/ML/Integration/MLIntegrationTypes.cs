@@ -738,12 +738,6 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public IList<string> OutputNames { get; } = [];
 
-        /// <summary>
-        /// Initializes a new instance of the CompiledModel class.
-        /// </summary>
-        public CompiledModel()
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the CompiledModel class.
@@ -789,7 +783,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the plan ID.
         /// </summary>
-        public required string PlanId { get; set; }
+        public required string PlanId { get; set; } = Guid.NewGuid().ToString();
 
         /// <summary>
         /// Gets the execution steps.
@@ -806,12 +800,6 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public IEnumerable<string> OutputNames { get; set; } = new List<string>();
 
-        /// <summary>
-        /// Initializes a new instance of the CompiledExecutionPlan class.
-        /// </summary>
-        public CompiledExecutionPlan()
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the CompiledExecutionPlan class.
@@ -833,17 +821,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the step name.
         /// </summary>
-        public required string Name { get; set; }
+        public required string Name { get; set; } = "step";
 
         /// <summary>
         /// Gets or sets the operation type.
         /// </summary>
-        public required string OperationType { get; set; }
+        public required string OperationType { get; set; } = "operation";
 
         /// <summary>
         /// Gets or sets the target device.
         /// </summary>
-        public required string TargetDevice { get; set; }
+        public required string TargetDevice { get; set; } = "GPU";
     }
 
     /// <summary>
@@ -854,29 +842,23 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the kernel name.
         /// </summary>
-        public required string KernelName { get; set; }
+        public required string KernelName { get; set; } = "default_kernel";
 
         /// <summary>
         /// Gets or sets the compiled code.
         /// </summary>
-        public required IList<byte> CompiledCode { get; set; }
+        public required IList<byte> CompiledCode { get; set; } = [0x00];
 
         /// <summary>
         /// Gets or sets the entry point.
         /// </summary>
-        public required string EntryPoint { get; set; }
+        public required string EntryPoint { get; set; } = "main";
 
         /// <summary>
         /// Gets kernel parameters.
         /// </summary>
         public IList<KernelParameter> Parameters { get; } = [];
 
-        /// <summary>
-        /// Initializes a new instance of the CompiledKernel class.
-        /// </summary>
-        public CompiledKernel()
-        {
-        }
 
         /// <summary>
         /// Initializes a new instance of the CompiledKernel class.
@@ -898,12 +880,12 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the parameter name.
         /// </summary>
-        public required string Name { get; set; }
+        public required string Name { get; set; } = "param";
 
         /// <summary>
         /// Gets or sets the parameter type.
         /// </summary>
-        public required string Type { get; set; }
+        public required string Type { get; set; } = "int";
 
         /// <summary>
         /// Gets or sets whether it's an input parameter.
@@ -1190,17 +1172,17 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        public required string Name { get; set; }
+        public required string Name { get; set; } = "value";
 
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
-        public required object Value { get; set; }
+        public required object Value { get; set; } = new object();
 
         /// <summary>
         /// Gets or sets the data type.
         /// </summary>
-        public required string DataType { get; set; }
+        public required string DataType { get; set; } = "object";
 
         /// <summary>
         /// Creates a named ONNX value.

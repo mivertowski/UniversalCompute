@@ -153,7 +153,7 @@ namespace ILGPU.Runtime.ROCm
                     {
                         // Fall back to unsafe copy
                         Buffer.MemoryCopy(
-                            sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                            (void*)sourcePtr, (void*)targetPtr,
                             LengthInBytes - targetView.Index, targetView.Length);
                     }
                 }
@@ -161,7 +161,7 @@ namespace ILGPU.Runtime.ROCm
                 {
                     // Host-to-host copy
                     Buffer.MemoryCopy(
-                        sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                        (void*)sourcePtr, (void*)targetPtr,
                         LengthInBytes - targetView.Index, targetView.Length);
                 }
             }
@@ -205,7 +205,7 @@ namespace ILGPU.Runtime.ROCm
                     {
                         // Fall back to unsafe copy
                         Buffer.MemoryCopy(
-                            sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                            (void*)sourcePtr, (void*)targetPtr,
                             targetView.Length, sourceView.Length);
                     }
                 }
@@ -213,7 +213,7 @@ namespace ILGPU.Runtime.ROCm
                 {
                     // Host-to-host copy
                     Buffer.MemoryCopy(
-                        sourcePtr.ToPointer(), targetPtr.ToPointer(),
+                        (void*)sourcePtr, (void*)targetPtr,
                         targetView.Length, sourceView.Length);
                 }
             }
@@ -239,7 +239,7 @@ namespace ILGPU.Runtime.ROCm
                 catch (Exception)
                 {
                     // Fall back to CPU memset
-                    var bytePtr = (byte*)ptr.ToPointer();
+                    var bytePtr = (byte*)(void*)ptr;
                     for (long i = 0; i < length; i++)
                         bytePtr[i] = value;
                 }
@@ -247,7 +247,7 @@ namespace ILGPU.Runtime.ROCm
             else
             {
                 // CPU memset for host memory
-                var bytePtr = (byte*)ptr.ToPointer();
+                var bytePtr = (byte*)(void*)ptr;
                 for (long i = 0; i < length; i++)
                     bytePtr[i] = value;
             }

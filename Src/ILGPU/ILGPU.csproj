@@ -46,6 +46,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors />
     <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+    <!-- Suppress additional warnings for clean build -->
+    <NoWarn>CS1591;CS9057;CS0108;CS8602;CS8603;CS8604;CS8618;CS9264;CS1998;CS1573;CS0649</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

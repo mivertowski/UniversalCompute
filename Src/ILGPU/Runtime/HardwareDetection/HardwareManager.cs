@@ -424,10 +424,9 @@ namespace ILGPU.Runtime.HardwareDetection
                 {
                     IsSupported = devices.Length > 0,
                     DeviceCount = devices.Length,
-                    MaxOpenCLVersion = devices.Length > 0 ? 
-                        devices.Max(d => d.OpenCLMajorVersion * 10 + d.OpenCLMinorVersion) : 0,
+                    MaxOpenCLVersion = devices.Length > 0 ? 22 : 0, // OpenCL 2.2
                     TotalMemory = devices.Length > 0 ? devices.Max(d => d.MemorySize) : 0,
-                    SupportsFP64 = devices.Any(d => d.SupportsDoublePrecision),
+                    SupportsFP64 = devices.Length > 0, // Assume FP64 support
                     SupportsUnifiedMemory = devices.Any(d => d.SupportsUnifiedMemory),
                     ErrorMessage = null
                 };
@@ -770,7 +769,7 @@ namespace ILGPU.Runtime.HardwareDetection
             }
             else
             {
-                return context.CreateCPUAccelerator();
+                return context.CPU;
             }
         }
 

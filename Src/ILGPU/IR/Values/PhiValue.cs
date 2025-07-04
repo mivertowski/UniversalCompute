@@ -355,7 +355,7 @@ namespace ILGPU.IR.Values
                 return this;
 
             var blockBuilder = methodBuilder[BasicBlock];
-            var phiBuilder = blockBuilder.CreatePhi(Location, Type!);
+            var phiBuilder = blockBuilder.CreatePhi(Location, Type ?? methodBuilder.Context.VoidType);
             for (int i = 0, e = Nodes.Length; i < e; ++i)
             {
                 if (!remapper.TryRemap(this, Sources[i], out var newSource))

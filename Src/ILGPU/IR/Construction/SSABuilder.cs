@@ -194,12 +194,17 @@ namespace ILGPU.IR.Construction
             /// <summary>
             /// Returns the associated block builder.
             /// </summary>
+            private BasicBlock.Builder? _builder;
+            
+            /// <summary>
+            /// Returns the associated block builder.
+            /// </summary>
             public BasicBlock.Builder Builder
             {
                 get
                 {
-                    field ??= Parent.MethodBuilder[Block];
-                    return field!;
+                    _builder ??= Parent.MethodBuilder[Block];
+                    return _builder!;
                 }
             }
 

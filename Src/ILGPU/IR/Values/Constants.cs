@@ -74,7 +74,7 @@ namespace ILGPU.IR.Values
         protected internal override Value Rebuild(
             IRBuilder builder,
             IRRebuilder rebuilder) =>
-            builder.CreateNull(Location, Type!);
+            builder.CreateNull(Location, Type ?? builder.Context.VoidType);
 
         /// <summary cref="Value.Write{T}(T)"/>
         protected internal override void Write<T>(T writer) { }
@@ -90,7 +90,7 @@ namespace ILGPU.IR.Values
         protected override string ToPrefixString() => "null";
 
         /// <summary cref="Value.ToArgString"/>
-        protected override string ToArgString() => Type!.ToString();
+        protected override string ToArgString() => Type?.ToString() ?? "unknown";
 
         #endregion
     }

@@ -423,3 +423,11 @@ ruv-swarm.ps1
 .claude/commands/training/specialization.md
 .claude/commands/workflows/development.md
 .claude/commands/workflows/research.md
+build_results.txt
+current_build.txt
+final_orchestration_result.txt
+final_status.txt
+final_validation.txt
+zero_warning_build.txt
+sessions/47bf2609-1a10-44d1-83a7-e52406d29c52.json
+sessions/f5c922bc-a006-4354-b03c-95ba91ad79a7.json

@@ -104,12 +104,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
+        public new string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
 
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public long MemorySize
+        public new long MemorySize
         {
             get
             {
@@ -126,37 +126,37 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public new AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public Index3D MaxGridSize => MaxWorkGroupCount;
+        public new Index3D MaxGridSize => MaxWorkGroupCount;
 
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public Index3D MaxGroupSize => MaxWorkGroupSize;
+        public new Index3D MaxGroupSize => MaxWorkGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public int MaxNumThreadsPerGroup => (int)MaxWorkGroupInvocations;
+        public new int MaxNumThreadsPerGroup => (int)MaxWorkGroupInvocations;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public long MaxSharedMemoryPerGroup => 32 * 1024; // 32KB typical
+        public new long MaxSharedMemoryPerGroup => 32 * 1024; // 32KB typical
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public long MaxConstantMemory => 64 * 1024; // 64KB typical
+        public new long MaxConstantMemory => 64 * 1024; // 64KB typical
 
         /// <summary>
         /// Gets the warp/subgroup size.
         /// </summary>
-        public int WarpSize
+        public new int WarpSize
         {
             get
             {
@@ -174,7 +174,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the number of multiprocessors/compute units.
         /// </summary>
-        public int NumMultiprocessors
+        public new int NumMultiprocessors
         {
             get
             {

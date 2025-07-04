@@ -154,7 +154,7 @@ namespace ILGPU.IR.Values
             {
                 // In the case of a structure, this operation will return a single
                 // pointer only
-                return Source.Type!;
+                return Source.Type ?? initializer.Context.VoidType;
             }
         }
 
@@ -216,7 +216,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            Source.Type!;
+            Source.Type ?? initializer.Context.VoidType;
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(

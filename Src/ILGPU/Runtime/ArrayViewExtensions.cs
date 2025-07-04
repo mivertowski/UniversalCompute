@@ -2351,7 +2351,7 @@ namespace ILGPU.Runtime
         /// <param name="extent">The 2D extent.</param>
         /// <returns>A 2D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ArrayView2D<T> As2DView<T>(this ArrayView<T> view, LongIndex2D extent)
+        public static ArrayView2D<T, Stride2D.DenseX> As2DView<T>(this ArrayView<T> view, LongIndex2D extent)
             where T : unmanaged
         {
             return view.As2DView(extent, new Stride2D.DenseX(extent.Y));
@@ -2365,7 +2365,7 @@ namespace ILGPU.Runtime
         /// <param name="extent">The 3D extent.</param>
         /// <returns>A 3D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ArrayView3D<T> As3DView<T>(this ArrayView<T> view, LongIndex3D extent)
+        public static ArrayView3D<T, Stride3D.DenseXY> As3DView<T>(this ArrayView<T> view, LongIndex3D extent)
             where T : unmanaged
         {
             return view.As3DView(extent, new Stride3D.DenseXY(extent.Y * extent.Z, extent.Z));

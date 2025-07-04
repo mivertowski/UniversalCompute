@@ -145,17 +145,7 @@ namespace ILGPU.Runtime.ROCm
             ROCmDeviceId = deviceId;
             Properties = properties;
             
-            // Set Device base class properties
-            Name = Properties.Name ?? $"ROCm Device {ROCmDeviceId}";
-            MemorySize = (long)Properties.TotalGlobalMem;
-            MaxGridSize = new Index3D(Properties.MaxGridSize[0], Properties.MaxGridSize[1], Properties.MaxGridSize[2]);
-            MaxGroupSize = new Index3D(Properties.MaxThreadsDim[0], Properties.MaxThreadsDim[1], Properties.MaxThreadsDim[2]);
-            MaxNumThreadsPerGroup = Properties.MaxThreadsPerBlock;
-            MaxSharedMemoryPerGroup = Properties.SharedMemPerBlock;
-            MaxConstantMemory = Properties.TotalConstMem;
-            WarpSize = Properties.WarpSize;
-            NumMultiprocessors = Properties.MultiProcessorCount;
-            MaxNumThreadsPerMultiprocessor = Properties.MaxThreadsPerMultiProcessor;
+            // Properties are now calculated from Properties in getter methods
             
             InitializeMemoryInfo();
         }

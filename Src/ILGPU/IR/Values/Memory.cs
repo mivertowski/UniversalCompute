@@ -157,7 +157,7 @@ namespace ILGPU.IR.Values
         protected override string ToArgString() =>
             ArrayLength.Resolve() is PrimitiveValue value
             ? $"{Type} [{value}]"
-            : Type!.ToString();
+            : (Type?.ToString() ?? "unknown");
 
         #endregion
     }
@@ -289,7 +289,7 @@ namespace ILGPU.IR.Values
         /// Returns the source address space this load reads from.
         /// </summary>
         public MemoryAddressSpace SourceAddressSpace =>
-            Source.Type!.As<AddressSpaceType>(this).AddressSpace;
+            Source.Type?.As<AddressSpaceType>(this)?.AddressSpace ?? MemoryAddressSpace.Global;
 
         #endregion
 
@@ -365,7 +365,7 @@ namespace ILGPU.IR.Values
         /// Returns the target address space this store writes to.
         /// </summary>
         public MemoryAddressSpace TargetAddressSpace =>
-            Target.Type!.As<AddressSpaceType>(this).AddressSpace;
+            Target.Type?.As<AddressSpaceType>(this)?.AddressSpace ?? MemoryAddressSpace.Global;
 
         /// <summary>
         /// Returns the value to store.
