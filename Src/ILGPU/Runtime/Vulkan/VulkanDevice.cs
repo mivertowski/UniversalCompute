@@ -89,7 +89,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets whether this device supports unified memory.
         /// </summary>
-        public bool SupportsUnifiedMemory => DeviceType == VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
+        public new bool SupportsUnifiedMemory => DeviceType == VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU;
 
         internal VulkanDevice(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties properties)
         {

@@ -93,7 +93,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets whether the device supports unified memory.
         /// </summary>
-        public bool SupportsUnifiedMemory => DeviceInfo.SupportsUnifiedMemory;
+        public new bool SupportsUnifiedMemory => DeviceInfo.SupportsUnifiedMemory;
 
         /// <summary>
         /// Gets whether this is a discrete GPU.
@@ -113,22 +113,22 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public string Name => DeviceInfo.Name ?? $"Intel GPU Device";
+        public new string Name => DeviceInfo.Name ?? $"Intel GPU Device";
 
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public long MemorySize => (long)DeviceInfo.GlobalMemSize;
+        public new long MemorySize => (long)DeviceInfo.GlobalMemSize;
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public new AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public Index3D MaxGridSize
+        public new Index3D MaxGridSize
         {
             get
             {
@@ -150,7 +150,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public Index3D MaxGroupSize
+        public new Index3D MaxGroupSize
         {
             get
             {
@@ -162,17 +162,17 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public int MaxNumThreadsPerGroup => (int)DeviceInfo.MaxWorkGroupSize;
+        public new int MaxNumThreadsPerGroup => (int)DeviceInfo.MaxWorkGroupSize;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public long MaxSharedMemoryPerGroup => (long)DeviceInfo.LocalMemSize;
+        public new long MaxSharedMemoryPerGroup => (long)DeviceInfo.LocalMemSize;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public long MaxConstantMemory
+        public new long MaxConstantMemory
         {
             get
             {
@@ -190,12 +190,12 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
         /// </summary>
-        public int WarpSize => SubgroupSize > 0 ? SubgroupSize : GetDefaultSubgroupSize();
+        public new int WarpSize => SubgroupSize > 0 ? SubgroupSize : GetDefaultSubgroupSize();
 
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public int NumMultiprocessors => ComputeUnits;
+        public new int NumMultiprocessors => ComputeUnits;
 
         /// <summary>
         /// Gets the device vendor.

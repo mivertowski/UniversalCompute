@@ -34,7 +34,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// The associated Intel GPU device.
         /// </summary>
-        public IntelOneAPIDevice Device { get; }
+        public new IntelOneAPIDevice Device { get; }
 
         /// <summary>
         /// The native SYCL context handle.
@@ -64,7 +64,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
-        public bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
+        public new bool SupportsUnifiedMemory => Device.SupportsUnifiedMemory;
 
         /// <summary>
         /// Gets whether this accelerator supports Intel MKL SYCL.
@@ -125,12 +125,12 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public new AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the name of this accelerator.
         /// </summary>
-        public string Name => Device.Name;
+        public new string Name => Device.Name;
 
         /// <summary>
         /// Gets the memory information of this accelerator.
@@ -140,37 +140,37 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
         /// </summary>
-        public Index3D MaxGridSize => Device.MaxGridSize;
+        public new Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size supported by this accelerator.
         /// </summary>
-        public Index3D MaxGroupSize => Device.MaxGroupSize;
+        public new Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the maximum number of threads per group.
         /// </summary>
-        public int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
+        public new int MaxNumThreadsPerGroup => Device.MaxNumThreadsPerGroup;
 
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public new long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public long MaxConstantMemory => Device.MaxConstantMemory;
+        public new long MaxConstantMemory => Device.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
         /// </summary>
-        public int WarpSize => Device.WarpSize;
+        public new int WarpSize => Device.WarpSize;
 
         /// <summary>
         /// Gets the number of multiprocessors (execution units).
         /// </summary>
-        public int NumMultiprocessors => Device.NumMultiprocessors;
+        public new int NumMultiprocessors => Device.NumMultiprocessors;
 
         #endregion
 

@@ -36,7 +36,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// The associated Intel AMX device.
         /// </summary>
-        public IntelAMXDevice Device { get; }
+        public new IntelAMXDevice Device { get; }
 
         /// <summary>
         /// Gets whether this accelerator supports BF16 operations.
@@ -100,37 +100,37 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public AcceleratorType AcceleratorType => AcceleratorType.CPU;
+        public new AcceleratorType AcceleratorType => AcceleratorType.CPU;
 
         /// <summary>
         /// Gets the accelerator name.
         /// </summary>
-        public string Name => $"Intel AMX ({Device.ProcessorName})";
+        public new string Name => $"Intel AMX ({Device.ProcessorName})";
 
         /// <summary>
         /// Gets the memory size in bytes.
         /// </summary>
-        public long MemorySize => Device.MemorySize;
+        public new long MemorySize => Device.MemorySize;
 
         /// <summary>
         /// Gets the maximum grid size.
         /// </summary>
-        public Index3D MaxGridSize => Device.MaxGridSize;
+        public new Index3D MaxGridSize => Device.MaxGridSize;
 
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public Index3D MaxGroupSize => Device.MaxGroupSize;
+        public new Index3D MaxGroupSize => Device.MaxGroupSize;
 
         /// <summary>
         /// Gets the warp size.
         /// </summary>
-        public int WarpSize => 1; // AMX operates on single thread
+        public new int WarpSize => 1; // AMX operates on single thread
 
         /// <summary>
         /// Gets the number of multiprocessors.
         /// </summary>
-        public int NumMultiprocessors => Device.NumCores;
+        public new int NumMultiprocessors => Device.NumCores;
 
         #endregion
 
