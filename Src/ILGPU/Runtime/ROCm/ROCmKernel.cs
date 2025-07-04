@@ -162,7 +162,7 @@ namespace ILGPU.Runtime.ROCm
                     (uint)sharedMemorySize,
                     stream.NativePtr,
                     parameters,
-                    null);
+                    IntPtr.Zero);
 
                 ROCmException.ThrowIfFailed(result);
             }

@@ -293,7 +293,7 @@ namespace ILGPU.Intel.NPU
 
         protected override PageLockScope<T> CreatePageLockFromPinnedInternal<T>(IntPtr pinned, long numElements)
         {
-            return new PageLockScope<T>(this, pinned, numElements);
+            return new NullPageLockScope<T>(this, pinned, numElements);
         }
 
         public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
@@ -365,7 +365,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets the memory bandwidth.
         /// </summary>
-        public long MemoryBandwidth => _capabilities.MemoryBandwidth;
+        public long MemoryBandwidth => (long)_capabilities.MemoryBandwidth;
 
         private void InitializeAcceleratorProperties()
         {

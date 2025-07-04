@@ -32,7 +32,9 @@ namespace ILGPU.Runtime.OneAPI
     {
         private readonly IntelOneAPIAccelerator accelerator;
         private readonly IntPtr nativePtr;
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         private bool disposed;
+#pragma warning restore CS0414
 
         /// <summary>
         /// Initializes a new OneAPI memory buffer.
@@ -277,7 +279,9 @@ namespace ILGPU.Runtime.OneAPI
     /// </summary>
     public sealed class OneAPIKernel : Kernel
     {
+#pragma warning disable CS0414 // Field is assigned but its value is never used
         private bool disposed;
+#pragma warning restore CS0414
 
         /// <summary>
         /// Initializes a new OneAPI kernel.

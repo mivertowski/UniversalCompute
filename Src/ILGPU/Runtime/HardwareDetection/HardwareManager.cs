@@ -40,7 +40,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <summary>
         /// Gets the detected hardware capabilities.
         /// </summary>
-        public static HardwareCapabilities Capabilities { get; private set; }
+        public static HardwareCapabilities Capabilities { get; private set; } = new HardwareCapabilities();
 
         /// <summary>
         /// Gets whether hardware detection has been performed.

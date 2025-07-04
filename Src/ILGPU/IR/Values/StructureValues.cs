@@ -945,7 +945,7 @@ namespace ILGPU.IR.Values
                 // Create a new structure type that corresponds to all value types
                 var typeBuilder = IRBuilder.CreateStructureType(Count);
                 foreach (var value in builder)
-                    typeBuilder.Add(value.Type);
+                    typeBuilder.Add(value.Type.AsNotNull());
                 builder.MoveTo(ref values);
                 return typeBuilder.Seal().As<StructureType>(Location);
             }
@@ -1213,7 +1213,7 @@ namespace ILGPU.IR.Values
 
         /// <summary cref="Value.ComputeType(in ValueInitializer)"/>
         protected override TypeNode ComputeType(in ValueInitializer initializer) =>
-            ObjectValue.Type;
+            ObjectValue.Type.AsNotNull();
 
         /// <summary cref="Value.Rebuild(IRBuilder, IRRebuilder)"/>
         protected internal override Value Rebuild(

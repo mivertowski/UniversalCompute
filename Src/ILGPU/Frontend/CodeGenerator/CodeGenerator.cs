@@ -536,7 +536,7 @@ namespace ILGPU.Frontend
 
             address = CreateConversion(
                 address,
-                Builder.CreatePointerType(value.Type, MemoryAddressSpace.Generic),
+                Builder.CreatePointerType(value.Type.AsNotNull(), MemoryAddressSpace.Generic),
                 ConvertFlags.None);
             Builder.CreateStore(Location, address, value);
         }

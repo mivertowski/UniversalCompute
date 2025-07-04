@@ -263,7 +263,7 @@ namespace ILGPU.Runtime.AI
                 var duration = DateTime.UtcNow - startTime;
                 PerformanceTracker.RecordExecution(workload.WorkloadType, duration, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Record failed execution
                 var duration = DateTime.UtcNow - startTime;

@@ -373,8 +373,8 @@ namespace ILGPU.Runtime.AMX
         public IReadOnlyList<byte> NativeCode { get; }
         public string FunctionName { get; }
 
-        public AMXCompiledKernel(Context context, byte[] nativeCode, string functionName, KernelInfo info)
-            : base(context, entryPoint: null, info)
+        public AMXCompiledKernel(Context context, EntryPoint entryPoint, byte[] nativeCode, string functionName, KernelInfo? info)
+            : base(context, entryPoint, info)
         {
             NativeCode = nativeCode ?? throw new ArgumentNullException(nameof(nativeCode));
             FunctionName = functionName ?? throw new ArgumentNullException(nameof(functionName));
