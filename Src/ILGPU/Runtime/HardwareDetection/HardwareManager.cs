@@ -568,7 +568,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 var devices = CudaDevice.GetDevices(_ => true);
                 if (devices.Length > 0)
-                    return context.CreateCudaAccelerator(devices[0]);
+                    return context.CreateCudaAccelerator(((CudaDevice)devices[0]).CudaDeviceId);
             }
 
             if (Capabilities.ROCm.IsSupported && Capabilities.ROCm.SupportsROCBLAS)
@@ -601,7 +601,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 var devices = CudaDevice.GetDevices(_ => true);
                 if (devices.Length > 0)
-                    return context.CreateCudaAccelerator(devices[0]);
+                    return context.CreateCudaAccelerator(((CudaDevice)devices[0]).CudaDeviceId);
             }
 
             if (Capabilities.ROCm.IsSupported && Capabilities.ROCm.SupportsROCFFT)
@@ -650,7 +650,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 var devices = CudaDevice.GetDevices(_ => true);
                 if (devices.Length > 0)
-                    return context.CreateCudaAccelerator(devices[0]);
+                    return context.CreateCudaAccelerator(((CudaDevice)devices[0]).CudaDeviceId);
             }
 
             if (Capabilities.Apple.IsSupported && Capabilities.Apple.SupportsMetalGPU)
@@ -675,7 +675,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 var devices = CudaDevice.GetDevices(_ => true);
                 if (devices.Length > 0)
-                    return context.CreateCudaAccelerator(devices[0]);
+                    return context.CreateCudaAccelerator(((CudaDevice)devices[0]).CudaDeviceId);
             }
 
             if (Capabilities.ROCm.IsSupported)
@@ -732,7 +732,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 var devices = CudaDevice.GetDevices(_ => true);
                 if (devices.Length > 0)
-                    return context.CreateCudaAccelerator(devices[0]);
+                    return context.CreateCudaAccelerator(((CudaDevice)devices[0]).CudaDeviceId);
             }
 
             if (Capabilities.Apple.IsSupported && Capabilities.Apple.SupportsMetalGPU)

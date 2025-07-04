@@ -592,28 +592,28 @@ namespace ILGPU.Runtime.OneAPI.Native
                 var deviceName = GetDeviceInfoString(device, SYCLDeviceInfo.Name).ToUpperInvariant();
                 var vendorName = GetDeviceInfoString(device, SYCLDeviceInfo.Vendor).ToUpperInvariant();
 
-                if (!vendorName.Contains("INTEL"))
+                if (!vendorName.Contains("INTEL", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.Unknown;
 
                 // Intel Arc GPUs (Xe-HPG)
-                if (deviceName.Contains("ARC A") || deviceName.Contains("DG2"))
+                if (deviceName.Contains("ARC A", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("DG2", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.XeHPG;
 
                 // Intel Data Center GPUs (Xe-HP/HPC)
-                if (deviceName.Contains("DATA CENTER") || deviceName.Contains("PONTE VECCHIO") || 
-                    deviceName.Contains("XE-HP") || deviceName.Contains("XE-HPC"))
+                if (deviceName.Contains("DATA CENTER", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("PONTE VECCHIO", StringComparison.OrdinalIgnoreCase) || 
+                    deviceName.Contains("XE-HP", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("XE-HPC", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.XeHPC;
 
                 // Intel Iris Xe GPUs (Gen12/Xe-LP)
-                if (deviceName.Contains("IRIS XE") || deviceName.Contains("XE GRAPHICS") || 
-                    deviceName.Contains("GEN12") || deviceName.Contains("TGL") || deviceName.Contains("DG1"))
+                if (deviceName.Contains("IRIS XE", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("XE GRAPHICS", StringComparison.OrdinalIgnoreCase) || 
+                    deviceName.Contains("GEN12", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("TGL", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("DG1", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.XeLP;
 
                 // Intel UHD Graphics (Gen11/Gen9)
-                if (deviceName.Contains("UHD") || deviceName.Contains("GEN11") || deviceName.Contains("ICL"))
+                if (deviceName.Contains("UHD", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("GEN11", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("ICL", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.Gen11;
 
-                if (deviceName.Contains("HD") || deviceName.Contains("GEN9") || deviceName.Contains("SKL"))
+                if (deviceName.Contains("HD", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("GEN9", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("SKL", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.Gen9;
 
                 return IntelGPUArchitecture.Unknown;

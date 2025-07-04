@@ -353,7 +353,7 @@ namespace ILGPU.FFT
             var totalSize = width * height;
             
             var cpuInput = new Complex[totalSize];
-            input.AsLinearView().AsLinearView().CopyToCPU(cpuInput);
+            input.AsLinearView().CopyToCPU(cpuInput);
             
             var tempData = new Complex[totalSize];
             var outputData = new Complex[totalSize];
@@ -391,7 +391,7 @@ namespace ILGPU.FFT
             }
             
             // Copy result back to GPU
-            output.AsLinearView().AsLinearView().CopyFromCPU(outputData);
+            output.AsLinearView().CopyFromCPU(outputData);
         }
 
         #endregion
