@@ -38,7 +38,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Stores the associated ROCm device.
         /// </summary>
-        public ROCmDevice Device { get; }
+        public new ROCmDevice Device { get; }
 
         /// <summary>
         /// Gets the backend of this accelerator.
@@ -48,12 +48,12 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the native ROCm context handle.
         /// </summary>
-        internal IntPtr NativePtr { get; private set; }
+        internal new IntPtr NativePtr { get; private set; }
 
         /// <summary>
         /// Gets whether this accelerator supports unified memory.
         /// </summary>
-        public bool SupportsUnifiedMemory => Device.SupportsUnifiedAddressing;
+        public new bool SupportsUnifiedMemory => Device.SupportsUnifiedAddressing;
 
         /// <summary>
         /// Gets whether this accelerator supports page-locked memory.

@@ -41,7 +41,7 @@ namespace ILGPU.Memory.Unified
             get
             {
                 // Default implementation requires GetNativeBuffer to be implemented
-                var nativeBuffer = GetNativeBuffer(null);
+                var nativeBuffer = GetNativeBuffer(null!);
                 return nativeBuffer?.View ?? throw new InvalidOperationException("No native buffer available for view access");
             }
         }
@@ -50,13 +50,13 @@ namespace ILGPU.Memory.Unified
         {
             if (width * height > Length)
                 throw new ArgumentException("2D view dimensions exceed buffer size");
-            return View.As2DView(width, height);
+            return View.As2DView(new LongIndex2D(width, height));
         }
         public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth)
         {
             if (width * height * depth > Length)
                 throw new ArgumentException("3D view dimensions exceed buffer size");
-            return View.As3DView(width, height, depth);
+            return View.As3DView(new LongIndex3D(width, height, depth));
         }
         public virtual void CopyFromCPU(ReadOnlySpan<T> source)
         {
@@ -127,14 +127,13 @@ namespace ILGPU.Memory.Unified
         }
         public virtual UniversalBufferStats GetStats() =>
             // Default implementation returns basic stats
-            new()
-            {
-                SizeInBytes = SizeInBytes,
-                CurrentLocation = CurrentLocation,
-                Placement = Placement,
-                AccessCount = 0,
-                LastAccessTime = DateTime.UtcNow
-            };
+            new UniversalBufferStats(
+                SizeInBytes,
+                0, // migrationCount
+                0.0, // totalMigrationTimeMs  
+                0.0, // averageMigrationBandwidthGBps
+                1, // activeCopies
+                CurrentLocation);
 
         public void Dispose()
         {

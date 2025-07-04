@@ -73,17 +73,17 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the warp size (wavefront size on AMD).
         /// </summary>
-        public int WarpSize => Properties.WarpSize;
+        public new int WarpSize => Properties.WarpSize;
 
         /// <summary>
         /// Gets the maximum shared memory per block.
         /// </summary>
-        public long MaxSharedMemoryPerGroup => (long)Properties.SharedMemPerBlock;
+        public new long MaxSharedMemoryPerGroup => (long)Properties.SharedMemPerBlock;
 
         /// <summary>
         /// Gets the maximum constant memory size.
         /// </summary>
-        public long MaxConstantMemory => (long)Properties.TotalConstMem;
+        public new long MaxConstantMemory => (long)Properties.TotalConstMem;
 
         /// <summary>
         /// Gets the clock rate in KHz.

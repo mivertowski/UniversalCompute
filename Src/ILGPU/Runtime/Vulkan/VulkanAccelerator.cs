@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.IR.Analyses;
 using ILGPU.Runtime.Vulkan.Native;
 using ILGPU.Util;
 using System;
@@ -83,7 +84,9 @@ namespace ILGPU.Runtime.Vulkan
                 CreateLogicalDevice();
 
                 // Get compute queue
-                VulkanNative.GetDeviceQueue(LogicalDevice, ComputeQueueFamily, 0, out ComputeQueue);
+                VkQueue queue;
+                VulkanNative.GetDeviceQueue(LogicalDevice, ComputeQueueFamily, 0, out queue);
+                ComputeQueue = queue;
 
                 // Initialize device properties
                 Init();
@@ -119,7 +122,9 @@ namespace ILGPU.Runtime.Vulkan
 
             try
             {
-                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out Instance);
+                VkInstance instance;
+                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out instance);
+                Instance = instance;
                 VulkanException.ThrowIfFailed(result);
             }
             catch (DllNotFoundException)
@@ -167,7 +172,9 @@ namespace ILGPU.Runtime.Vulkan
                     enabledExtensionCount = 0
                 };
 
-                var result = VulkanNative.CreateDevice(Device.PhysicalDevice, ref deviceCreateInfo, IntPtr.Zero, out LogicalDevice);
+                VkDevice device;
+                var result = VulkanNative.CreateDevice(Device.PhysicalDevice, ref deviceCreateInfo, IntPtr.Zero, out device);
+                LogicalDevice = device;
                 VulkanException.ThrowIfFailed(result);
             }
             catch (Exception)
@@ -234,7 +241,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public MemoryInfo MemoryInfo => new(Device.MemorySize);
+        public MemoryInfo MemoryInfo => new(Device.MemorySize, Device.MemorySize, 0, 0, 0, false, false, false, 0, 0);
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.

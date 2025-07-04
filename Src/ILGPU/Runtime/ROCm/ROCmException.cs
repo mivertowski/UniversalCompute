@@ -122,6 +122,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);

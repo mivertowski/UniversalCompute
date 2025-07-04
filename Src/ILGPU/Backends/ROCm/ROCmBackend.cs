@@ -54,9 +54,9 @@ namespace ILGPU.Backends.ROCm
             ROCmCapabilities capabilities)
             : base(
                 context,
-                capabilities, // Use ROCm capabilities
                 BackendType.OpenCL, // Use OpenCL as base for now
-                ArgumentMapper.CreateDefault(context, capabilities))
+                capabilities, // Use ROCm capabilities
+                ArgumentMapper.CreateDefault(context))
         {
             InstructionSet = instructionSet;
             Capabilities = capabilities;
@@ -89,6 +89,8 @@ namespace ILGPU.Backends.ROCm
                 var compiledBinary = hipCompiler.CompileToHSAIL(hipSourceCode, entryPoint.Name);
 
                 var kernelInfo = new KernelInfo(
+                    0, // SharedMemory
+                    0, // ConstantMemory
                     new AllocaKindInformation(),
                     System.Collections.Immutable.ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
 
@@ -102,6 +104,8 @@ namespace ILGPU.Backends.ROCm
             {
                 // Fall back to placeholder binary for now
                 var kernelInfo = new KernelInfo(
+                    0, // SharedMemory
+                    0, // ConstantMemory
                     new AllocaKindInformation(),
                     System.Collections.Immutable.ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
 
