@@ -541,7 +541,8 @@ namespace ILGPU.MixedPrecision
         {
             if (accelerator.SupportsTensorCores())
             {
-                var supportedPrecisions = accelerator.GetSupportedTensorPrecisions();
+                // Materialize the collection to avoid multiple enumerations
+                var supportedPrecisions = accelerator.GetSupportedTensorPrecisions().ToList();
                 
                 if (supportedPrecisions.Contains(TensorPrecision.BF16))
                     return PrecisionMode.BFloat16;

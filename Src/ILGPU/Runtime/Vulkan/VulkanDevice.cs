@@ -48,7 +48,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public uint DeviceID => Properties.deviceID;
+        public uint DeviceIdentifier => Properties.deviceID;
 
         /// <summary>
         /// Gets the device type.
@@ -104,7 +104,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public new string Name => GetDeviceNameFromProperties() ?? $"Vulkan Device {DeviceID}";
+        public new string Name => GetDeviceNameFromProperties() ?? $"Vulkan Device {DeviceIdentifier}";
 
         /// <summary>
         /// Gets the total device memory in bytes.
@@ -192,7 +192,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device ID.
         /// </summary>
-        public override DeviceId DeviceId => new(DeviceID, AcceleratorType.Vulkan);
+        public override DeviceId DeviceId => new(DeviceIdentifier, AcceleratorType.Vulkan);
 
         /// <summary>
         /// Creates an accelerator for this device.
@@ -353,8 +353,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device type description.
         /// </summary>
-        /// <returns>Device type description.</returns>
-        public string GetDeviceTypeDescription() => DeviceType switch
+        public string DeviceTypeDescription => DeviceType switch
         {
             VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU => "Discrete GPU",
             VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU => "Integrated GPU",
@@ -366,13 +365,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets a human-readable string of device capabilities.
         /// </summary>
-        /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString() => $"API {APIVersion >> 22}.{(APIVersion >> 12) & 0x3FF}, " +
+        public string CapabilitiesString => $"API {APIVersion >> 22}.{(APIVersion >> 12) & 0x3FF}, " +
                    $"Driver 0x{DriverVersion:X8}, " +
                    $"{NumMultiprocessors} CUs, " +
                    $"Subgroup {WarpSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
-                   $"{GetDeviceTypeDescription()}";
+                   $"{DeviceTypeDescription}";
 
         /// <summary>
         /// Extracts device name from properties structure.
@@ -418,7 +416,7 @@ namespace ILGPU.Runtime.Vulkan
         /// </summary>
         /// <returns>The string representation.</returns>
         public override string ToString() => 
-            $"Vulkan Device: {Name} ({GetDeviceTypeDescription()}, {MemorySize / (1024 * 1024)} MB)";
+            $"Vulkan Device: {Name} ({DeviceTypeDescription}, {MemorySize / (1024 * 1024)} MB)";
 
         /// <summary>
         /// Returns the hash code of this device.

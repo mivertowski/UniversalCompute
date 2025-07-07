@@ -600,6 +600,7 @@ namespace ILGPU.Runtime.Vulkan
     /// </summary>
     public class VulkanException : AcceleratorException
     {
+        public VulkanException() { }
         public VulkanException(string message) : base(message) { }
         public VulkanException(string message, Exception innerException) : base(message, innerException) { }
 

@@ -190,10 +190,35 @@ namespace ILGPU.Core
             Accelerator accelerator) 
             where T : unmanaged
         {
+#pragma warning disable CA2000 // Dispose objects before losing scope - Complex resource management with conditional disposal handled in finally block
             var leftUnified = ConvertToUnified<T>(left, accelerator);
             var rightUnified = ConvertToUnified<T>(right, accelerator);
+#pragma warning restore CA2000
             
-            return operation(leftUnified, rightUnified);
+            // Track which tensors we created vs passed through
+            var createdLeft = !ReferenceEquals(leftUnified, left);
+            var createdRight = !ReferenceEquals(rightUnified, right);
+            
+            try
+            {
+                var result = operation(leftUnified, rightUnified);
+                
+                // If the result is one of our input tensors, transfer ownership to caller
+                if (ReferenceEquals(result, leftUnified))
+                    createdLeft = false;
+                if (ReferenceEquals(result, rightUnified))
+                    createdRight = false;
+                    
+                return result;
+            }
+            finally
+            {
+                // Only dispose created tensors that weren't returned as the result
+                if (createdLeft)
+                    leftUnified.Dispose();
+                if (createdRight)
+                    rightUnified.Dispose();
+            }
         }
 
         /// <summary>

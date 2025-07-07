@@ -272,7 +272,10 @@ namespace ILGPU.Numerics
             // Choose optimal execution based on tensor sizes and capabilities
             if (ShouldUseTensorCores())
                 return await MatMulTensorCoreAsync(other, ct).ConfigureAwait(false);
-            else return ShouldUseGpu() ? await MatMulGpuAsync(otherTensor, ct).ConfigureAwait(false) : MatMulSimd(other);
+            else 
+#pragma warning disable CA2000 // Dispose objects before losing scope - returned tensor ownership transferred to caller
+                return ShouldUseGpu() ? await MatMulGpuAsync(otherTensor, ct).ConfigureAwait(false) : MatMulSimd(other);
+#pragma warning restore CA2000
         }
 
         /// <inheritdoc/>
@@ -332,7 +335,9 @@ namespace ILGPU.Numerics
                 throw new ArgumentException("Tensors must have the same shape for addition");
 
             // Choose optimal execution strategy
+#pragma warning disable CA2000 // Dispose objects before losing scope - returned tensor ownership transferred to caller
             return ShouldUseGpu() ? await AddGpuAsync(otherTensor, ct).ConfigureAwait(false) : AddSimd(other);
+#pragma warning restore CA2000
         }
 
         /// <inheritdoc/>

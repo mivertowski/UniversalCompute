@@ -48,7 +48,7 @@ namespace ILGPU.Runtime.LINQ
         /// <returns>The execution result.</returns>
         public object Execute(Expression expression)
         {
-            var visitor = new GPUQueryExpressionVisitor(accelerator, stream);
+            var visitor = new GPUQueryExpressionVisitor(accelerator);
             return visitor.Visit(expression);
         }
 
@@ -61,7 +61,7 @@ namespace ILGPU.Runtime.LINQ
         public IEnumerable<T> Execute<T>(Expression expression)
             where T : unmanaged
         {
-            var visitor = new GPUQueryExpressionVisitor(accelerator, stream);
+            var visitor = new GPUQueryExpressionVisitor(accelerator);
             var result = visitor.Visit(expression);
             
             if (result is MemoryBuffer1D<T, Stride1D.Dense> buffer)
@@ -85,7 +85,7 @@ namespace ILGPU.Runtime.LINQ
         public void ExecuteTo<T>(Expression expression, MemoryBuffer1D<T, Stride1D.Dense> outputBuffer)
             where T : unmanaged
         {
-            var visitor = new GPUQueryExpressionVisitor(accelerator, stream);
+            var visitor = new GPUQueryExpressionVisitor(accelerator);
             var result = visitor.Visit(expression);
             
             if (result is MemoryBuffer1D<T, Stride1D.Dense> sourceBuffer)

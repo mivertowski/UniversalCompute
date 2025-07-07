@@ -55,7 +55,7 @@ namespace ILGPU.Backends.WebGPU
             : base(context, device)
         {
             WebGPUDevice = webgpuDevice ?? throw new ArgumentNullException(nameof(webgpuDevice));
-            Queue = WebGPUDevice.GetQueue();
+            Queue = WebGPUDevice.Queue;
             Capabilities = WebGPUCapabilities.Query(WebGPUDevice);
 
             // Initialize accelerator properties

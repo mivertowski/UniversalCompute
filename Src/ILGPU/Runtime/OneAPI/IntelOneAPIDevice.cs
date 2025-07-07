@@ -392,8 +392,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the architecture description.
         /// </summary>
-        /// <returns>Architecture description.</returns>
-        public string GetArchitectureDescription() => Architecture switch
+        public string ArchitectureDescription => Architecture switch
         {
             IntelGPUArchitecture.XeHPC => "Xe-HPC (Data Center)",
             IntelGPUArchitecture.XeHPG => "Xe-HPG (Intel Arc)",
@@ -407,8 +406,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets a human-readable string of device capabilities.
         /// </summary>
-        /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString() => $"{GetArchitectureDescription()}, " +
+        public string CapabilitiesString => $"{ArchitectureDescription}, " +
                    $"{ComputeUnits} EUs, " +
                    $"Subgroup {WarpSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
@@ -425,7 +423,7 @@ namespace ILGPU.Runtime.OneAPI
         /// </summary>
         /// <returns>The string representation.</returns>
         public override string ToString() => 
-            $"Intel OneAPI Device: {Name} ({GetArchitectureDescription()}, {MemorySize / (1024 * 1024)} MB)";
+            $"Intel OneAPI Device: {Name} ({ArchitectureDescription}, {MemorySize / (1024 * 1024)} MB)";
 
         /// <summary>
         /// Returns the hash code of this device.

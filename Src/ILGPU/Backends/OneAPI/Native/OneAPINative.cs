@@ -41,9 +41,7 @@ namespace ILGPU.Backends.OneAPI.Native
     {
         #region Constants
 
-        private const string SYCLLibrary = "sycl";
         private const string OpenCLLibrary = "OpenCL";
-        private const string LevelZeroLibrary = "ze_loader";
 
         #endregion
 

@@ -420,7 +420,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the native pointer to the buffer data as void*.
         /// </summary>
-        public unsafe void* GetNativePtr() => (void*)_nativePtr;
+        public unsafe void* RawPtr => (void*)_nativePtr;
 
         /// <summary>
         /// Sets the contents of this buffer to the given byte value.

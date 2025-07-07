@@ -81,7 +81,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the size of the SPIR-V binary in bytes.
         /// </summary>
-        public int BinarySize => SPIRVBinary.Length;
+        public int BinarySize => SPIRVBinary.Count;
 
         #endregion
 
@@ -130,10 +130,10 @@ namespace ILGPU.Runtime.OneAPI
             }
 
             // Compare binary content
-            if (SPIRVBinary.Length != other.SPIRVBinary.Length)
+            if (SPIRVBinary.Count != other.SPIRVBinary.Count)
                 return false;
 
-            for (int i = 0; i < SPIRVBinary.Length; i++)
+            for (int i = 0; i < SPIRVBinary.Count; i++)
             {
                 if (SPIRVBinary[i] != other.SPIRVBinary[i])
                     return false;

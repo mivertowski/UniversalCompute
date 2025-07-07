@@ -331,8 +331,7 @@ namespace ILGPU
         /// <summary>
         /// Gets all compiled kernels.
         /// </summary>
-        /// <returns>A collection of all compiled kernel entries.</returns>
-        public IEnumerable<CompiledKernelEntry> GetAllCompiledKernels() => compiledKernels.Values;
+        public IEnumerable<CompiledKernelEntry> AllCompiledKernels => compiledKernels.Values;
 
         /// <summary>
         /// Gets the complete generated source code.

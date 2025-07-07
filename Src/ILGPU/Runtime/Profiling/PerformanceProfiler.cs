@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -578,12 +579,12 @@ namespace ILGPU.Runtime.Profiling
             return metrics;
         }
 
-        private static List<PerformanceRecommendation> GenerateRecommendations(
+        private static Collection<PerformanceRecommendation> GenerateRecommendations(
             PerformanceMetrics metrics,
             List<KernelExecutionRecord> kernelExecutions,
             List<MemoryOperationRecord> memoryOperations)
         {
-            var recommendations = new List<PerformanceRecommendation>();
+            var recommendations = new Collection<PerformanceRecommendation>();
 
             // Analyze kernel performance
             if (metrics.Kernels.CompilationCacheHitRatio < 0.8)

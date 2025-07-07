@@ -178,7 +178,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
             // (buffers, textures, uniform data, etc.) to the compute shader
             
             // Create bind group layout (simplified)
-            var layout = new WebGPUBindGroupLayout(null!); // Placeholder
+            using var layout = new WebGPUBindGroupLayout(null!); // Placeholder
             
             // Create bind group entries from kernel parameters
             var entries = CreateBindGroupEntries(parameters);

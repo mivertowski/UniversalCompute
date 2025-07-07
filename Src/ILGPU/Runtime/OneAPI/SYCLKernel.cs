@@ -18,6 +18,7 @@
 using ILGPU.Runtime.OneAPI.Native;
 using ILGPU.Util;
 using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -63,11 +64,12 @@ namespace ILGPU.Runtime.OneAPI
             try
             {
                 // Create SYCL kernel from SPIR-V binary
+                var spirvArray = kernel.SPIRVBinary.ToArray();
                 var result = SYCLNative.CreateKernelFromSPIRV(
                     accelerator.ContextHandle,
                     [accelerator.DeviceHandle],
                     1,
-                    kernel.SPIRVBinary,
+                    spirvArray,
                     new UIntPtr((uint)kernel.BinarySize),
                     kernel.Name,
                     out kernelPtr);
@@ -142,7 +144,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <param name="accelerator">The accelerator.</param>
         /// <param name="kernel">The compiled kernel.</param>
         /// <returns>True if kernel creation succeeded; otherwise, false.</returns>
-        private bool TryCreateKernelFromSource(IntelOneAPIAccelerator accelerator, SYCLCompiledKernel kernel)
+        private static bool TryCreateKernelFromSource(IntelOneAPIAccelerator accelerator, SYCLCompiledKernel kernel)
         {
 #pragma warning disable CA1031 // Do not catch general exception types
             try

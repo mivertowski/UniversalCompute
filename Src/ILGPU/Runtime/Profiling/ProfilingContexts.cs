@@ -90,6 +90,9 @@ namespace ILGPU.Runtime.Profiling
             {
                 RecordExecution(stopwatch.Elapsed);
             }
+            
+            // Note: profiler is not disposed here as it's not owned by this context
+            // The profiler is a shared resource passed in from the parent scope
         }
     }
 
@@ -171,6 +174,9 @@ namespace ILGPU.Runtime.Profiling
 
             // If completion wasn't explicitly recorded, record it now
             RecordCompletion(stopwatch.Elapsed);
+            
+            // Note: profiler is not disposed here as it's not owned by this context
+            // The profiler is a shared resource passed in from the parent scope
         }
     }
 

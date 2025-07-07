@@ -129,7 +129,7 @@ namespace ILGPU.Runtime.OneAPI
         /// Unregisters host memory from SYCL.
         /// </summary>
         /// <param name="hostPtr">The host memory pointer.</param>
-        private void TryUnregisterHostMemory(IntPtr hostPtr)
+        private static void TryUnregisterHostMemory(IntPtr hostPtr)
         {
 #pragma warning disable CA1031 // Do not catch general exception types
             try

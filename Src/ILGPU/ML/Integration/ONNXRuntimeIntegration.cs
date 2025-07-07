@@ -31,6 +31,8 @@ namespace ILGPU.ML.Integration
     /// </summary>
     public class ILGPUUniversalExecutionProvider : IDisposable
     {
+        private static readonly string[] DefaultOutputNames = new[] { "output" };
+        
         private readonly AdaptiveScheduler _scheduler;
         private readonly UniversalComputeEngine _computeEngine;
         private readonly ModelOptimizer _modelOptimizer;
@@ -73,7 +75,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets performance statistics for the execution provider.
         /// </summary>
-        public static ExecutionProviderStats Stats => UniversalComputeEngine.GetStats();
+        public static ExecutionProviderStats Stats => UniversalComputeEngine.Stats;
 
         /// <summary>
         /// Runs inference on the ONNX model with automatic hardware optimization.
@@ -339,7 +341,7 @@ namespace ILGPU.ML.Integration
             
             for (int i = 0; i < 10; i++)
             {
-                await RunAsync(modelPath, sampleInputs, new[] { "output" }).ConfigureAwait(false);
+                await RunAsync(modelPath, sampleInputs, DefaultOutputNames).ConfigureAwait(false);
             }
 
             var endTime = DateTime.UtcNow;
@@ -352,10 +354,13 @@ namespace ILGPU.ML.Integration
 
         private static WorkloadAnalysis AnalyzeWorkloadSamples(IEnumerable<WorkloadSample> samples)
         {
+            // Materialize the collection to avoid multiple enumerations
+            var samplesList = samples.ToList();
+            
             // Analyze common patterns in workload samples
-            var batchSizes = samples.Select(s => s.BatchSize).ToList();
-            var modelSizes = samples.Select(s => s.ModelComplexity).ToList();
-            var frequencies = samples.Select(s => s.Frequency).ToList();
+            var batchSizes = samplesList.Select(s => s.BatchSize).ToList();
+            var modelSizes = samplesList.Select(s => s.ModelComplexity).ToList();
+            var frequencies = samplesList.Select(s => s.Frequency).ToList();
 
             return new WorkloadAnalysis(
                 TimeSpan.FromMilliseconds(batchSizes.Count != 0 ? batchSizes.Average() * 10 : 10),

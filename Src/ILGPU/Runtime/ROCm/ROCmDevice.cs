@@ -292,8 +292,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets a human-readable string of device capabilities.
         /// </summary>
-        /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString() => $"Compute {ComputeCapability}, {MultiprocessorCount} CUs, " +
+        public string CapabilitiesString => $"Compute {ComputeCapability}, {MultiprocessorCount} CUs, " +
                    $"{MaxThreadsPerMultiprocessor} threads/CU, " +
                    $"Warp {WarpSize}, {MemorySize / (1024 * 1024)} MB, " +
                    $"{ClockRate / 1000} MHz, {Architecture}";

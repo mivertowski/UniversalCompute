@@ -62,7 +62,7 @@ namespace ILGPU.Runtime.MemoryPooling
         /// </summary>
         /// <param name="buffer">The buffer to return.</param>
         /// <param name="clearBuffer">Whether to clear the buffer contents.</param>
-        void Return(IPooledMemoryBuffer<T> buffer, bool clearBuffer = false);
+        void ReturnBuffer(IPooledMemoryBuffer<T> buffer, bool clearBuffer = false);
 
         /// <summary>
         /// Trims unused buffers from the pool.

@@ -334,13 +334,13 @@ namespace ILGPU.Backends.Vulkan
 #pragma warning disable CA1031 // Do not catch general exception types
             try
             {
-                var vulkanInstance = VulkanInstance.Create();
+                using var vulkanInstance = VulkanInstance.Create();
                 var physicalDevices = vulkanInstance.EnumeratePhysicalDevices();
                 
                 if (deviceIndex >= physicalDevices.Length) return null;
 
                 var physicalDevice = physicalDevices[deviceIndex];
-                var vulkanDevice = physicalDevice.CreateLogicalDevice();
+                using var vulkanDevice = physicalDevice.CreateLogicalDevice();
 
                 // TODO: Implement proper Vulkan device creation
                 // For now, return null as Vulkan integration is not complete
@@ -365,7 +365,7 @@ namespace ILGPU.Backends.Vulkan
 #pragma warning disable CA1031 // Do not catch general exception types
             try
             {
-                var vulkanInstance = VulkanInstance.Create();
+                using var vulkanInstance = VulkanInstance.Create();
                 var physicalDevices = vulkanInstance.EnumeratePhysicalDevices();
                 var accelerators = new VulkanAccelerator[physicalDevices.Length];
 

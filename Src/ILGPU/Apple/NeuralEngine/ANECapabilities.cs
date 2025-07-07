@@ -326,7 +326,7 @@ namespace ILGPU.Apple.NeuralEngine
         public override string ToString() => $"Apple Neural Engine {Generation}: {MaxTOPS:F1} TOPS, " +
                    $"FP16={SupportsFloat16}, INT8={SupportsInt8}, " +
                    $"Conv={SupportsConvolution}, Attn={SupportsAttention}, " +
-                   $"Efficiency={GetPowerEfficiency():F1} TOPS/W";
+                   $"Efficiency={PowerEfficiency:F1} TOPS/W";
     }
 
     /// <summary>

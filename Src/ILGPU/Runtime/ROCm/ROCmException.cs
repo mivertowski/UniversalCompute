@@ -92,6 +92,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+        [Obsolete("SYSLIB0050: Formatter-based serialization is obsolete", DiagnosticId = "SYSLIB0050")]
 #pragma warning disable SYSLIB0050 // Type or member is obsolete
         protected ROCmException(SerializationInfo info, StreamingContext context)
             : base(info, context)

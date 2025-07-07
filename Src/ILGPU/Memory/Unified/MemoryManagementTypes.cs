@@ -479,6 +479,7 @@ namespace ILGPU.Memory.Unified
             if (disposing)
             {
                 _accelerators?.Clear();
+                _usageTracker?.Dispose();
             }
         }
     }

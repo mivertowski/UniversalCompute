@@ -642,7 +642,8 @@ namespace ILGPU.FFT
         {
             if (!_disposed && disposing)
             {
-                // No persistent resources to clean up in this implementation
+                // Note: _cudaAccelerator is not disposed here as it's passed in from the parent
+                // and is not owned by this class
                 _disposed = true;
             }
         }

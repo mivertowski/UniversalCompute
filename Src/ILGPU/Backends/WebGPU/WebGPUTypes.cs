@@ -26,7 +26,7 @@ namespace ILGPU.Backends.WebGPU
     /// WebGPU buffer usage flags.
     /// </summary>
     [Flags]
-    public enum WebGPUBufferUsage : uint
+    public enum WebGPUBufferUsage : int
     {
         /// <summary>
         /// Buffer can be mapped for reading.
@@ -525,16 +525,19 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Gets the device queue.
         /// </summary>
-        public static WebGPUQueue GetQueue()
+        public static WebGPUQueue Queue
         {
-#if BROWSER
-            if (_jsDevice != null)
+            get
             {
-                var jsQueue = _jsDevice.GetPropertyAsJSObject("queue");
-                return new WebGPUQueue(jsQueue!);
-            }
+#if BROWSER
+                if (_jsDevice != null)
+                {
+                    var jsQueue = _jsDevice.GetPropertyAsJSObject("queue");
+                    return new WebGPUQueue(jsQueue!);
+                }
 #endif
-            throw new InvalidOperationException("Device not available");
+                throw new InvalidOperationException("Device not available");
+            }
         }
 
         /// <summary>
@@ -601,7 +604,7 @@ namespace ILGPU.Backends.WebGPU
             {
                 var descriptor = JSHost.GlobalThis.GetPropertyAsJSObject("Object").Invoke("create", JSHost.GlobalThis.GetPropertyAsJSObject("Object"));
                 descriptor.SetProperty("size", (double)size);
-                descriptor.SetProperty("usage", (uint)usage);
+                descriptor.SetProperty("usage", (int)usage);
                 
                 var jsBuffer = _jsDevice.Invoke("createBuffer", descriptor);
                 return new WebGPUBuffer(jsBuffer, size, usage, null!);
@@ -815,7 +818,7 @@ namespace ILGPU.Backends.WebGPU
             _usage = WebGPUBufferUsage.Storage;
         }
 
-        public unsafe void* GetNativePtr() => throw new NotSupportedException("WebGPU buffers don't expose raw pointers");
+        public unsafe void* RawPtr => throw new NotSupportedException("WebGPU buffers don't expose raw pointers");
 
         public void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length) =>
             // WebGPU buffer operations are asynchronous and handled through the queue

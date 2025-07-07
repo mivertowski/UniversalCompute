@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace ILGPU.Runtime.Scheduling
 {
@@ -54,11 +55,11 @@ namespace ILGPU.Runtime.Scheduling
 
     public class ExecutionSchedule
     {
-        public List<ScheduledNode> Nodes { get; } = [];
+        public Collection<ScheduledNode> Nodes { get; } = [];
         public TimeSpan TotalDuration { get; set; }
         public double Efficiency { get; set; }
-        public List<ParallelExecutionGroup> ParallelGroups { get; } = [];
-        public List<ScheduledExecutionLevel> Levels { get; } = [];
+        public Collection<ParallelExecutionGroup> ParallelGroups { get; } = [];
+        public Collection<ScheduledExecutionLevel> Levels { get; } = [];
 
         public ExecutionSchedule()
         {
@@ -79,7 +80,7 @@ namespace ILGPU.Runtime.Scheduling
         public TimeSpan StartTime { get; set; }
         public TimeSpan Duration { get; set; }
         public Accelerator TargetAccelerator { get; set; } = null!;
-        public List<string> Dependencies { get; } = [];
+        public Collection<string> Dependencies { get; } = [];
         public double EstimatedTimeMs { get; set; }
 
         public ScheduledNode()
@@ -96,7 +97,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class ParallelExecutionGroup
     {
-        public List<ScheduledNode> Nodes { get; } = [];
+        public Collection<ScheduledNode> Nodes { get; } = [];
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
     }
@@ -104,7 +105,7 @@ namespace ILGPU.Runtime.Scheduling
     public class ScheduledExecutionLevel
     {
         public int Level { get; set; }
-        public List<ScheduledNode> Nodes { get; } = [];
+        public Collection<ScheduledNode> Nodes { get; } = [];
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public double ParallelismFactor { get; set; }
@@ -125,7 +126,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class MemoryTransferPlan
     {
-        public List<MemoryTransfer> Transfers { get; } = [];
+        public Collection<MemoryTransfer> Transfers { get; } = [];
         public long TotalBytes { get; set; }
         public TimeSpan EstimatedTime { get; set; }
         public double Bandwidth { get; set; }
@@ -190,7 +191,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class LoadBalancer : IDisposable
     {
-        private readonly List<Accelerator> accelerators;
+        private readonly Collection<Accelerator> accelerators;
         private readonly Dictionary<Accelerator, double> currentLoads;
         private bool disposed;
 
@@ -202,7 +203,7 @@ namespace ILGPU.Runtime.Scheduling
 
         public LoadBalancer(IEnumerable<Accelerator> accelerators)
         {
-            this.accelerators = [.. accelerators];
+            this.accelerators = new Collection<Accelerator>(accelerators.ToList());
             currentLoads = [];
             foreach (var acc in this.accelerators)
             {
@@ -274,7 +275,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class PerformanceProfiler : IDisposable
     {
-        private readonly Dictionary<string, List<TimeSpan>> executionTimes;
+        private readonly Dictionary<string, Collection<TimeSpan>> executionTimes;
         private readonly Dictionary<string, DateTime> activeExecutions;
         private bool disposed;
 

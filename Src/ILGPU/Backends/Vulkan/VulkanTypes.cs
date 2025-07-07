@@ -47,7 +47,7 @@ namespace ILGPU.Backends.Vulkan
     /// Vulkan buffer usage flags.
     /// </summary>
     [Flags]
-    public enum VulkanBufferUsage : uint
+    public enum VulkanBufferUsage : int
     {
         /// <summary>
         /// Transfer source buffer.
@@ -265,7 +265,7 @@ namespace ILGPU.Backends.Vulkan
     /// <summary>
     /// Vulkan device types.
     /// </summary>
-    public enum VulkanDeviceType : uint
+    public enum VulkanDeviceType : int
     {
         /// <summary>
         /// Other device type.
@@ -725,7 +725,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Gets the native buffer pointer.
         /// </summary>
-        public unsafe void* GetNativePtr() => (void*)_buffer;
+        public unsafe void* RawPtr => (void*)_buffer;
 
         /// <summary>
         /// Copies data from CPU memory to this buffer.

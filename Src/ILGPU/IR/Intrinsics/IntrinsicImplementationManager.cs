@@ -210,7 +210,7 @@ namespace ILGPU.IR.Intrinsics
         /// </summary>
         public IntrinsicImplementationManager()
         {
-            var backendType = Enum.GetValues(typeof(BackendType));
+            var backendType = Enum.GetValues<BackendType>();
             containers = new BackendContainer[backendType.Length];
             for (int i = 0, e = containers.Length; i < e; ++i)
                 containers[i] = BackendContainer.Create();

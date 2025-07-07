@@ -18,6 +18,7 @@
 using ILGPU.ML.Integration;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -439,10 +440,10 @@ namespace ILGPU.Runtime.Scheduling
                     _devices[assignments[node]], 
                     EstimateExecutionTime(node, assignments[node]))).ToList();
 
-                scheduledLevels.Add(new ScheduledExecutionLevel(i, scheduledNodes));
+                scheduledLevels.Add(new ScheduledExecutionLevel(i, new Collection<ScheduledNode>(scheduledNodes)));
             }
 
-            return new ExecutionSchedule([.. scheduledLevels.SelectMany(l => l.Nodes)]);
+            return new ExecutionSchedule(new Collection<ScheduledNode>(scheduledLevels.SelectMany(l => l.Nodes).ToList()));
         }
 
         private MemoryTransferPlan OptimizeMemoryTransfers(
@@ -468,7 +469,7 @@ namespace ILGPU.Runtime.Scheduling
                 }
             }
 
-            return new MemoryTransferPlan(transfers);
+            return new MemoryTransferPlan(new Collection<MemoryTransfer>(transfers));
         }
 
         private async Task ExecuteMemoryTransfersAsync(MemoryTransferPlan plan)

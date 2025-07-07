@@ -1052,7 +1052,7 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Gets execution provider statistics.
         /// </summary>
-        public static ExecutionProviderStats GetStats() => new()
+        public static ExecutionProviderStats Stats => new()
         {
             ProviderName = "UniversalComputeEngine",
             ExecutionCount = 0,

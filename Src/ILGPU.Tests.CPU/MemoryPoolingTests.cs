@@ -62,7 +62,7 @@ namespace ILGPU.Tests.CPU
             Assert.False(buffer.IsReturned);
 
             // Return the buffer
-            pool.Return(buffer);
+            pool.ReturnBuffer(buffer);
             Assert.True(buffer.IsReturned);
         }
 
@@ -74,13 +74,13 @@ namespace ILGPU.Tests.CPU
             // Rent and return a buffer
             var buffer1 = pool.Rent(1000);
             var originalPtr = buffer1.NativePtr;
-            pool.Return(buffer1);
+            pool.ReturnBuffer(buffer1);
 
             // Rent again - should get the same buffer back
             var buffer2 = pool.Rent(1000);
             Assert.Equal(originalPtr, buffer2.NativePtr);
 
-            pool.Return(buffer2);
+            pool.ReturnBuffer(buffer2);
         }
 
         [Fact]
@@ -96,8 +96,8 @@ namespace ILGPU.Tests.CPU
             Assert.Equal(2, stats.TotalAllocations);
             Assert.True(stats.UsedSizeBytes > 0);
 
-            pool.Return(buffer1);
-            pool.Return(buffer2);
+            pool.ReturnBuffer(buffer1);
+            pool.ReturnBuffer(buffer2);
 
             stats = pool.GetStatistics();
             Assert.Equal(0, stats.RentedBuffers);
@@ -116,8 +116,8 @@ namespace ILGPU.Tests.CPU
             // Both should be same bucket size (rounded up)
             Assert.Equal(buffer1.ActualLength, buffer2.ActualLength);
 
-            pool.Return(buffer1);
-            pool.Return(buffer2);
+            pool.ReturnBuffer(buffer1);
+            pool.ReturnBuffer(buffer2);
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace ILGPU.Tests.CPU
             // This should throw
             Assert.Throws<ArgumentException>(() => pool.Rent(2048));
 
-            pool.Return(buffer1);
+            pool.ReturnBuffer(buffer1);
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace ILGPU.Tests.CPU
                 
                 var buffer = pool.Rent(1000);
                 Assert.NotNull(buffer);
-                pool.Return(buffer);
+                pool.ReturnBuffer(buffer);
             }
         }
 
@@ -196,7 +196,7 @@ namespace ILGPU.Tests.CPU
             for (int i = 0; i < 5; i++)
             {
                 var buffer = pool.Rent(1000);
-                pool.Return(buffer);
+                pool.ReturnBuffer(buffer);
             }
 
             var statsBefore = pool.GetStatistics();
@@ -218,7 +218,7 @@ namespace ILGPU.Tests.CPU
             Assert.NotNull(buffer);
             Assert.True(buffer.Length >= 1000);
 
-            pool.Return(buffer);
+            pool.ReturnBuffer(buffer);
         }
 
         [Fact]
@@ -247,7 +247,7 @@ namespace ILGPU.Tests.CPU
             var buffer = pool.Rent(1000);
             Assert.NotNull(buffer);
             
-            pool.Return(buffer);
+            pool.ReturnBuffer(buffer);
         }
     }
 }

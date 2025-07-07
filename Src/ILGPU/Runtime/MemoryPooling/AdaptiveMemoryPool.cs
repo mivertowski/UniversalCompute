@@ -108,7 +108,9 @@ namespace ILGPU.Runtime.MemoryPooling
             Interlocked.Increment(ref totalMisses);
             Interlocked.Increment(ref totalAllocations);
 
+#pragma warning disable CA2000 // Dispose objects before losing scope - Buffer ownership transferred to PooledBuffer or disposed in catch block
             var buffer = accelerator.Allocate1D<T>(bucketSize);
+#pragma warning restore CA2000
             PooledBuffer newPooledBuffer;
             try
             {
@@ -136,7 +138,7 @@ namespace ILGPU.Runtime.MemoryPooling
             await Task.Run(() => Rent(minLength), ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public void Return(IPooledMemoryBuffer<T> buffer, bool clearBuffer = false)
+        public void ReturnBuffer(IPooledMemoryBuffer<T> buffer, bool clearBuffer = false)
         {
             if (buffer is not PooledBuffer pooledBuffer || pooledBuffer.Pool != this)
                 throw new ArgumentException("Buffer does not belong to this pool");
@@ -189,7 +191,9 @@ namespace ILGPU.Runtime.MemoryPooling
                 var minToKeep = GetMinBuffersToKeep(bucketSize);
                 var keptCount = 0;
 
+#pragma warning disable CA2000 // Dispose objects before losing scope - Buffers either kept for reuse or disposed in next loop
                 while (queue.TryDequeue(out var buffer) && keptCount < minToKeep)
+#pragma warning restore CA2000
                 {
                     toKeep.Add(buffer);
                     keptCount++;
@@ -347,7 +351,7 @@ namespace ILGPU.Runtime.MemoryPooling
                 if (size * Unsafe.SizeOf<T>() <= config.MaxBufferSizeBytes)
                 {
                     var buffer = Rent(size);
-                    Return(buffer);
+                    ReturnBuffer(buffer);
                 }
             }
         }
@@ -426,7 +430,7 @@ namespace ILGPU.Runtime.MemoryPooling
             {
                 if (!IsReturned && Pool is AdaptiveMemoryPool<T> pool)
                 {
-                    pool.Return(this, clearBuffer);
+                    pool.ReturnBuffer(this, clearBuffer);
                 }
             }
 

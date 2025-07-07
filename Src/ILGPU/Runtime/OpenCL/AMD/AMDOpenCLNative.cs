@@ -36,12 +36,6 @@ namespace ILGPU.Runtime.OpenCL.AMD
     {
         #region Constants
 
-#if WINDOWS
-        private const string OpenCLLibrary = "OpenCL";
-#else
-        private const string OpenCLLibrary = "libOpenCL.so.1";
-#endif
-
         #endregion
 
         #region AMD Platform Detection

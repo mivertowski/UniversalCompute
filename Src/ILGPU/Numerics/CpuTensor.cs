@@ -200,7 +200,7 @@ namespace ILGPU.Numerics
             for (int i = 0; i < Rank; i++)
             {
                 if (indices[i] < 0 || indices[i] >= Shape[i])
-                    throw new IndexOutOfRangeException($"Index {indices[i]} is out of range for dimension {i} (size {Shape[i]}).");
+                    throw new ArgumentOutOfRangeException(nameof(indices), indices[i], $"Index {indices[i]} is out of range for dimension {i} (size {Shape[i]}).");
 
                 index += indices[i] * _strides[i];
             }
