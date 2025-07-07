@@ -38,12 +38,8 @@ namespace ILGPU.Runtime.OpenCL.AMD
 
 #if WINDOWS
         private const string OpenCLLibrary = "OpenCL";
-        private const string AMDCalLibrary = "amdcalrt"; // AMD CAL runtime
-        private const string AMDAppProfilesLibrary = "amdappsdk";
 #else
         private const string OpenCLLibrary = "libOpenCL.so.1";
-        private const string AMDCalLibrary = "libamdhsart64.so"; // AMD HSA runtime  
-        private const string AMDAppProfilesLibrary = "libamdsdk64.so";
 #endif
 
         #endregion

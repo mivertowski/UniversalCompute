@@ -300,8 +300,6 @@ namespace ILGPU.FFT
 
         private const int IPP_FFT_DIV_FWD_BY_N = 1;
         private const int IPP_FFT_DIV_INV_BY_N = 2;
-        private const int IPP_FFT_DIV_BY_SQRTN = 4;
-        private const int IPP_FFT_NODIV_BY_ANY = 8;
 
         #endregion
 
@@ -468,7 +466,7 @@ namespace ILGPU.FFT
         {
             if (!_disposed && disposing)
             {
-                // No persistent resources to clean up
+                _cpuAccelerator?.Dispose();
                 _disposed = true;
             }
         }

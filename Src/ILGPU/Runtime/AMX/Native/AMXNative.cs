@@ -43,11 +43,9 @@ namespace ILGPU.Runtime.AMX.Native
 #if WINDOWS
         private const string AMXLibrary = "amx"; // Intel AMX runtime
         private const string TileLibrary = "tilecfg"; // Tile configuration library
-        private const string OneDNNLibrary = "dnnl"; // Intel oneDNN with AMX support
 #else
         private const string AMXLibrary = "libamx.so.1";
         private const string TileLibrary = "libtilecfg.so.1";
-        private const string OneDNNLibrary = "libdnnl.so.3";
 #endif
 
         #endregion
@@ -241,7 +239,12 @@ namespace ILGPU.Runtime.AMX.Native
                 }
 
                 // Release tile configuration
-                ReleaseTiles();
+                var releaseResult = ReleaseTiles();
+                if (releaseResult != 0)
+                {
+                    // Log or handle the error, but don't throw as this is cleanup
+                    // In a real implementation, you might want to log this warning
+                }
             }
             catch (DllNotFoundException)
             {

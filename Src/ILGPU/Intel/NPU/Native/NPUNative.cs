@@ -40,10 +40,8 @@ namespace ILGPU.Intel.NPU.Native
 
 #if WINDOWS
         private const string OpenVINOLibrary = "openvino";
-        private const string NPUDriverLibrary = "NPU_Driver";
 #else
         private const string OpenVINOLibrary = "libopenvino.so.2520";
-        private const string NPUDriverLibrary = "libNPU_Driver.so";
 #endif
 
         #endregion

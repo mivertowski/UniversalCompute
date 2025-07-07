@@ -270,12 +270,16 @@ namespace ILGPU.FFT
             {
                 if (IPPCapabilities.DetectIPP())
                 {
-                    var cpuAccelerator = _context.CreateCPUAccelerator(0, CPUAcceleratorMode.Auto);
-                    using var ippFFT = new IPPFFTAccelerator(cpuAccelerator);
+                    using var cpuAccelerator = _context.CreateCPUAccelerator(0, CPUAcceleratorMode.Auto);
+                    var ippFFT = new IPPFFTAccelerator(cpuAccelerator);
                     if (ippFFT.IsAvailable)
                     {
                         _accelerators.Add(ippFFT);
                         _acceleratorMap[AcceleratorType.CPU] = ippFFT;
+                    }
+                    else
+                    {
+                        ippFFT.Dispose();
                     }
                 }
             }
@@ -294,13 +298,17 @@ namespace ILGPU.FFT
 #pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
-                        var cudaAccelerator = device.CreateCudaAccelerator(_context);
-                        using var cudaFFT = new CudaFFTAccelerator(cudaAccelerator);
+                        using var cudaAccelerator = device.CreateCudaAccelerator(_context);
+                        var cudaFFT = new CudaFFTAccelerator(cudaAccelerator);
                         if (cudaFFT.IsAvailable)
                         {
                             _accelerators.Add(cudaFFT);
                             if (!_acceleratorMap.ContainsKey(AcceleratorType.Cuda))
                                 _acceleratorMap[AcceleratorType.Cuda] = cudaFFT;
+                        }
+                        else
+                        {
+                            cudaFFT.Dispose();
                         }
                     }
                     catch

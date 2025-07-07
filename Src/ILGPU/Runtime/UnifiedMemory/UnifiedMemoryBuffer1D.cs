@@ -30,6 +30,7 @@ namespace ILGPU.Runtime.UnifiedMemory
         #region Instance
 
         private readonly object syncLock = new();
+        private readonly MemoryBuffer1D<T, Stride1D.Dense>? _underlyingBuffer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnifiedMemoryBuffer1D{T}"/> class.
@@ -41,10 +42,17 @@ namespace ILGPU.Runtime.UnifiedMemory
             Accelerator accelerator,
             long length,
             UnifiedMemoryAccessMode accessMode)
-            : base(accelerator, accelerator.Allocate1D<T>(length).View)
+            : base(accelerator, CreateBufferAndStore(accelerator, length, out var underlyingBuffer))
         {
+            _underlyingBuffer = underlyingBuffer;
             AccessMode = accessMode;
             IsUnifiedMemorySupported = accelerator.Device.SupportsUnifiedMemory;
+        }
+
+        private static ArrayView<T> CreateBufferAndStore(Accelerator accelerator, long length, out MemoryBuffer1D<T, Stride1D.Dense> underlyingBuffer)
+        {
+            underlyingBuffer = accelerator.Allocate1D<T>(length);
+            return underlyingBuffer.View;
         }
 
         #endregion
@@ -180,6 +188,23 @@ namespace ILGPU.Runtime.UnifiedMemory
             var result = new T[Length];
             View.CopyToCPU(result);
             return result;
+        }
+
+        #endregion
+
+        #region IDisposable
+
+        /// <summary>
+        /// Disposes the unified memory buffer and underlying resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected override void DisposeAcceleratorObject(bool disposing)
+        {
+            if (disposing)
+            {
+                _underlyingBuffer?.Dispose();
+            }
+            base.DisposeAcceleratorObject(disposing);
         }
 
         #endregion

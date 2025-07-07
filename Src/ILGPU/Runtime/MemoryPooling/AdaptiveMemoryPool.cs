@@ -109,13 +109,22 @@ namespace ILGPU.Runtime.MemoryPooling
             Interlocked.Increment(ref totalAllocations);
 
             var buffer = accelerator.Allocate1D<T>(bucketSize);
-            var newPooledBuffer = new PooledBuffer(this, buffer, bucketSize);
-            
-            Interlocked.Add(ref currentPoolSize, bucketSize * Unsafe.SizeOf<T>());
-            
-            var newRentTime = DateTime.UtcNow;
-            rentedBuffers.TryAdd(newPooledBuffer, newRentTime);
-            newPooledBuffer.MarkAsRented();
+            PooledBuffer newPooledBuffer;
+            try
+            {
+                newPooledBuffer = new PooledBuffer(this, buffer, bucketSize);
+                
+                Interlocked.Add(ref currentPoolSize, bucketSize * Unsafe.SizeOf<T>());
+                
+                var newRentTime = DateTime.UtcNow;
+                rentedBuffers.TryAdd(newPooledBuffer, newRentTime);
+                newPooledBuffer.MarkAsRented();
+            }
+            catch
+            {
+                buffer.Dispose();
+                throw;
+            }
             
             return newPooledBuffer;
         }

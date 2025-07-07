@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ILGPU.Runtime.Scheduling
 {
@@ -26,7 +27,7 @@ namespace ILGPU.Runtime.Scheduling
         public long MemoryRequirement { get; set; }
         public WorkloadType Type { get; set; }
         public int Priority { get; set; }
-        public Dictionary<string, object> Properties { get; set; } = [];
+        public Dictionary<string, object> Properties { get; } = [];
 
         public WorkloadAnalysis()
         {
@@ -53,19 +54,22 @@ namespace ILGPU.Runtime.Scheduling
 
     public class ExecutionSchedule
     {
-        public List<ScheduledNode> Nodes { get; set; } = [];
+        public List<ScheduledNode> Nodes { get; } = [];
         public TimeSpan TotalDuration { get; set; }
         public double Efficiency { get; set; }
-        public List<ParallelExecutionGroup> ParallelGroups { get; set; } = [];
-        public List<ScheduledExecutionLevel> Levels { get; set; } = [];
+        public List<ParallelExecutionGroup> ParallelGroups { get; } = [];
+        public List<ScheduledExecutionLevel> Levels { get; } = [];
 
         public ExecutionSchedule()
         {
         }
 
-        public ExecutionSchedule(List<ScheduledNode> nodes)
+        public ExecutionSchedule(Collection<ScheduledNode> nodes)
         {
-            Nodes = nodes ?? throw new ArgumentNullException(nameof(nodes));
+            foreach (var node in nodes ?? throw new ArgumentNullException(nameof(nodes)))
+            {
+                Nodes.Add(node);
+            }
         }
     }
 
@@ -75,7 +79,7 @@ namespace ILGPU.Runtime.Scheduling
         public TimeSpan StartTime { get; set; }
         public TimeSpan Duration { get; set; }
         public Accelerator TargetAccelerator { get; set; } = null!;
-        public List<string> Dependencies { get; set; } = [];
+        public List<string> Dependencies { get; } = [];
         public double EstimatedTimeMs { get; set; }
 
         public ScheduledNode()
@@ -92,7 +96,7 @@ namespace ILGPU.Runtime.Scheduling
 
     public class ParallelExecutionGroup
     {
-        public List<ScheduledNode> Nodes { get; set; } = [];
+        public List<ScheduledNode> Nodes { get; } = [];
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
     }
@@ -100,7 +104,7 @@ namespace ILGPU.Runtime.Scheduling
     public class ScheduledExecutionLevel
     {
         public int Level { get; set; }
-        public List<ScheduledNode> Nodes { get; set; } = [];
+        public List<ScheduledNode> Nodes { get; } = [];
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public double ParallelismFactor { get; set; }
@@ -109,16 +113,19 @@ namespace ILGPU.Runtime.Scheduling
         {
         }
 
-        public ScheduledExecutionLevel(int level, List<ScheduledNode> nodes)
+        public ScheduledExecutionLevel(int level, Collection<ScheduledNode> nodes)
         {
             Level = level;
-            Nodes = nodes ?? throw new ArgumentNullException(nameof(nodes));
+            foreach (var node in nodes ?? throw new ArgumentNullException(nameof(nodes)))
+            {
+                Nodes.Add(node);
+            }
         }
     }
 
     public class MemoryTransferPlan
     {
-        public List<MemoryTransfer> Transfers { get; set; } = [];
+        public List<MemoryTransfer> Transfers { get; } = [];
         public long TotalBytes { get; set; }
         public TimeSpan EstimatedTime { get; set; }
         public double Bandwidth { get; set; }
@@ -127,9 +134,12 @@ namespace ILGPU.Runtime.Scheduling
         {
         }
 
-        public MemoryTransferPlan(List<MemoryTransfer> transfers)
+        public MemoryTransferPlan(Collection<MemoryTransfer> transfers)
         {
-            Transfers = transfers ?? throw new ArgumentNullException(nameof(transfers));
+            foreach (var transfer in transfers ?? throw new ArgumentNullException(nameof(transfers)))
+            {
+                Transfers.Add(transfer);
+            }
         }
     }
 
@@ -161,7 +171,7 @@ namespace ILGPU.Runtime.Scheduling
         public double OverallEfficiency { get; set; }
         public TimeSpan TotalTime { get; set; }
         public ComputeGraph Graph { get; set; } = new();
-        public Dictionary<ComputeNode, ComputeDevice> Assignments { get; set; } = [];
+        public Dictionary<ComputeNode, ComputeDevice> Assignments { get; } = [];
 
         public ExecutionPlan()
         {
@@ -220,9 +230,9 @@ namespace ILGPU.Runtime.Scheduling
 
         public void UpdateLoad(Accelerator accelerator, double loadDelta)
         {
-            if (currentLoads.ContainsKey(accelerator))
+            if (currentLoads.TryGetValue(accelerator, out var currentLoad))
             {
-                currentLoads[accelerator] = Math.Max(0, currentLoads[accelerator] + loadDelta);
+                currentLoads[accelerator] = Math.Max(0, currentLoad + loadDelta);
             }
         }
 
@@ -244,10 +254,19 @@ namespace ILGPU.Runtime.Scheduling
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (!disposed)
             {
-                accelerators.Clear();
-                currentLoads.Clear();
+                if (disposing)
+                {
+                    accelerators.Clear();
+                    currentLoads.Clear();
+                }
                 disposed = true;
             }
         }
@@ -267,11 +286,12 @@ namespace ILGPU.Runtime.Scheduling
 
         public void RecordExecution(string operationName, TimeSpan duration)
         {
-            if (!executionTimes.ContainsKey(operationName))
+            if (!executionTimes.TryGetValue(operationName, out var times))
             {
-                executionTimes[operationName] = [];
+                times = [];
+                executionTimes[operationName] = times;
             }
-            executionTimes[operationName].Add(duration);
+            times.Add(duration);
         }
 
         public void StartExecution(string operationName) => activeExecutions[operationName] = DateTime.UtcNow;
@@ -317,18 +337,18 @@ namespace ILGPU.Runtime.Scheduling
 
         public TimeSpan GetAverageTime(string operationName)
         {
-            if (!executionTimes.ContainsKey(operationName) || executionTimes[operationName].Count == 0)
+            if (!executionTimes.TryGetValue(operationName, out var times) || times.Count == 0)
             {
                 return TimeSpan.Zero;
             }
 
             var total = TimeSpan.Zero;
-            foreach (var time in executionTimes[operationName])
+            foreach (var time in times)
             {
                 total = total.Add(time);
             }
 
-            return new TimeSpan(total.Ticks / executionTimes[operationName].Count);
+            return new TimeSpan(total.Ticks / times.Count);
         }
 
         public double GetEfficiencyScore(string operationName)
@@ -339,10 +359,19 @@ namespace ILGPU.Runtime.Scheduling
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
             if (!disposed)
             {
-                executionTimes.Clear();
-                activeExecutions.Clear();
+                if (disposing)
+                {
+                    executionTimes.Clear();
+                    activeExecutions.Clear();
+                }
                 disposed = true;
             }
         }

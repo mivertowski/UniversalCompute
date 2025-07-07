@@ -189,7 +189,6 @@ namespace ILGPU.Intel.AMX
     public sealed class AMXKernel(AMXAccelerator accelerator, CompiledKernel compiledKernel) : Kernel(accelerator, compiledKernel, null)
     {
         private readonly AMXAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-        private readonly CompiledKernel _compiledKernel = compiledKernel ?? throw new ArgumentNullException(nameof(compiledKernel));
 
 
         /// <summary>
@@ -197,7 +196,10 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         protected override void DisposeAcceleratorObject(bool disposing)
         {
-            // No special cleanup needed for AMX kernels
+            if (disposing)
+            {
+                _accelerator?.Dispose();
+            }
         }
     }
 }

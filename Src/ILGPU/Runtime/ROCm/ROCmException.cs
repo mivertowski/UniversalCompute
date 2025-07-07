@@ -92,8 +92,10 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
+#pragma warning disable SYSLIB0050 // Type or member is obsolete
         protected ROCmException(SerializationInfo info, StreamingContext context)
             : base(info, context)
+#pragma warning restore SYSLIB0050 // Type or member is obsolete
         {
             ErrorCode = (HipError)info.GetInt32(ErrorCodePropertyName);
         }
@@ -121,7 +123,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="info">The serialization info.</param>
         /// <param name="context">The streaming context.</param>
-        [Obsolete]
+        [Obsolete("Formatter-based serialization is obsolete")]
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);

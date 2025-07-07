@@ -38,7 +38,6 @@ namespace ILGPU.Apple.NeuralEngine.Native
         #region Constants
 
         private const string CoreMLFramework = "/System/Library/Frameworks/CoreML.framework/CoreML";
-        private const string AccelerateFramework = "/System/Library/Frameworks/Accelerate.framework/Accelerate";
 
         #endregion
 

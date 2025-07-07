@@ -40,11 +40,9 @@ namespace ILGPU.Runtime.ROCm.Native
 #if WINDOWS
         private const string HipLibrary = "hip64_530"; // HIP version 5.30+
         private const string ROCBlasLibrary = "rocblas";
-        private const string ROCFFTLibrary = "rocfft";
 #else
         private const string HipLibrary = "libamdhip64.so.5";
         private const string ROCBlasLibrary = "librocblas.so.3";
-        private const string ROCFFTLibrary = "librocfft.so.1";
 #endif
 
         #endregion

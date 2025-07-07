@@ -40,16 +40,10 @@ namespace ILGPU.Runtime.OneAPI.Native
 
 #if WINDOWS
         private const string SYCLLibrary = "sycl7"; // Intel OneAPI SYCL runtime
-        private const string LevelZeroLibrary = "ze_loader"; // Intel Level Zero
-        private const string OpenCLLibrary = "OpenCL"; // OpenCL fallback
         private const string MKLLibrary = "mkl_sycl"; // Intel MKL SYCL
-        private const string DPCPPLibrary = "sycl7"; // Intel DPC++ compiler runtime
 #else
         private const string SYCLLibrary = "libsycl.so.7";
-        private const string LevelZeroLibrary = "libze_loader.so.1";
-        private const string OpenCLLibrary = "libOpenCL.so.1";
         private const string MKLLibrary = "libmkl_sycl.so.2";
-        private const string DPCPPLibrary = "libsycl.so.7";
 #endif
 
         #endregion

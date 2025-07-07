@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace ILGPU.AI.ONNX
@@ -278,9 +279,9 @@ namespace ILGPU.AI.ONNX
         /// </summary>
         /// <param name="batchInputs">Batch of input tensors.</param>
         /// <returns>Batch of output tensors.</returns>
-        public List<Dictionary<string, ArrayView<float>>> RunBatchInference(List<Dictionary<string, ArrayView<float>>> batchInputs)
+        public Collection<Dictionary<string, ArrayView<float>>> RunBatchInference(Collection<Dictionary<string, ArrayView<float>>> batchInputs)
         {
-            var batchOutputs = new List<Dictionary<string, ArrayView<float>>>();
+            var batchOutputs = new Collection<Dictionary<string, ArrayView<float>>>();
 
             foreach (var inputs in batchInputs)
             {
@@ -314,7 +315,7 @@ namespace ILGPU.AI.ONNX
 
         #region Private Methods
 
-        private IntPtr CreateSession(string modelPath, ONNXRuntimeConfig config)
+        private static IntPtr CreateSession(string modelPath, ONNXRuntimeConfig config)
         {
             try
             {
@@ -454,10 +455,8 @@ namespace ILGPU.AI.ONNX
                 var name = kvp.Key;
                 var data = kvp.Value;
                 
-                if (!_inputInfo.ContainsKey(name))
+                if (!_inputInfo.TryGetValue(name, out var info))
                     throw new ArgumentException($"Unknown input tensor: {name}");
-
-                var info = _inputInfo[name];
                 var tensor = CreateTensorFromArrayView(data, info);
                 inputTensors[name] = tensor;
             }

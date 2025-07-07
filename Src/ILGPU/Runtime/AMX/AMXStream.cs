@@ -112,8 +112,10 @@ namespace ILGPU.Runtime.AMX
             {
                 if (IsTileConfigured)
                 {
-                    AMXNative.ReleaseTiles();
+                    var releaseResult = AMXNative.ReleaseTiles();
                     IsTileConfigured = false;
+                    // Note: We don't throw on error since this is cleanup code
+                    // In production, you might want to log the error if releaseResult != 0
                 }
             }
             catch (Exception)

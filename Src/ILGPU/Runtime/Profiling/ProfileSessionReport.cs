@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ILGPU.Runtime.Profiling
 {
@@ -58,17 +59,17 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets detailed kernel execution records.
         /// </summary>
-        public List<KernelExecutionRecord> KernelExecutions { get; init; } = [];
+        public Collection<KernelExecutionRecord> KernelExecutions { get; init; } = [];
 
         /// <summary>
         /// Gets detailed memory operation records.
         /// </summary>
-        public List<MemoryOperationRecord> MemoryOperations { get; init; } = [];
+        public Collection<MemoryOperationRecord> MemoryOperations { get; init; } = [];
 
         /// <summary>
         /// Gets custom event records.
         /// </summary>
-        public List<CustomEventRecord> CustomEvents { get; init; } = [];
+        public Collection<CustomEventRecord> CustomEvents { get; init; } = [];
 
         /// <summary>
         /// Gets system information at the time of profiling.
@@ -88,7 +89,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets performance recommendations based on the profiling data.
         /// </summary>
-        public List<PerformanceRecommendation> Recommendations { get; init; } = [];
+        public Collection<PerformanceRecommendation> Recommendations { get; init; } = [];
     }
 
     /// <summary>
@@ -379,7 +380,7 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Gets specific suggestions for improvement.
         /// </summary>
-        public List<string> Suggestions { get; init; } = [];
+        public Collection<string> Suggestions { get; init; } = [];
 
         /// <summary>
         /// Gets the estimated performance impact.

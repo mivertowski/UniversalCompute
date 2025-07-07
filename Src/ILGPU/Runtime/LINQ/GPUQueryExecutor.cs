@@ -110,12 +110,11 @@ namespace ILGPU.Runtime.LINQ
     /// </remarks>
     /// <param name="accelerator">The accelerator.</param>
     /// <param name="stream">The accelerator stream.</param>
-    internal sealed class GPUQueryExpressionVisitor(Accelerator accelerator, AcceleratorStream stream) : ExpressionVisitor
+    internal sealed class GPUQueryExpressionVisitor(Accelerator accelerator) : ExpressionVisitor
     {
         #region Instance
 
         private readonly Accelerator accelerator = accelerator;
-        private readonly AcceleratorStream stream = stream;
 
         #endregion
 

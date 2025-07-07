@@ -18,6 +18,7 @@
 using ILGPU.Backends;
 using ILGPU.Backends.EntryPoints;
 using System;
+using System.Collections.ObjectModel;
 
 namespace ILGPU.Runtime.OneAPI
 {
@@ -44,7 +45,7 @@ namespace ILGPU.Runtime.OneAPI
             string? syclSource = null)
             : base(context, entryPoint, info)
         {
-            SPIRVBinary = spirvBinary ?? throw new ArgumentNullException(nameof(spirvBinary));
+            SPIRVBinary = new ReadOnlyCollection<byte>(spirvBinary ?? throw new ArgumentNullException(nameof(spirvBinary)));
             SYCLSource = syclSource ?? string.Empty;
         }
 
@@ -60,7 +61,7 @@ namespace ILGPU.Runtime.OneAPI
         /// executed on Intel OneAPI/SYCL-compatible devices. This includes Intel GPUs,
         /// CPUs, and potentially other accelerators that support SPIR-V.
         /// </remarks>
-        public byte[] SPIRVBinary { get; }
+        public ReadOnlyCollection<byte> SPIRVBinary { get; }
 
         /// <summary>
         /// Returns the SYCL/DPC++ source code.
@@ -99,11 +100,11 @@ namespace ILGPU.Runtime.OneAPI
             hash.Add(Specialization);
             
             // Include a subset of the binary in the hash for performance
-            var binaryHash = SPIRVBinary.Length > 0 ? SPIRVBinary[0] : 0;
-            if (SPIRVBinary.Length > 4)
+            var binaryHash = SPIRVBinary.Count > 0 ? SPIRVBinary[0] : 0;
+            if (SPIRVBinary.Count > 4)
             {
-                binaryHash ^= SPIRVBinary[SPIRVBinary.Length / 2];
-                binaryHash ^= SPIRVBinary[SPIRVBinary.Length - 1];
+                binaryHash ^= SPIRVBinary[SPIRVBinary.Count / 2];
+                binaryHash ^= SPIRVBinary[SPIRVBinary.Count - 1];
             }
             hash.Add(binaryHash);
             

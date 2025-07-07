@@ -139,7 +139,10 @@ namespace ILGPU.Memory.Unified
         /// <param name="disposing">True if disposing managed resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            // Stub implementation for derived classes to override
+            if (disposing)
+            {
+                _manager?.Dispose();
+            }
         }
     }
     /// <summary>

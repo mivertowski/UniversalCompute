@@ -276,8 +276,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the power efficiency in TOPS/Watt.
         /// </summary>
-        /// <returns>The power efficiency.</returns>
-        public double GetPowerEfficiency() => Generation switch
+        public double PowerEfficiency => Generation switch
         {
             ANEGeneration.ANE1 => 11.0, // ~5.5 TOPS / 0.5W
             ANEGeneration.ANE2 => 13.75, // ~11 TOPS / 0.8W

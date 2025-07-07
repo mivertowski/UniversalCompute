@@ -459,7 +459,7 @@ namespace ILGPU.Runtime.OneAPI
                                                          {
                                                              throw new NotSupportedException("Intel AI acceleration functions not found. Check OneAPI AI toolkit installation.");
                                                          }
-                                                     });
+                                                     }).ConfigureAwait(false);
 
         /// <summary>
         /// Placeholder for Intel GPU AI inference.

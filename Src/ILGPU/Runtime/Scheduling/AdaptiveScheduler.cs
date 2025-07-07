@@ -542,11 +542,25 @@ namespace ILGPU.Runtime.Scheduling
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the adaptive scheduler and releases resources.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (_disposed)
                 return;
 
-            _profiler?.Dispose();
-            _loadBalancer?.Dispose();
+            if (disposing)
+            {
+                _profiler?.Dispose();
+                _loadBalancer?.Dispose();
+            }
+            
             _disposed = true;
         }
     }
