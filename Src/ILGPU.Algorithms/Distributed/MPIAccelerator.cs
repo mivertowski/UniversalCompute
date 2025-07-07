@@ -298,7 +298,7 @@ namespace ILGPU.Algorithms.Distributed
             sendData.CopyToCPU(hostSendBuffer);
             
             // Perform all-to-all exchange
-            Communicator.AllToAll(hostSendBuffer, hostRecvBuffer, elementsPerProcess);
+            Communicator.AllToAll(hostSendBuffer, hostRecvBuffer, (int)elementsPerProcess);
             
             recvData.CopyFromCPU(hostRecvBuffer);
             actualStream.Synchronize();
@@ -462,7 +462,7 @@ namespace ILGPU.Algorithms.Distributed
         public async Task<MPIRequest> ReceiveAsync<T>(ArrayView<T> data, int srcRank, int tag = 0, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var request = await Communicator.ReceiveAsync<T>(data.Length, srcRank, tag).ConfigureAwait(false);
+            var request = await Communicator.ReceiveAsync<T>((int)data.Length, srcRank, tag).ConfigureAwait(false);
             
             // When request completes, copy data to GPU
             _ = Task.Run(async () =>

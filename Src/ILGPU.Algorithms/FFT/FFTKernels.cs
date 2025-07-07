@@ -41,7 +41,7 @@ namespace ILGPU.Algorithms.FFT
             var logN = plan.LogN;
 
             // Bit-reversal permutation
-            BitReversalPermutation(input, output, n);
+            BitReversalPermutation(input, output, (int)n);
 
             // Cooley-Tukey FFT
             for (int s = 1; s <= logN; s++)
@@ -77,7 +77,7 @@ namespace ILGPU.Algorithms.FFT
             var logN = plan.LogN;
 
             // Bit-reversal permutation
-            BitReversalPermutation(input, output, n);
+            BitReversalPermutation(input, output, (int)n);
 
             // Cooley-Tukey inverse FFT
             for (int s = 1; s <= logN; s++)
@@ -113,7 +113,7 @@ namespace ILGPU.Algorithms.FFT
             var logN = plan.LogN;
 
             // Bit-reversal for radix-4
-            BitReversalPermutation(input, output, n);
+            BitReversalPermutation(input, output, (int)n);
 
             // Radix-4 FFT stages
             var stages = logN / 2;
@@ -170,7 +170,7 @@ namespace ILGPU.Algorithms.FFT
             var n = input.Length;
             var logN = plan.LogN;
 
-            BitReversalPermutation(input, output, n);
+            BitReversalPermutation(input, output, (int)n);
 
             var stages = logN / 2;
             for (int stage = 0; stage < stages; stage++)
