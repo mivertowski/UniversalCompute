@@ -27,8 +27,8 @@ namespace ILGPU.Memory.Unified
     public abstract class BaseUniversalBuffer<T>(long size, UniversalMemoryManager manager) : IUniversalBuffer<T>
         where T : unmanaged
     {
-        protected readonly long _length = size;
-        protected readonly UniversalMemoryManager _manager = manager ?? throw new ArgumentNullException(nameof(manager));
+        private readonly long _length = size;
+        private readonly UniversalMemoryManager _manager = manager ?? throw new ArgumentNullException(nameof(manager));
 
         public long Length => _length;
         public long SizeInBytes => _length * System.Runtime.CompilerServices.Unsafe.SizeOf<T>();

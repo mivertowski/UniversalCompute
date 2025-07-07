@@ -104,7 +104,7 @@ namespace ILGPU.Runtime
             if (IncludeStackTrace && severity == ErrorSeverity.Critical && exception.StackTrace != null)
             {
                 Console.WriteLine("  Stack Trace:");
-                Console.WriteLine($"    {exception.StackTrace.Replace("\n", "\n    ")}");
+                Console.WriteLine($"    {exception.StackTrace.Replace("\n", "\n    ", StringComparison.Ordinal)}");
             }
 
             Console.WriteLine();

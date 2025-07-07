@@ -705,9 +705,9 @@ namespace ILGPU.ML.Integration
         public required string ModelId { get; set; }
 
         /// <summary>
-        /// Gets or sets the compiled bytecode.
+        /// Gets the compiled bytecode.
         /// </summary>
-        public required IList<byte> CompiledBytecode { get; set; }
+        public required IList<byte> CompiledBytecode { get; init; }
 
         /// <summary>
         /// Gets or sets the target device.
@@ -841,9 +841,9 @@ namespace ILGPU.ML.Integration
         public required string KernelName { get; set; } = "default_kernel";
 
         /// <summary>
-        /// Gets or sets the compiled code.
+        /// Gets the compiled code.
         /// </summary>
-        public required IList<byte> CompiledCode { get; set; } = [0x00];
+        public required IList<byte> CompiledCode { get; init; } = [0x00];
 
         /// <summary>
         /// Gets or sets the entry point.
@@ -1117,9 +1117,9 @@ namespace ILGPU.ML.Integration
         public required string ModelPath { get; set; }
 
         /// <summary>
-        /// Gets or sets the model bytes.
+        /// Gets the model bytes.
         /// </summary>
-        public required IList<byte> ModelBytes { get; set; }
+        public required IList<byte> ModelBytes { get; init; }
 
         /// <summary>
         /// Gets the input names.

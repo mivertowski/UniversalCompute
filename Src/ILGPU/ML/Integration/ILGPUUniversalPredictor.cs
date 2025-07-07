@@ -308,14 +308,24 @@ namespace ILGPU.ML.Integration
         /// </summary>
         public void Dispose()
         {
-            if (_disposed)
-                return;
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-            _orchestrator?.Dispose();
-            _scheduler?.Dispose();
-            // _model doesn't implement IDisposable
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed && disposing)
+            {
+                _orchestrator?.Dispose();
+                _scheduler?.Dispose();
+                // _model doesn't implement IDisposable
 
-            _disposed = true;
+                _disposed = true;
+            }
         }
     }
 

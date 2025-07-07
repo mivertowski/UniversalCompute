@@ -134,9 +134,9 @@ namespace ILGPU.AI.ONNX
         public bool EnableProfiling { get; set; }
 
         /// <summary>
-        /// Gets or sets custom execution provider options.
+        /// Gets custom execution provider options.
         /// </summary>
-        public Dictionary<string, string> ProviderOptions { get; set; } = [];
+        public Dictionary<string, string> ProviderOptions { get; } = [];
 
         /// <summary>
         /// Creates a default ONNX Runtime configuration.
@@ -148,20 +148,23 @@ namespace ILGPU.AI.ONNX
         /// </summary>
         /// <param name="deviceId">CUDA device ID.</param>
         /// <returns>CUDA-optimized configuration.</returns>
-        public static ONNXRuntimeConfig ForCUDA(int deviceId = 0) => new()
+        public static ONNXRuntimeConfig ForCUDA(int deviceId = 0)
         {
-            ExecutionProvider = ONNXExecutionProvider.CUDA,
-            DeviceId = deviceId,
-            OptimizationLevel = ONNXOptimizationLevel.All,
-            EnableMemoryOptimization = true,
-            EnableParallelExecution = true,
-            ProviderOptions = new Dictionary<string, string>
+            var config = new ONNXRuntimeConfig
             {
-                ["device_id"] = deviceId.ToString(),
-                ["gpu_mem_limit"] = "2147483648", // 2GB limit
-                ["arena_extend_strategy"] = "kSameAsRequested"
-            }
-        };
+                ExecutionProvider = ONNXExecutionProvider.CUDA,
+                DeviceId = deviceId,
+                OptimizationLevel = ONNXOptimizationLevel.All,
+                EnableMemoryOptimization = true,
+                EnableParallelExecution = true
+            };
+            
+            config.ProviderOptions["device_id"] = deviceId.ToString();
+            config.ProviderOptions["gpu_mem_limit"] = "2147483648"; // 2GB limit
+            config.ProviderOptions["arena_extend_strategy"] = "kSameAsRequested";
+            
+            return config;
+        }
 
         /// <summary>
         /// Creates a configuration optimized for CPU execution.
@@ -556,14 +559,17 @@ namespace ILGPU.AI.ONNX
 
         private static void ReleaseSession(IntPtr session) => ONNXNative.ReleaseSession(session);
 
-        private static ONNXProfilingInfo QueryProfilingInfo(IntPtr session) =>
+        private static ONNXProfilingInfo QueryProfilingInfo(IntPtr session)
+        {
             // Query profiling information from ONNX Runtime
-            new()
+            var info = new ONNXProfilingInfo
             {
                 TotalInferenceTime = 0.0,
-                OperatorTimes = [],
                 MemoryUsage = 0L
             };
+            // OperatorTimes is already initialized as an empty dictionary
+            return info;
+        }
 
         #endregion
     }
@@ -672,9 +678,9 @@ namespace ILGPU.AI.ONNX
         public double TotalInferenceTime { get; set; }
 
         /// <summary>
-        /// Gets or sets operator execution times.
+        /// Gets operator execution times.
         /// </summary>
-        public Dictionary<string, double> OperatorTimes { get; set; } = [];
+        public Dictionary<string, double> OperatorTimes { get; } = [];
 
         /// <summary>
         /// Gets or sets memory usage in bytes.

@@ -17,6 +17,7 @@
 
 using ILGPU.Intel.AMX.Native;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 
@@ -399,9 +400,9 @@ namespace ILGPU.Intel.AMX
         public byte Palette { get; set; }
 
         /// <summary>
-        /// Gets or sets the tile descriptors for all 8 AMX tiles.
+        /// Gets the tile descriptors for all 8 AMX tiles.
         /// </summary>
-        public AMXTileDescriptor[] Tiles { get; set; } = new AMXTileDescriptor[8];
+        public IList<AMXTileDescriptor> Tiles { get; } = new AMXTileDescriptor[8];
 
         /// <summary>
         /// Converts this configuration to a native configuration structure.

@@ -336,11 +336,24 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (!_disposed)
             {
+                if (disposing)
+                {
+                    // Dispose managed resources
+                }
                 _disposed = true;
             }
-            GC.SuppressFinalize(this);
         }
     }
 
@@ -361,11 +374,24 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
             if (!_disposed)
             {
+                if (disposing)
+                {
+                    // Dispose managed resources
+                }
                 _disposed = true;
             }
-            GC.SuppressFinalize(this);
         }
     }
 

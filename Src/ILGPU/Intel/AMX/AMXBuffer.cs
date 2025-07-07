@@ -160,17 +160,21 @@ namespace ILGPU.Intel.AMX
         }
 
         [LibraryImport("msvcrt.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
         private static partial IntPtr _aligned_malloc(UIntPtr size, UIntPtr alignment);
 
         [LibraryImport("msvcrt.dll")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
         private static partial void _aligned_free(IntPtr ptr);
 
         [LibraryImport("libc", EntryPoint = "posix_memalign")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static partial int posix_memalign(out IntPtr ptr, UIntPtr alignment, UIntPtr size);
 
         [LibraryImport("libc", EntryPoint = "free")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static partial void free(IntPtr ptr);
     }
 

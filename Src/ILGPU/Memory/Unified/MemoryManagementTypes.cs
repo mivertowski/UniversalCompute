@@ -138,11 +138,24 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         public void Dispose()
         {
-            // Clean up any remaining allocations
-            lock (_syncLock)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _allocations.Clear();
-                _totalAllocatedBytes = 0;
+                // Clean up any remaining allocations
+                lock (_syncLock)
+                {
+                    _allocations.Clear();
+                    _totalAllocatedBytes = 0;
+                }
             }
         }
 
@@ -291,9 +304,22 @@ namespace ILGPU.Memory.Unified
         /// </summary>
         public void Dispose()
         {
-            lock (_syncLock)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                _usageStats.Clear();
+                lock (_syncLock)
+                {
+                    _usageStats.Clear();
+                }
             }
         }
     }
@@ -438,7 +464,23 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Disposes the memory placement optimizer.
         /// </summary>
-        public void Dispose() => _accelerators?.Clear();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes managed and unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _accelerators?.Clear();
+            }
+        }
     }
 
     /// <summary>

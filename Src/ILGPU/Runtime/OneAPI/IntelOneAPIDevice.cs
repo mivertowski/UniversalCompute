@@ -352,8 +352,8 @@ namespace ILGPU.Runtime.OneAPI
             try
             {
                 var extensions = SYCLNative.GetDeviceInfoString(nativeDevice, SYCLDeviceInfo.Extensions);
-                return extensions.Contains("cl_khr_fp64") || 
-                       extensions.Contains("cl_amd_fp64");
+                return extensions.Contains("cl_khr_fp64", StringComparison.Ordinal) || 
+                       extensions.Contains("cl_amd_fp64", StringComparison.Ordinal);
             }
             catch
             {

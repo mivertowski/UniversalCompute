@@ -243,7 +243,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets or sets the zero point for asymmetric quantization.
         /// </summary>
-        public int ZeroPoint { get; set; } = 0;
+        public int ZeroPoint { get; set; }
 
         /// <summary>
         /// Gets or sets the number of input elements.
@@ -339,7 +339,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets or sets whether to enable profiling.
         /// </summary>
-        public bool EnableProfiling { get; set; } = false;
+        public bool EnableProfiling { get; set; }
 
         /// <summary>
         /// Gets or sets the precision mode.
@@ -349,7 +349,7 @@ namespace ILGPU.Intel.NPU
         /// <summary>
         /// Gets or sets the cache mode.
         /// </summary>
-        public int CacheMode { get; set; } = 0;
+        public int CacheMode { get; set; }
 
         /// <summary>
         /// Gets or sets the input data size.

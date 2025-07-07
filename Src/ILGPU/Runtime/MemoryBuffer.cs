@@ -528,8 +528,8 @@ namespace ILGPU.Runtime
         /// Gets the number of dimensions of this buffer.
         /// </summary>
         public override int Dimensions => View is ArrayView<byte> ? 1 : 
-                                          View.GetType().Name.Contains("2D") ? 2 : 
-                                          View.GetType().Name.Contains("3D") ? 3 : 1;
+                                          View.GetType().Name.Contains("2D", StringComparison.Ordinal) ? 2 : 
+                                          View.GetType().Name.Contains("3D", StringComparison.Ordinal) ? 3 : 1;
 
         #endregion
 

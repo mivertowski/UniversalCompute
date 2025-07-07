@@ -570,35 +570,35 @@ __kernel void amd_gemm_f32(
             var name = deviceName.ToUpperInvariant();
 
             // RDNA 3.0 (Navi 3x)
-            if (name.Contains("RX 7") || name.Contains("NAVI 31") || name.Contains("NAVI 32") || name.Contains("NAVI 33"))
+            if (name.Contains("RX 7", StringComparison.Ordinal) || name.Contains("NAVI 31", StringComparison.Ordinal) || name.Contains("NAVI 32", StringComparison.Ordinal) || name.Contains("NAVI 33", StringComparison.Ordinal))
                 return AMDGPUArchitecture.RDNA3;
 
             // RDNA 2.0 (Navi 2x)  
-            if (name.Contains("RX 6") || name.Contains("NAVI 21") || name.Contains("NAVI 22") || name.Contains("NAVI 23") || name.Contains("NAVI 24"))
+            if (name.Contains("RX 6", StringComparison.Ordinal) || name.Contains("NAVI 21", StringComparison.Ordinal) || name.Contains("NAVI 22", StringComparison.Ordinal) || name.Contains("NAVI 23", StringComparison.Ordinal) || name.Contains("NAVI 24", StringComparison.Ordinal))
                 return AMDGPUArchitecture.RDNA2;
 
             // RDNA 1.0 (Navi 1x)
-            if (name.Contains("RX 5") || name.Contains("NAVI 10") || name.Contains("NAVI 12") || name.Contains("NAVI 14"))
+            if (name.Contains("RX 5", StringComparison.Ordinal) || name.Contains("NAVI 10", StringComparison.Ordinal) || name.Contains("NAVI 12", StringComparison.Ordinal) || name.Contains("NAVI 14", StringComparison.Ordinal))
                 return AMDGPUArchitecture.RDNA1;
 
             // GCN 5.0 (Vega)
-            if (name.Contains("VEGA") || name.Contains("RX VEGA") || name.Contains("RADEON VII"))
+            if (name.Contains("VEGA", StringComparison.Ordinal) || name.Contains("RX VEGA", StringComparison.Ordinal) || name.Contains("RADEON VII", StringComparison.Ordinal))
                 return AMDGPUArchitecture.GCN5;
 
             // GCN 4.0 (Polaris)
-            if (name.Contains("RX 4") || name.Contains("RX 5") || name.Contains("POLARIS"))
+            if (name.Contains("RX 4", StringComparison.Ordinal) || name.Contains("RX 5", StringComparison.Ordinal) || name.Contains("POLARIS", StringComparison.Ordinal))
                 return AMDGPUArchitecture.GCN4;
 
             // GCN 3.0 (Fiji/Tonga)
-            if (name.Contains("R9 FURY") || name.Contains("R9 390") || name.Contains("FIJI") || name.Contains("TONGA"))
+            if (name.Contains("R9 FURY", StringComparison.Ordinal) || name.Contains("R9 390", StringComparison.Ordinal) || name.Contains("FIJI", StringComparison.Ordinal) || name.Contains("TONGA", StringComparison.Ordinal))
                 return AMDGPUArchitecture.GCN3;
 
             // GCN 2.0 (Hawaii/Bonaire)
-            if (name.Contains("R9 290") || name.Contains("R9 280") || name.Contains("HAWAII") || name.Contains("BONAIRE"))
+            if (name.Contains("R9 290", StringComparison.Ordinal) || name.Contains("R9 280", StringComparison.Ordinal) || name.Contains("HAWAII", StringComparison.Ordinal) || name.Contains("BONAIRE", StringComparison.Ordinal))
                 return AMDGPUArchitecture.GCN2;
 
             // GCN 1.0 (Tahiti/Pitcairn/Cape Verde)
-            return name.Contains("R9 270") || name.Contains("R9 260") || name.Contains("HD 7") || name.Contains("TAHITI") || name.Contains("PITCAIRN")
+            return name.Contains("R9 270", StringComparison.Ordinal) || name.Contains("R9 260", StringComparison.Ordinal) || name.Contains("HD 7", StringComparison.Ordinal) || name.Contains("TAHITI", StringComparison.Ordinal) || name.Contains("PITCAIRN", StringComparison.Ordinal)
                 ? AMDGPUArchitecture.GCN1
                 : AMDGPUArchitecture.Unknown;
         }

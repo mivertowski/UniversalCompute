@@ -635,11 +635,12 @@ namespace ILGPU.FFT
         #region Dispose
 
         /// <summary>
-        /// Disposes this CUDA FFT accelerator.
+        /// Disposes managed and unmanaged resources.
         /// </summary>
-        public override void Dispose()
+        /// <param name="disposing">True to dispose managed resources.</param>
+        protected override void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (!_disposed && disposing)
             {
                 // No persistent resources to clean up in this implementation
                 _disposed = true;
