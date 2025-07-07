@@ -377,15 +377,6 @@ namespace ILGPU.IR.Transformations
                 "Maintainability",
                 "CA1508:Avoid dead conditional code",
                 Justification = "There is no dead code in the method below")]
-        #endregion
-
-        #region Movement and Placement
-
-        /// <summary>
-        /// Tracks and validates the movement of values with side effects to different
-        /// blocks. Enabling movement of side effect values makes the whole placement
-        /// algorithm significantly more aggressive.
-        /// </summary>
         private readonly struct Mover(Method.Builder builder, CodePlacementMode mode) : IMover
         {
             #region Instance

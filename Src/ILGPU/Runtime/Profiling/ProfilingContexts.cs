@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Runtime.Profiling
 {
@@ -26,6 +27,8 @@ namespace ILGPU.Runtime.Profiling
     /// </summary>
     internal sealed class KernelProfilingContext(PerformanceProfiler profiler, string executionId, string kernelName, Index3D gridSize, Index3D groupSize) : IKernelProfilingContext
     {
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+            Justification = "PerformanceProfiler is not owned by this context and should not be disposed")]
         private readonly PerformanceProfiler profiler = profiler;
         private readonly string executionId = executionId;
         private readonly Stopwatch stopwatch = Stopwatch.StartNew();
@@ -107,6 +110,8 @@ namespace ILGPU.Runtime.Profiling
         string source,
         string destination) : IMemoryProfilingContext
     {
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+            Justification = "PerformanceProfiler is not owned by this context and should not be disposed")]
         private readonly PerformanceProfiler profiler = profiler;
         private readonly string operationId = operationId;
         private readonly string source = source;
@@ -142,7 +147,7 @@ namespace ILGPU.Runtime.Profiling
             profiler.CompleteMemoryOperation(operationId, record);
         }
 
-        public void RecordError(Exception error)
+        public void RecordError(Exception exception)
         {
             if (disposed)
                 return;
@@ -158,7 +163,7 @@ namespace ILGPU.Runtime.Profiling
                 SizeInBytes = SizeInBytes,
                 Source = source,
                 Destination = destination,
-                Error = error.Message
+                Error = exception.Message
             };
 
             profiler.CompleteMemoryOperation(operationId, record);
@@ -205,7 +210,7 @@ namespace ILGPU.Runtime.Profiling
         public DateTime StartTime => DateTime.MinValue;
 
         public void RecordCompletion(TimeSpan actualDuration, double? bandwidth = null) { }
-        public void RecordError(Exception error) { }
+        public void RecordError(Exception exception) { }
         public void Dispose() { }
     }
 }

@@ -109,7 +109,6 @@ namespace ILGPU.Runtime.LINQ
     /// Initializes a new instance of the <see cref="GPUQueryExpressionVisitor"/> class.
     /// </remarks>
     /// <param name="accelerator">The accelerator.</param>
-    /// <param name="stream">The accelerator stream.</param>
     internal sealed class GPUQueryExpressionVisitor(Accelerator accelerator) : ExpressionVisitor
     {
         #region Instance
@@ -192,7 +191,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleWhere(MethodCallExpression methodCall)
+        private ConstantExpression HandleWhere(MethodCallExpression methodCall)
         {
             var source = Visit(methodCall.Arguments[0]);
             var predicate = (LambdaExpression)((UnaryExpression)methodCall.Arguments[1]).Operand;
@@ -245,7 +244,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleCount(MethodCallExpression methodCall)
+        private ConstantExpression HandleCount(MethodCallExpression methodCall)
         {
             var source = Visit(methodCall.Arguments[0]);
             var sourceBuffer = GetBuffer(source);

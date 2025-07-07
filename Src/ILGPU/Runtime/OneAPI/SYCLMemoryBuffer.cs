@@ -18,6 +18,7 @@
 using ILGPU.Runtime.OneAPI.Native;
 using ILGPU.Util;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ILGPU.Runtime.OneAPI
@@ -25,6 +26,8 @@ namespace ILGPU.Runtime.OneAPI
     /// <summary>
     /// A SYCL-specific memory buffer implementation for Intel OneAPI devices.
     /// </summary>
+    [SuppressMessage("Microsoft.Design", "CA2216:DisposableTypesShouldDeclareFinalizer", 
+        Justification = "Base class MemoryBuffer already provides finalizer infrastructure via DisposeBase")]
     public sealed class SYCLMemoryBuffer : MemoryBuffer
     {
         #region Instance

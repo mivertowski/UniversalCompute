@@ -20,6 +20,7 @@
 // you may not use this file except in compliance with the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using ILGPU.Runtime;
@@ -127,6 +128,8 @@ namespace ILGPU.FFT
 
         #region Instance
 
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+            Justification = "CudaAccelerator is not owned by this class and should not be disposed")]
         private readonly CudaAccelerator _cudaAccelerator = cudaAccelerator ?? throw new ArgumentNullException(nameof(cudaAccelerator));
         private bool _disposed;
 

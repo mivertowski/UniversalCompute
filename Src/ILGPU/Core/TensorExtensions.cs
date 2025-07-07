@@ -238,7 +238,7 @@ namespace ILGPU.Core
                        tensor.GetType().GetGenericTypeDefinition() == typeof(ILGPU.ML.Tensor<>) &&
                        typeof(T).GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(System.Numerics.INumber<>))
                     => ConvertMLTensorDynamic<T>(tensor, accelerator),
-                _ => throw new ArgumentException($"Unsupported tensor type: {tensor?.GetType()}")
+                _ => throw new ArgumentException($"Unsupported tensor type: {tensor.GetType()}")
             };
 
         private static ITensorCore<T> ConvertMLTensorDynamic<T>(object mlTensor, Accelerator accelerator) 

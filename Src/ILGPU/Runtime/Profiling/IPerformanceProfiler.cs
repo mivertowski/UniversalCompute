@@ -182,8 +182,8 @@ namespace ILGPU.Runtime.Profiling
         /// <summary>
         /// Records an error during the memory operation.
         /// </summary>
-        /// <param name="error">The error that occurred.</param>
-        void RecordError(Exception error);
+        /// <param name="exception">The error that occurred.</param>
+        void RecordError(Exception exception);
     }
 
     /// <summary>

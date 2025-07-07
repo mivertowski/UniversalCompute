@@ -63,6 +63,8 @@ namespace ILGPU.Runtime.Profiling
         private readonly List<KernelExecutionRecord> currentKernelExecutions = [];
         private readonly List<MemoryOperationRecord> currentMemoryOperations = [];
         private readonly List<CustomEventRecord> currentCustomEvents = [];
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+            Justification = "Accelerator is not owned by this profiler and should not be disposed")]
         private readonly Accelerator accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
         
         private volatile bool isProfilingEnabled = enabledByDefault;
@@ -374,7 +376,7 @@ namespace ILGPU.Runtime.Profiling
             var totalExecTime = executions.Sum(e => e.ExecutionTime.Ticks);
             var totalCompTime = executions.Sum(e => e.CompilationTime.Ticks);
             var totalThreads = executions.Sum(e => e.TotalThreads);
-            var throughputs = executions.Where(e => e.Throughput.HasValue).Select(e => e.Throughput!.Value);
+            var throughputs = executions.Where(e => e.Throughput.HasValue).Select(e => e.Throughput!.Value).ToList();
 
             var kernelStats = executions
                 .GroupBy(e => e.KernelName)
@@ -404,7 +406,7 @@ namespace ILGPU.Runtime.Profiling
                 return new MemoryMetrics();
 
             var totalBytes = operations.Sum(o => o.SizeInBytes);
-            var bandwidths = operations.Where(o => o.Bandwidth.HasValue).Select(o => o.Bandwidth!.Value);
+            var bandwidths = operations.Where(o => o.Bandwidth.HasValue).Select(o => o.Bandwidth!.Value).ToList();
             var operationStats = operations
                 .GroupBy(o => o.OperationType)
                 .ToDictionary(g => g.Key, g => CalculateMemoryOperationStatistics([.. g]));
@@ -499,7 +501,7 @@ namespace ILGPU.Runtime.Profiling
         {
             var totalBytes = operations.Sum(o => o.SizeInBytes);
             var totalTime = operations.Sum(o => o.Duration.Ticks);
-            var bandwidths = operations.Where(o => o.Bandwidth.HasValue).Select(o => o.Bandwidth!.Value);
+            var bandwidths = operations.Where(o => o.Bandwidth.HasValue).Select(o => o.Bandwidth!.Value).ToList();
             var failedOps = operations.Count(o => !string.IsNullOrEmpty(o.Error));
 
             return new MemoryOperationStatistics

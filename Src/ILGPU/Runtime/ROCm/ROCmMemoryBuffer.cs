@@ -146,7 +146,7 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            (IntPtr)targetPtr, (IntPtr)sourcePtr, checked((ulong)targetView.Length), 
+                            checked((IntPtr)targetPtr), checked((IntPtr)sourcePtr), checked((ulong)targetView.Length), 
                             HipMemcpyKind.HostToDevice);
                         ROCmException.ThrowIfFailed(result);
                     }
@@ -200,7 +200,7 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            (IntPtr)targetPtr, (IntPtr)sourcePtr, checked((ulong)sourceView.Length),
+                            checked((IntPtr)targetPtr), checked((IntPtr)sourcePtr), checked((ulong)sourceView.Length),
                             HipMemcpyKind.DeviceToHost);
                         ROCmException.ThrowIfFailed(result);
                     }
@@ -238,7 +238,7 @@ namespace ILGPU.Runtime.ROCm
 #pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
-                    var result = ROCmNative.Memset((IntPtr)ptr, value, checked((ulong)length));
+                    var result = ROCmNative.Memset(checked((IntPtr)ptr), value, checked((ulong)length));
                     ROCmException.ThrowIfFailed(result);
                 }
                 catch (Exception)
