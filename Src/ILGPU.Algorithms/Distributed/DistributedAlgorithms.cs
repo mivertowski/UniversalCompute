@@ -193,7 +193,7 @@ namespace ILGPU.Algorithms.Distributed
             
             // Step 2: Sample local data
             var sampleSize = Math.Min(size - 1, localData.Length / size);
-            var samples = SampleData(mpiAccelerator.LocalAccelerator, localData, sampleSize, actualStream);
+            var samples = SampleData(mpiAccelerator.LocalAccelerator, localData, (int)sampleSize, actualStream);
             
             // Step 3: Gather all samples to root
             var allSamples = mpiAccelerator.LocalAccelerator.Allocate1D<T>(sampleSize * size);
@@ -251,7 +251,7 @@ namespace ILGPU.Algorithms.Distributed
                 throw new ArgumentException("Target sizes array must have same length as number of processes");
 
             // Calculate send counts and displacements
-            var sendCounts = CalculateSendCounts(localData.Length, targetSizes, rank);
+            var sendCounts = CalculateSendCounts((int)localData.Length, targetSizes, rank);
             var sendBuffer = mpiAccelerator.LocalAccelerator.Allocate1D<T>(localData.Length);
             localData.CopyTo(sendBuffer.View, actualStream);
 
