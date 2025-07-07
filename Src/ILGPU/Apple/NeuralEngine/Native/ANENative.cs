@@ -48,23 +48,23 @@ namespace ILGPU.Apple.NeuralEngine.Native
         /// Creates a Neural Engine context for computation.
         /// </summary>
         /// <returns>Handle to the ANE context, or IntPtr.Zero if failed.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLCreateNeuralEngineContext")]
-        internal static extern IntPtr CreateContext();
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLCreateNeuralEngineContext")]
+        internal static partial IntPtr CreateContext();
 
         /// <summary>
         /// Releases a Neural Engine context.
         /// </summary>
         /// <param name="context">Handle to the ANE context.</param>
-        [DllImport(CoreMLFramework, EntryPoint = "MLReleaseNeuralEngineContext")]
-        internal static extern void ReleaseContext(IntPtr context);
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLReleaseNeuralEngineContext")]
+        internal static partial void ReleaseContext(IntPtr context);
 
         /// <summary>
         /// Checks if the Neural Engine is available on this device.
         /// </summary>
         /// <returns>True if ANE is available; otherwise, false.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLIsNeuralEngineAvailable")]
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLIsNeuralEngineAvailable")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        internal static extern bool IsNeuralEngineAvailable();
+        internal static partial bool IsNeuralEngineAvailable();
 
         #endregion
 
@@ -73,44 +73,44 @@ namespace ILGPU.Apple.NeuralEngine.Native
         /// <summary>
         /// Executes convolution operation on ANE.
         /// </summary>
-        [DllImport(CoreMLFramework, EntryPoint = "MLExecuteConvolution")]
-        internal static unsafe extern void ExecuteConvolution(
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLExecuteConvolution")]
+        internal static unsafe partial void ExecuteConvolution(
             float* input, float* result, long inputSize, long outputSize, IntPtr context);
 
         /// <summary>
         /// Executes matrix multiplication on ANE.
         /// </summary>
-        [DllImport(CoreMLFramework, EntryPoint = "MLExecuteMatMul")]
-        internal static unsafe extern void ExecuteMatMul(
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLExecuteMatMul")]
+        internal static unsafe partial void ExecuteMatMul(
             float* input, float* result, long inputSize, long outputSize, IntPtr context);
 
         /// <summary>
         /// Executes attention mechanism on ANE.
         /// </summary>
-        [DllImport(CoreMLFramework, EntryPoint = "MLExecuteAttention")]
-        internal static unsafe extern void ExecuteAttention(
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLExecuteAttention")]
+        internal static unsafe partial void ExecuteAttention(
             float* input, float* result, long inputSize, long outputSize, IntPtr context);
 
         /// <summary>
         /// Executes Core ML inference on ANE.
         /// </summary>
-        [DllImport(CoreMLFramework, EntryPoint = "MLExecuteCoreMLInference")]
-        internal static unsafe extern void ExecuteCoreMLInference(
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLExecuteCoreMLInference")]
+        internal static unsafe partial void ExecuteCoreMLInference(
             float* input, float* result, long inputSize, long outputSize, IntPtr modelHandle, IntPtr context);
 
         /// <summary>
         /// Executes convolution with bias on ANE.
         /// </summary>
-        [DllImport(CoreMLFramework, EntryPoint = "MLExecuteConvolutionWithBias")]
-        internal static unsafe extern void ExecuteConvolutionWithBias(
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLExecuteConvolutionWithBias")]
+        internal static unsafe partial void ExecuteConvolutionWithBias(
             float* input, float* weights, float* bias, float* result,
             long inputSize, long weightsSize, long outputSize, IntPtr context);
 
         /// <summary>
         /// Executes multi-head attention on ANE.
         /// </summary>
-        [DllImport(CoreMLFramework, EntryPoint = "MLExecuteMultiHeadAttention")]
-        internal static unsafe extern void ExecuteMultiHeadAttention(
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLExecuteMultiHeadAttention")]
+        internal static unsafe partial void ExecuteMultiHeadAttention(
             float* query, float* key, float* value, float* result,
             long querySize, long keySize, long valueSize, IntPtr context);
 
@@ -123,16 +123,16 @@ namespace ILGPU.Apple.NeuralEngine.Native
         /// </summary>
         /// <param name="info">Pointer to device info structure.</param>
         /// <returns>0 on success, error code otherwise.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLGetNeuralEngineDeviceInfo")]
-        internal static extern int GetDeviceInfo(out ANEDeviceInfo info);
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLGetNeuralEngineDeviceInfo")]
+        internal static partial int GetDeviceInfo(out ANEDeviceInfo info);
 
         /// <summary>
         /// Gets Neural Engine capabilities.
         /// </summary>
         /// <param name="capabilities">Pointer to capabilities structure.</param>
         /// <returns>0 on success, error code otherwise.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLGetNeuralEngineCapabilities")]
-        internal static extern int GetCapabilities(out ANENativeCapabilities capabilities);
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLGetNeuralEngineCapabilities")]
+        internal static partial int GetCapabilities(out ANENativeCapabilities capabilities);
 
         #endregion
 
@@ -143,24 +143,24 @@ namespace ILGPU.Apple.NeuralEngine.Native
         /// </summary>
         /// <param name="context">ANE context handle.</param>
         /// <returns>Performance metrics structure.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLGetNeuralEnginePerformanceMetrics")]
-        internal static extern ANEPerformanceMetrics GetPerformanceMetrics(IntPtr context);
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLGetNeuralEnginePerformanceMetrics")]
+        internal static partial ANEPerformanceMetrics GetPerformanceMetrics(IntPtr context);
 
         /// <summary>
         /// Gets power consumption information.
         /// </summary>
         /// <param name="context">ANE context handle.</param>
         /// <returns>Power information structure.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLGetNeuralEnginePowerInfo")]
-        internal static extern ANEPowerInfo GetPowerInfo(IntPtr context);
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLGetNeuralEnginePowerInfo")]
+        internal static partial ANEPowerInfo GetPowerInfo(IntPtr context);
 
         /// <summary>
         /// Gets thermal state of the Neural Engine.
         /// </summary>
         /// <param name="context">ANE context handle.</param>
         /// <returns>Thermal state.</returns>
-        [DllImport(CoreMLFramework, EntryPoint = "MLGetNeuralEngineThermalState")]
-        internal static extern ANEThermalState GetThermalState(IntPtr context);
+        [LibraryImport(CoreMLFramework, EntryPoint = "MLGetNeuralEngineThermalState")]
+        internal static partial ANEThermalState GetThermalState(IntPtr context);
 
         #endregion
 

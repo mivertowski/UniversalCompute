@@ -510,7 +510,10 @@ namespace ILGPU.Tests
 
             var expected = new long[length];
             for (int i = 0; i < length; ++i)
+            {
                 expected[i] = -1L;
+            }
+
             Verify(buffer.View, expected);
 
             var expectedLength = Enumerable.Repeat(
@@ -558,7 +561,10 @@ namespace ILGPU.Tests
 
             var expected = new Int2[MaxLength / 2];
             for (int i = 0; i < expected.Length; ++i)
+            {
                 expected[i] = i + length;
+            }
+
             Verify(buffer.View, expected);
         }
 
@@ -959,7 +965,10 @@ namespace ILGPU.Tests
             for (int i = 0; i < NumThreads; ++i)
             {
                 if (i < prefixLength)
+                {
                     expected[i] = value;
+                }
+
                 expected[prefixLength + i] = value;
             }
 

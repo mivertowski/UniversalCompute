@@ -413,7 +413,7 @@ namespace ILGPU.Backends.WebGPU
             }
 #else
             // Non-browser implementation would use WebGPU native libraries
-            await Task.Delay(1);
+            await Task.Delay(1).ConfigureAwait(false);
             return null;
 #endif
         }
@@ -424,8 +424,8 @@ namespace ILGPU.Backends.WebGPU
         /// <returns>Array of WebGPU adapters.</returns>
         public static async Task<WebGPUAdapter[]> EnumerateAdaptersAsync()
         {
-            var adapter = await RequestAdapterAsync();
-            return adapter != null ? [adapter] : Array.Empty<WebGPUAdapter>();
+            var adapter = await RequestAdapterAsync().ConfigureAwait(false);
+            return adapter != null ? [adapter] : [];
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace ILGPU.Backends.WebGPU
                 return null;
             }
 #else
-            await Task.Delay(1);
+            await Task.Delay(1).ConfigureAwait(false);
             return null;
 #endif
         }
@@ -494,7 +494,9 @@ namespace ILGPU.Backends.WebGPU
         {
             if (!_disposed)
             {
+#pragma warning disable CA1416 // Validate platform compatibility
                 _jsAdapter?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
                 _jsAdapter = null;
                 _disposed = true;
             }
@@ -634,6 +636,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Disposes the WebGPU device.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         public void Dispose()
         {
             if (!_disposed)
@@ -655,7 +658,10 @@ namespace ILGPU.Backends.WebGPU
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUQueue(JSObject jsQueue) => JSObject = jsQueue;
+        internal WebGPUQueue(JSObject jsQueue)
+        {
+            JSObject = jsQueue;
+        }
 
         public static void Submit(WebGPUCommandBuffer commandBuffer)
         {
@@ -664,14 +670,19 @@ namespace ILGPU.Backends.WebGPU
 #endif
         }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUCommandEncoder : IDisposable
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUCommandEncoder(JSObject jsEncoder) => JSObject = jsEncoder;
+        internal WebGPUCommandEncoder(JSObject jsEncoder)
+        {
+            JSObject = jsEncoder;
+        }
 
         public WebGPUComputePassEncoder BeginComputePass()
         {
@@ -693,14 +704,19 @@ namespace ILGPU.Backends.WebGPU
 #endif
         }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUComputePassEncoder : IDisposable
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUComputePassEncoder(JSObject jsPassEncoder) => JSObject = jsPassEncoder;
+        internal WebGPUComputePassEncoder(JSObject jsPassEncoder)
+        {
+            JSObject = jsPassEncoder;
+        }
 
         public static void SetPipeline(WebGPUComputePipeline pipeline)
         {
@@ -730,34 +746,51 @@ namespace ILGPU.Backends.WebGPU
 #endif
         }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUCommandBuffer : IDisposable
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUCommandBuffer(JSObject jsCommandBuffer) => JSObject = jsCommandBuffer;
+        internal WebGPUCommandBuffer(JSObject jsCommandBuffer)
+        {
+            JSObject = jsCommandBuffer;
+        }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUShaderModule : IDisposable
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUShaderModule(JSObject jsShaderModule) => JSObject = jsShaderModule;
+        internal WebGPUShaderModule(JSObject jsShaderModule)
+        {
+            JSObject = jsShaderModule;
+        }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUComputePipeline : IDisposable
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUComputePipeline(JSObject jsComputePipeline) => JSObject = jsComputePipeline;
+        internal WebGPUComputePipeline(JSObject jsComputePipeline)
+        {
+            JSObject = jsComputePipeline;
+        }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUBuffer : MemoryBuffer
@@ -807,7 +840,9 @@ namespace ILGPU.Backends.WebGPU
 #if BROWSER
                 JSObject?.Invoke("destroy");
 #endif
+#pragma warning disable CA1416 // Validate platform compatibility
                 JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
                 JSObject = null;
                 _disposed = true;
             }
@@ -818,18 +853,28 @@ namespace ILGPU.Backends.WebGPU
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUBindGroup(JSObject jsBindGroup) => JSObject = jsBindGroup;
+        internal WebGPUBindGroup(JSObject jsBindGroup)
+        {
+            JSObject = jsBindGroup;
+        }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public sealed class WebGPUBindGroupLayout : IDisposable
     {
         internal JSObject? JSObject { get; private set; }
 
-        internal WebGPUBindGroupLayout(JSObject jsBindGroupLayout) => JSObject = jsBindGroupLayout;
+        internal WebGPUBindGroupLayout(JSObject jsBindGroupLayout)
+        {
+            JSObject = jsBindGroupLayout;
+        }
 
+#pragma warning disable CA1416 // Validate platform compatibility
         public void Dispose() => JSObject?.Dispose();
+#pragma warning restore CA1416 // Validate platform compatibility
     }
 
     public struct WebGPUBindGroupEntry

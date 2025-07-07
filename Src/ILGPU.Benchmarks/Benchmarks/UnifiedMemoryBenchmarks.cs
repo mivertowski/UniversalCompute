@@ -84,8 +84,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(ZeroCopyKernel);
 
         if (buffer == null || bufferB == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(DataSize, buffer.View, bufferB.View);
         accelerator.Synchronize();
 
@@ -103,9 +105,13 @@ public class UnifiedMemoryBenchmarks : IDisposable
             using var buffer2D = accelerator!.Allocate2DDenseX<float>(new Index2D(dim, dim));
             var index = 0;
             for (int y = 0; y < buffer2D.IntExtent.Y && index < dim * dim; y++)
+            {
                 for (int x = 0; x < buffer2D.IntExtent.X && index < dim * dim; x++)
+                {
                     buffer2D.View[y, x] = hostData![index++];
-            
+                }
+            }
+
             var result = buffer2D.GetAsArray2D();
             return result[0, 0];
         }
@@ -129,13 +135,21 @@ public class UnifiedMemoryBenchmarks : IDisposable
             
             var indexA = 0;
             for (int y = 0; y < bufferA.IntExtent.Y && indexA < dim * dim; y++)
+            {
                 for (int x = 0; x < bufferA.IntExtent.X && indexA < dim * dim; x++)
+                {
                     bufferA.View[y, x] = hostData![indexA++];
-            
+                }
+            }
+
             var indexB = 0;
             for (int y = 0; y < bufferB.IntExtent.Y && indexB < dim * dim; y++)
+            {
                 for (int x = 0; x < bufferB.IntExtent.X && indexB < dim * dim; x++)
+                {
                     bufferB.View[y, x] = hostData[indexB++];
+                }
+            }
 
             // Element-wise addition kernel
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -167,13 +181,21 @@ public class UnifiedMemoryBenchmarks : IDisposable
             
             var indexMA = 0;
             for (int y = 0; y < matrixA.IntExtent.Y && indexMA < dim * dim; y++)
+            {
                 for (int x = 0; x < matrixA.IntExtent.X && indexMA < dim * dim; x++)
+                {
                     matrixA.View[y, x] = hostData![indexMA++];
-            
+                }
+            }
+
             var indexMB = 0;
             for (int y = 0; y < matrixB.IntExtent.Y && indexMB < dim * dim; y++)
+            {
                 for (int x = 0; x < matrixB.IntExtent.X && indexMB < dim * dim; x++)
+                {
                     matrixB.View[y, x] = hostData[indexMB++];
+                }
+            }
 
             // Matrix multiplication kernel
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -227,8 +249,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>, int>(CoalescedAccessKernel);
 
         if (buffer == null)
+        {
             return 0.0f;
-            
+        }
+
         using var result = accelerator.Allocate1D<float>(DataSize);
         kernel(DataSize, buffer.View, result.View, 1);
         accelerator.Synchronize();
@@ -245,8 +269,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(SequentialAccessKernel);
 
         if (buffer == null)
+        {
             return 0.0f;
-            
+        }
+
         using var result = accelerator.Allocate1D<float>(DataSize);
         kernel(DataSize, buffer.View, result.View);
         accelerator.Synchronize();
@@ -263,8 +289,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>, int>(RandomAccessKernel);
 
         if (buffer == null)
+        {
             return 0.0f;
-            
+        }
+
         using var result = accelerator.Allocate1D<float>(DataSize);
         kernel(DataSize, buffer.View, result.View, DataSize);
         accelerator.Synchronize();
@@ -324,9 +352,13 @@ public class UnifiedMemoryBenchmarks : IDisposable
             using var buffer2D = accelerator!.Allocate2DDenseX<float>(new Index2D(width, height));
             var index2D = 0;
             for (int y = 0; y < buffer2D.IntExtent.Y && index2D < width * height; y++)
+            {
                 for (int x = 0; x < buffer2D.IntExtent.X && index2D < width * height; x++)
+                {
                     buffer2D.View[y, x] = hostData![index2D++];
-            
+                }
+            }
+
             // Test tensor slicing simulation using subviews
             var sliceWidth = Math.Min(width / 2, height);
             var sliceExtent = new Index2D(sliceWidth, sliceWidth);
@@ -371,8 +403,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         var sum = 0.0f;
         for (int k = 0; k < size; k++)
         {
@@ -388,8 +422,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
         int stride)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         // Coalesced memory access pattern
         var coalescedIndex = index * stride % input.Length;
         output[index] = input[coalescedIndex];
@@ -410,8 +446,10 @@ public class UnifiedMemoryBenchmarks : IDisposable
         int length)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         // Random access pattern (pseudorandom based on index)
         var randomIndex = (index * 1103515245 + 12345) / 65536 % length;
         output[index] = input[randomIndex];

@@ -171,20 +171,15 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory
-        {
-            get
-            {
+        public new long MaxConstantMemory =>
                 // Intel GPUs typically have large constant memory
-                return Architecture switch
+                Architecture switch
                 {
                     IntelGPUArchitecture.XeHPC => 2L * 1024 * 1024 * 1024, // 2GB for data center
                     IntelGPUArchitecture.XeHPG => 512L * 1024 * 1024,      // 512MB for Arc
                     IntelGPUArchitecture.XeLP => 256L * 1024 * 1024,       // 256MB for Iris Xe
                     _ => 64L * 1024 * 1024 // 64MB default
                 };
-            }
-        }
 
         /// <summary>
         /// Gets the warp size (subgroup size on Intel GPUs).
@@ -225,13 +220,13 @@ namespace ILGPU.Runtime.OneAPI
         public static IntelOneAPIDevice[] GetDevices()
         {
             if (!SYCLNative.IsSYCLSupported())
-                return Array.Empty<IntelOneAPIDevice>();
+                return [];
 
             try
             {
                 var nativeDevices = SYCLNative.GetIntelGPUDevices();
                 if (nativeDevices.Length == 0)
-                    return Array.Empty<IntelOneAPIDevice>();
+                    return [];
 
                 var devices = new IntelOneAPIDevice[nativeDevices.Length];
                 for (int i = 0; i < nativeDevices.Length; i++)

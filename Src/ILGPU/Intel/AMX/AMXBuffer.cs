@@ -25,7 +25,7 @@ namespace ILGPU.Intel.AMX
     /// <summary>
     /// AMX memory buffer implementation using CPU memory.
     /// </summary>
-    public sealed class AMXBuffer : MemoryBuffer
+    public sealed partial class AMXBuffer : MemoryBuffer
     {
         private readonly IntPtr _nativePtr;
         private readonly long _lengthInBytes;
@@ -159,17 +159,19 @@ namespace ILGPU.Intel.AMX
             }
         }
 
-        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr _aligned_malloc(UIntPtr size, UIntPtr alignment);
+        [LibraryImport("msvcrt.dll")]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial IntPtr _aligned_malloc(UIntPtr size, UIntPtr alignment);
 
-        [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void _aligned_free(IntPtr ptr);
+        [LibraryImport("msvcrt.dll")]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial void _aligned_free(IntPtr ptr);
 
-        [DllImport("libc", EntryPoint = "posix_memalign")]
-        private static extern int posix_memalign(out IntPtr ptr, UIntPtr alignment, UIntPtr size);
+        [LibraryImport("libc", EntryPoint = "posix_memalign")]
+        private static partial int posix_memalign(out IntPtr ptr, UIntPtr alignment, UIntPtr size);
 
-        [DllImport("libc", EntryPoint = "free")]
-        private static extern void free(IntPtr ptr);
+        [LibraryImport("libc", EntryPoint = "free")]
+        private static partial void free(IntPtr ptr);
     }
 
     /// <summary>

@@ -28,7 +28,7 @@ namespace ILGPU.Intel.IPP.Native
     /// Native bindings for Intel Integrated Performance Primitives (IPP) FFT functions.
     /// Provides high-performance CPU-based FFT operations optimized for Intel processors.
     /// </summary>
-    public static class IPPNative
+    public static partial class IPPNative
     {
         #region Library Constants
 
@@ -99,8 +99,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Gets the size of the FFT specification structure and work buffer.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTGetSize_C_32fc(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTGetSize_C_32fc(
             int order,
             int flag,
             IppHintAlgorithm hint,
@@ -111,8 +113,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Initializes the FFT specification structure.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTInit_C_32fc(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTInit_C_32fc(
             out IntPtr ppFFTSpec,
             int order,
             int flag,
@@ -123,8 +127,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Performs forward complex-to-complex FFT.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTFwd_CToC_32fc(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTFwd_CToC_32fc(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -133,8 +139,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Performs inverse complex-to-complex FFT.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTInv_CToC_32fc(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTInv_CToC_32fc(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -147,8 +155,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Gets the size of the real FFT specification structure and work buffer.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTGetSize_R_32f(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTGetSize_R_32f(
             int order,
             int flag,
             IppHintAlgorithm hint,
@@ -159,8 +169,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Initializes the real FFT specification structure.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTInit_R_32f(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTInit_R_32f(
             out IntPtr ppFFTSpec,
             int order,
             int flag,
@@ -171,8 +183,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Performs forward real-to-complex FFT.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTFwd_RToPack_32f(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTFwd_RToPack_32f(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -181,8 +195,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Performs inverse complex-to-real FFT.
         /// </summary>
-        [DllImport(IPPSLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippsFFTInv_PackToR_32f(
+        [LibraryImport(IPPSLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippsFFTInv_PackToR_32f(
             IntPtr pSrc,
             IntPtr pDst,
             IntPtr pFFTSpec,
@@ -195,8 +211,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Gets the size of 2D FFT specification structure and work buffer.
         /// </summary>
-        [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippiFFTGetSize_C_32fc(
+        [LibraryImport(IPPCCLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippiFFTGetSize_C_32fc(
             IppiSize roiSize,
             int flag,
             IppHintAlgorithm hint,
@@ -207,8 +225,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Initializes 2D FFT specification structure.
         /// </summary>
-        [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippiFFTInit_C_32fc(
+        [LibraryImport(IPPCCLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippiFFTInit_C_32fc(
             out IntPtr ppFFTSpec,
             IppiSize roiSize,
             int flag,
@@ -219,8 +239,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Performs forward 2D complex-to-complex FFT.
         /// </summary>
-        [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippiFFTFwd_CToC_32fc_C1R(
+        [LibraryImport(IPPCCLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippiFFTFwd_CToC_32fc_C1R(
             IntPtr pSrc,
             int srcStep,
             IntPtr pDst,
@@ -231,8 +253,10 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Performs inverse 2D complex-to-complex FFT.
         /// </summary>
-        [DllImport(IPPCCLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippiFFTInv_CToC_32fc_C1R(
+        [LibraryImport(IPPCCLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippiFFTInv_CToC_32fc_C1R(
             IntPtr pSrc,
             int srcStep,
             IntPtr pDst,
@@ -271,20 +295,26 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Allocates aligned memory for IPP operations.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr ippsMalloc_32f(int len);
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr ippsMalloc_32f(int len);
 
         /// <summary>
         /// Allocates aligned memory for complex IPP operations.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr ippsMalloc_32fc(int len);
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr ippsMalloc_32fc(int len);
 
         /// <summary>
         /// Frees memory allocated by IPP.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void ippsFree(IntPtr ptr);
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void ippsFree(IntPtr ptr);
 
         #endregion
 
@@ -293,14 +323,18 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Gets CPU features supported by IPP.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern ulong ippGetCpuFeatures();
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial ulong ippGetCpuFeatures();
 
         /// <summary>
         /// Gets the current CPU type.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppCpuType ippGetCpuType();
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppCpuType ippGetCpuType();
 
         /// <summary>
         /// CPU types supported by IPP.
@@ -351,14 +385,18 @@ namespace ILGPU.Intel.IPP.Native
         /// <summary>
         /// Initializes IPP library.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IppStatus ippInit();
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IppStatus ippInit();
 
         /// <summary>
         /// Gets IPP library version information.
         /// </summary>
-        [DllImport(IPPLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr ippGetLibVersion();
+        [LibraryImport(IPPLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr ippGetLibVersion();
 
         #endregion
     }

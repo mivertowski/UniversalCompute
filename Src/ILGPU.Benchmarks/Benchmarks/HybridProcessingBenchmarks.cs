@@ -99,7 +99,9 @@ namespace ILGPU.Benchmarks.Benchmarks
         public float GPU_Only_VectorAdd()
         {
             if (gpuAccelerator == null)
+            {
                 return 0f;
+            }
 
             var kernel = gpuAccelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>>(
                 (index, a, b, c) => c[index] = a[index] + b[index]);
@@ -116,7 +118,9 @@ namespace ILGPU.Benchmarks.Benchmarks
         public float Hybrid_CPUPreprocess_GPUCompute()
         {
             if (gpuAccelerator == null)
+            {
                 return CPU_Only_VectorAdd();
+            }
 
             // CPU preprocessing: normalize data
             var preprocessKernel = cpuAccelerator!.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
@@ -147,7 +151,9 @@ namespace ILGPU.Benchmarks.Benchmarks
         public float Hybrid_GPUCompute_CPUPostprocess()
         {
             if (gpuAccelerator == null)
+            {
                 return CPU_Only_VectorAdd();
+            }
 
             // GPU computation: heavy mathematical operation
             var computeKernel = gpuAccelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
@@ -178,7 +184,9 @@ namespace ILGPU.Benchmarks.Benchmarks
         public float Hybrid_Parallel_Execution()
         {
             if (gpuAccelerator == null)
+            {
                 return CPU_Only_VectorAdd();
+            }
 
             var halfSize = ProblemSize / 2;
 
@@ -223,7 +231,9 @@ namespace ILGPU.Benchmarks.Benchmarks
         public float HybridTensor_CPUSetup_GPUCompute()
         {
             if (gpuAccelerator == null)
+            {
                 return CPU_Only_VectorAdd();
+            }
 
             try
             {

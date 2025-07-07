@@ -33,14 +33,7 @@ namespace ILGPU.Tests
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data)
         {
-            if (data[index] == 0)
-            {
-                data[index] = 42;
-            }
-            else
-            {
-                data[index] = 24;
-            }
+            data[index] = data[index] == 0 ? 42 : 24;
         }
 
         [Fact]
@@ -99,7 +92,10 @@ namespace ILGPU.Tests
         {
             using var array = Accelerator.AllocatePageLocked1D<long>(Length);
             for (int i = 0; i < Length; i++)
+            {
                 array[i] = constant;
+            }
+
             using var buff = Accelerator.Allocate1D<long>(Length);
 
             // Start copying, create the expected array in the meantime
@@ -115,7 +111,9 @@ namespace ILGPU.Tests
 
             Assert.Equal(expected.Length, array.Length);
             for (int i = 0; i < Length; i++)
+            {
                 Assert.Equal(expected[i], array[i]);
+            }
         }
 
         // No need for kernel, assuming copy tests pass.
@@ -125,14 +123,19 @@ namespace ILGPU.Tests
         {
             using var array = Accelerator.AllocatePageLocked1D<long>(Length);
             for (int i = 0; i < Length; i++)
+            {
                 array[i] = 10;
+            }
 
             using var buff = Accelerator.Allocate1D<long>(Length);
             buff.View.CopyFrom(array.ArrayView);
 
             var expected = new int[Length];
             for (int i = 0; i < Length; i++)
+            {
                 expected[i] = 10;
+            }
+
             Accelerator.Synchronize();
 
             var data = buff.View.GetAsPageLocked1D();
@@ -141,7 +144,9 @@ namespace ILGPU.Tests
             Assert.Equal(expected.Length, data.Length);
 
             for (int i = 0; i < Length; i++)
+            {
                 Assert.Equal(expected[i], data[i]);
+            }
         }
     }
 }

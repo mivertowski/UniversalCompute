@@ -48,7 +48,9 @@ public class TensorCoreBenchmarks : IDisposable
             accelerator = device?.CreateAccelerator(context);
 
             if (accelerator == null)
+            {
                 throw new NotSupportedException("No suitable accelerator found");
+            }
 
             // Allocate matrices for tensor operations
             var totalElements = MatrixSize * MatrixSize;
@@ -75,8 +77,10 @@ public class TensorCoreBenchmarks : IDisposable
         accelerator = device?.CreateAccelerator(context);
         
         if (accelerator == null)
+        {
             throw new NotSupportedException("No suitable accelerator found for fallback");
-        
+        }
+
         var totalElements = MatrixSize * MatrixSize;
         matrixA = accelerator.Allocate1D<Half>(totalElements);
         matrixB = accelerator.Allocate1D<Half>(totalElements);
@@ -119,8 +123,10 @@ public class TensorCoreBenchmarks : IDisposable
             StandardMatMulKernel);
 
         if (matrixA == null || matrixB == null || matrixC == null || result == null)
+        {
             return;
-            
+        }
+
         kernel(new Index2D(MatrixSize, MatrixSize),
             matrixA.View, matrixB.View, matrixC.View, result.View, MatrixSize);
         
@@ -143,8 +149,10 @@ public class TensorCoreBenchmarks : IDisposable
             var config = TensorOperations.TensorConfig.Default;
             
             if (matrixA == null || matrixB == null || matrixC == null || result == null)
+            {
                 return;
-                
+            }
+
             // Convert to 2D views for tensor operations
             var a2D = matrixA.View.As2DDenseXView(new Index2D(MatrixSize, MatrixSize));
             var b2D = matrixB.View.As2DDenseXView(new Index2D(MatrixSize, MatrixSize));
@@ -186,8 +194,10 @@ public class TensorCoreBenchmarks : IDisposable
                 MixedPrecisionKernel);
 
             if (matrixA == null || matrixB == null || matrixC == null || result == null)
+            {
                 return;
-                
+            }
+
             kernel(new Index2D(MatrixSize, MatrixSize),
                 matrixA.View, matrixB.View, matrixC.View, result.View, MatrixSize);
             
@@ -252,7 +262,9 @@ public class TensorCoreBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
+        }
 
         float sum = matrixC[index.X * size + index.Y];
         
@@ -275,7 +287,9 @@ public class TensorCoreBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
+        }
 
         // Simulate mixed precision computation
         float sum = matrixC[index.X * size + index.Y];

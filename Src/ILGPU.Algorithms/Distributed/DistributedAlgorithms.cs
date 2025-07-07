@@ -219,7 +219,7 @@ namespace ILGPU.Algorithms.Distributed
             var partitions = PartitionData(mpiAccelerator.LocalAccelerator, localData, pivotsBuffer.View, actualStream);
             
             // Step 7: Exchange partitions with other processes
-            var receivedData = await ExchangePartitions(mpiAccelerator, partitions, actualStream);
+            var receivedData = await ExchangePartitions(mpiAccelerator, partitions, actualStream).ConfigureAwait(false);
             
             // Step 8: Sort received data
             SortLocal(mpiAccelerator.LocalAccelerator, receivedData, actualStream);

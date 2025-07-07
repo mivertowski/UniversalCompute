@@ -271,14 +271,7 @@ namespace ILGPU
             // Create default IL backend
 #if !NATIVE_AOT && !AOT_COMPATIBLE
             // Runtime detection of AOT mode - only create IL backend if dynamic code generation is supported
-            if (KernelSystem.SupportsDynamicGeneration)
-            {
-                DefautltILBackend = new DefaultILBackend(this);
-            }
-            else
-            {
-                DefautltILBackend = null;
-            }
+            DefautltILBackend = KernelSystem.SupportsDynamicGeneration ? new DefaultILBackend(this) : (ILBackend?)null;
 #endif
 
             // Initialize default transformer

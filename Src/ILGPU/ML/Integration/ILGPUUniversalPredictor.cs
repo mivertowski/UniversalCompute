@@ -150,7 +150,7 @@ namespace ILGPU.ML.Integration
 
                 if (batch.Count >= batchSize)
                 {
-                    var results = await PredictBatchAsync(batch.ToArray()).ConfigureAwait(false);
+                    var results = await PredictBatchAsync([.. batch]).ConfigureAwait(false);
                     
                     foreach (var result in results)
                     {
@@ -164,7 +164,7 @@ namespace ILGPU.ML.Integration
             // Process remaining items
             if (batch.Count > 0)
             {
-                var results = await PredictBatchAsync(batch.ToArray()).ConfigureAwait(false);
+                var results = await PredictBatchAsync([.. batch]).ConfigureAwait(false);
                 
                 foreach (var result in results)
                 {

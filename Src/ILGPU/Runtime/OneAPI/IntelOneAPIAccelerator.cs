@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.IR.Analyses;
 using ILGPU.Runtime.OneAPI.Native;
 using System;
 using System.Collections.Immutable;
@@ -508,6 +509,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Prints detailed GPU information.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         public void PrintGPUInformation()
         {
             Console.WriteLine($"Intel OneAPI Device Information:");
@@ -549,6 +551,9 @@ namespace ILGPU.Runtime.OneAPI
         {
             if (result != SYCLResult.Success)
                 throw new SYCLException($"SYCL operation failed with result: {result}");
+        }
+        public SYCLException()
+        {
         }
     }
 }

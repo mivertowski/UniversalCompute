@@ -239,7 +239,9 @@ namespace ILGPU.Runtime.HardwareDetection
             // RDNA2 (gfx10xx)  
             if (deviceName.Contains("6900", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6800", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6700", StringComparison.OrdinalIgnoreCase) || 
                 deviceName.Contains("6600", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6500", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("6400", StringComparison.OrdinalIgnoreCase))
+            {
                 return 103; // RDNA2 generation
+            }
 
             // RDNA1 (gfx10xx)
             if (deviceName.Contains("5700", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("5600", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("5500", StringComparison.OrdinalIgnoreCase))
@@ -759,7 +761,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <summary>
         /// Creates a fallback CPU accelerator.
         /// </summary>
-        private static Accelerator CreateFallbackAccelerator(Context context) => Capabilities.Velocity.IsSupported ? (Accelerator)context.CreateVelocityAccelerator() : context.CPU;
+        private static Accelerator CreateFallbackAccelerator(Context context) => Capabilities.Velocity.IsSupported ? (Accelerator)context.CreateVelocityAccelerator() : context.CPUAccelerator;
 
         #endregion
 
@@ -768,6 +770,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <summary>
         /// Prints comprehensive hardware detection results.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         public static void PrintHardwareInfo()
         {
             Initialize();

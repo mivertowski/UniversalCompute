@@ -228,7 +228,10 @@ public class ScalabilityBenchmarks : IDisposable
     public void MatrixMultiplicationScaling()
     {
         var matrixSize = (int)Math.Sqrt(ProblemSize);
-        if (matrixSize * matrixSize != ProblemSize) return;
+        if (matrixSize * matrixSize != ProblemSize)
+        {
+            return;
+        }
 
         var matrixA = testDataSets[ProblemSize];
         var matrixB = new float[ProblemSize];

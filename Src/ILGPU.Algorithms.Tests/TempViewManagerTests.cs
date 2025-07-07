@@ -69,7 +69,9 @@ namespace ILGPU.Algorithms.Tests
             // so ignore types that are one integer, or smaller, in size. These types
             // will never have alignment issues.
             if (Interop.SizeOf<T>() <= Interop.SizeOf<int>())
+            {
                 return;
+            }
 
             var length = Interop.ComputeRelativeSizeOf<int, T>(1) + 1;
             using var buffer = Accelerator.Allocate1D<int>(length);

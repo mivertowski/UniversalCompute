@@ -43,7 +43,7 @@ namespace ILGPU.Runtime.UnifiedMemory
             UnifiedMemoryAccessMode accessMode)
             : base(accelerator, accelerator.Allocate1D<T>(length).View)
         {
-            this.AccessMode = accessMode;
+            AccessMode = accessMode;
             IsUnifiedMemorySupported = accelerator.Device.SupportsUnifiedMemory;
         }
 

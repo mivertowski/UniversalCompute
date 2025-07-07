@@ -119,7 +119,7 @@ namespace ILGPU.Memory.Unified
         }
         public virtual UniversalBufferStats GetStats() =>
             // Default implementation returns basic stats
-            new UniversalBufferStats(
+            new(
                 SizeInBytes,
                 0, // migrationCount
                 0.0, // totalMigrationTimeMs  

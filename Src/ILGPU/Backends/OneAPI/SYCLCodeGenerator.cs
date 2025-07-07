@@ -123,7 +123,7 @@ namespace ILGPU.Backends.OneAPI
                 for (int i = 0; i < parameters.Count; i++)
                 {
                     var param = parameters[i];
-                    var typeString = param.Type?.ToString() ?? "void*";
+                    var typeString = param.BaseType?.ToString() ?? "void*";
                     var paramType = GetSYCLType(typeString);
                     var paramName = $"param_{i}";
                     
@@ -155,7 +155,7 @@ namespace ILGPU.Backends.OneAPI
                 if (i > 0) codeBuilder.Append(", ");
                 
                 var param = parameters[i];
-                var paramType = GetSYCLType(param.Type.ToString());
+                var paramType = GetSYCLType(param.BaseType.ToString());
                 var paramName = $"param_{i}";
                 
                 codeBuilder.Append($"{paramType} {paramName}_arg");
@@ -299,7 +299,7 @@ namespace ILGPU.Backends.OneAPI
             for (int i = 0; i < parameters.Count; i++)
             {
                 var param = parameters[i];
-                var paramType = GetSYCLType(param.Type.ToString());
+                var paramType = GetSYCLType(param.BaseType.ToString());
                 codeBuilder.Append($", {paramType} param_{i}");
             }
             
@@ -360,8 +360,8 @@ namespace ILGPU.Backends.OneAPI
             "float16" or "half" => "sycl::half",
             "float32" or "float" => "float",
             "float64" or "double" => "double",
-            _ when typeName.Contains("*") => "void*", // Pointer types
-            _ when typeName.Contains("[]") => "void*", // Array types  
+            _ when typeName.Contains('*', StringComparison.OrdinalIgnoreCase) => "void*", // Pointer types
+            _ when typeName.Contains("[]", StringComparison.OrdinalIgnoreCase) => "void*", // Array types  
             _ => "void*" // Default fallback
         };
 

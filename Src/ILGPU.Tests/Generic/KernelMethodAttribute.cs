@@ -67,7 +67,10 @@ namespace ILGPU.Tests
                 var attribute = callingMethod.GetCustomAttribute<
                     KernelMethodAttribute>();
                 if (attribute == null)
+                {
                     continue;
+                }
+
                 var type = attribute.Type ?? callingMethod.DeclaringType.ThrowIfNull();
                 return TestBase.GetKernelMethod(
                     type,

@@ -447,7 +447,7 @@ namespace ILGPU.Algorithms.Distributed
             var hostBuffer = new T[data.Length];
             data.CopyToCPU(hostBuffer);
             
-            return await Communicator.SendAsync(hostBuffer, destRank, tag);
+            return await Communicator.SendAsync(hostBuffer, destRank, tag).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -462,7 +462,7 @@ namespace ILGPU.Algorithms.Distributed
         public async Task<MPIRequest> ReceiveAsync<T>(ArrayView<T> data, int srcRank, int tag = 0, AcceleratorStream? stream = null)
             where T : unmanaged
         {
-            var request = await Communicator.ReceiveAsync<T>(data.Length, srcRank, tag);
+            var request = await Communicator.ReceiveAsync<T>(data.Length, srcRank, tag).ConfigureAwait(false);
             
             // When request completes, copy data to GPU
             _ = Task.Run(async () =>

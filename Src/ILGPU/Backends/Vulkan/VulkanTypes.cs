@@ -332,7 +332,7 @@ namespace ILGPU.Backends.Vulkan
             uint deviceCount = 0;
             var result = VulkanNative.vkEnumeratePhysicalDevices(Handle, ref deviceCount, IntPtr.Zero);
             if (result != VkResult.Success || deviceCount == 0)
-                return Array.Empty<VulkanPhysicalDevice>();
+                return [];
 
             var deviceHandles = new IntPtr[deviceCount];
             var devicesPtr = Marshal.AllocHGlobal((int)(deviceCount * IntPtr.Size));
@@ -340,7 +340,7 @@ namespace ILGPU.Backends.Vulkan
             {
                 result = VulkanNative.vkEnumeratePhysicalDevices(Handle, ref deviceCount, devicesPtr);
                 if (result != VkResult.Success)
-                    return Array.Empty<VulkanPhysicalDevice>();
+                    return [];
 
                 Marshal.Copy(devicesPtr, deviceHandles, 0, (int)deviceCount);
 

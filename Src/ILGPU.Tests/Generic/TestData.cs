@@ -565,19 +565,25 @@ namespace ILGPU.Tests
         public ShortFixedBufferStruct(short data)
         {
             for (int i = 0; i < Length; ++i)
+            {
                 Data[i] = data;
+            }
         }
 
         public void Deserialize(IXunitSerializationInfo info)
         {
             for (int i = 0; i < Length; ++i)
+            {
                 Data[i] = info.GetValue<short>(nameof(Data) + i);
+            }
         }
 
         public void Serialize(IXunitSerializationInfo info)
         {
             for (int i = 0; i < Length; ++i)
+            {
                 info.AddValue(nameof(Data) + i, Data[i]);
+            }
         }
 
         public override string ToString()
@@ -587,7 +593,9 @@ namespace ILGPU.Tests
             {
                 result += Data[i];
                 if (i + 1 < Length)
+                {
                     result += ", ";
+                }
             }
             return result;
         }
@@ -602,19 +610,25 @@ namespace ILGPU.Tests
         public LongFixedBufferStruct(long data)
         {
             for (int i = 0; i < Length; ++i)
+            {
                 Data[i] = data;
+            }
         }
 
         public void Deserialize(IXunitSerializationInfo info)
         {
             for (int i = 0; i < Length; ++i)
+            {
                 Data[i] = info.GetValue<long>(nameof(Data) + i);
+            }
         }
 
         public void Serialize(IXunitSerializationInfo info)
         {
             for (int i = 0; i < Length; ++i)
+            {
                 info.AddValue(nameof(Data) + i, Data[i]);
+            }
         }
 
         public override string ToString()
@@ -624,7 +638,9 @@ namespace ILGPU.Tests
             {
                 result += Data[i];
                 if (i + 1 < Length)
+                {
                     result += ", ";
+                }
             }
             return result;
         }

@@ -62,8 +62,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="platformCount">Number of platforms.</param>
         /// <param name="platforms">Platform handles.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_get_platforms", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult GetPlatforms(out uint platformCount, IntPtr[] platforms);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_get_platforms")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult GetPlatforms(out uint platformCount, IntPtr[] platforms);
 
         /// <summary>
         /// Gets SYCL devices for a platform.
@@ -73,8 +75,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="deviceCount">Number of devices.</param>
         /// <param name="devices">Device handles.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_get_devices", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult GetDevices(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_get_devices")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult GetDevices(
             IntPtr platform, 
             SYCLDeviceType deviceType, 
             out uint deviceCount, 
@@ -89,8 +93,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="value">Value buffer.</param>
         /// <param name="retSize">Returned size.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_get_device_info", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult GetDeviceInfo(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_get_device_info")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult GetDeviceInfo(
             IntPtr device,
             SYCLDeviceInfo infoType,
             UIntPtr valueSize,
@@ -104,8 +110,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="devices">Device handles.</param>
         /// <param name="context">Created context handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_create_context", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult CreateContext(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_create_context")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult CreateContext(
             uint deviceCount,
             IntPtr[] devices,
             out IntPtr context);
@@ -115,8 +123,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// </summary>
         /// <param name="context">Context handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_release_context", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult ReleaseContext(IntPtr context);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_release_context")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult ReleaseContext(IntPtr context);
 
         #endregion
 
@@ -130,8 +140,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="properties">Queue properties.</param>
         /// <param name="queue">Created queue handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_create_queue", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult CreateQueue(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_create_queue")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult CreateQueue(
             IntPtr context,
             IntPtr device,
             SYCLQueueProperties properties,
@@ -142,16 +154,20 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// </summary>
         /// <param name="queue">Queue handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_release_queue", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult ReleaseQueue(IntPtr queue);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_release_queue")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult ReleaseQueue(IntPtr queue);
 
         /// <summary>
         /// Waits for queue to complete.
         /// </summary>
         /// <param name="queue">Queue handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_queue_wait", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult QueueWait(IntPtr queue);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_queue_wait")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult QueueWait(IntPtr queue);
 
         #endregion
 
@@ -164,8 +180,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="device">Device handle.</param>
         /// <param name="context">Context handle.</param>
         /// <returns>Device memory pointer.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_malloc_device", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr MallocDevice(UIntPtr size, IntPtr device, IntPtr context);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_malloc_device")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr MallocDevice(UIntPtr size, IntPtr device, IntPtr context);
 
         /// <summary>
         /// Allocates shared memory.
@@ -174,8 +192,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="device">Device handle.</param>
         /// <param name="context">Context handle.</param>
         /// <returns>Shared memory pointer.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_malloc_shared", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr MallocShared(UIntPtr size, IntPtr device, IntPtr context);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_malloc_shared")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr MallocShared(UIntPtr size, IntPtr device, IntPtr context);
 
         /// <summary>
         /// Allocates host memory.
@@ -183,16 +203,20 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="size">Memory size in bytes.</param>
         /// <param name="context">Context handle.</param>
         /// <returns>Host memory pointer.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_malloc_host", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr MallocHost(UIntPtr size, IntPtr context);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_malloc_host")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr MallocHost(UIntPtr size, IntPtr context);
 
         /// <summary>
         /// Frees SYCL memory.
         /// </summary>
         /// <param name="ptr">Memory pointer.</param>
         /// <param name="context">Context handle.</param>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_free", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void Free(IntPtr ptr, IntPtr context);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_free")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void Free(IntPtr ptr, IntPtr context);
 
         /// <summary>
         /// Copies memory.
@@ -202,8 +226,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="src">Source pointer.</param>
         /// <param name="size">Size in bytes.</param>
         /// <returns>Event handle.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_memcpy", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr Memcpy(IntPtr queue, IntPtr dest, IntPtr src, UIntPtr size);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_memcpy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr Memcpy(IntPtr queue, IntPtr dest, IntPtr src, UIntPtr size);
 
         /// <summary>
         /// Sets memory to a value.
@@ -213,8 +239,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="value">Value to set.</param>
         /// <param name="size">Size in bytes.</param>
         /// <returns>Event handle.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_memset", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr Memset(IntPtr queue, IntPtr ptr, int value, UIntPtr size);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_memset")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr Memset(IntPtr queue, IntPtr ptr, int value, UIntPtr size);
 
         #endregion
 
@@ -231,8 +259,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="kernelName">Kernel entry point name.</param>
         /// <param name="kernel">Created kernel handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_create_kernel_from_spirv", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult CreateKernelFromSPIRV(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_create_kernel_from_spirv")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult CreateKernelFromSPIRV(
             IntPtr context,
             IntPtr[] devices,
             uint deviceCount,
@@ -246,8 +276,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// </summary>
         /// <param name="kernel">Kernel handle.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_release_kernel", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult ReleaseKernel(IntPtr kernel);
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_release_kernel")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult ReleaseKernel(IntPtr kernel);
 
         /// <summary>
         /// Sets kernel argument.
@@ -257,8 +289,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="argSize">Argument size.</param>
         /// <param name="argValue">Argument value.</param>
         /// <returns>SYCL result code.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_set_kernel_arg", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern SYCLResult SetKernelArg(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_set_kernel_arg")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial SYCLResult SetKernelArg(
             IntPtr kernel,
             uint argIndex,
             UIntPtr argSize,
@@ -275,8 +309,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <param name="eventWaitList">Wait events.</param>
         /// <param name="numEvents">Number of wait events.</param>
         /// <returns>Event handle.</returns>
-        [DllImport(SYCLLibrary, EntryPoint = "sycl_submit_kernel", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr SubmitKernel(
+        [LibraryImport(SYCLLibrary, EntryPoint = "sycl_submit_kernel")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr SubmitKernel(
             IntPtr queue,
             IntPtr kernel,
             uint workDim,
@@ -326,12 +362,12 @@ namespace ILGPU.Runtime.OneAPI.Native
                 // Get platforms
                 var result = GetPlatforms(out uint platformCount, []);
                 if (result != SYCLResult.Success || platformCount == 0)
-                    return Array.Empty<IntPtr>();
+                    return [];
 
                 var platforms = new IntPtr[platformCount];
                 result = GetPlatforms(out _, platforms);
                 if (result != SYCLResult.Success)
-                    return Array.Empty<IntPtr>();
+                    return [];
 
                 var allDevices = new System.Collections.Generic.List<IntPtr>();
 
@@ -355,11 +391,11 @@ namespace ILGPU.Runtime.OneAPI.Native
                     }
                 }
 
-                return allDevices.ToArray();
+                return [.. allDevices];
             }
             catch
             {
-                return Array.Empty<IntPtr>();
+                return [];
             }
         }
 
@@ -510,8 +546,10 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <summary>
         /// Native Intel MKL SYCL GEMM implementation.
         /// </summary>
-        [DllImport(MKLLibrary, EntryPoint = "oneapi_mkl_blas_sgemm", CallingConvention = CallingConvention.Cdecl)]
-        private static extern SYCLResult ExecuteMKLSYCLGEMM(
+        [LibraryImport(MKLLibrary, EntryPoint = "oneapi_mkl_blas_sgemm")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial SYCLResult ExecuteMKLSYCLGEMM(
             IntPtr queue,
             int layout, int transA, int transB,
             int m, int n, int k,
@@ -593,12 +631,16 @@ namespace ILGPU.Runtime.OneAPI.Native
                 // Intel Data Center GPUs (Xe-HP/HPC)
                 if (deviceName.Contains("DATA CENTER", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("PONTE VECCHIO", StringComparison.OrdinalIgnoreCase) || 
                     deviceName.Contains("XE-HP", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("XE-HPC", StringComparison.OrdinalIgnoreCase))
+                {
                     return IntelGPUArchitecture.XeHPC;
+                }
 
                 // Intel Iris Xe GPUs (Gen12/Xe-LP)
                 if (deviceName.Contains("IRIS XE", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("XE GRAPHICS", StringComparison.OrdinalIgnoreCase) || 
                     deviceName.Contains("GEN12", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("TGL", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("DG1", StringComparison.OrdinalIgnoreCase))
+                {
                     return IntelGPUArchitecture.XeLP;
+                }
 
                 // Intel UHD Graphics (Gen11/Gen9)
                 if (deviceName.Contains("UHD", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("GEN11", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("ICL", StringComparison.OrdinalIgnoreCase))

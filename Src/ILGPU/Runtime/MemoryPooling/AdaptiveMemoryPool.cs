@@ -219,7 +219,7 @@ namespace ILGPU.Runtime.MemoryPooling
                 var hitRatio = totalOps > 0 ? (double)Interlocked.Read(ref totalHits) / totalOps : 0.0;
                 
                 var avgRentTime = TimeSpan.Zero;
-                if (rentedBuffers.Count > 0)
+                if (!rentedBuffers.IsEmpty)
                 {
                     var now = DateTime.UtcNow;
                     var totalRentTime = rentedBuffers.Values.Sum(startTime => (now - startTime).Ticks);

@@ -186,17 +186,17 @@ namespace ILGPU.Runtime.Scheduling
 
         public LoadBalancer()
         {
-            this.accelerators = [];
-            this.currentLoads = [];
+            accelerators = [];
+            currentLoads = [];
         }
 
         public LoadBalancer(IEnumerable<Accelerator> accelerators)
         {
             this.accelerators = [.. accelerators];
-            this.currentLoads = [];
+            currentLoads = [];
             foreach (var acc in this.accelerators)
             {
-                this.currentLoads[acc] = 0.0;
+                currentLoads[acc] = 0.0;
             }
         }
 

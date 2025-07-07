@@ -53,7 +53,9 @@ namespace ILGPU.SourceGenerators.Generators
         private static bool IsOptimizableKernelMethod(SyntaxNode node, CancellationToken cancellationToken)
         {
             if (node is not MethodDeclarationSyntax method)
+            {
                 return false;
+            }
 
             // Look for methods that can benefit from optimization
             return method.Modifiers.Any(SyntaxKind.StaticKeyword) &&
@@ -112,7 +114,9 @@ namespace ILGPU.SourceGenerators.Generators
 
             var methodSymbol = semanticModel.GetDeclaredSymbol(method);
             if (methodSymbol == null)
+            {
                 return null;
+            }
 
             var analysis = new KernelOptimizationAnalysis();
             
@@ -285,7 +289,7 @@ namespace ILGPU.SourceGenerators.Generators
 
             foreach (var group in validKernels)
             {
-                var sourceCode = GenerateOptimizedKernelClass(group.Key, group.ToImmutableArray());
+                var sourceCode = GenerateOptimizedKernelClass(group.Key, [.. group]);
                 var fileName = $"{SanitizeTypeName(group.Key)}_OptimizedKernels.g.cs";
                 
                 context.AddSource(fileName, SourceText.From(sourceCode, Encoding.UTF8));
@@ -350,7 +354,9 @@ namespace ILGPU.SourceGenerators.Generators
         private static void GenerateUnrolledVariant(StringBuilder sb, OptimizableKernelInfo kernel, string baseName)
         {
             if (kernel.Analysis.LoopUnrollCandidates.Count == 0)
+            {
                 return;
+            }
 
             sb.AppendLine($"        /// <summary>");
             sb.AppendLine($"        /// Loop-unrolled variant of {baseName} for improved performance");
@@ -373,7 +379,9 @@ namespace ILGPU.SourceGenerators.Generators
         private static void GenerateVectorizedVariant(StringBuilder sb, OptimizableKernelInfo kernel, string baseName)
         {
             if (kernel.Analysis.VectorizationCandidates.Count == 0)
+            {
                 return;
+            }
 
             sb.AppendLine($"        /// <summary>");
             sb.AppendLine($"        /// SIMD-vectorized variant of {baseName} for improved throughput");
@@ -399,7 +407,9 @@ namespace ILGPU.SourceGenerators.Generators
         private static void GenerateSpecializedParameterVariants(StringBuilder sb, OptimizableKernelInfo kernel, string baseName)
         {
             if (kernel.Analysis.SpecializableParameters.Count == 0)
+            {
                 return;
+            }
 
             // Generate variants for common parameter values
             var commonSizes = new[] { 32, 64, 128, 256, 512, 1024 };

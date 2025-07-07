@@ -239,8 +239,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pAllocator">Memory allocator.</param>
         /// <param name="pInstance">Created instance handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkCreateInstance(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkCreateInstance(
             IntPtr pCreateInfo,
             IntPtr pAllocator,
             out IntPtr pInstance);
@@ -250,8 +252,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="instance">Instance handle.</param>
         /// <param name="pAllocator">Memory allocator.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkDestroyInstance(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkDestroyInstance(
             IntPtr instance,
             IntPtr pAllocator);
 
@@ -262,8 +266,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pPhysicalDeviceCount">Device count.</param>
         /// <param name="pPhysicalDevices">Device handles.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkEnumeratePhysicalDevices(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkEnumeratePhysicalDevices(
             IntPtr instance,
             ref uint pPhysicalDeviceCount,
             IntPtr pPhysicalDevices);
@@ -277,8 +283,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="physicalDevice">Physical device handle.</param>
         /// <param name="pProperties">Device properties.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkGetPhysicalDeviceProperties(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkGetPhysicalDeviceProperties(
             IntPtr physicalDevice,
             out VkPhysicalDeviceProperties pProperties);
 
@@ -288,8 +296,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="physicalDevice">Physical device handle.</param>
         /// <param name="pQueueFamilyPropertyCount">Queue family count.</param>
         /// <param name="pQueueFamilyProperties">Queue family properties.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkGetPhysicalDeviceQueueFamilyProperties(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkGetPhysicalDeviceQueueFamilyProperties(
             IntPtr physicalDevice,
             ref uint pQueueFamilyPropertyCount,
             IntPtr pQueueFamilyProperties);
@@ -299,8 +309,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="physicalDevice">Physical device handle.</param>
         /// <param name="pMemoryProperties">Memory properties.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkGetPhysicalDeviceMemoryProperties(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkGetPhysicalDeviceMemoryProperties(
             IntPtr physicalDevice,
             IntPtr pMemoryProperties);
 
@@ -316,8 +328,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pAllocator">Memory allocator.</param>
         /// <param name="pDevice">Created device handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkCreateDevice(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkCreateDevice(
             IntPtr physicalDevice,
             IntPtr pCreateInfo,
             IntPtr pAllocator,
@@ -328,8 +342,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="device">Device handle.</param>
         /// <param name="pAllocator">Memory allocator.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkDestroyDevice(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkDestroyDevice(
             IntPtr device,
             IntPtr pAllocator);
 
@@ -340,8 +356,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="queueFamilyIndex">Queue family index.</param>
         /// <param name="queueIndex">Queue index.</param>
         /// <param name="pQueue">Queue handle.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkGetDeviceQueue(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkGetDeviceQueue(
             IntPtr device,
             uint queueFamilyIndex,
             uint queueIndex,
@@ -359,8 +377,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pAllocator">Memory allocator.</param>
         /// <param name="pBuffer">Created buffer handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkCreateBuffer(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkCreateBuffer(
             IntPtr device,
             IntPtr pCreateInfo,
             IntPtr pAllocator,
@@ -372,8 +392,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="device">Device handle.</param>
         /// <param name="buffer">Buffer handle.</param>
         /// <param name="pAllocator">Memory allocator.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkDestroyBuffer(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkDestroyBuffer(
             IntPtr device,
             IntPtr buffer,
             IntPtr pAllocator);
@@ -386,8 +408,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pAllocator">Memory allocator.</param>
         /// <param name="pMemory">Allocated memory handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkAllocateMemory(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkAllocateMemory(
             IntPtr device,
             IntPtr pAllocateInfo,
             IntPtr pAllocator,
@@ -399,8 +423,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="device">Device handle.</param>
         /// <param name="memory">Memory handle.</param>
         /// <param name="pAllocator">Memory allocator.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkFreeMemory(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkFreeMemory(
             IntPtr device,
             IntPtr memory,
             IntPtr pAllocator);
@@ -413,8 +439,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="memory">Memory handle.</param>
         /// <param name="memoryOffset">Memory offset.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkBindBufferMemory(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkBindBufferMemory(
             IntPtr device,
             IntPtr buffer,
             IntPtr memory,
@@ -432,8 +460,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pAllocator">Memory allocator.</param>
         /// <param name="pCommandPool">Created command pool handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkCreateCommandPool(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkCreateCommandPool(
             IntPtr device,
             IntPtr pCreateInfo,
             IntPtr pAllocator,
@@ -445,8 +475,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="device">Device handle.</param>
         /// <param name="commandPool">Command pool handle.</param>
         /// <param name="pAllocator">Memory allocator.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkDestroyCommandPool(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkDestroyCommandPool(
             IntPtr device,
             IntPtr commandPool,
             IntPtr pAllocator);
@@ -458,8 +490,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pAllocateInfo">Command buffer allocation info.</param>
         /// <param name="pCommandBuffers">Allocated command buffer handles.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkAllocateCommandBuffers(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkAllocateCommandBuffers(
             IntPtr device,
             IntPtr pAllocateInfo,
             IntPtr pCommandBuffers);
@@ -470,8 +504,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="commandBuffer">Command buffer handle.</param>
         /// <param name="pBeginInfo">Begin info.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkBeginCommandBuffer(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkBeginCommandBuffer(
             IntPtr commandBuffer,
             IntPtr pBeginInfo);
 
@@ -480,8 +516,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="commandBuffer">Command buffer handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkEndCommandBuffer(IntPtr commandBuffer);
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkEndCommandBuffer(IntPtr commandBuffer);
 
         #endregion
 
@@ -494,8 +532,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="groupCountX">Number of workgroups in X dimension.</param>
         /// <param name="groupCountY">Number of workgroups in Y dimension.</param>
         /// <param name="groupCountZ">Number of workgroups in Z dimension.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkCmdDispatch(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkCmdDispatch(
             IntPtr commandBuffer,
             uint groupCountX,
             uint groupCountY,
@@ -506,8 +546,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="commandBuffer">Command buffer handle.</param>
         /// <param name="pipeline">Pipeline handle.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkCmdBindPipeline(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkCmdBindPipeline(
             IntPtr commandBuffer,
             uint pipelineBindPoint,
             IntPtr pipeline);
@@ -523,8 +565,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pDescriptorSets">Descriptor sets.</param>
         /// <param name="dynamicOffsetCount">Dynamic offset count.</param>
         /// <param name="pDynamicOffsets">Dynamic offsets.</param>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void vkCmdBindDescriptorSets(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void vkCmdBindDescriptorSets(
             IntPtr commandBuffer,
             uint pipelineBindPoint,
             IntPtr layout,
@@ -546,8 +590,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <param name="pSubmits">Submit info.</param>
         /// <param name="fence">Fence handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkQueueSubmit(
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkQueueSubmit(
             IntPtr queue,
             uint submitCount,
             IntPtr pSubmits,
@@ -558,8 +604,10 @@ namespace ILGPU.Backends.Vulkan.Native
         /// </summary>
         /// <param name="queue">Queue handle.</param>
         /// <returns>Vulkan result code.</returns>
-        [DllImport(VulkanLibrary, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern VkResult vkQueueWaitIdle(IntPtr queue);
+        [LibraryImport(VulkanLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial VkResult vkQueueWaitIdle(IntPtr queue);
 
         #endregion
 

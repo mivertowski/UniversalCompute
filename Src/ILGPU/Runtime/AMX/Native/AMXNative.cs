@@ -77,15 +77,19 @@ namespace ILGPU.Runtime.AMX.Native
         /// </summary>
         /// <param name="config">Tile configuration.</param>
         /// <returns>Status code.</returns>
-        [DllImport(TileLibrary, EntryPoint = "ldtilecfg", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int ConfigureTiles(ref AMXTileConfig config);
+        [LibraryImport(TileLibrary, EntryPoint = "ldtilecfg")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial int ConfigureTiles(ref AMXTileConfig config);
 
         /// <summary>
         /// Releases AMX tile configuration.
         /// </summary>
         /// <returns>Status code.</returns>
-        [DllImport(TileLibrary, EntryPoint = "tilerelease", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int ReleaseTiles();
+        [LibraryImport(TileLibrary, EntryPoint = "tilerelease")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial int ReleaseTiles();
 
         /// <summary>
         /// Loads data into an AMX tile.
@@ -93,8 +97,10 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="tile">Tile number (0-7).</param>
         /// <param name="src">Source data pointer.</param>
         /// <param name="stride">Stride in bytes.</param>
-        [DllImport(AMXLibrary, EntryPoint = "tileloadd", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileLoad(byte tile, IntPtr src, long stride);
+        [LibraryImport(AMXLibrary, EntryPoint = "tileloadd")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileLoad(byte tile, IntPtr src, long stride);
 
         /// <summary>
         /// Stores data from an AMX tile.
@@ -102,15 +108,19 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="tile">Tile number (0-7).</param>
         /// <param name="dst">Destination data pointer.</param>
         /// <param name="stride">Stride in bytes.</param>
-        [DllImport(AMXLibrary, EntryPoint = "tilestored", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileStore(byte tile, IntPtr dst, long stride);
+        [LibraryImport(AMXLibrary, EntryPoint = "tilestored")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileStore(byte tile, IntPtr dst, long stride);
 
         /// <summary>
         /// Zeros an AMX tile.
         /// </summary>
         /// <param name="tile">Tile number (0-7).</param>
-        [DllImport(AMXLibrary, EntryPoint = "tilezero", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileZero(byte tile);
+        [LibraryImport(AMXLibrary, EntryPoint = "tilezero")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileZero(byte tile);
 
         #endregion
 
@@ -122,8 +132,10 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="tileA">Source tile A (0-7).</param>
         /// <param name="tileB">Source tile B (0-7).</param>
         /// <param name="tileC">Destination tile C (0-7).</param>
-        [DllImport(AMXLibrary, EntryPoint = "tdpbf16ps", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileMatMulBF16(byte tileA, byte tileB, byte tileC);
+        [LibraryImport(AMXLibrary, EntryPoint = "tdpbf16ps")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileMatMulBF16(byte tileA, byte tileB, byte tileC);
 
         /// <summary>
         /// Performs INT8 matrix multiplication using AMX.
@@ -131,8 +143,10 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="tileA">Source tile A (0-7).</param>
         /// <param name="tileB">Source tile B (0-7).</param>
         /// <param name="tileC">Destination tile C (0-7).</param>
-        [DllImport(AMXLibrary, EntryPoint = "tdpbssd", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileMatMulINT8(byte tileA, byte tileB, byte tileC);
+        [LibraryImport(AMXLibrary, EntryPoint = "tdpbssd")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileMatMulINT8(byte tileA, byte tileB, byte tileC);
 
         /// <summary>
         /// Performs UINT8 matrix multiplication using AMX.
@@ -140,8 +154,10 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="tileA">Source tile A (0-7).</param>
         /// <param name="tileB">Source tile B (0-7).</param>
         /// <param name="tileC">Destination tile C (0-7).</param>
-        [DllImport(AMXLibrary, EntryPoint = "tdpbusd", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileMatMulUINT8(byte tileA, byte tileB, byte tileC);
+        [LibraryImport(AMXLibrary, EntryPoint = "tdpbusd")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileMatMulUINT8(byte tileA, byte tileB, byte tileC);
 
         /// <summary>
         /// Performs mixed precision UINT8/INT8 matrix multiplication.
@@ -149,8 +165,10 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="tileA">Source tile A (0-7).</param>
         /// <param name="tileB">Source tile B (0-7).</param>
         /// <param name="tileC">Destination tile C (0-7).</param>
-        [DllImport(AMXLibrary, EntryPoint = "tdpbuud", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void TileMatMulMixed(byte tileA, byte tileB, byte tileC);
+        [LibraryImport(AMXLibrary, EntryPoint = "tdpbuud")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void TileMatMulMixed(byte tileA, byte tileB, byte tileC);
 
         #endregion
 
@@ -449,8 +467,11 @@ namespace ILGPU.Runtime.AMX.Native
         /// Checks CPUID for AMX support.
         /// </summary>
         /// <returns>True if AMX is supported.</returns>
-        [DllImport(AMXLibrary, EntryPoint = "check_amx_support", CallingConvention = CallingConvention.Cdecl)]
-        private static extern bool CheckAMXCPUID();
+        [LibraryImport(AMXLibrary, EntryPoint = "check_amx_support")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool CheckAMXCPUID();
 
         /// <summary>
         /// CPU fallback for matrix multiplication.

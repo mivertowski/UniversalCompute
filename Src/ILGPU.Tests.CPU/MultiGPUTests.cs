@@ -374,7 +374,7 @@ namespace ILGPU.Tests.CPU
                 async (chunk, gpu, cancellationToken) =>
                 {
                     await Task.Delay(10, cancellationToken).ConfigureAwait(false); // Simulate processing
-                    return chunk.Select(x => x * 2).ToArray();
+                    return [.. chunk.Select(x => x * 2)];
                 }).ConfigureAwait(false);
 
             Assert.Equal(inputData.Length, result.Length);

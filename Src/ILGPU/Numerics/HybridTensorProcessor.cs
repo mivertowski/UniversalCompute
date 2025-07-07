@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -245,7 +246,7 @@ namespace ILGPU.Numerics.Hybrid
         public bool SupportsHybridExecution { get; set; }
         public int MaxCpuCores { get; set; }
         public int MaxGpuDevices { get; set; }
-        public IList<TensorPrecision> SupportedPrecisions { get; set; }
+        public IList<TensorPrecision> SupportedPrecisions { get; }
         public long GpuMemoryBytes { get; set; }
         public long CpuMemoryBytes { get; set; }
     }
@@ -278,8 +279,8 @@ namespace ILGPU.Numerics.Hybrid
                 } 
                 catch { }
             }
-            this.accelerators = acceleratorList.ToArray();
-            this.stats = new HybridProcessorStats();
+            accelerators = [.. acceleratorList];
+            stats = new HybridProcessorStats();
         }
 
         /// <inheritdoc/>
@@ -350,7 +351,7 @@ namespace ILGPU.Numerics.Hybrid
                 SupportsHybridExecution = cpuAccelerator != null && gpuAccelerator != null,
                 MaxCpuCores = Environment.ProcessorCount,
                 MaxGpuDevices = accelerators.Length,
-                SupportedPrecisions = gpuAccelerator?.GetSupportedTensorPrecisions().ToList() ?? new List<TensorPrecision>(),
+                SupportedPrecisions = gpuAccelerator?.GetSupportedTensorPrecisions().ToList() ?? [],
                 GpuMemoryBytes = gpuAccelerator?.MemorySize ?? 0,
                 CpuMemoryBytes = GC.GetTotalMemory(false)
             };

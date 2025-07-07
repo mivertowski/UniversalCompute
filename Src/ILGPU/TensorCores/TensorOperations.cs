@@ -27,10 +27,16 @@ namespace ILGPU.TensorCores
     /// </summary>
     public readonly struct BatchedGemmParams
     {
-        public readonly int M, N, K;
-        public readonly int LdA, StrideA;
-        public readonly int LdB, StrideB;
-        public readonly int LdC, StrideC;
+        public readonly int M { get; }
+        public readonly int N { get; }
+        public readonly int K { get; }
+
+        public readonly int LdA { get; }
+        public readonly int StrideA { get; }
+        public readonly int LdB { get; }
+        public readonly int StrideB { get; }
+        public readonly int LdC { get; }
+        public readonly int StrideC { get; }
 
         public BatchedGemmParams(int m, int n, int k, int ldA, int strideA, int ldB, int strideB, int ldC, int strideC)
         {
@@ -46,11 +52,20 @@ namespace ILGPU.TensorCores
     /// </summary>
     public readonly struct ConvolutionParams
     {
-        public readonly int InputN, InputC, InputH, InputW;
-        public readonly int FilterK, FilterC, FilterR, FilterS;
-        public readonly int StrideH, StrideW;
-        public readonly int PadH, PadW;
-        public readonly int OutputH, OutputW;
+        public readonly int InputN { get; }
+        public readonly int InputC { get; }
+        public readonly int InputH { get; }
+        public readonly int InputW { get; }
+        public readonly int FilterK { get; }
+        public readonly int FilterC { get; }
+        public readonly int FilterR { get; }
+        public readonly int FilterS { get; }
+        public readonly int StrideH { get; }
+        public readonly int StrideW { get; }
+        public readonly int PadH { get; }
+        public readonly int PadW { get; }
+        public readonly int OutputH { get; }
+        public readonly int OutputW { get; }
 
         public ConvolutionParams(int inputN, int inputC, int inputH, int inputW,
                                int filterK, int filterC, int filterR, int filterS,

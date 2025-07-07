@@ -117,12 +117,9 @@ namespace ILGPU.TensorCores
         /// <summary>
         /// Validates that the tensor dimensions are supported by tensor cores.
         /// </summary>
-        public static bool IsSupported
-        {
-            get
-            {
+        public static bool IsSupported =>
                 // Tensor cores support specific dimension combinations
-                return (M, N, K) switch
+                (M, N, K) switch
                 {
                     (16, 16, 16) => true,  // Most common
                     (32, 8, 16) => true,   // Tall matrices
@@ -130,25 +127,17 @@ namespace ILGPU.TensorCores
                     (16, 16, 8) when typeof(T) == typeof(float) => true,  // TF32
                     _ => false
                 };
-            }
-        }
 
         /// <summary>
         /// Gets the precision mode based on the element type.
         /// </summary>
-        public static TensorPrecision Precision
+        public static TensorPrecision Precision => typeof(T) switch
         {
-            get
-            {
-                return typeof(T) switch
-                {
-                    Type t when t == typeof(Half) => TensorPrecision.FP16,
-                    Type t when t == typeof(BFloat16) => TensorPrecision.BF16,
-                    Type t when t == typeof(float) => TensorPrecision.TF32,
-                    _ => throw new NotSupportedException($"Unsupported tensor type: {typeof(T)}")
-                };
-            }
-        }
+            Type t when t == typeof(Half) => TensorPrecision.FP16,
+            Type t when t == typeof(BFloat16) => TensorPrecision.BF16,
+            Type t when t == typeof(float) => TensorPrecision.TF32,
+            _ => throw new NotSupportedException($"Unsupported tensor type: {typeof(T)}")
+        };
 
         /// <summary>
         /// Creates a matrix A fragment descriptor.

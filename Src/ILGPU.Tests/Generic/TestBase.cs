@@ -68,7 +68,9 @@ namespace ILGPU.Tests
             if (method.IsGenericMethod)
             {
                 if (typeArguments == null)
+                {
                     throw new ArgumentNullException(nameof(typeArguments));
+                }
 
                 // Try to specialize the method
                 method = method.MakeGenericMethod(typeArguments);
@@ -282,7 +284,9 @@ namespace ILGPU.Tests
             Assert.True(dataLength <= data.Length);
             Assert.Equal(dataLength, expected.Length);
             for (int i = offset ?? 0, e = dataLength; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i]);
+            }
         }
 
         /// <summary>
@@ -296,7 +300,9 @@ namespace ILGPU.Tests
         {
             Assert.Equal(source.Length, expected.Length);
             for (int i = 0; i < expected.Length; ++i)
+            {
                 Assert.Equal(expected[i], source[i]);
+            }
         }
 
         /// <summary>
@@ -318,8 +324,12 @@ namespace ILGPU.Tests
             var data = view.AsContiguous().GetAsArray();
             Assert.Equal(data.Length, expected.Length);
             for (int i = 0; i < expected.GetLength(0); ++i)
+            {
                 for (int j = 0; j < expected.GetLength(1); ++j)
+                {
                     Assert.Equal(expected[i, j], data[view.ComputeLinearIndex((i, j))]);
+                }
+            }
         }
 
         /// <summary>
@@ -337,8 +347,12 @@ namespace ILGPU.Tests
         {
             Assert.Equal(source.Length, expected.Length);
             for (int i = 0; i < expected.GetLength(0); ++i)
+            {
                 for (int j = 0; j < expected.GetLength(1); ++j)
+                {
                     Assert.Equal(expected[i, j], source[i, j]);
+                }
+            }
         }
 
         /// <summary>
@@ -360,13 +374,17 @@ namespace ILGPU.Tests
             var data = view.AsContiguous().GetAsArray();
             Assert.Equal(data.Length, expected.Length);
             for (int i = 0; i < expected.GetLength(0); ++i)
+            {
                 for (int j = 0; j < expected.GetLength(1); ++j)
+                {
                     for (int k = 0; k < expected.GetLength(2); ++k)
                     {
                         Assert.Equal(
                             expected[i, j, k],
                             data[view.ComputeLinearIndex((i, j, k))]);
                     }
+                }
+            }
         }
 
         /// <summary>
@@ -384,9 +402,15 @@ namespace ILGPU.Tests
         {
             Assert.Equal(source.Length, expected.Length);
             for (int i = 0; i < expected.GetLength(0); ++i)
+            {
                 for (int j = 0; j < expected.GetLength(1); ++j)
+                {
                     for (int k = 0; k < expected.GetLength(2); ++k)
+                    {
                         Assert.Equal(expected[i, j, k], source[i, j, k]);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -400,7 +424,10 @@ namespace ILGPU.Tests
         {
             var data = new T[view.Length];
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 data[i] = value;
+            }
+
             view.CopyFromCPU(Accelerator.DefaultStream, data);
         }
 
@@ -415,7 +442,10 @@ namespace ILGPU.Tests
         {
             var data = new T[view.Length];
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 data[i] = sequencer(i);
+            }
+
             view.CopyFromCPU(Accelerator.DefaultStream, data);
         }
 
@@ -427,7 +457,10 @@ namespace ILGPU.Tests
         protected override void Dispose(bool disposing)
         {
             if (CleanTests)
+            {
                 TestContext.ClearCaches();
+            }
+
             base.Dispose(disposing);
         }
 

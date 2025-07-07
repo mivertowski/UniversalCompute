@@ -31,12 +31,16 @@ namespace ILGPU.Benchmarks
         public static Context GetOrCreateContext()
         {
             if (_sharedContext != null && !_sharedContext.IsDisposed)
+            {
                 return _sharedContext;
+            }
 
             lock (_lock)
             {
                 if (_sharedContext != null && !_sharedContext.IsDisposed)
+                {
                     return _sharedContext;
+                }
 
                 try
                 {

@@ -132,10 +132,7 @@ namespace ILGPU.Runtime.ROCm
                 kind = HipMemcpyKind.DeviceToDevice;
             else if (source is ROCmMemoryBuffer)
                 kind = HipMemcpyKind.DeviceToHost;
-            else if (target is ROCmMemoryBuffer)
-                kind = HipMemcpyKind.HostToDevice;
-            else
-                kind = HipMemcpyKind.HostToHost;
+            else kind = target is ROCmMemoryBuffer ? HipMemcpyKind.HostToDevice : HipMemcpyKind.HostToHost;
 
             try
             {

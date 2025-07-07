@@ -128,7 +128,7 @@ namespace ILGPU.Backends.Vulkan
             uint groupCountX,
             uint groupCountY = 1,
             uint groupCountZ = 1,
-            CancellationToken cancellationToken = default) => await Task.Run(() => DispatchCompute(pipeline, descriptorSet, groupCountX, groupCountY, groupCountZ), cancellationToken);
+            CancellationToken cancellationToken = default) => await Task.Run(() => DispatchCompute(pipeline, descriptorSet, groupCountX, groupCountY, groupCountZ), cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Creates a compute pipeline from SPIR-V bytecode.
@@ -358,7 +358,7 @@ namespace ILGPU.Backends.Vulkan
         /// <returns>Array of Vulkan accelerators.</returns>
         public static VulkanAccelerator[] EnumerateDevices(Context context)
         {
-            if (!IsAvailable()) return Array.Empty<VulkanAccelerator>();
+            if (!IsAvailable()) return [];
 
             try
             {
@@ -376,7 +376,7 @@ namespace ILGPU.Backends.Vulkan
             }
             catch
             {
-                return Array.Empty<VulkanAccelerator>();
+                return [];
             }
         }
 

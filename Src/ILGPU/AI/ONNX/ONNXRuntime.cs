@@ -268,7 +268,7 @@ namespace ILGPU.AI.ONNX
         /// </summary>
         /// <param name="inputs">Input tensors.</param>
         /// <returns>Task with output tensors.</returns>
-        public async Task<Dictionary<string, ArrayView<float>>> RunInferenceAsync(Dictionary<string, ArrayView<float>> inputs) => await Task.Run(() => RunInference(inputs));
+        public async Task<Dictionary<string, ArrayView<float>>> RunInferenceAsync(Dictionary<string, ArrayView<float>> inputs) => await Task.Run(() => RunInference(inputs)).ConfigureAwait(false);
 
         /// <summary>
         /// Runs batch inference on multiple inputs.
@@ -582,7 +582,7 @@ namespace ILGPU.AI.ONNX
         /// Gets or sets the tensor shape.
         /// </summary>
 #pragma warning disable CA1819 // Properties should not return arrays
-        public int[] Shape { get; set; } = Array.Empty<int>();
+        public int[] Shape { get; set; } = [];
 #pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>

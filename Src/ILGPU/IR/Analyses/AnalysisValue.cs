@@ -10,6 +10,7 @@
 // ---------------------------------------------------------------------------------------
 
 using ILGPU.IR.Types;
+using ILGPU.Util;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;

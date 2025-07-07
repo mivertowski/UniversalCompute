@@ -30,7 +30,10 @@ namespace ILGPU.Tests
         {
             int value = 42;
             while (false)
+            {
                 ++value;
+            }
+
             data[index] = value;
         }
 
@@ -52,7 +55,10 @@ namespace ILGPU.Tests
         {
             int value = 42;
             for (int i = 0; i < counter; ++i)
+            {
                 ++value;
+            }
+
             data[index] = value;
         }
 
@@ -79,7 +85,10 @@ namespace ILGPU.Tests
             int value = 42;
             var counter = source[index];
             for (int i = 0; i < counter; ++i)
+            {
                 ++value;
+            }
+
             data[index] = value;
         }
 
@@ -137,7 +146,9 @@ namespace ILGPU.Tests
             for (int i = 0; i < counter; ++i)
             {
                 for (int j = 0; j < counter2; ++j)
+                {
                     value += 2;
+                }
             }
             data[index] = value;
         }
@@ -166,7 +177,9 @@ namespace ILGPU.Tests
             for (int i = 0; i < 10; ++i)
             {
                 for (int j = 0; j < 20; ++j)
+                {
                     value += 2;
+                }
             }
             data[index] = value;
         }
@@ -298,11 +311,17 @@ namespace ILGPU.Tests
             for (int i = 0; i < counter; ++i)
             {
                 if (i == counter2)
+                {
                     continue;
+                }
+
                 ++accumulate;
 
                 if (i == counter3)
+                {
                     continue;
+                }
+
                 ++accumulate;
             }
             data[index] = accumulate;
@@ -334,11 +353,17 @@ namespace ILGPU.Tests
             for (int i = 0; i < counter; ++i)
             {
                 if (i == counter2)
+                {
                     break;
+                }
+
                 ++accumulate;
 
                 if (i == counter3)
+                {
                     break;
+                }
+
                 ++accumulate;
             }
             data[index] = accumulate;
@@ -373,14 +398,21 @@ namespace ILGPU.Tests
                 for (int j = 0; j < counter2; ++j)
                 {
                     if (j == i)
+                    {
                         continue;
+                    }
 
                     if (++k == counter3)
+                    {
                         break;
+                    }
                 }
 
                 if (i == counter2)
+                {
                     continue;
+                }
+
                 ++accumulate;
             }
             data[index] = accumulate;
@@ -416,14 +448,21 @@ namespace ILGPU.Tests
                 for (int j = 0; j < 13; ++j)
                 {
                     if (j == i)
+                    {
                         continue;
+                    }
 
                     if (++k == 9)
+                    {
                         break;
+                    }
                 }
 
                 if (i == 13)
+                {
                     continue;
+                }
+
                 ++accumulate;
             }
             data[index] = accumulate;
@@ -445,7 +484,9 @@ namespace ILGPU.Tests
             ArrayView1D<int, Stride1D.Dense> data)
         {
             for (int i = 0; i <= 2; i++)
+            {
                 data[index] = i;
+            }
         }
 
         [Fact]
@@ -467,7 +508,11 @@ namespace ILGPU.Tests
             for (int i = 0; i < 4; ++i)
             {
                 ++j;
-                if (i == 2) break;
+                if (i == 2)
+                {
+                    break;
+                }
+
                 ++j;
             }
             data[index] = j;
@@ -492,7 +537,11 @@ namespace ILGPU.Tests
             for (int i = 0; i <= 4; ++i)
             {
                 ++j;
-                if (i == 2) break;
+                if (i == 2)
+                {
+                    break;
+                }
+
                 ++j;
             }
             data[index] = j;
@@ -517,7 +566,11 @@ namespace ILGPU.Tests
             for (int i = 0; i < 4; ++i)
             {
                 ++j;
-                if (i == 2) continue;
+                if (i == 2)
+                {
+                    continue;
+                }
+
                 ++j;
             }
             data[index] = j;
@@ -543,7 +596,9 @@ namespace ILGPU.Tests
             {
                 var j = source[i];
                 if (i > 2 && i < 5 && i == j)
+                {
                     data[index] = j;
+                }
             }
         }
 
@@ -611,12 +666,16 @@ namespace ILGPU.Tests
         {
             var b = a[0];
             if (b == -1)
+            {
                 return -1;
+            }
 
             while (true)
             {
                 if (b == 13)
+                {
                     break;
+                }
             }
             return b;
         }
@@ -625,12 +684,16 @@ namespace ILGPU.Tests
         {
             int b = 0;
             for (var i = 0; i < a.Length; i++)
+            {
                 b = a[i];
+            }
 
             while (true)
             {
                 if (b >= 13)
+                {
                     break;
+                }
             }
             return b;
         }
@@ -657,7 +720,9 @@ namespace ILGPU.Tests
         {
             dataView[index] = 0;
             for (int i = 0; i < 3; i += 2)
+            {
                 dataView[index]++;
+            }
         }
 
         [Fact]
@@ -677,7 +742,9 @@ namespace ILGPU.Tests
         {
             dataView[index] = 0;
             for (int i = 0; i == 6; i++)
+            {
                 dataView[index]++;
+            }
         }
 
         [Fact]
@@ -697,7 +764,9 @@ namespace ILGPU.Tests
         {
             dataView[index] = 0;
             for (int i = 0; i < 4; i += 2)
+            {
                 dataView[index] += i;
+            }
         }
 
         [Fact]
@@ -749,7 +818,10 @@ namespace ILGPU.Tests
             var view2 = source2;
 
             for (int i = 0; i < numIterations; ++i)
+            {
                 Utilities.Swap(ref view1, ref view2);
+            }
+
             target1[index] = (view1[0], view2[0]);
 
             view1 = source1;
@@ -791,13 +863,19 @@ namespace ILGPU.Tests
                 numIterations);
 
             for (int i = 0; i < numIterations; ++i)
+            {
                 Utilities.Swap(ref expected[0], ref expected[1]);
+            }
+
             var expectedData = Enumerable.Repeat(
                 (expected[0], expected[1]), Length).ToArray();
             Verify(target1.View, expectedData);
 
             for (int i = 1; i < numIterations; ++i)
+            {
                 Utilities.Swap(ref expected2[0], ref expected2[1]);
+            }
+
             var expectedData2 = Enumerable.Repeat(
                 (expected2[0], expected2[1]), Length).ToArray();
             Verify(target2.View, expectedData2);
@@ -920,27 +998,42 @@ namespace ILGPU.Tests
             int value)
         {
             for (int laneOffset = Warp.WarpSize / 2; laneOffset > 0; laneOffset >>= 1)
+            {
                 value += Warp.ShuffleDown(value, laneOffset);
+            }
+
             data1[index] = value;
 
             // Simple skip loop
             for (int i = 0; i > 0; i >>= 1)
+            {
                 value += 1;
+            }
+
             data2[index] = value;
 
             // Negative start value
             for (int i = -1; i >= 0; i >>= 2)
+            {
                 value += i;
+            }
+
             data3[index] = value;
 
             // Trip count not a multiple of the divisor
             for (int i = 17; i > 0; i /= 3)
+            {
                 value += i;
+            }
+
             data4[index] = value;
 
             // Loop down to 1
             for (int i = 21; i >= 1; i /= 3)
+            {
                 value += 13;
+            }
+
             data5[index] = value;
         }
 
@@ -986,21 +1079,33 @@ namespace ILGPU.Tests
             int value)
         {
             for (int laneOffset = 1; laneOffset < Warp.WarpSize; laneOffset <<= 1)
+            {
                 value += Warp.ShuffleUp(value, laneOffset);
+            }
+
             data1[index] = value;
 
             // Trip count not a multiple of the multiplier
             for (int i = 1; i < 13; i *= 3)
+            {
                 value += 1;
+            }
+
             data2[index] = value;
 
             // Negative start value
             for (int i = -1; i > -17; i *= 4)
+            {
                 value += 2;
+            }
+
             data3[index] = value;
 
             for (int i = 17; i < 51; i *= 2)
+            {
                 value += i;
+            }
+
             data4[index] = value;
         }
 

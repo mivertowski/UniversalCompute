@@ -100,7 +100,7 @@ namespace ILGPU.Backends.Vulkan
             // 2. Transform it to SPIR-V using ILGPU's backend system
             // 3. Return the compiled SPIR-V bytecode
 
-            Array.Empty<byte>(); // Placeholder
+            []; // Placeholder
 
         private (uint groupCountX, uint groupCountY, uint groupCountZ) CalculateWorkgroupConfiguration<TIndex>(TIndex extent)
             where TIndex : struct, IIndex

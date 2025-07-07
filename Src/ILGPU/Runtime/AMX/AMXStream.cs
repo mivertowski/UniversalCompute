@@ -17,6 +17,7 @@
 
 using ILGPU.Backends;
 using ILGPU.Runtime.AMX.Native;
+using ILGPU.Util;
 using System;
 using static ILGPU.Runtime.AMX.Native.AMXNative;
 

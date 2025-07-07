@@ -178,7 +178,7 @@ namespace ILGPU.Tests
 
                 Execute(extent, buffer.View, new Index1D(i - 1));
 
-                expected = Enumerable.Repeat(0, (int)buffer.Length).ToArray();
+                expected = [.. Enumerable.Repeat(0, (int)buffer.Length)];
                 Verify(buffer.View, expected);
             }
         }
@@ -212,7 +212,7 @@ namespace ILGPU.Tests
 
                 Execute(extent, buffer.View, new Index1D(0));
 
-                expected = Enumerable.Repeat(0, (int)buffer.Length).ToArray();
+                expected = [.. Enumerable.Repeat(0, (int)buffer.Length)];
                 Verify(buffer.View, expected);
             }
         }

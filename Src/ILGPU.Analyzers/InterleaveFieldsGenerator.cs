@@ -93,7 +93,9 @@ namespace ILGPU.Analyzers
                 targetNode,
                 (diagnostic) => sourceProductionContext.ReportDiagnostic(diagnostic),
                 out var parentNodes))
+            {
                 return;
+            }
 
             // Generate the resulting structure with field members. Since we are using
             // fixed-sized buffers, we also need to add the 'unsafe' keyword.
@@ -214,15 +216,21 @@ namespace ILGPU.Analyzers
             {
                 // Ignore static members.
                 if (member.IsStatic)
+                {
                     continue;
+                }
 
                 // Ignore non-field members.
                 if (member is not IFieldSymbol fieldSymbol)
+                {
                     continue;
+                }
 
                 // Ignore field members using reference types.
                 if (!fieldSymbol.Type.IsValueType)
+                {
                     continue;
+                }
 
                 if (fieldSymbol.Type.IsPrimitiveType() || fieldSymbol.IsFixedSizeBuffer)
                 {
@@ -336,15 +344,12 @@ namespace ILGPU.Analyzers
                         .WithModifiers(SF.TokenList(SF.Token(SyntaxKind.PartialKeyword)))
                         .WithMembers(SF.SingletonList(declaration));
                 }
-                else if (parentNode is NamespaceDeclarationSyntax namespaceDeclaration)
-                {
-                    declaration =
-                        SF.NamespaceDeclaration(namespaceDeclaration.Name)
-                        .WithMembers(SF.SingletonList(declaration));
-                }
                 else
                 {
-                    throw new NotImplementedException();
+                    declaration = parentNode is NamespaceDeclarationSyntax namespaceDeclaration
+                        ? (MemberDeclarationSyntax)SF.NamespaceDeclaration(namespaceDeclaration.Name)
+                                            .WithMembers(SF.SingletonList(declaration))
+                        : throw new NotImplementedException();
                 }
             }
 

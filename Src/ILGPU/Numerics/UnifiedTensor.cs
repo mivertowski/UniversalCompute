@@ -98,8 +98,8 @@ namespace ILGPU.Numerics
         /// <param name="layoutMode">The memory layout optimization mode.</param>
         public UnifiedTensor(Accelerator accelerator, TensorShape shape, MemoryLayoutMode layoutMode = MemoryLayoutMode.Auto)
         {
-            this.Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            this.Shape = shape;
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Shape = shape;
             this.layoutMode = layoutMode == MemoryLayoutMode.Auto ? ChooseOptimalLayout() : layoutMode;
             
             InitializeMemory();

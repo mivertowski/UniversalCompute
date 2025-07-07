@@ -52,16 +52,22 @@ namespace ILGPU.SourceGenerators.Generators
         {
             // Look for static methods that could be kernel methods
             if (node is not MethodDeclarationSyntax methodSyntax)
+            {
                 return false;
+            }
 
             // Must be static
             if (!methodSyntax.Modifiers.Any(m => m.IsKind(SyntaxKind.StaticKeyword)))
+            {
                 return false;
+            }
 
             // Must return void
             if (methodSyntax.ReturnType is not PredefinedTypeSyntax returnType ||
                 !returnType.Keyword.IsKind(SyntaxKind.VoidKeyword))
+            {
                 return false;
+            }
 
             // Check for attributes that indicate this is a kernel method
             return methodSyntax.AttributeLists
@@ -108,7 +114,9 @@ namespace ILGPU.SourceGenerators.Generators
             var validKernels = kernelMethods.Where(k => k is not null).Cast<KernelMethodInfo>().ToList();
 
             if (validKernels.Count == 0)
+            {
                 return;
+            }
 
             // Group kernels by containing class
             var kernelsByClass = validKernels.GroupBy(k => k.MethodSymbol.ContainingType, SymbolEqualityComparer.Default);
@@ -116,8 +124,10 @@ namespace ILGPU.SourceGenerators.Generators
             foreach (var classGroup in kernelsByClass)
             {
                 if (classGroup.Key is not INamedTypeSymbol containingType)
+                {
                     continue;
-                    
+                }
+
                 var kernelsInClass = classGroup.ToList();
 
                 var sourceCode = GenerateKernelLauncherClass(containingType, kernelsInClass);

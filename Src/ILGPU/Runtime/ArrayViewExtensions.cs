@@ -2346,7 +2346,7 @@ namespace ILGPU.Runtime
         /// <returns>A 2D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArrayView2D<T, Stride2D.DenseX> As2DView<T>(this ArrayView<T> view, LongIndex2D extent)
-            where T : unmanaged => view.As2DView(extent, new Stride2D.DenseX(extent.Y));
+            where T : unmanaged => view.As2DView(extent);
 
         /// <summary>
         /// Converts a 1D ArrayView to a 3D view.
@@ -2357,6 +2357,6 @@ namespace ILGPU.Runtime
         /// <returns>A 3D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArrayView3D<T, Stride3D.DenseXY> As3DView<T>(this ArrayView<T> view, LongIndex3D extent)
-            where T : unmanaged => view.As3DView(extent, new Stride3D.DenseXY(extent.Y * extent.Z, extent.Z));
+            where T : unmanaged => view.As3DView(extent);
     }
 }

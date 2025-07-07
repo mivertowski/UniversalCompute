@@ -44,7 +44,9 @@ namespace ILGPU.Tests.CPU
             foreach (var size in TestSizes)
             {
                 if (!fftAccelerator.IsSizeSupported(size))
+                {
                     continue;
+                }
 
                 // Create test data: simple sinusoid
                 var inputData = new Complex[size];
@@ -81,7 +83,9 @@ namespace ILGPU.Tests.CPU
             foreach (var size in TestSizes)
             {
                 if (!fftAccelerator.IsSizeSupported(size))
+                {
                     continue;
+                }
 
                 // Create real test data
                 var inputData = new float[size];
@@ -117,7 +121,9 @@ namespace ILGPU.Tests.CPU
             foreach (var size in TestSizes)
             {
                 if (!fftAccelerator.IsSizeSupported(size))
+                {
                     continue;
+                }
 
                 // Create frequency domain data
                 var inputData = new Complex[size / 2 + 1];
@@ -161,7 +167,9 @@ namespace ILGPU.Tests.CPU
 
             var size = 8; // Small 2D FFT
             if (!fftAccelerator.IsSizeSupported(size))
+            {
                 return;
+            }
 
             // Create 2D test data
             var inputData = new Complex[size * size];
@@ -209,7 +217,9 @@ namespace ILGPU.Tests.CPU
             var batchCount = 4;
             
             if (!fftAccelerator.IsSizeSupported(size))
+            {
                 return;
+            }
 
             // Create batch test data
             var inputs = new ArrayView<Complex>[batchCount];
@@ -270,7 +280,9 @@ namespace ILGPU.Tests.CPU
 
             var size = 32;
             if (!fftAccelerator.IsSizeSupported(size))
+            {
                 return;
+            }
 
             // Test Intel IPP FFT implementation
             var inputData = new Complex[size];
@@ -304,7 +316,9 @@ namespace ILGPU.Tests.CPU
 
             var size = 64;
             if (!fftAccelerator.IsSizeSupported(size))
+            {
                 return;
+            }
 
             // Test FFT -> IFFT round trip
             var originalData = new float[size];

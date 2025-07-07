@@ -255,7 +255,9 @@ public class BenchmarkRunner(ILogger<BenchmarkRunner> logger, BenchmarkConfig co
         AnsiConsole.MarkupLine("[yellow]Warning: This will run all benchmarks and may take several hours.[/]");
         
         if (!AnsiConsole.Confirm("Continue with comprehensive benchmarks?"))
+        {
             return;
+        }
 
         await AnsiConsole.Progress()
             .StartAsync(async ctx =>

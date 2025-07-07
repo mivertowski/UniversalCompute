@@ -26,11 +26,7 @@ namespace ILGPU.Tests
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data)
         {
-            int value;
-            if (true)
-                value = 42;
-            else
-                value = 23;
+            int value = true ? 42 : 23;
             data[index] = value;
         }
 
@@ -49,11 +45,7 @@ namespace ILGPU.Tests
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data)
         {
-            int value;
-            if (false)
-                value = 42;
-            else
-                value = 23;
+            int value = false ? 42 : 23;
             data[index] = value;
         }
 
@@ -233,13 +225,7 @@ namespace ILGPU.Tests
             Index1D index,
             ArrayView1D<int, Stride1D.Dense> data)
         {
-            int value;
-
-            if ((index.X == 0 || index.X == 1) && index.X <= 2)
-                value = 42;
-            else
-                value = 0;
-
+            int value = (index.X == 0 || index.X == 1) && index.X <= 2 ? 42 : 0;
             data[index] = value;
         }
 
@@ -265,9 +251,14 @@ namespace ILGPU.Tests
             if (c < 23)
             {
                 if ((index.X == 0 || index.X == 1) && index.X <= 2)
+                {
                     value = 42;
+                }
+
                 if ((index.X == 3 || index.X == 4 || index.X <= 5) && c < 42)
+                {
                     value = 43;
+                }
             }
             else if (c == 23 || c < 43 && c > d)
             {
@@ -302,7 +293,10 @@ namespace ILGPU.Tests
             if (c < 23)
             {
                 if ((index.X == 0 || index.X == 1) && index.X <= 2)
+                {
                     data[index] = 42;
+                }
+
                 if ((index.X == 3 || index.X == 4 || index.X <= 5) && c < 42)
                 {
                     data[index] = 43;

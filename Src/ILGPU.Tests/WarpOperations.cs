@@ -46,7 +46,10 @@ namespace ILGPU.Tests
 
             var expectedIndices = new int[length];
             for (int i = 0; i < length; ++i)
+            {
                 expectedIndices[i] = i % Accelerator.WarpSize;
+            }
+
             Verify(idxBuffer.View, expectedIndices);
         }
 
@@ -165,7 +168,9 @@ namespace ILGPU.Tests
                 {
                     var baseIdx = i * Accelerator.WarpSize;
                     for (int j = 0; j < Accelerator.WarpSize - shiftAmount; ++j)
+                    {
                         expected[baseIdx + j] = j + shiftAmount;
+                    }
 
                     // Do no test the remaining values as they are undefined
                     // for (
@@ -206,7 +211,9 @@ namespace ILGPU.Tests
                 {
                     var baseIdx = i * Accelerator.WarpSize;
                     for (int j = shiftAmount; j < Accelerator.WarpSize; ++j)
+                    {
                         expected[baseIdx + j] = j - shiftAmount;
+                    }
 
                     // Do no test the remaining values as they are undefined
                     // for (int j = 0; j < shiftAmount; ++j)

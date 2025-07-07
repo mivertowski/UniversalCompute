@@ -86,12 +86,18 @@ namespace ILGPU.Algorithms.Tests
             ref var bestSharedDistance = ref SharedMemory.Allocate<int>();
             var sharedDistanceValues = SharedMemory.Allocate<int>(MaxGroupSize);
             for (int i = Group.IdxX; i < MaxGroupSize; i += Group.DimX)
+            {
                 sharedDistanceValues[Group.IdxX] = localDistance;
+            }
+
             Group.Barrier();
 
             int source = values[Grid.IdxX];
             if (source < 0)
+            {
                 return;
+            }
+
             for (int i = Group.IdxX; i < origins.IntLength; i += Group.DimX)
             {
                 int origin = origins[i];
@@ -121,13 +127,17 @@ namespace ILGPU.Algorithms.Tests
 
                 // First lane contains the actual result
                 if (Warp.IsFirstLane)
+                {
                     bestSharedDistance = sharedDistanceValues[entry.LaneIndex];
+                }
             }
             Group.Barrier();
 
             // First thread should have all results
             if (Group.IsFirstThread)
+            {
                 results[Grid.IdxX] = bestSharedDistance;
+            }
         }
 
         [Fact]

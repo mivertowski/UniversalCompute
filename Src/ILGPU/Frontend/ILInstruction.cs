@@ -795,7 +795,9 @@ namespace ILGPU.Frontend
                 return false;
             if (InstructionType != other.InstructionType ||
                 FlagsContext != other.FlagsContext)
+            {
                 return false;
+            }
 
             return Equals(Argument, other.Argument);
         }

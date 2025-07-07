@@ -373,7 +373,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load ONNX model - placeholder implementation
-            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
+            new();
     }
 
     /// <summary>
@@ -389,7 +389,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load OpenVINO model - placeholder implementation
-            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
+            new();
     }
 
     /// <summary>
@@ -405,7 +405,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load TensorFlow model - placeholder implementation
-            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
+            new();
     }
 
     /// <summary>
@@ -421,6 +421,6 @@ namespace ILGPU.Intel.NPU
         /// <returns>The loaded neural network.</returns>
         public AppleNeuralNetwork LoadModel(string modelPath, NPUCapabilities capabilities) =>
             // Load PyTorch model - placeholder implementation
-            new ILGPU.Apple.NeuralEngine.NeuralNetwork();
+            new();
     }
 }

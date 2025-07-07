@@ -63,8 +63,11 @@ public class MixedPrecisionBenchmarks : IDisposable
     [Benchmark]
     public float FP16ToFP32Conversion()
     {
-        if (accelerator == null) return 0f;
-        
+        if (accelerator == null)
+        {
+            return 0f;
+        }
+
         var size = MatrixSize * MatrixSize;
         using var fp16Buffer = accelerator.Allocate1D<Half>(size);
         using var fp32Buffer = accelerator.Allocate1D<float>(size);
@@ -105,8 +108,11 @@ public class MixedPrecisionBenchmarks : IDisposable
     [Benchmark]
     public float MixedPrecisionGEMM()
     {
-        if (accelerator == null) return 0f;
-        
+        if (accelerator == null)
+        {
+            return 0f;
+        }
+
         try
         {
             using var matrixA = accelerator.Allocate1D<Half>(MatrixSize * MatrixSize);
@@ -172,7 +178,9 @@ public class MixedPrecisionBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
+        }
 
         float sum = 0.0f;
         for (int k = 0; k < size; k++)

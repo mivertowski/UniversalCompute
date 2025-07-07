@@ -136,18 +136,13 @@ namespace ILGPU.Backends.Velocity
             // Creates a new IL emitter
             Method = method;
             Allocas = allocas;
-            if (typeof(TILEmitter) == typeof(DebugILEmitter))
-            {
-                Emitter = (TILEmitter)Activator.CreateInstance(
+            Emitter = typeof(TILEmitter) == typeof(DebugILEmitter)
+                ? (TILEmitter)Activator.CreateInstance(
                     typeof(DebugILEmitter),
-                    Console.Out).AsNotNull();
-            }
-            else
-            {
-                Emitter = (TILEmitter)Activator.CreateInstance(
+                    Console.Out).AsNotNull()
+                : (TILEmitter)Activator.CreateInstance(
                     typeof(TILEmitter),
                     Module.GetILGenerator(method)).AsNotNull();
-            }
 
             // Create a new vector masks analysis instance
             masks = new(method.Blocks, Emitter, Specializer);

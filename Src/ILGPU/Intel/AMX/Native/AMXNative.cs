@@ -165,8 +165,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <summary>
         /// Native tile configuration loader (placeholder for intrinsic).
         /// </summary>
-        [DllImport("kernel32", EntryPoint = "ldtilecfg_native", SetLastError = true)]
-        private static unsafe extern void LoadTileConfigNative(byte* config);
+        [LibraryImport("kernel32", EntryPoint = "ldtilecfg_native", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static unsafe partial void LoadTileConfigNative(byte* config);
 
         #endregion
 
@@ -178,8 +179,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="tileId">The tile ID (0-7).</param>
         /// <param name="data">Pointer to the data.</param>
         /// <param name="stride">The row stride in bytes.</param>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static unsafe extern void LoadTile(int tileId, void* data, int stride);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static unsafe partial void LoadTile(int tileId, void* data, int stride);
 
         /// <summary>
         /// Stores tile data using TILESTORED instruction.
@@ -187,21 +189,24 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="tileId">The tile ID (0-7).</param>
         /// <param name="data">Pointer to the destination.</param>
         /// <param name="stride">The row stride in bytes.</param>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static unsafe extern void StoreTile(int tileId, void* data, int stride);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static unsafe partial void StoreTile(int tileId, void* data, int stride);
 
         /// <summary>
         /// Zeros a tile using TILEZERO instruction.
         /// </summary>
         /// <param name="tileId">The tile ID (0-7).</param>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static extern void ZeroTile(int tileId);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial void ZeroTile(int tileId);
 
         /// <summary>
         /// Releases tile resources using TILERELEASE instruction.
         /// </summary>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static extern void ReleaseTiles();
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial void ReleaseTiles();
 
         #endregion
 
@@ -213,8 +218,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile ID.</param>
         /// <param name="src1">Source tile 1 ID.</param>
         /// <param name="src2">Source tile 2 ID.</param>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static extern void TileMatMulBF16(int dst, int src1, int src2);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial void TileMatMulBF16(int dst, int src1, int src2);
 
         /// <summary>
         /// Performs INT8 matrix multiplication using TDPBSSD instruction.
@@ -222,8 +228,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile ID.</param>
         /// <param name="src1">Source tile 1 ID.</param>
         /// <param name="src2">Source tile 2 ID.</param>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static extern void TileMatMulINT8(int dst, int src1, int src2);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial void TileMatMulINT8(int dst, int src1, int src2);
 
         /// <summary>
         /// Performs FP32 matrix multiplication using TDPFP32 instruction (future).
@@ -231,8 +238,9 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="dst">Destination tile ID.</param>
         /// <param name="src1">Source tile 1 ID.</param>
         /// <param name="src2">Source tile 2 ID.</param>
-        [DllImport("kernel32", SetLastError = true)]
-        internal static extern void TileMatMulFP32(int dst, int src1, int src2);
+        [LibraryImport("kernel32", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial void TileMatMulFP32(int dst, int src1, int src2);
 
         #endregion
 
@@ -515,7 +523,7 @@ namespace ILGPU.Intel.AMX.Native
         /// Checks if the current processor supports AMX.
         /// </summary>
         /// <returns>True if AMX is supported; otherwise, false.</returns>
-        private static bool IsAMXSupported() => CheckAMXSupport();
+        public static bool IsAMXSupported() => CheckAMXSupport();
 
         #endregion
     }

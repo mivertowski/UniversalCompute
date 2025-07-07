@@ -108,7 +108,7 @@ namespace ILGPU.Backends.WebGPU
             WebGPUQueue.Submit(commandBuffer);
 
             // Wait for completion
-            await WaitForCompletion();
+            await WaitForCompletion().ConfigureAwait(false);
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace ILGPU.Backends.WebGPU
         private static async Task WaitForCompletion() =>
             // WebGPU operations are asynchronous by nature
             // This would typically involve waiting for promises to resolve
-            await Task.Delay(1); // Minimal delay - real implementation would wait for GPU
+            await Task.Delay(1).ConfigureAwait(false); // Minimal delay - real implementation would wait for GPU
 
         #endregion
 
@@ -334,10 +334,10 @@ namespace ILGPU.Backends.WebGPU
 
             try
             {
-                var adapter = await WebGPUAdapter.RequestAdapterAsync();
+                var adapter = await WebGPUAdapter.RequestAdapterAsync().ConfigureAwait(false);
                 if (adapter == null) return null;
 
-                var webgpuDevice = await adapter.RequestDeviceAsync();
+                var webgpuDevice = await adapter.RequestDeviceAsync().ConfigureAwait(false);
                 if (webgpuDevice == null) return null;
 
                 // TODO: Implement proper WebGPU device creation
@@ -357,17 +357,17 @@ namespace ILGPU.Backends.WebGPU
         /// <returns>Array of WebGPU accelerators.</returns>
         public static async Task<WebGPUAccelerator[]> EnumerateDevicesAsync(Context context)
         {
-            if (!IsAvailable()) return Array.Empty<WebGPUAccelerator>();
+            if (!IsAvailable()) return [];
 
             try
             {
-                var adapters = await WebGPUAdapter.EnumerateAdaptersAsync();
+                var adapters = await WebGPUAdapter.EnumerateAdaptersAsync().ConfigureAwait(false);
                 var accelerators = new List<WebGPUAccelerator>();
 
                 for (int i = 0; i < adapters.Length; i++)
                 {
                     var adapter = adapters[i];
-                    var webgpuDevice = await adapter.RequestDeviceAsync();
+                    var webgpuDevice = await adapter.RequestDeviceAsync().ConfigureAwait(false);
                     if (webgpuDevice != null)
                     {
                         // TODO: Implement proper WebGPU device enumeration
@@ -375,11 +375,11 @@ namespace ILGPU.Backends.WebGPU
                     }
                 }
 
-                return accelerators.ToArray();
+                return [.. accelerators];
             }
             catch
             {
-                return Array.Empty<WebGPUAccelerator>();
+                return [];
             }
         }
 
@@ -424,7 +424,7 @@ namespace ILGPU.Backends.WebGPU
             {
                 // Real implementation would use WebGPU's mapAsync and JavaScript interop
                 // to efficiently transfer data between JS and GPU memory
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -432,6 +432,7 @@ namespace ILGPU.Backends.WebGPU
         /// </summary>
         /// <param name="typedArray">JavaScript typed array.</param>
         /// <returns>WebGPU buffer containing the data.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         public WebGPUBuffer CreateBufferFromTypedArray(JSObject typedArray)
         {
             if (!IsWebAssembly)

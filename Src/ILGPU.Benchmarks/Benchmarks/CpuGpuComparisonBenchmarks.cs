@@ -278,7 +278,10 @@ public class CpuGpuComparisonBenchmarks : IDisposable
     public void MatrixMultiplyCpu()
     {
         int matrixSize = (int)Math.Sqrt(DataSize);
-        if (matrixSize * matrixSize != DataSize) return;
+        if (matrixSize * matrixSize != DataSize)
+        {
+            return;
+        }
 
         var matrixB = new float[DataSize];
         var result = new float[DataSize];
@@ -388,7 +391,9 @@ public class CpuGpuComparisonBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
+        }
 
         float sum = 0.0f;
         for (int k = 0; k < size; k++)

@@ -320,7 +320,7 @@ namespace ILGPU.Runtime.Vulkan
             CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), []);
             return LoadKernelInternal(kernel);
         }
 
@@ -332,7 +332,7 @@ namespace ILGPU.Runtime.Vulkan
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), []);
             return LoadKernelInternal(kernel);
         }
 

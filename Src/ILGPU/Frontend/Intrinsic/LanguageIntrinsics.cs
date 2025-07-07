@@ -136,16 +136,14 @@ namespace ILGPU.Frontend.Intrinsic
                     {
                         direction = CudaEmitParameterDirection.Out;
                     }
-                    else if (typeof(Ref<>).IsAssignableFrom(genericArgType))
-                    {
-                        direction = CudaEmitParameterDirection.Both;
-                    }
                     else
                     {
-                        throw location.GetNotSupportedException(
-                            ErrorMessages.NotSupportedInlinePTXFormatArgumentType,
-                            ptxExpression,
-                            genericArg.ToString());
+                        direction = typeof(Ref<>).IsAssignableFrom(genericArgType)
+                            ? CudaEmitParameterDirection.Both
+                            : throw location.GetNotSupportedException(
+                                                    ErrorMessages.NotSupportedInlinePTXFormatArgumentType,
+                                                    ptxExpression,
+                                                    genericArg.ToString());
                     }
                 }
                 else

@@ -81,12 +81,12 @@ namespace ILGPU.Backends.WebGPU
             var (workgroupCountX, workgroupCountY, workgroupCountZ) = CalculateWorkgroupConfiguration(extent);
 
             // Create bind group for kernel parameters
-            var bindGroup = await CreateBindGroupAsync(parameters);
+            var bindGroup = await CreateBindGroupAsync(parameters).ConfigureAwait(false);
 
             try
             {
                 // Dispatch compute work
-                await _accelerator.DispatchComputeAsync(Pipeline, bindGroup, workgroupCountX, workgroupCountY, workgroupCountZ);
+                await _accelerator.DispatchComputeAsync(Pipeline, bindGroup, workgroupCountX, workgroupCountY, workgroupCountZ).ConfigureAwait(false);
             }
             finally
             {
@@ -212,7 +212,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
                 // Handle other parameter types (textures, samplers, uniforms, etc.)
             }
             
-            return entries.ToArray();
+            return [.. entries];
         }
 
         private void ThrowIfDisposed()
@@ -273,7 +273,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
         /// </summary>
         public new async Task SynchronizeAsync(CancellationToken cancellationToken = default) =>
             // WebGPU's natural async nature makes this the preferred synchronization method
-            await Task.Run(Synchronize, cancellationToken);
+            await Task.Run(Synchronize, cancellationToken).ConfigureAwait(false);
 
         /// <summary>
         /// Adds a profiling marker to the stream.

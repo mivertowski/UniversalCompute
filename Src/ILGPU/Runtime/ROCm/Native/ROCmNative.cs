@@ -55,16 +55,20 @@ namespace ILGPU.Runtime.ROCm.Native
         /// Initializes HIP runtime.
         /// </summary>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipInit", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError Initialize(uint flags);
+        [LibraryImport(HipLibrary, EntryPoint = "hipInit")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError Initialize(uint flags);
 
         /// <summary>
         /// Gets the number of HIP devices.
         /// </summary>
         /// <param name="count">Number of devices.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipGetDeviceCount", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError GetDeviceCount(out int count);
+        [LibraryImport(HipLibrary, EntryPoint = "hipGetDeviceCount")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError GetDeviceCount(out int count);
 
         /// <summary>
         /// Gets device properties.
@@ -72,24 +76,30 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="props">Device properties structure.</param>
         /// <param name="device">Device index.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipGetDeviceProperties", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError GetDeviceProperties(out HipDeviceProperties props, int device);
+        [LibraryImport(HipLibrary, EntryPoint = "hipGetDeviceProperties")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError GetDeviceProperties(out HipDeviceProperties props, int device);
 
         /// <summary>
         /// Sets the current device.
         /// </summary>
         /// <param name="device">Device index.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipSetDevice", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError SetDevice(int device);
+        [LibraryImport(HipLibrary, EntryPoint = "hipSetDevice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError SetDevice(int device);
 
         /// <summary>
         /// Gets the current device.
         /// </summary>
         /// <param name="device">Current device index.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipGetDevice", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError GetDevice(out int device);
+        [LibraryImport(HipLibrary, EntryPoint = "hipGetDevice")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError GetDevice(out int device);
 
         #endregion
 
@@ -101,16 +111,20 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="ptr">Pointer to allocated memory.</param>
         /// <param name="size">Size in bytes.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipMalloc", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError Malloc(out IntPtr ptr, ulong size);
+        [LibraryImport(HipLibrary, EntryPoint = "hipMalloc")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError Malloc(out IntPtr ptr, ulong size);
 
         /// <summary>
         /// Frees device memory.
         /// </summary>
         /// <param name="ptr">Pointer to free.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipFree", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError Free(IntPtr ptr);
+        [LibraryImport(HipLibrary, EntryPoint = "hipFree")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError Free(IntPtr ptr);
 
         /// <summary>
         /// Copies memory between host and device.
@@ -120,8 +134,10 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="sizeBytes">Size in bytes.</param>
         /// <param name="kind">Copy direction.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipMemcpy", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError Memcpy(IntPtr dst, IntPtr src, ulong sizeBytes, HipMemcpyKind kind);
+        [LibraryImport(HipLibrary, EntryPoint = "hipMemcpy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError Memcpy(IntPtr dst, IntPtr src, ulong sizeBytes, HipMemcpyKind kind);
 
         /// <summary>
         /// Asynchronous memory copy.
@@ -132,8 +148,10 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="kind">Copy direction.</param>
         /// <param name="stream">HIP stream.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipMemcpyAsync", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError MemcpyAsync(IntPtr dst, IntPtr src, ulong sizeBytes, HipMemcpyKind kind, IntPtr stream);
+        [LibraryImport(HipLibrary, EntryPoint = "hipMemcpyAsync")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError MemcpyAsync(IntPtr dst, IntPtr src, ulong sizeBytes, HipMemcpyKind kind, IntPtr stream);
 
         /// <summary>
         /// Sets device memory to a specific value.
@@ -142,8 +160,10 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="value">Value to set.</param>
         /// <param name="count">Number of bytes.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipMemset", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError Memset(IntPtr devPtr, int value, ulong count);
+        [LibraryImport(HipLibrary, EntryPoint = "hipMemset")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError Memset(IntPtr devPtr, int value, ulong count);
 
         #endregion
 
@@ -154,24 +174,30 @@ namespace ILGPU.Runtime.ROCm.Native
         /// </summary>
         /// <param name="stream">Stream handle.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipStreamCreate", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError StreamCreate(out IntPtr stream);
+        [LibraryImport(HipLibrary, EntryPoint = "hipStreamCreate")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError StreamCreate(out IntPtr stream);
 
         /// <summary>
         /// Destroys a HIP stream.
         /// </summary>
         /// <param name="stream">Stream handle.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipStreamDestroy", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError StreamDestroy(IntPtr stream);
+        [LibraryImport(HipLibrary, EntryPoint = "hipStreamDestroy")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError StreamDestroy(IntPtr stream);
 
         /// <summary>
         /// Synchronizes a HIP stream.
         /// </summary>
         /// <param name="stream">Stream handle.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipStreamSynchronize", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError StreamSynchronize(IntPtr stream);
+        [LibraryImport(HipLibrary, EntryPoint = "hipStreamSynchronize")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError StreamSynchronize(IntPtr stream);
 
         #endregion
 
@@ -192,8 +218,10 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="kernelParams">Kernel parameters.</param>
         /// <param name="extra">Extra parameters.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipLaunchKernel", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError LaunchKernel(
+        [LibraryImport(HipLibrary, EntryPoint = "hipLaunchKernel")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError LaunchKernel(
             IntPtr function,
             uint gridDimX, uint gridDimY, uint gridDimZ,
             uint blockDimX, uint blockDimY, uint blockDimZ,
@@ -210,8 +238,10 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="module">Module handle.</param>
         /// <param name="image">Binary image data.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipModuleLoadData", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError ModuleLoadData(out IntPtr module, byte[] image);
+        [LibraryImport(HipLibrary, EntryPoint = "hipModuleLoadData")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError ModuleLoadData(out IntPtr module, byte[] image);
 
         /// <summary>
         /// Gets a function from a module.
@@ -220,16 +250,20 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="module">Module handle.</param>
         /// <param name="name">Function name.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipModuleGetFunction", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError ModuleGetFunction(out IntPtr function, IntPtr module, [MarshalAs(UnmanagedType.LPWStr)] string name);
+        [LibraryImport(HipLibrary, EntryPoint = "hipModuleGetFunction")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError ModuleGetFunction(out IntPtr function, IntPtr module, [MarshalAs(UnmanagedType.LPWStr)] string name);
 
         /// <summary>
         /// Unloads a module.
         /// </summary>
         /// <param name="module">Module handle.</param>
         /// <returns>Hip error code.</returns>
-        [DllImport(HipLibrary, EntryPoint = "hipModuleUnload", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError ModuleUnload(IntPtr module);
+        [LibraryImport(HipLibrary, EntryPoint = "hipModuleUnload")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial HipError ModuleUnload(IntPtr module);
 
         #endregion
 
@@ -372,8 +406,10 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <summary>
         /// Native ROCBlas matrix multiplication implementation.
         /// </summary>
-        [DllImport(ROCBlasLibrary, EntryPoint = "rocblas_sgemm", CallingConvention = CallingConvention.Cdecl)]
-        private static extern HipError ExecuteROCBlasMatMulNative(
+        [LibraryImport(ROCBlasLibrary, EntryPoint = "rocblas_sgemm")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial HipError ExecuteROCBlasMatMulNative(
             IntPtr handle, int transA, int transB,
             int m, int n, int k,
             float alpha, IntPtr a, int lda,

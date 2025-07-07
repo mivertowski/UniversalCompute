@@ -380,7 +380,7 @@ namespace ILGPU.Runtime.KernelCache
         /// Gets all cache keys.
         /// </summary>
         /// <returns>A collection of all cache keys.</returns>
-        public IEnumerable<string> GetKeys() => disposed ? throw new ObjectDisposedException(nameof(KernelCacheManager)) : (IEnumerable<string>)cache.Keys.ToList();
+        public IEnumerable<string> GetKeys() => disposed ? throw new ObjectDisposedException(nameof(KernelCacheManager)) : (IEnumerable<string>)[.. cache.Keys];
 
         /// <summary>
         /// Checks if a key exists in the cache.

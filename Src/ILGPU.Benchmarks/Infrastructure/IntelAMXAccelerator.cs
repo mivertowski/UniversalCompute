@@ -24,7 +24,7 @@ namespace ILGPU.Benchmarks.Infrastructure;
 /// Real Intel AMX accelerator using native AMX intrinsics.
 /// </summary>
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Specialized accelerator must handle all exceptions gracefully for fallback behavior")]
-public sealed class IntelAMXAccelerator : ISpecializedAccelerator
+public sealed partial class IntelAMXAccelerator : ISpecializedAccelerator
 {
     private bool _disposed;
     private readonly bool _tileConfigured;
@@ -63,7 +63,9 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
         ThrowIfDisposed();
         
         if (!IsAvailable)
+        {
             throw new NotSupportedException("Intel AMX not available");
+        }
 
         try
         {
@@ -98,7 +100,9 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
         ThrowIfDisposed();
         
         if (!IsAvailable)
+        {
             throw new NotSupportedException("Intel AMX not available");
+        }
 
         try
         {
@@ -133,7 +137,9 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
         ThrowIfDisposed();
         
         if (!IsAvailable)
+        {
             throw new NotSupportedException("Intel AMX not available");
+        }
 
         // For demo purposes, implement a simple fully connected layer using AMX
         try
@@ -152,7 +158,7 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
             var result = await ExecuteMatrixMultiplyAsync(input, weights, (int)Math.Sqrt(inputSize));
             
             Console.WriteLine($"✅ Intel AMX inference completed");
-            return result.Take(outputSize).ToArray();
+            return [.. result.Take(outputSize)];
         }
         catch (Exception ex)
         {
@@ -166,12 +172,14 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
         try
         {
             if (RuntimeInformation.ProcessArchitecture != Architecture.X64)
+            {
                 return false;
+            }
 
             // Configure AMX tile registers
             // This would typically require calling LDTILECFG instruction
             // For now, we'll use a simplified approach
-            
+
             unsafe
             {
                 // AMX tile configuration structure
@@ -296,8 +304,8 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
     }
 
     // Platform invoke declarations for AMX intrinsics
-    [DllImport("kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
-    private static extern void ZeroMemory(IntPtr dest, IntPtr size);
+    [LibraryImport("kernel32.dll", EntryPoint = "RtlZeroMemory", SetLastError = false)]
+    private static partial void ZeroMemory(IntPtr dest, IntPtr size);
 
     private static unsafe void LoadTileConfig(byte* config)
     {
@@ -338,13 +346,17 @@ public sealed class IntelAMXAccelerator : ISpecializedAccelerator
     private void ThrowIfDisposed()
     {
         if (_disposed)
+        {
             throw new ObjectDisposedException(nameof(IntelAMXAccelerator));
+        }
     }
 
     public void Dispose()
     {
         if (_disposed)
+        {
             return;
+        }
 
         try
         {

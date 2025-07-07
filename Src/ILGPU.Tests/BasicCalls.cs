@@ -229,7 +229,10 @@ namespace ILGPU.Tests
             ArrayView1D<int, Stride1D.Dense> data)
         {
             if (0.0.Equals(index))
+            {
                 return;
+            }
+
             data[index] = 1;
         }
 
@@ -242,17 +245,23 @@ namespace ILGPU.Tests
             data[index] = 0;
 
             if (c < d)
+            {
                 return;
+            }
 
             InternalReturn(index, data);
 
             if (c + 1 < d)
+            {
                 return;
+            }
 
             for (int i = 0; i < c; ++i)
             {
                 if (i + 10 < d)
+                {
                     return;
+                }
             }
 
             data[index] = int.MaxValue;

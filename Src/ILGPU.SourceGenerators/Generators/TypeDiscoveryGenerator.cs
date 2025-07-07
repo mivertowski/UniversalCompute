@@ -60,7 +60,9 @@ namespace ILGPU.SourceGenerators.Generators
         {
             var typeSymbol = context.SemanticModel.GetDeclaredSymbol(context.Node);
             if (typeSymbol is not INamedTypeSymbol namedType)
+            {
                 return null;
+            }
 
             // Check if this type is likely to be used in kernels
             return IsKernelCompatibleType(namedType) ? new KernelTypeInfo(namedType, AnalyzeTypeForKernelUsage(namedType)) : null;
@@ -70,10 +72,14 @@ namespace ILGPU.SourceGenerators.Generators
         {
             // Check if type is suitable for GPU kernels
             if (type.TypeKind == TypeKind.Struct)
+            {
                 return true; // Structs are generally kernel-compatible
+            }
 
             if (type.TypeKind == TypeKind.Enum)
+            {
                 return true; // Enums are kernel-compatible
+            }
 
             // Check for specific ILGPU types
             var typeName = type.ToDisplayString();
@@ -120,7 +126,9 @@ namespace ILGPU.SourceGenerators.Generators
             var validTypes = types.Where(t => t is not null).Cast<KernelTypeInfo>().ToList();
 
             if (validTypes.Count == 0)
+            {
                 return;
+            }
 
             var sourceCode = GenerateTypeRegistryClass(validTypes);
             context.AddSource("KernelTypeRegistry.g.cs", SourceText.From(sourceCode, Encoding.UTF8));

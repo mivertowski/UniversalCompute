@@ -108,19 +108,14 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the total device memory in bytes.
         /// </summary>
-        public new long MemorySize
-        {
-            get
-            {
+        public new long MemorySize =>
                 // Estimate memory size based on device type
-                return DeviceType switch
+                DeviceType switch
                 {
                     VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU => 8L * 1024 * 1024 * 1024, // 8GB
                     VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU => 4L * 1024 * 1024 * 1024, // 4GB
                     _ => 2L * 1024 * 1024 * 1024 // 2GB default
                 };
-            }
-        }
 
         /// <summary>
         /// Gets the accelerator type.
@@ -155,30 +150,22 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the warp/subgroup size.
         /// </summary>
-        public new int WarpSize
-        {
-            get
-            {
+        public new int WarpSize =>
                 // Typical subgroup sizes by vendor
-                return GetVendorName() switch
+                GetVendorName() switch
                 {
                     "NVIDIA" => 32,    // NVIDIA warp size
                     "AMD" => 64,       // AMD wavefront size
                     "Intel" => 16,     // Intel SIMD width (varies)
                     _ => 32            // Default
                 };
-            }
-        }
 
         /// <summary>
         /// Gets the number of multiprocessors/compute units.
         /// </summary>
-        public new int NumMultiprocessors
-        {
-            get
-            {
+        public new int NumMultiprocessors =>
                 // Estimate based on device type and vendor
-                return DeviceType switch
+                DeviceType switch
                 {
                     VkPhysicalDeviceType.VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU => GetVendorName() switch
                     {
@@ -195,8 +182,6 @@ namespace ILGPU.Runtime.Vulkan
                     },
                     _ => 8
                 };
-            }
-        }
 
         /// <summary>
         /// Gets the device vendor.
@@ -227,7 +212,7 @@ namespace ILGPU.Runtime.Vulkan
         public static VulkanDevice[] GetDevices()
         {
             if (!VulkanNative.IsVulkanSupported())
-                return Array.Empty<VulkanDevice>();
+                return [];
 
             try
             {
@@ -250,7 +235,7 @@ namespace ILGPU.Runtime.Vulkan
 
                 var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
                 if (result != VkResult.VK_SUCCESS)
-                    return Array.Empty<VulkanDevice>();
+                    return [];
 
                 try
                 {
@@ -258,12 +243,12 @@ namespace ILGPU.Runtime.Vulkan
                     uint deviceCount = 0;
                     result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, null!);
                     if (result != VkResult.VK_SUCCESS || deviceCount == 0)
-                        return Array.Empty<VulkanDevice>();
+                        return [];
 
                     var physicalDevices = new VkPhysicalDevice[deviceCount];
                     result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, physicalDevices);
                     if (result != VkResult.VK_SUCCESS)
-                        return Array.Empty<VulkanDevice>();
+                        return [];
 
                     // Create device objects
                     var devices = new VulkanDevice[deviceCount];
@@ -282,15 +267,15 @@ namespace ILGPU.Runtime.Vulkan
             }
             catch (DllNotFoundException)
             {
-                return Array.Empty<VulkanDevice>();
+                return [];
             }
             catch (EntryPointNotFoundException)
             {
-                return Array.Empty<VulkanDevice>();
+                return [];
             }
             catch
             {
-                return Array.Empty<VulkanDevice>();
+                return [];
             }
         }
 

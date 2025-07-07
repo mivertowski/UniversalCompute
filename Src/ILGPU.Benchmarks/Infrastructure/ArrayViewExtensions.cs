@@ -96,8 +96,10 @@ public static class ArrayViewExtensions
         where TStride : struct, IStride2D
     {
         if (index.X >= source.IntExtent.X || index.Y >= source.IntExtent.Y)
+        {
             return;
-            
+        }
+
         var linearIndex = index.Y * source.IntExtent.X + index.X;
         if (linearIndex < destination.Length)
         {

@@ -27,15 +27,10 @@ namespace ILGPU.CrossPlatform
         /// Gets the global thread index for the current kernel execution.
         /// This works consistently across all ILGPU backends.
         /// </summary>
-        public static Index2D GlobalIndex
-        {
-            get
-            {
+        public static Index2D GlobalIndex =>
                 // This is automatically translated by the ILGPU compiler
                 // to the appropriate backend-specific index calculation
-                return Group.IdxXY * Group.DimXY + Group.IdxXY;
-            }
-        }
+                Group.IdxXY * Group.DimXY + Group.IdxXY;
 
         /// <summary>
         /// Gets the global thread index as a 1D value.
@@ -64,14 +59,9 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets the dimension of the current grid.
         /// </summary>
-        public static Index2D GridDimension
-        {
-            get
-            {
+        public static Index2D GridDimension =>
                 // Automatically translated by ILGPU compiler
-                return Group.DimXY;
-            }
-        }
+                Group.DimXY;
 
         /// <summary>
         /// Gets the total number of threads in the grid.
@@ -81,24 +71,12 @@ namespace ILGPU.CrossPlatform
         /// <summary>
         /// Gets the local thread index within the current work group/block.
         /// </summary>
-        public static Index2D LocalIndex
-        {
-            get
-            {
-                return Group.IdxXY;
-            }
-        }
+        public static Index2D LocalIndex => Group.IdxXY;
 
         /// <summary>
         /// Gets the work group/block index.
         /// </summary>
-        public static Index2D GroupIndex
-        {
-            get
-            {
-                return ILGPU.Grid.IdxXY;
-            }
-        }
+        public static Index2D GroupIndex => ILGPU.Grid.IdxXY;
 
         /// <summary>
         /// Synchronizes all threads in the current work group/block.

@@ -326,7 +326,7 @@ namespace ILGPU.Intel.NPU.Native
         /// <param name="batchSize">Batch size.</param>
         /// <param name="precision">Precision mode.</param>
         /// <param name="cacheMode">Cache mode.</param>
-        internal static void SetExecutionConfig(IntPtr context, int batchSize, int precision, int cacheMode)
+        internal static void SetExecutionConfig(IntPtr context, int batchSize, NPUPrecision precision, int cacheMode)
         {
             // Real implementation would configure NPU execution parameters
             // For now, this is a no-op placeholder
@@ -373,23 +373,29 @@ namespace ILGPU.Intel.NPU.Native
         /// Creates OpenVINO core instance for NPU access.
         /// </summary>
         /// <returns>OpenVINO core handle, or IntPtr.Zero on failure.</returns>
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_create", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr CreateOpenVINOCore();
+        [LibraryImport(OpenVINOLibrary, EntryPoint = "ov_core_create")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr CreateOpenVINOCore();
 
         /// <summary>
         /// Releases OpenVINO core instance.
         /// </summary>
         /// <param name="core">OpenVINO core handle.</param>
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_free", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void ReleaseOpenVINOCore(IntPtr core);
+        [LibraryImport(OpenVINOLibrary, EntryPoint = "ov_core_free")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void ReleaseOpenVINOCore(IntPtr core);
 
         /// <summary>
         /// Gets available NPU devices from OpenVINO.
         /// </summary>
         /// <param name="core">OpenVINO core handle.</param>
         /// <returns>Device list handle, or IntPtr.Zero if no NPU devices.</returns>
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_get_available_devices", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr GetNPUDevices(IntPtr core);
+        [LibraryImport(OpenVINOLibrary, EntryPoint = "ov_core_get_available_devices")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr GetNPUDevices(IntPtr core);
 
         /// <summary>
         /// Compiles a model for NPU execution.
@@ -398,24 +404,30 @@ namespace ILGPU.Intel.NPU.Native
         /// <param name="modelPath">Path to the model file.</param>
         /// <param name="deviceName">NPU device name.</param>
         /// <returns>Compiled model handle.</returns>
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_compile_model", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr CompileModel(IntPtr core, [MarshalAs(UnmanagedType.LPWStr)] string modelPath, [MarshalAs(UnmanagedType.LPWStr)] string deviceName);
+        [LibraryImport(OpenVINOLibrary, EntryPoint = "ov_core_compile_model")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr CompileModel(IntPtr core, [MarshalAs(UnmanagedType.LPWStr)] string modelPath, [MarshalAs(UnmanagedType.LPWStr)] string deviceName);
 
         /// <summary>
         /// Creates inference request for NPU execution.
         /// </summary>
         /// <param name="compiledModel">Compiled model handle.</param>
         /// <returns>Inference request handle.</returns>
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_compiled_model_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr CreateInferenceRequest(IntPtr compiledModel);
+        [LibraryImport(OpenVINOLibrary, EntryPoint = "ov_compiled_model_create_infer_request")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial IntPtr CreateInferenceRequest(IntPtr compiledModel);
 
         /// <summary>
         /// Executes inference on NPU.
         /// </summary>
         /// <param name="inferRequest">Inference request handle.</param>
         /// <returns>0 on success, error code otherwise.</returns>
-        [DllImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int ExecuteInference(IntPtr inferRequest);
+        [LibraryImport(OpenVINOLibrary, EntryPoint = "ov_infer_request_infer")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial int ExecuteInference(IntPtr inferRequest);
 
         #endregion
 
@@ -585,7 +597,7 @@ namespace ILGPU.Intel.NPU.Native
                 var vendor = $"{cpuid0.Ebx:X8}{cpuid0.Edx:X8}{cpuid0.Ecx:X8}";
                 
                 // Check for Intel vendor ID
-                if (!vendor.Contains("756E6547") || !vendor.Contains("6C65746E") || !vendor.Contains("49656E69"))
+                if (!vendor.Contains("756E6547", StringComparison.OrdinalIgnoreCase) || !vendor.Contains("6C65746E", StringComparison.OrdinalIgnoreCase) || !vendor.Contains("49656E69", StringComparison.OrdinalIgnoreCase))
                     return false;
 
                 // Get processor family and model
@@ -793,7 +805,7 @@ namespace ILGPU.Intel.NPU.Native
     /// <summary>
     /// NPU kernel implementations for optimized operations.
     /// </summary>
-    internal static class NPUKernels
+    internal static partial class NPUKernels
     {
         /// <summary>
         /// Executes float32 inference on NPU.
@@ -1037,34 +1049,49 @@ namespace ILGPU.Intel.NPU.Native
 
 #if WINDOWS
         [DllImport("openvino", EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
+         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         private static extern IntPtr CreateInferenceRequest();
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl)]
+         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         private static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
+         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         private static extern void ExecuteInference(IntPtr request);
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl)]
+         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         private static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]
+         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         private static extern void ReleaseInferenceRequest(IntPtr request);
 #else
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
-        private static extern IntPtr CreateInferenceRequest();
+        [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_create_infer_request")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial IntPtr CreateInferenceRequest();
 
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        private static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
+        [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_set_input_tensor", StringMarshalling = StringMarshalling.Utf16)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
 
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void ExecuteInference(IntPtr request);
+        [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_infer")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial void ExecuteInference(IntPtr request);
 
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-        private static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
+        [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_get_output_tensor", StringMarshalling = StringMarshalling.Utf16)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial void GetOutputTensor(IntPtr request, string name, IntPtr data);
 
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void ReleaseInferenceRequest(IntPtr request);
+        [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_release")]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial void ReleaseInferenceRequest(IntPtr request);
 #endif
 
         private static void SetConvolutionParameters(IntPtr request, int strideH, int strideW, int padH, int padW)

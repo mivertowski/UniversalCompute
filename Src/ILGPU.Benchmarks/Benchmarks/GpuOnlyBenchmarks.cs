@@ -45,8 +45,10 @@ public class GpuOnlyBenchmarks : IDisposable
             var device = context.GetPreferredDevice(preferCPU: false);
             
             if (device == null || device.AcceleratorType == AcceleratorType.CPU)
+            {
                 throw new NotSupportedException("GPU-only benchmarks require a non-CPU accelerator");
-                
+            }
+
             accelerator = device.CreateAccelerator(context);
 
             // Allocate GPU memory
@@ -83,8 +85,10 @@ public class GpuOnlyBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(VectorAddKernel);
 
         if (inputBuffer == null || outputBuffer == null)
+        {
             return;
-            
+        }
+
         kernel(DataSize, inputBuffer.View, outputBuffer.View);
         accelerator!.Synchronize();
     }
@@ -96,8 +100,10 @@ public class GpuOnlyBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(VectorMulKernel);
 
         if (inputBuffer == null || outputBuffer == null)
+        {
             return;
-            
+        }
+
         kernel(DataSize, inputBuffer.View, outputBuffer.View);
         accelerator!.Synchronize();
     }
@@ -109,8 +115,10 @@ public class GpuOnlyBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(ReductionKernel);
 
         if (inputBuffer == null || workBuffer == null)
+        {
             return;
-            
+        }
+
         kernel(DataSize, inputBuffer.View, workBuffer.View);
         accelerator!.Synchronize();
     }
@@ -123,8 +131,10 @@ public class GpuOnlyBenchmarks : IDisposable
             MemoryBandwidthKernel);
 
         if (inputBuffer == null || outputBuffer == null || workBuffer == null)
+        {
             return;
-            
+        }
+
         kernel(DataSize, inputBuffer.View, outputBuffer.View, workBuffer.View);
         accelerator!.Synchronize();
     }
@@ -136,8 +146,10 @@ public class GpuOnlyBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(ComplexComputeKernel);
 
         if (inputBuffer == null || outputBuffer == null)
+        {
             return;
-            
+        }
+
         kernel(DataSize, inputBuffer.View, outputBuffer.View);
         accelerator!.Synchronize();
     }
@@ -147,24 +159,30 @@ public class GpuOnlyBenchmarks : IDisposable
     private static void VectorAddKernel(Index1D index, ArrayView<float> input, ArrayView<float> output)
     {
         if (index >= input.Length)
+        {
             return;
-            
+        }
+
         output[index] = input[index] + 1.0f;
     }
 
     private static void VectorMulKernel(Index1D index, ArrayView<float> input, ArrayView<float> output)
     {
         if (index >= input.Length)
+        {
             return;
-            
+        }
+
         output[index] = input[index] * 2.0f;
     }
 
     private static void ReductionKernel(Index1D index, ArrayView<float> input, ArrayView<float> work)
     {
         if (index >= input.Length)
+        {
             return;
-            
+        }
+
         // Comprehensive parallel reduction using GPU memory hierarchy
         var groupSize = Group.DimX;
         var localId = Group.IdxX;
@@ -231,8 +249,10 @@ public class GpuOnlyBenchmarks : IDisposable
         ArrayView<float> work)
     {
         if (index >= input.Length)
+        {
             return;
-            
+        }
+
         // Memory-intensive operations to test bandwidth
         var temp = input[index];
         work[index] = temp * 0.5f;
@@ -242,8 +262,10 @@ public class GpuOnlyBenchmarks : IDisposable
     private static void ComplexComputeKernel(Index1D index, ArrayView<float> input, ArrayView<float> output)
     {
         if (index >= input.Length)
+        {
             return;
-            
+        }
+
         var value = input[index];
         
         // Complex mathematical operations
@@ -265,9 +287,16 @@ public class GpuOnlyBenchmarks : IDisposable
     {
         // Fast sine approximation using Taylor series
         x = x - ((int)(x / (2.0f * 3.14159f))) * (2.0f * 3.14159f);
-        if (x > 3.14159f) x -= 2.0f * 3.14159f;
-        if (x < -3.14159f) x += 2.0f * 3.14159f;
-        
+        if (x > 3.14159f)
+        {
+            x -= 2.0f * 3.14159f;
+        }
+
+        if (x < -3.14159f)
+        {
+            x += 2.0f * 3.14159f;
+        }
+
         var x2 = x * x;
         return x * (1.0f - x2 / 6.0f + x2 * x2 / 120.0f);
     }
@@ -276,9 +305,16 @@ public class GpuOnlyBenchmarks : IDisposable
     {
         // Fast cosine approximation
         x = x - ((int)(x / (2.0f * 3.14159f))) * (2.0f * 3.14159f);
-        if (x > 3.14159f) x -= 2.0f * 3.14159f;
-        if (x < -3.14159f) x += 2.0f * 3.14159f;
-        
+        if (x > 3.14159f)
+        {
+            x -= 2.0f * 3.14159f;
+        }
+
+        if (x < -3.14159f)
+        {
+            x += 2.0f * 3.14159f;
+        }
+
         var x2 = x * x;
         return 1.0f - x2 / 2.0f + x2 * x2 / 24.0f;
     }
@@ -286,8 +322,11 @@ public class GpuOnlyBenchmarks : IDisposable
     private static float SqrtApprox(float x)
     {
         // Fast square root approximation using Newton's method
-        if (x <= 0.0f) return 0.0f;
-        
+        if (x <= 0.0f)
+        {
+            return 0.0f;
+        }
+
         var guess = x;
         for (int i = 0; i < 3; i++) // Limited iterations for speed
         {

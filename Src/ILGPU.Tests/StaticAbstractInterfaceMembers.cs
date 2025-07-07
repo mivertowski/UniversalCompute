@@ -141,9 +141,9 @@ namespace ILGPU.Tests
         [Fact]
         public void StaticInterfaceTest()
         {
-            int[] input = Enumerable.Range(0, Length).ToArray();
+            int[] input = [.. Enumerable.Range(0, Length)];
 
-            int[] expected = input.Select(Incrementer.Inc).ToArray();
+            int[] expected = [.. input.Select(Incrementer.Inc)];
 
             TestIncrementingKernel<Incrementer>(input, expected);
         }

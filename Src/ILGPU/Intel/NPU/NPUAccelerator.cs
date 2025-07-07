@@ -453,7 +453,7 @@ namespace ILGPU.Intel.NPU
             _nativePtr = NPUNative.AllocateMemory((ulong)sizeInBytes);
             
             if (_nativePtr == IntPtr.Zero)
-                throw new OutOfMemoryException("Failed to allocate NPU buffer memory");
+                throw new GpuMemoryException("Failed to allocate NPU buffer memory");
                 
             NativePtr = _nativePtr;
         }

@@ -35,7 +35,7 @@ namespace ILGPU.FFT
     /// Constructs a new CUDA FFT accelerator.
     /// </remarks>
     /// <param name="cudaAccelerator">The parent CUDA accelerator.</param>
-    public sealed class CudaFFTAccelerator(CudaAccelerator cudaAccelerator) : FFTAccelerator(cudaAccelerator)
+    public sealed partial class CudaFFTAccelerator(CudaAccelerator cudaAccelerator) : FFTAccelerator(cudaAccelerator)
     {
         #region Native cuFFT Bindings
 
@@ -88,26 +88,40 @@ namespace ILGPU.FFT
             Inverse = 1
         }
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftPlan1d(out IntPtr plan, int nx, CufftType type, int batch);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftPlan1d(out IntPtr plan, int nx, CufftType type, int batch);
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftPlan2d(out IntPtr plan, int nx, int ny, CufftType type);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftPlan2d(out IntPtr plan, int nx, int ny, CufftType type);
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftDestroy(IntPtr plan);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftDestroy(IntPtr plan);
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftExecC2C(IntPtr plan, IntPtr idata, IntPtr odata, CufftDirection direction);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftExecC2C(IntPtr plan, IntPtr idata, IntPtr odata, CufftDirection direction);
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftExecR2C(IntPtr plan, IntPtr idata, IntPtr odata);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftExecR2C(IntPtr plan, IntPtr idata, IntPtr odata);
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftExecC2R(IntPtr plan, IntPtr idata, IntPtr odata);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftExecC2R(IntPtr plan, IntPtr idata, IntPtr odata);
 
-        [DllImport(CuFFTLibrary, CallingConvention = CallingConvention.Cdecl)]
-        private static extern CufftResult cufftSetStream(IntPtr plan, IntPtr stream);
+        [LibraryImport(CuFFTLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        private static partial CufftResult cufftSetStream(IntPtr plan, IntPtr stream);
 
         #endregion
 

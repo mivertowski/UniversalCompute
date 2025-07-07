@@ -234,7 +234,7 @@ namespace ILGPU.ML.Integration
                 deviceRecommendations,
                 analysis.RecommendedBatchSize,
                 analysis.OptimalMemoryLayout,
-                analysis.SuggestedOptimizations.ToArray());
+                [.. analysis.SuggestedOptimizations]);
         }
 
         private async Task<CompiledModel> GetOrCompileModelAsync(string modelPath)
@@ -303,7 +303,7 @@ namespace ILGPU.ML.Integration
                 }
             }
 
-            return outputs.ToArray();
+            return [.. outputs];
         }
 
         private static async Task<NamedOnnxValue?> ConvertTensorToOnnxValueAsync(string name, ITensor<float> tensor) =>

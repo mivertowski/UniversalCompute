@@ -414,7 +414,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         ArrayView2D<float, Stride2D.DenseX> data,
         int size)
     {
-        if (index.X >= size || index.Y >= size) return;
+        if (index.X >= size || index.Y >= size)
+        {
+            return;
+        }
+
         data[index] = data[index] * 1.1f;
     }
 
@@ -423,7 +427,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         ArrayView2D<float, Stride2D.DenseY> data,
         int size)
     {
-        if (index.X >= size || index.Y >= size) return;
+        if (index.X >= size || index.Y >= size)
+        {
+            return;
+        }
+
         data[index] = data[index] * 1.1f;
     }
 
@@ -433,8 +441,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         int matrixSize,
         int tileSize)
     {
-        if (index.X >= matrixSize || index.Y >= matrixSize) return;
-        
+        if (index.X >= matrixSize || index.Y >= matrixSize)
+        {
+            return;
+        }
+
         var dataIndex = index.X * matrixSize + index.Y;
         data[dataIndex] = data[dataIndex] * 1.1f;
     }
@@ -445,8 +456,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         int matrixSize,
         int blockSize)
     {
-        if (index.X >= matrixSize || index.Y >= matrixSize) return;
-        
+        if (index.X >= matrixSize || index.Y >= matrixSize)
+        {
+            return;
+        }
+
         var dataIndex = index.X * matrixSize + index.Y;
         data[dataIndex] = data[dataIndex] * 1.1f;
     }
@@ -458,8 +472,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         ArrayView<float> zData,
         int size)
     {
-        if (index >= size) return;
-        
+        if (index >= size)
+        {
+            return;
+        }
+
         // Process all components separately (SOA pattern)
         xData[index] = xData[index] * 1.1f;
         yData[index] = yData[index] * 1.1f;
@@ -471,8 +488,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         ArrayView<float> data,
         int numElements)
     {
-        if (index >= numElements) return;
-        
+        if (index >= numElements)
+        {
+            return;
+        }
+
         // Process interleaved data (AOS pattern)
         var baseIndex = index * 3;
         data[baseIndex + 0] = data[baseIndex + 0] * 1.1f; // x
@@ -486,8 +506,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         int matrixSize,
         int paddedWidth)
     {
-        if (index.X >= matrixSize || index.Y >= matrixSize) return;
-        
+        if (index.X >= matrixSize || index.Y >= matrixSize)
+        {
+            return;
+        }
+
         var dataIndex = index.X * paddedWidth + index.Y;
         data[dataIndex] = data[dataIndex] * 1.1f;
     }
@@ -497,7 +520,11 @@ public class MemoryLayoutBenchmarks : IDisposable
         ArrayView<float> data,
         int size)
     {
-        if (index >= size) return;
+        if (index >= size)
+        {
+            return;
+        }
+
         data[index] = data[index] * 1.1f;
     }
 

@@ -208,7 +208,9 @@ public class HardwareAcceleratorComparison : IDisposable
     public float CrossAcceleratorComparison()
     {
         if (availableAccelerators.Count < 2)
+        {
             return 0.0f;
+        }
 
         var results = new ConcurrentBag<float>();
         var tasks = new List<Task>();
@@ -230,7 +232,7 @@ public class HardwareAcceleratorComparison : IDisposable
             }));
         }
 
-        Task.WaitAll(tasks.ToArray());
+        Task.WaitAll([.. tasks]);
         
         // Return average result across all accelerators
         return results.Any() ? results.Average() : 0.0f;
@@ -293,7 +295,9 @@ public class HardwareAcceleratorComparison : IDisposable
         int batchSize)
     {
         if (index >= input.Length)
+        {
             return;
+        }
 
         // AMX-optimized matrix operation with tile-based computation
         var batch = index / (matrixSize * matrixSize);
@@ -302,7 +306,9 @@ public class HardwareAcceleratorComparison : IDisposable
         var col = localIdx % matrixSize;
 
         if (batch >= batchSize)
+        {
             return;
+        }
 
         // Simulate AMX tile operations for optimal performance
         const int tileSize = 16; // AMX standard tile size
@@ -341,14 +347,18 @@ public class HardwareAcceleratorComparison : IDisposable
         int batchSize)
     {
         if (index >= input.Length)
+        {
             return;
+        }
 
         // NPU-optimized neural network operation with quantization
         var batch = index / (matrixSize * matrixSize);
         var localIdx = index % (matrixSize * matrixSize);
 
         if (batch >= batchSize)
+        {
             return;
+        }
 
         // Simulate NPU INT8 quantization for AI workloads
         const float scale = 0.125f;
@@ -379,14 +389,18 @@ public class HardwareAcceleratorComparison : IDisposable
         int batchSize)
     {
         if (index >= input.Length)
+        {
             return;
+        }
 
         // ANE-optimized neural operation with FP16 precision
         var batch = index / (matrixSize * matrixSize);
         var localIdx = index % (matrixSize * matrixSize);
 
         if (batch >= batchSize)
+        {
             return;
+        }
 
         float sum = 0.0f;
         
@@ -414,14 +428,18 @@ public class HardwareAcceleratorComparison : IDisposable
         int batchSize)
     {
         if (index >= input.Length)
+        {
             return;
+        }
 
         // Generic operation for CPU/GPU accelerators
         var batch = index / (matrixSize * matrixSize);
         var localIdx = index % (matrixSize * matrixSize);
 
         if (batch >= batchSize)
+        {
             return;
+        }
 
         float sum = 0.0f;
         for (int i = 0; i < IntrinsicMath.Min(matrixSize, input.Length - batch * matrixSize * matrixSize); i++)

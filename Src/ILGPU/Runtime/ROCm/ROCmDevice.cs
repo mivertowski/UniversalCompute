@@ -182,11 +182,11 @@ namespace ILGPU.Runtime.ROCm
         public static ROCmDevice[] GetDevices()
         {
             if (!ROCmNative.IsROCmSupported())
-                return Array.Empty<ROCmDevice>();
+                return [];
 
             int deviceCount = ROCmNative.GetDeviceCountSafe();
             if (deviceCount == 0)
-                return Array.Empty<ROCmDevice>();
+                return [];
 
             var devices = new ROCmDevice[deviceCount];
             for (int i = 0; i < deviceCount; i++)

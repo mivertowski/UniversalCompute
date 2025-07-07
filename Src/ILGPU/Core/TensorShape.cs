@@ -176,9 +176,11 @@ namespace ILGPU.Core
             for (int i = Rank - 1; i >= 0; i--)
             {
                 if (indices[i] < 0 || indices[i] >= dimensions[i])
+                {
                     throw new ArgumentOutOfRangeException(nameof(indices), 
                         $"Index {indices[i]} is out of range for dimension {i} (size {dimensions[i]})");
-                        
+                }
+
                 linearIndex += indices[i] * stride;
                 stride *= dimensions[i];
             }
@@ -194,8 +196,10 @@ namespace ILGPU.Core
         public int[] ComputeMultiDimensionalIndex(long linearIndex)
         {
             if (linearIndex < 0 || linearIndex >= ElementCount)
+            {
                 throw new ArgumentOutOfRangeException(nameof(linearIndex), 
                     $"Linear index {linearIndex} is out of range (size {ElementCount})");
+            }
 
             var indices = new int[Rank];
             var remaining = linearIndex;
@@ -332,10 +336,7 @@ namespace ILGPU.Core
                     result[maxRank - 1 - i] = dim2;
                 else if (dim2 == 1)
                     result[maxRank - 1 - i] = dim1;
-                else if (dim1 == dim2)
-                    result[maxRank - 1 - i] = dim1;
-                else
-                    throw new ArgumentException($"Cannot broadcast dimensions {dim1} and {dim2}");
+                else result[maxRank - 1 - i] = dim1 == dim2 ? dim1 : throw new ArgumentException($"Cannot broadcast dimensions {dim1} and {dim2}");
             }
             
             return result;

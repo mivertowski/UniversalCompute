@@ -65,7 +65,9 @@ namespace ILGPU.Tests
         {
             var value = source[index];
             if (value < 23)
+            {
                 goto exit;
+            }
 
             data[index] = value;
             return;
@@ -102,7 +104,9 @@ namespace ILGPU.Tests
             for (int i = 0; i < source.Length; ++i)
             {
                 if (source[i] == 23)
+                {
                     goto exit;
+                }
             }
 
             data[index] = 42;
@@ -143,7 +147,10 @@ namespace ILGPU.Tests
                 if (source[i] == 23)
                 {
                     if (k < c)
+                    {
                         goto exit;
+                    }
+
                     goto nested;
                 }
             }
@@ -156,7 +163,10 @@ namespace ILGPU.Tests
 
         exit:
             if (k++ < 1)
+            {
                 goto entry;
+            }
+
             data[index] = 23 + k;
         }
 
@@ -199,7 +209,10 @@ namespace ILGPU.Tests
 
         exit:
             if (k++ < 1)
+            {
                 goto entry;
+            }
+
             target[index] = 23 + k;
         }
 

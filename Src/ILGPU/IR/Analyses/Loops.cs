@@ -171,8 +171,8 @@ namespace ILGPU.IR.Analyses
                 backEdgeBlocks.MoveTo(ref backEdges);
                 AllMembers = members;
                 children = InlineList<Node>.Create(1);
-                Entries = entries.ToImmutableArray();
-                Exits = exits.ToImmutableArray();
+                Entries = [.. entries];
+                Exits = [.. exits];
             }
 
             #endregion

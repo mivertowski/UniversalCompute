@@ -140,7 +140,9 @@ namespace ILGPU.Algorithms.Tests
                 var diff = Math.Abs(x - y);
 
                 if (diff == 0)
+                {
                     return true;
+                }
 
                 return x != 0 ? Math.Abs(diff / x) < RelativeError : false;
             }
@@ -176,7 +178,9 @@ namespace ILGPU.Algorithms.Tests
                 var diff = Math.Abs(x - y);
 
                 if (diff == 0)
+                {
                     return true;
+                }
 
                 return x != 0 ? Math.Abs(diff / x) < RelativeError : false;
             }
@@ -212,7 +216,9 @@ namespace ILGPU.Algorithms.Tests
                 var diff = Math.Abs(x - y);
 
                 if (diff == 0)
+                {
                     return true;
+                }
 
                 return x != 0 ? Math.Abs(diff / x) < RelativeError : false;
             }
@@ -240,7 +246,9 @@ namespace ILGPU.Algorithms.Tests
 
             var comparer = new HalfPrecisionComparer(decimalPlaces);
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i], comparer);
+            }
         }
 
         /// <summary>
@@ -259,7 +267,9 @@ namespace ILGPU.Algorithms.Tests
 
             var comparer = new FloatPrecisionComparer(decimalPlaces);
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i], comparer);
+            }
         }
 
         /// <summary>
@@ -278,7 +288,9 @@ namespace ILGPU.Algorithms.Tests
 
             var comparer = new DoublePrecisionComparer(decimalPlaces);
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i], comparer);
+            }
         }
 
         /// <summary>
@@ -297,7 +309,9 @@ namespace ILGPU.Algorithms.Tests
 
             var comparer = new HalfRelativeErrorComparer((float)relativeError);
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i], comparer);
+            }
         }
 
         /// <summary>
@@ -316,7 +330,9 @@ namespace ILGPU.Algorithms.Tests
 
             var comparer = new FloatRelativeErrorComparer((float)relativeError);
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i], comparer);
+            }
         }
 
         /// <summary>
@@ -335,7 +351,9 @@ namespace ILGPU.Algorithms.Tests
 
             var comparer = new DoubleRelativeErrorComparer(relativeError);
             for (int i = 0, e = data.Length; i < e; ++i)
+            {
                 Assert.Equal(expected[i], data[i], comparer);
+            }
         }
     }
 }

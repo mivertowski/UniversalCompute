@@ -212,7 +212,7 @@ namespace ILGPU.Memory.Unified
                     description: "Intel integrated GPU shared memory"));
             }
 
-            return placements.ToArray();
+            return [.. placements];
         }
 
         /// <summary>
@@ -315,14 +315,9 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets whether Intel integrated GPU is available.
         /// </summary>
-        public static bool HasIntelIntegratedGpu
-        {
-            get
-            {
+        public static bool HasIntelIntegratedGpu =>
                 // This would check for Intel integrated graphics
                 // Implementation would depend on platform-specific detection
-                return true; // Simplified for now
-            }
-        }
+                true; // Simplified for now
     }
 }

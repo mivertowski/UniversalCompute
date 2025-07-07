@@ -49,7 +49,9 @@ public sealed class LightweightAMXAccelerator : ISpecializedAccelerator
         ThrowIfDisposed();
         
         if (!IsAvailable)
+        {
             throw new NotSupportedException("Intel AMX not available");
+        }
 
         try
         {
@@ -103,7 +105,9 @@ public sealed class LightweightAMXAccelerator : ISpecializedAccelerator
         ThrowIfDisposed();
         
         if (!IsAvailable)
+        {
             throw new NotSupportedException("Intel AMX not available");
+        }
 
         try
         {
@@ -168,7 +172,9 @@ public sealed class LightweightAMXAccelerator : ISpecializedAccelerator
         ThrowIfDisposed();
         
         if (!IsAvailable)
+        {
             throw new NotSupportedException("Intel AMX not available");
+        }
 
         try
         {
@@ -186,7 +192,7 @@ public sealed class LightweightAMXAccelerator : ISpecializedAccelerator
             var result = await ExecuteMatrixMultiplyAsync(input, weights, (int)Math.Sqrt(inputSize));
             
             Console.WriteLine($"✅ Intel AMX (lightweight) inference completed");
-            return result.Take(outputSize).ToArray();
+            return [.. result.Take(outputSize)];
         }
         catch (Exception ex)
         {
@@ -198,13 +204,17 @@ public sealed class LightweightAMXAccelerator : ISpecializedAccelerator
     private void ThrowIfDisposed()
     {
         if (_disposed)
+        {
             throw new ObjectDisposedException(nameof(LightweightAMXAccelerator));
+        }
     }
 
     public void Dispose()
     {
         if (_disposed)
+        {
             return;
+        }
 
         Console.WriteLine("🧹 Intel AMX (lightweight) resources cleaned up");
         _disposed = true;

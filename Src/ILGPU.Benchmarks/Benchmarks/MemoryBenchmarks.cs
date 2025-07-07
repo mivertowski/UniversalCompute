@@ -302,8 +302,11 @@ public class MemoryBenchmarks : IDisposable
         ArrayView<float> data,
         int size)
     {
-        if (index >= size) return;
-        
+        if (index >= size)
+        {
+            return;
+        }
+
         // Coalesced access pattern (consecutive threads access consecutive memory)
         data[index] = data[index] * 1.1f;
     }
@@ -315,8 +318,11 @@ public class MemoryBenchmarks : IDisposable
         int size)
     {
         int actualIndex = index * stride;
-        if (actualIndex >= size) return;
-        
+        if (actualIndex >= size)
+        {
+            return;
+        }
+
         // Strided access pattern (may cause memory bank conflicts)
         data[actualIndex] = data[actualIndex] * 1.1f;
     }

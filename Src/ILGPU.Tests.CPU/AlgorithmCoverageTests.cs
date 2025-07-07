@@ -98,7 +98,10 @@ namespace ILGPU.Tests.CPU
                         {
                             float sum = 0;
                             for (int i = 0; i < input.Length; i++)
+                            {
                                 sum += input[i];
+                            }
+
                             output[0] = sum;
                         }
                     });
@@ -141,7 +144,10 @@ namespace ILGPU.Tests.CPU
                 {
                     float sum = 0;
                     for (int i = 0; i <= index; i++)
+                    {
                         sum += input[i];
+                    }
+
                     output[index] = sum;
                 });
 
@@ -315,8 +321,15 @@ namespace ILGPU.Tests.CPU
             var matrixC = new float[M * N];
 
             // Initialize with simple patterns
-            for (int i = 0; i < M * K; i++) matrixA[i] = i + 1;
-            for (int i = 0; i < K * N; i++) matrixB[i] = (i % K) + 1;
+            for (int i = 0; i < M * K; i++)
+            {
+                matrixA[i] = i + 1;
+            }
+
+            for (int i = 0; i < K * N; i++)
+            {
+                matrixB[i] = (i % K) + 1;
+            }
 
             using var bufferA = accelerator.Allocate1D<float>(M * K);
             using var bufferB = accelerator.Allocate1D<float>(K * N);
@@ -415,13 +428,17 @@ namespace ILGPU.Tests.CPU
                 {
                     // Various initialization patterns
                     if (index < array.Length / 4)
+                    {
                         array[index] = 1.0f;
+                    }
                     else if (index < array.Length / 2)
+                    {
                         array[index] = index;
-                    else if (index < 3 * array.Length / 4)
-                        array[index] = index * index;
+                    }
                     else
-                        array[index] = 1.0f / (index + 1);
+                    {
+                        array[index] = index < 3 * array.Length / 4 ? index * index : 1.0f / (index + 1);
+                    }
                 });
 
             initKernel(size, buffer.View);

@@ -153,8 +153,10 @@ public class IntelNPUBenchmarks : IDisposable
             StandardNeuralNetworkKernel);
 
         if (inputBuffer == null || weightBuffer == null || biasBuffer == null || outputBuffer == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
         ilgpuAccelerator!.Synchronize();
         
@@ -180,8 +182,10 @@ public class IntelNPUBenchmarks : IDisposable
                 NPUHardwareKernel);
 
             if (inputBuffer == null || weightBuffer == null || biasBuffer == null || outputBuffer == null)
+            {
                 return 0.0f;
-                
+            }
+
             kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
             npuAccelerator.Synchronize();
             
@@ -207,8 +211,10 @@ public class IntelNPUBenchmarks : IDisposable
             NPUInferenceKernel);
 
         if (inputBuffer == null || weightBuffer == null || biasBuffer == null || outputBuffer == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
         ilgpuAccelerator!.Synchronize();
         
@@ -226,8 +232,10 @@ public class IntelNPUBenchmarks : IDisposable
             QuantizedInferenceKernel);
 
         if (inputBuffer == null || weightBuffer == null || biasBuffer == null || outputBuffer == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(NetworkSize, inputBuffer.View, weightBuffer.View, biasBuffer.View, outputBuffer.View, NetworkSize);
         ilgpuAccelerator!.Synchronize();
         
@@ -245,8 +253,10 @@ public class IntelNPUBenchmarks : IDisposable
             ConvolutionalKernel);
 
         if (inputBuffer == null || weightBuffer == null || outputBuffer == null)
+        {
             return 0.0f;
-            
+        }
+
         var kernelSize = Math.Min(64, NetworkSize / 8); // Small convolution for simulation
         kernel(kernelSize * kernelSize, inputBuffer.View, weightBuffer.View, outputBuffer.View, kernelSize);
         ilgpuAccelerator!.Synchronize();
@@ -265,8 +275,10 @@ public class IntelNPUBenchmarks : IDisposable
             TransformerAttentionKernel);
 
         if (inputBuffer == null || weightBuffer == null || outputBuffer == null)
+        {
             return 0.0f;
-            
+        }
+
         var sequenceLength = Math.Min(128, NetworkSize / 8);
         var hiddenSize = Math.Min(256, NetworkSize / 4);
         
@@ -289,8 +301,10 @@ public class IntelNPUBenchmarks : IDisposable
         int inputSize)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         // This kernel will be executed on real NPU hardware via ILGPU
         // The NPU accelerator will automatically optimize quantization and AI operations
         float sum = 0.0f;
@@ -314,8 +328,10 @@ public class IntelNPUBenchmarks : IDisposable
         int inputSize)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         float sum = 0.0f;
         for (int i = 0; i < inputSize && i < input.Length; i++)
         {
@@ -337,8 +353,10 @@ public class IntelNPUBenchmarks : IDisposable
         int inputSize)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         // Simulate NPU with FP16 precision (approximate with reduced precision)
         float sum = 0.0f;
         for (int i = 0; i < inputSize && i < input.Length; i++)
@@ -365,8 +383,10 @@ public class IntelNPUBenchmarks : IDisposable
         int inputSize)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         // Simulate INT8 quantized inference
         const float scale = 0.125f;
         const float zeroPoint = 128.0f;
@@ -399,8 +419,10 @@ public class IntelNPUBenchmarks : IDisposable
         int kernelSize)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         // Simulate 2D convolution
         float sum = 0.0f;
         for (int i = 0; i < kernelSize && i < input.Length; i++)
@@ -426,8 +448,10 @@ public class IntelNPUBenchmarks : IDisposable
         int hiddenSize)
     {
         if (index >= sequenceLength)
+        {
             return;
-            
+        }
+
         // Full multi-head self-attention implementation for NPU
         const int numHeads = 8;
         const int headDim = 64; // hiddenSize / numHeads assumed
@@ -514,9 +538,16 @@ public class IntelNPUBenchmarks : IDisposable
     private static float ExpApprox(float x)
     {
         // Fast exponential approximation
-        if (x > 10.0f) return 22026.5f; // e^10 approximately
-        if (x < -10.0f) return 0.0f;
-        
+        if (x > 10.0f)
+        {
+            return 22026.5f; // e^10 approximately
+        }
+
+        if (x < -10.0f)
+        {
+            return 0.0f;
+        }
+
         var result = 1.0f + x;
         var term = x;
         term *= x / 2.0f;
@@ -529,8 +560,11 @@ public class IntelNPUBenchmarks : IDisposable
     private static float SqrtApprox(float x)
     {
         // Fast square root approximation using Newton's method
-        if (x <= 0.0f) return 0.0f;
-        
+        if (x <= 0.0f)
+        {
+            return 0.0f;
+        }
+
         var guess = x;
         for (int i = 0; i < 3; i++) // Limited iterations for speed
         {

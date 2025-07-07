@@ -41,7 +41,7 @@ namespace ILGPU.Runtime
         /// <param name="cancellationToken">The cancellation token.</param>
         internal KernelExecutionResult(AcceleratorStream stream, CancellationToken cancellationToken)
         {
-            this.Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            Stream = stream ?? throw new ArgumentNullException(nameof(stream));
             completionSource = new TaskCompletionSource<object?>();
             
             if (cancellationToken.CanBeCanceled)

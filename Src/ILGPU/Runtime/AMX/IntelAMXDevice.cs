@@ -140,14 +140,9 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the maximum group size.
         /// </summary>
-        public new Index3D MaxGroupSize
-        {
-            get
-            {
+        public new Index3D MaxGroupSize =>
                 // For AMX, group size is typically limited by tile operations
-                return new Index3D(MaxTileSize, MaxTileSize, 1);
-            }
-        }
+                new(MaxTileSize, MaxTileSize, 1);
 
         /// <summary>
         /// Gets the maximum number of threads per group.
@@ -196,10 +191,10 @@ namespace ILGPU.Runtime.AMX
             {
                 // Check if AMX is supported
                 if (!AMXNative.IsAMXSupported())
-                    return Array.Empty<IntelAMXDevice>();
+                    return [];
 
                 var deviceInfo = DetectProcessorInfo();
-                return deviceInfo == null ? Array.Empty<IntelAMXDevice>() : ([deviceInfo]);
+                return deviceInfo == null ? [] : [deviceInfo];
             }
             catch (Exception)
             {
@@ -274,12 +269,12 @@ namespace ILGPU.Runtime.AMX
                     try
                     {
                         var cpuinfo = System.IO.File.ReadAllText("/proc/cpuinfo");
-                        if (cpuinfo.Contains("model name"))
+                        if (cpuinfo.Contains("model name", StringComparison.OrdinalIgnoreCase))
                         {
                             var lines = cpuinfo.Split('\n');
                             foreach (var line in lines)
                             {
-                                if (line.StartsWith("model name"))
+                                if (line.StartsWith("model name", StringComparison.OrdinalIgnoreCase))
                                 {
                                     var parts = line.Split(':');
                                     if (parts.Length > 1)
@@ -296,10 +291,10 @@ namespace ILGPU.Runtime.AMX
                 }
 
                 // Detect AMX capabilities based on processor generation
-                bool supportsBF16 = processorName.Contains("Xeon") || 
-                                   processorName.Contains("12th Gen") || 
-                                   processorName.Contains("13th Gen") ||
-                                   processorName.Contains("14th Gen");
+                bool supportsBF16 = processorName.Contains("Xeon", StringComparison.OrdinalIgnoreCase) || 
+                                   processorName.Contains("12th Gen", StringComparison.OrdinalIgnoreCase) || 
+                                   processorName.Contains("13th Gen", StringComparison.OrdinalIgnoreCase) ||
+                                   processorName.Contains("14th Gen", StringComparison.OrdinalIgnoreCase);
                                    
                 bool supportsINT8 = true; // All AMX processors support INT8
                 bool supportsMixedPrecision = supportsBF16; // Mixed precision available with BF16
@@ -360,7 +355,7 @@ namespace ILGPU.Runtime.AMX
                     var lines = meminfo.Split('\n');
                     foreach (var line in lines)
                     {
-                        if (line.StartsWith("MemTotal:"))
+                        if (line.StartsWith("MemTotal:", StringComparison.OrdinalIgnoreCase))
                         {
                             var parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                             if (parts.Length > 1 && long.TryParse(parts[1], out var memKB))
@@ -382,7 +377,7 @@ namespace ILGPU.Runtime.AMX
         /// Gets a human-readable string of device capabilities.
         /// </summary>
         /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString() => $"{ProcessorName}, " +
+        public string CapabilitiesString => $"{ProcessorName}, " +
                    $"{NumCores} cores, " +
                    $"Tiles {TileCount}x{MaxTileSize}x{MaxTileSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
@@ -406,7 +401,7 @@ namespace ILGPU.Runtime.AMX
         /// Returns the hash code of this device.
         /// </summary>
         /// <returns>The hash code.</returns>
-        public override int GetHashCode() => ProcessorName.GetHashCode() ^ NumCores.GetHashCode();
+        public override int GetHashCode() => ProcessorName.GetHashCode(StringComparison.OrdinalIgnoreCase) ^ NumCores.GetHashCode();
 
         /// <summary>
         /// Checks for equality with another object.

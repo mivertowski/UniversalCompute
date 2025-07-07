@@ -48,7 +48,9 @@ public class BurnInTestRunner(ILogger<BurnInTestRunner> logger, BenchmarkConfig 
         AnsiConsole.MarkupLine("[yellow]Ensure adequate cooling and power supply before continuing.[/]");
 
         if (!AnsiConsole.Confirm("Continue with burn-in test?"))
+        {
             return;
+        }
 
         var duration = AnsiConsole.Prompt(
             new SelectionPrompt<TimeSpan>()
@@ -93,7 +95,9 @@ public class BurnInTestRunner(ILogger<BurnInTestRunner> logger, BenchmarkConfig 
                     mainTask.Value = Math.Min((int)elapsed, (int)duration.TotalSeconds);
                     
                     if (elapsed >= duration.TotalSeconds)
+                    {
                         break;
+                    }
                 }
 
                 mainTask.Description = "[red]Stopping burn-in test...[/]";
@@ -378,13 +382,17 @@ public class BurnInTestRunner(ILogger<BurnInTestRunner> logger, BenchmarkConfig 
         {
             var floatData = data as float[];
             for (int i = 0; i < size; i++)
+            {
                 floatData![i] = random.NextSingle();
+            }
         }
         else if (typeof(T) == typeof(Half))
         {
             var halfData = data as Half[];
             for (int i = 0; i < size; i++)
+            {
                 halfData![i] = (Half)random.NextSingle();
+            }
         }
         
         return data;
@@ -400,7 +408,9 @@ public class BurnInTestRunner(ILogger<BurnInTestRunner> logger, BenchmarkConfig 
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
+        }
 
         float sum = 0.0f;
         for (int k = 0; k < size; k++)

@@ -81,7 +81,9 @@ namespace ILGPU.Algorithms.Tests
                 for (var y = 0; y < rightColumns; y++)
                 {
                     for (var z = 0; z < leftColumns; z++)
+                    {
                         result[x, y] += left[x, z] * right[z, y];
+                    }
                 }
             }
 
@@ -101,7 +103,9 @@ namespace ILGPU.Algorithms.Tests
             for (var i = 0; i < rows; i++)
             {
                 for (var j = 0; j < columns; j++)
+                {
                     transposed[j, i] = matrix[i, j];
+                }
             }
 
             return transposed;
@@ -170,7 +174,9 @@ namespace ILGPU.Algorithms.Tests
             for (int i = 0; i < denseMatrix.GetLength(0); ++i)
             {
                 for (int j = 0; j < denseMatrix.GetLength(1); ++j)
+                {
                     denseMatrix[i, j] = (float)random.NextDouble();
+                }
             }
 
             for (int i = 0; i < sparseMatrix.GetLength(0); ++i)
@@ -188,7 +194,9 @@ namespace ILGPU.Algorithms.Tests
             for (int i = 0; i < sparseMaskMatrix.GetLength(0); ++i)
             {
                 for (int j = 0; j < sparseMaskMatrix.GetLength(1); ++j)
+                {
                     sparseMaskMatrix[i, j] = 1.0f;
+                }
             }
 
             // Initialize our sparse matrix

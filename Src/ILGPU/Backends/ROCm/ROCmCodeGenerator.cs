@@ -132,7 +132,7 @@ namespace ILGPU.Backends.ROCm
         {
             codeBuilder.Append("extern \"C\" __global__ void ");
             codeBuilder.Append(entryPoint.Name);
-            codeBuilder.Append("(");
+            codeBuilder.Append('(');
 
             // Generate parameters
             var parameters = entryPoint.Parameters;
@@ -142,11 +142,11 @@ namespace ILGPU.Backends.ROCm
                     codeBuilder.Append(", ");
 
                 var param = parameters[i];
-                var paramType = GetHipType(param.Type);
+                var paramType = GetHipType(param.BaseType.ToString());
                 var paramName = $"param_{i}";
                 
                 codeBuilder.Append(paramType);
-                codeBuilder.Append(" ");
+                codeBuilder.Append(' ');
                 codeBuilder.Append(paramName);
 
                 // Map parameter to name

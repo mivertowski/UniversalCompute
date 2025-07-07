@@ -102,7 +102,7 @@ namespace ILGPU.Algorithms.Distributed
                 {
                     System.Threading.Thread.Sleep(1);
                 }
-            });
+            }).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace ILGPU.Algorithms.Distributed
             // Clean up handle when request completes
             _ = Task.Run(async () =>
             {
-                await request.Wait();
+                await request.Wait().ConfigureAwait(false);
                 handle.Free();
             });
             
@@ -293,7 +293,7 @@ namespace ILGPU.Algorithms.Distributed
             // Clean up handle when request completes
             _ = Task.Run(async () =>
             {
-                await request.Wait();
+                await request.Wait().ConfigureAwait(false);
                 handle.Free();
             });
             

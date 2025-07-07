@@ -89,7 +89,7 @@ namespace ILGPU.Backends.ROCm
                     0, // SharedMemory
                     0, // ConstantMemory
                     new AllocaKindInformation(),
-                    System.Collections.Immutable.ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+                    []);
 
                 return new Runtime.ROCm.ROCmCompiledKernel(
                     Context,
@@ -104,7 +104,7 @@ namespace ILGPU.Backends.ROCm
                     0, // SharedMemory
                     0, // ConstantMemory
                     new AllocaKindInformation(),
-                    System.Collections.Immutable.ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+                    []);
 
                 // Generate a placeholder binary with error information
                 var errorMessage = $"// ROCm compilation failed: {ex.Message}\n";

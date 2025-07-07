@@ -182,10 +182,7 @@ public class BFloat16Benchmarks
             var biased = weighted + bias;
             
             // Simple activation (ReLU-like)
-            if (biased.ToFloat() > 0.0f)
-                result![i] = biased;
-            else
-                result![i] = BFloat16.FromFloat(0.0f);
+            result![i] = biased.ToFloat() > 0.0f ? biased : BFloat16.FromFloat(0.0f);
         }
     }
 

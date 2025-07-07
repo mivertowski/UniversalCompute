@@ -42,10 +42,9 @@ namespace ILGPU.Backends.PTX
             SupportedInstructionSets = ImmutableSortedSet.Create(
                 Comparer<CudaInstructionSet>.Create((first, second) =>
                     second.CompareTo(first)),
-                CudaDriverVersionUtils.InstructionSetLookup
+                [.. CudaDriverVersionUtils.InstructionSetLookup
                     .Keys
-                    .Where(x => x >= CudaInstructionSet.ISA_60)
-                    .ToArray());
+                    .Where(x => x >= CudaInstructionSet.ISA_60)]);
 
         /// <summary>
         /// The name for the globally registered dynamic shared memory alloca (if any).

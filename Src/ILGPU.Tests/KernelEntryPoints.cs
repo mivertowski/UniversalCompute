@@ -29,7 +29,10 @@ namespace ILGPU.Tests
         {
             // Clear the internal caches in case they will not be cleared
             if (!CleanTests)
+            {
                 TestContext.ClearCaches();
+            }
+
             base.Dispose(disposing);
         }
 

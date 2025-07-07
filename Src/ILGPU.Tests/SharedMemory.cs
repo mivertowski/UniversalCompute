@@ -25,7 +25,10 @@ namespace ILGPU.Tests
         {
             ref var sharedMemory = ref ILGPU.SharedMemory.Allocate<int>();
             if (Group.IsFirstThread)
+            {
                 sharedMemory = 0;
+            }
+
             Group.Barrier();
 
             Atomic.Add(ref sharedMemory, 1);
@@ -225,7 +228,10 @@ namespace ILGPU.Tests
                 new Index2D(5, 7),
                 new Stride2D.DenseX(7));
             if (Group.IsFirstThread)
+            {
                 sharedMemory[2, 6] = 42;
+            }
+
             Group.Barrier();
             output[Grid.GlobalIndex.X] = sharedMemory[2, 6];
         }
@@ -258,10 +264,7 @@ namespace ILGPU.Tests
                 sharedMemory[1, Grid.GlobalIndex.X] = 7 * Grid.GlobalIndex.X;
             }
             Group.Barrier();
-            if (Grid.GlobalIndex.X < 100)
-                output[Grid.GlobalIndex.X] = sharedMemory[1, Grid.GlobalIndex.X];
-            else
-                output[Grid.GlobalIndex.X] = sharedMemory[0, 0];
+            output[Grid.GlobalIndex.X] = Grid.GlobalIndex.X < 100 ? sharedMemory[1, Grid.GlobalIndex.X] : sharedMemory[0, 0];
         }
 
         [Fact]
@@ -293,10 +296,7 @@ namespace ILGPU.Tests
                 sharedMemory[Grid.GlobalIndex.X, 1] = 7 * Grid.GlobalIndex.X;
             }
             Group.Barrier();
-            if (Grid.GlobalIndex.X < 100)
-                output[Grid.GlobalIndex.X] = sharedMemory[Grid.GlobalIndex.X, 1];
-            else
-                output[Grid.GlobalIndex.X] = sharedMemory[0, 0];
+            output[Grid.GlobalIndex.X] = Grid.GlobalIndex.X < 100 ? sharedMemory[Grid.GlobalIndex.X, 1] : sharedMemory[0, 0];
         }
 
         [Fact]
@@ -319,7 +319,10 @@ namespace ILGPU.Tests
                 new Index3D(5, 7, 3),
                 new Stride3D.DenseZY(3 * 7, 3));
             if (Group.IsFirstThread)
+            {
                 sharedMemory[2, 6, 1] = 42;
+            }
+
             Group.Barrier();
             output[Grid.GlobalIndex.X] = sharedMemory[2, 6, 1];
         }
@@ -342,7 +345,10 @@ namespace ILGPU.Tests
             var sharedMemory = ILGPU.SharedMemory.Allocate3DDenseXY<int>(
                 new Index3D(11, 17, 13));
             if (Group.IsFirstThread)
+            {
                 sharedMemory[4, 5, 2] = 42;
+            }
+
             Group.Barrier();
             output[Grid.GlobalIndex.X] = sharedMemory[4, 5, 2];
         }
@@ -365,7 +371,10 @@ namespace ILGPU.Tests
             var sharedMemory = ILGPU.SharedMemory.Allocate3DDenseZY<int>(
                 new Index3D(11, 17, 13));
             if (Group.IsFirstThread)
+            {
                 sharedMemory[4, 5, 2] = 42;
+            }
+
             Group.Barrier();
             output[Grid.GlobalIndex.X] = sharedMemory[4, 5, 2];
         }

@@ -96,7 +96,9 @@ namespace ILGPU.Tests.CPU
             implicitKernel(buff.IntExtent, buff.View);
             var implicitData = buff.GetAsArray();
             for (int i = 0; i < implicitData.Length; ++i)
+            {
                 Assert.Equal(implicitData[i], i);
+            }
 
             // Validate the explicit kernel
             var explicitKernel = accl.LoadStreamKernel<ArrayView<int>>(
@@ -107,7 +109,9 @@ namespace ILGPU.Tests.CPU
                 buff.View);
             var explicitData = buff.GetAsArray();
             for (int i = 0; i < explicitData.Length; ++i)
+            {
                 Assert.Equal(explicitData[i], i);
+            }
         }
     }
 }

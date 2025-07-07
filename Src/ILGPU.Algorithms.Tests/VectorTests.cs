@@ -145,7 +145,9 @@ namespace ILGPU.Algorithms.Tests
 
             var expected = new Vector2[size];
             for (int i = 0; i < size; ++i)
+            {
                 expected[i] = new Vector2(i, size - 1 - i) + vector.GetVector();
+            }
 
             Verify(targetBuffer.View, expected);
         }
@@ -170,7 +172,9 @@ namespace ILGPU.Algorithms.Tests
 
             var expected = new Vector3[size];
             for (int i = 0; i < size; ++i)
+            {
                 expected[i] = new Vector3(i, size - 1 - i, i) + vector.GetVector();
+            }
 
             Verify(targetBuffer.View, expected);
         }
@@ -195,7 +199,9 @@ namespace ILGPU.Algorithms.Tests
 
             var expected = new Vector4[size];
             for (int i = 0; i < size; ++i)
+            {
                 expected[i] = new Vector4(i, size - 1 - i, i, 0) + vector.GetVector();
+            }
 
             Verify(targetBuffer.View, expected);
         }

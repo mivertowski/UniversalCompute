@@ -260,7 +260,9 @@ namespace ILGPU.Tests.CPU
             finally
             {
                 if (System.IO.File.Exists(tempFile))
+                {
                     System.IO.File.Delete(tempFile);
+                }
             }
         }
 
@@ -287,7 +289,9 @@ namespace ILGPU.Tests.CPU
             finally
             {
                 if (System.IO.File.Exists(tempFile))
+                {
                     System.IO.File.Delete(tempFile);
+                }
             }
         }
 

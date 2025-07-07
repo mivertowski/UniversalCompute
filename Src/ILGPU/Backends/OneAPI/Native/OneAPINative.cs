@@ -37,7 +37,7 @@ namespace ILGPU.Backends.OneAPI.Native
     /// <summary>
     /// Native Intel OneAPI/SYCL API bindings.
     /// </summary>
-    internal static class OneAPINative
+    internal static partial class OneAPINative
     {
         #region Constants
 
@@ -52,8 +52,9 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets all available platforms.
         /// </summary>
-        [DllImport(OpenCLLibrary)]
-        internal static extern int clGetPlatformIDs(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial int clGetPlatformIDs(
             uint numEntries,
             [Out] IntPtr[]? platforms,
             out uint numPlatforms);
@@ -61,8 +62,9 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets all devices for a platform.
         /// </summary>
-        [DllImport(OpenCLLibrary)]
-        internal static extern int clGetDeviceIDs(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static partial int clGetDeviceIDs(
             IntPtr platform,
             ulong deviceType,
             uint numEntries,
@@ -72,8 +74,9 @@ namespace ILGPU.Backends.OneAPI.Native
         /// <summary>
         /// Gets device information.
         /// </summary>
-        [DllImport(OpenCLLibrary)]
-        internal static unsafe extern int clGetDeviceInfo(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        internal static unsafe partial int clGetDeviceInfo(
             IntPtr device,
             uint paramName,
             nuint paramValueSize,
@@ -101,8 +104,9 @@ namespace ILGPU.Backends.OneAPI.Native
             }
         }
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clReleaseDevice(IntPtr device);
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clReleaseDevice(IntPtr device);
 
         #endregion
 
@@ -177,8 +181,9 @@ namespace ILGPU.Backends.OneAPI.Native
             }
         }
 
-        [DllImport(OpenCLLibrary)]
-        private static extern IntPtr clCreateContext(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial IntPtr clCreateContext(
             IntPtr properties,
             uint numDevices,
             [In] IntPtr[] devices,
@@ -186,21 +191,25 @@ namespace ILGPU.Backends.OneAPI.Native
             IntPtr userData,
             out int errCodeRet);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clReleaseContext(IntPtr context);
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clReleaseContext(IntPtr context);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern IntPtr clCreateCommandQueueWithProperties(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial IntPtr clCreateCommandQueueWithProperties(
             IntPtr context,
             IntPtr device,
             IntPtr properties,
             out int errCodeRet);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clReleaseCommandQueue(IntPtr commandQueue);
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clReleaseCommandQueue(IntPtr commandQueue);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clFinish(IntPtr commandQueue);
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clFinish(IntPtr commandQueue);
 
         #endregion
 
@@ -296,16 +305,18 @@ namespace ILGPU.Backends.OneAPI.Native
             }
         }
 
-        [DllImport(OpenCLLibrary)]
-        private static extern IntPtr clCreateProgramWithSource(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial IntPtr clCreateProgramWithSource(
             IntPtr context,
             uint count,
             [In] IntPtr[] strings,
             [In] nuint[] lengths,
             out int errCodeRet);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clBuildProgram(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clBuildProgram(
             IntPtr program,
             uint numDevices,
             [In] IntPtr[] deviceList,
@@ -313,11 +324,13 @@ namespace ILGPU.Backends.OneAPI.Native
             IntPtr pfnNotify,
             IntPtr userData);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clReleaseProgram(IntPtr program);
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clReleaseProgram(IntPtr program);
 
-        [DllImport(OpenCLLibrary)]
-        private static extern int clGetProgramBuildInfo(
+        [LibraryImport(OpenCLLibrary)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
+        private static partial int clGetProgramBuildInfo(
             IntPtr program,
             IntPtr device,
             uint paramName,
@@ -400,7 +413,7 @@ namespace ILGPU.Backends.OneAPI.Native
         {
             // Check for Intel USM extension
             var extensions = GetDeviceInfo<string>(device, OneAPIDeviceInfo.Extensions);
-            return extensions.Contains("cl_intel_unified_shared_memory");
+            return extensions.Contains("cl_intel_unified_shared_memory", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -409,7 +422,7 @@ namespace ILGPU.Backends.OneAPI.Native
         internal static bool SupportsFP16(IntPtr device)
         {
             var extensions = GetDeviceInfo<string>(device, OneAPIDeviceInfo.Extensions);
-            return extensions.Contains("cl_khr_fp16");
+            return extensions.Contains("cl_khr_fp16", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -418,7 +431,7 @@ namespace ILGPU.Backends.OneAPI.Native
         internal static bool SupportsFP64(IntPtr device)
         {
             var extensions = GetDeviceInfo<string>(device, OneAPIDeviceInfo.Extensions);
-            return extensions.Contains("cl_khr_fp64");
+            return extensions.Contains("cl_khr_fp64", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -427,7 +440,7 @@ namespace ILGPU.Backends.OneAPI.Native
         internal static bool SupportsSubgroups(IntPtr device)
         {
             var extensions = GetDeviceInfo<string>(device, OneAPIDeviceInfo.Extensions);
-            return extensions.Contains("cl_intel_subgroups");
+            return extensions.Contains("cl_intel_subgroups", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

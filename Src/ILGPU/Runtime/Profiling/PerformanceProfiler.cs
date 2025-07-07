@@ -314,7 +314,7 @@ namespace ILGPU.Runtime.Profiling
             var timeout = TimeSpan.FromSeconds(5);
             var stopwatch = Stopwatch.StartNew();
 
-            while ((activeKernelExecutions.Count > 0 || activeMemoryOperations.Count > 0) && 
+            while ((!activeKernelExecutions.IsEmpty || !activeMemoryOperations.IsEmpty) && 
                    stopwatch.Elapsed < timeout)
             {
                 Thread.Sleep(10);
@@ -375,7 +375,7 @@ namespace ILGPU.Runtime.Profiling
 
             var kernelStats = executions
                 .GroupBy(e => e.KernelName)
-                .ToDictionary(g => g.Key, g => CalculateKernelStatistics(g.ToList()));
+                .ToDictionary(g => g.Key, g => CalculateKernelStatistics([.. g]));
 
             var cacheHits = executions.Count(e => e.WasFromCache);
             var cacheHitRatio = executions.Count > 0 ? (double)cacheHits / executions.Count : 0.0;
@@ -404,7 +404,7 @@ namespace ILGPU.Runtime.Profiling
             var bandwidths = operations.Where(o => o.Bandwidth.HasValue).Select(o => o.Bandwidth!.Value);
             var operationStats = operations
                 .GroupBy(o => o.OperationType)
-                .ToDictionary(g => g.Key, g => CalculateMemoryOperationStatistics(g.ToList()));
+                .ToDictionary(g => g.Key, g => CalculateMemoryOperationStatistics([.. g]));
 
             var allocations = operations.Count(o => o.OperationType == MemoryOperationType.Allocation);
             var deallocations = operations.Count(o => o.OperationType == MemoryOperationType.Deallocation);
@@ -460,7 +460,7 @@ namespace ILGPU.Runtime.Profiling
         {
             var eventStats = events
                 .GroupBy(e => e.EventName)
-                .ToDictionary(g => g.Key, g => CalculateEventStatistics(g.ToList()));
+                .ToDictionary(g => g.Key, g => CalculateEventStatistics([.. g]));
 
             return new CustomEventMetrics
             {

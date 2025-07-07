@@ -101,7 +101,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> GEMM_MatrixMultiplication()
     {
         if (primitives == null || inputTensor == null || weightTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var start = DateTime.UtcNow;
         await primitives.GemmAsync(inputTensor, weightTensor, outputTensor, 1.0f, 0.0f);
@@ -116,7 +118,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> BatchedGEMM_Performance()
     {
         if (primitives == null || inputTensor == null || weightTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var start = DateTime.UtcNow;
         await primitives.BatchedGemmAsync(inputTensor, weightTensor, outputTensor);
@@ -131,7 +135,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> Conv2D_Performance()
     {
         if (primitives == null || inputTensor == null || weightTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var parameters = new ConvolutionParameters
         {
@@ -153,7 +159,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> MultiHeadAttention_Performance()
     {
         if (primitives == null || queryTensor == null || keyTensor == null || valueTensor == null)
+        {
             return 0.0;
+        }
 
         var parameters = new AttentionParameters
         {
@@ -175,7 +183,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> ScaledDotProductAttention_Performance()
     {
         if (primitives == null || queryTensor == null || keyTensor == null || valueTensor == null)
+        {
             return 0.0;
+        }
 
         var start = DateTime.UtcNow;
         await primitives.ScaledDotProductAttentionAsync(queryTensor, keyTensor, valueTensor, queryTensor, 1.0f);
@@ -192,7 +202,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> GELU_Activation_Performance()
     {
         if (primitives == null || inputTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var start = DateTime.UtcNow;
         await primitives.GELUAsync(inputTensor, outputTensor);
@@ -207,7 +219,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> LayerNorm_Performance()
     {
         if (primitives == null || inputTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var lastDim = inputTensor.Shape[inputTensor.Shape.Rank - 1];
         var gamma = TensorFactory.Create<float>(new TensorShape(lastDim), ComputeLocation.Gpu);
@@ -226,7 +240,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> MaxPool2D_Performance()
     {
         if (primitives == null || inputTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var poolSize = new Size2D(2, 2);
         var stride = new Size2D(2, 2);
@@ -244,7 +260,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> AvgPool2D_Performance()
     {
         if (primitives == null || inputTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var poolSize = new Size2D(2, 2);
         var stride = new Size2D(2, 2);
@@ -262,7 +280,9 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     public async Task<double> MemoryBandwidth_CopyAsync()
     {
         if (primitives == null || inputTensor == null || outputTensor == null)
+        {
             return 0.0;
+        }
 
         var start = DateTime.UtcNow;
         inputTensor.CopyTo(outputTensor);

@@ -78,8 +78,8 @@ namespace ILGPU.Runtime.LINQ
             Accelerator accelerator,
             MemoryBuffer1D<T, Stride1D.Dense> buffer)
         {
-            this.Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            this.Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
             Provider = new GPUQueryProvider(accelerator);
             Expression = Expression.Constant(this);
         }
@@ -97,10 +97,10 @@ namespace ILGPU.Runtime.LINQ
             Accelerator accelerator,
             MemoryBuffer1D<T, Stride1D.Dense> buffer)
         {
-            this.Provider = provider ?? throw new ArgumentNullException(nameof(provider));
-            this.Expression = expression ?? throw new ArgumentNullException(nameof(expression));
-            this.Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            this.Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
+            Provider = provider ?? throw new ArgumentNullException(nameof(provider));
+            Expression = expression ?? throw new ArgumentNullException(nameof(expression));
+            Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            Buffer = buffer ?? throw new ArgumentNullException(nameof(buffer));
         }
 
         #endregion
@@ -166,7 +166,7 @@ namespace ILGPU.Runtime.LINQ
         /// Executes the query and returns the results as an array.
         /// </summary>
         /// <returns>The query results as an array.</returns>
-        public T[] ToArray() => Execute().ToArray();
+        public T[] ToArray() => [.. Execute()];
 
         /// <summary>
         /// Executes the query and stores the results in the specified buffer.

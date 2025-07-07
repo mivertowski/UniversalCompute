@@ -85,11 +85,15 @@ namespace ILGPU.SourceGenerators.Generators
                     .FirstOrDefault(name => name.EndsWith(resourceName, StringComparison.Ordinal));
 
                 if (resourcePath == null)
+                {
                     return null;
+                }
 
                 using var stream = assembly.GetManifestResourceStream(resourcePath);
                 if (stream == null)
+                {
                     return null;
+                }
 
                 using var reader = new StreamReader(stream);
                 return reader.ReadToEnd();
@@ -109,7 +113,9 @@ namespace ILGPU.SourceGenerators.Generators
                 var imports = xmlDoc.Root;
                 
                 if (imports?.Name != "Imports")
+                {
                     return;
+                }
 
                 var namespaceName = imports.Attribute("Namespace")?.Value ?? "ILGPU.Runtime.Generated";
                 var className = imports.Attribute("ClassName")?.Value ?? "GeneratedAPI";
@@ -149,15 +155,28 @@ namespace ILGPU.SourceGenerators.Generators
             var result = new Dictionary<string, string>();
             
             if (libraryNamesElement == null)
+            {
                 return result;
+            }
 
             var windows = libraryNamesElement.Element("Windows")?.Value;
             var linux = libraryNamesElement.Element("Linux")?.Value;
             var macOS = libraryNamesElement.Element("MacOS")?.Value;
 
-            if (!string.IsNullOrEmpty(windows)) result["Windows"] = windows!;
-            if (!string.IsNullOrEmpty(linux)) result["Linux"] = linux!;
-            if (!string.IsNullOrEmpty(macOS)) result["MacOS"] = macOS!;
+            if (!string.IsNullOrEmpty(windows))
+            {
+                result["Windows"] = windows!;
+            }
+
+            if (!string.IsNullOrEmpty(linux))
+            {
+                result["Linux"] = linux!;
+            }
+
+            if (!string.IsNullOrEmpty(macOS))
+            {
+                result["MacOS"] = macOS!;
+            }
 
             return result;
         }
@@ -170,7 +189,9 @@ namespace ILGPU.SourceGenerators.Generators
             {
                 var name = import.Attribute("Name")?.Value;
                 if (string.IsNullOrEmpty(name))
+                {
                     continue;
+                }
 
                 var returnType = import.Attribute("ReturnType")?.Value ?? defaultReturnType;
                 var stringMarshalling = import.Attribute("StringMarshalling")?.Value;
@@ -423,9 +444,14 @@ namespace ILGPU.SourceGenerators.Generators
                 if (!string.IsNullOrEmpty(flags))
                 {
                     if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
+                    {
                         return $"out {paramName}";
+                    }
+
                     if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
+                    {
                         return $"ref {paramName}";
+                    }
                 }
                 
                 return paramName;
@@ -492,9 +518,14 @@ namespace ILGPU.SourceGenerators.Generators
             if (!string.IsNullOrEmpty(flags))
             {
                 if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
+                {
                     return $"out {type}";
+                }
+
                 if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
+                {
                     return $"ref {type}";
+                }
             }
 
             return type;
@@ -511,9 +542,14 @@ namespace ILGPU.SourceGenerators.Generators
             if (!string.IsNullOrEmpty(dllFlags))
             {
                 if (dllFlags!.IndexOf("In", StringComparison.Ordinal) >= 0)
+                {
                     attributes.Add("In");
+                }
+
                 if (dllFlags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
+                {
                     attributes.Add("Out");
+                }
             }
 
             var attributeString = attributes.Count > 0 ? $"[{string.Join(", ", attributes)}] " : "";
@@ -521,9 +557,14 @@ namespace ILGPU.SourceGenerators.Generators
             if (!string.IsNullOrEmpty(flags))
             {
                 if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
+                {
                     return $"{attributeString}out {type}";
+                }
+
                 if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
+                {
                     return $"{attributeString}ref {type}";
+                }
             }
 
             return $"{attributeString}{type}";
@@ -538,9 +579,14 @@ namespace ILGPU.SourceGenerators.Generators
             if (!string.IsNullOrEmpty(flags))
             {
                 if (flags!.IndexOf("Out", StringComparison.Ordinal) >= 0)
+                {
                     return $"out {type}";
+                }
+
                 if (flags!.IndexOf("Ref", StringComparison.Ordinal) >= 0)
+                {
                     return $"ref {type}";
+                }
             }
 
             return type;
@@ -550,9 +596,15 @@ namespace ILGPU.SourceGenerators.Generators
         {
             // Handle C# keywords and special characters
             if (parameterName == "event")
+            {
                 return "@event";
+            }
+
             if (parameterName == "object")
+            {
                 return "@object";
+            }
+
             return parameterName == "string" ? "@string" : parameterName;
         }
 

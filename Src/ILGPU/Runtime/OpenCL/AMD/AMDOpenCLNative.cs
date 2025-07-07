@@ -87,13 +87,13 @@ namespace ILGPU.Runtime.OpenCL.AMD
                 // Get total platform count
                 var result = CLApi.GetPlatformIDs(0, null, out uint platformCount);
                 if (result != CLError.CL_SUCCESS || platformCount == 0)
-                    return Array.Empty<IntPtr>();
+                    return [];
 
                 // Get all platforms
                 var platforms = new IntPtr[platformCount];
                 result = CLApi.GetPlatformIDs(platformCount, platforms, out _);
                 if (result != CLError.CL_SUCCESS)
-                    return Array.Empty<IntPtr>();
+                    return [];
 
                 // Filter for AMD platforms
                 var amdPlatforms = new System.Collections.Generic.List<IntPtr>();
@@ -103,11 +103,11 @@ namespace ILGPU.Runtime.OpenCL.AMD
                         amdPlatforms.Add(platforms[i]);
                 }
 
-                return amdPlatforms.ToArray();
+                return [.. amdPlatforms];
             }
             catch
             {
-                return Array.Empty<IntPtr>();
+                return [];
             }
         }
 
@@ -170,11 +170,11 @@ namespace ILGPU.Runtime.OpenCL.AMD
                     allDevices.AddRange(devices);
                 }
 
-                return allDevices.ToArray();
+                return [.. allDevices];
             }
             catch
             {
-                return Array.Empty<IntPtr>();
+                return [];
             }
         }
 
@@ -191,16 +191,16 @@ namespace ILGPU.Runtime.OpenCL.AMD
                 // Get device count
                 var result = CLApi.GetDeviceIDs(platform, deviceType, 0, null, out uint deviceCount);
                 if (result != CLError.CL_SUCCESS || deviceCount == 0)
-                    return Array.Empty<IntPtr>();
+                    return [];
 
                 // Get devices
                 var devices = new IntPtr[deviceCount];
                 result = CLApi.GetDeviceIDs(platform, deviceType, deviceCount, devices, out _);
-                return result != CLError.CL_SUCCESS ? Array.Empty<IntPtr>() : devices;
+                return result != CLError.CL_SUCCESS ? [] : devices;
             }
             catch
             {
-                return Array.Empty<IntPtr>();
+                return [];
             }
         }
 

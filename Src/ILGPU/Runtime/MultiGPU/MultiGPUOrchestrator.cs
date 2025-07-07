@@ -58,7 +58,7 @@ namespace ILGPU.Runtime.MultiGPU
             if (accelerators == null)
                 throw new ArgumentNullException(nameof(accelerators));
 
-            this.Options = options ?? new MultiGPUOptions();
+            Options = options ?? new MultiGPUOptions();
             workQueue = new ConcurrentQueue<MultiGPUWorkItem>();
             loadStats = new ConcurrentDictionary<int, double>();
 
@@ -67,7 +67,7 @@ namespace ILGPU.Runtime.MultiGPU
             int index = 0;
             foreach (var accelerator in accelerators)
             {
-                if (this.Options.MaxGPUs.HasValue && index >= this.Options.MaxGPUs.Value)
+                if (Options.MaxGPUs.HasValue && index >= Options.MaxGPUs.Value)
                     break;
 
                 var performanceScore = CalculatePerformanceScore(accelerator);
@@ -78,13 +78,13 @@ namespace ILGPU.Runtime.MultiGPU
             }
 
             // Start load balancing timer if enabled
-            if (this.Options.EnableLoadBalancing && availableGPUs.Count > 1)
+            if (Options.EnableLoadBalancing && availableGPUs.Count > 1)
             {
                 loadBalancingTimer = new Timer(
                     LoadBalancingCallback,
                     null,
-                    TimeSpan.FromMilliseconds(this.Options.LoadBalancingInterval),
-                    TimeSpan.FromMilliseconds(this.Options.LoadBalancingInterval));
+                    TimeSpan.FromMilliseconds(Options.LoadBalancingInterval),
+                    TimeSpan.FromMilliseconds(Options.LoadBalancingInterval));
             }
         }
 
@@ -161,7 +161,7 @@ namespace ILGPU.Runtime.MultiGPU
                 }
 
                 // Sort by priority (higher first)
-                workItems = workItems.OrderByDescending(w => w.Priority).ToList();
+                workItems = [.. workItems.OrderByDescending(w => w.Priority)];
 
                 // Distribute work according to strategy
                 var gpuWorkAssignments = DistributeWork(workItems, activeGpus);

@@ -61,7 +61,7 @@ namespace ILGPU.IR.Values
             foreach (var entry in groupedUses)
                 groupedUsesList.Add((entry.Key, entry.Value));
             groupedUsesList.Sort((x, y) => y.Item1.CompareTo(x.Item1));
-            Uses = groupedUsesList.ToImmutableArray();
+            Uses = [.. groupedUsesList];
 
             var groupedUsesPerTypeList = new List<(int, Type, int)>(usesPerType.Count);
             foreach (var entry in usesPerType)
@@ -71,8 +71,8 @@ namespace ILGPU.IR.Values
             }
             groupedUsesPerTypeList.Sort((x, y) => y.Item1.CompareTo(x.Item1));
 
-            Uses = groupedUsesList.ToImmutableArray();
-            UsesPerType = groupedUsesPerTypeList.ToImmutableArray();
+            Uses = [.. groupedUsesList];
+            UsesPerType = [.. groupedUsesPerTypeList];
         }
 
         #endregion

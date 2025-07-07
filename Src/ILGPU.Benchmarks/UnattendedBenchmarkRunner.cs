@@ -37,7 +37,7 @@ public class UnattendedBenchmarkRunner
     {
         this.logger = logger;
         this.config = config;
-        this.outputDirectory = Path.Combine(Environment.CurrentDirectory, "BenchmarkResults");
+        outputDirectory = Path.Combine(Environment.CurrentDirectory, "BenchmarkResults");
         Directory.CreateDirectory(outputDirectory);
     }
 
@@ -542,9 +542,15 @@ public class UnattendedBenchmarkRunner
     private static string FormatPerformance(double opsPerSec)
     {
         if (opsPerSec >= 1_000_000_000)
+        {
             return $"{opsPerSec / 1_000_000_000:F2}B ops/s";
+        }
+
         if (opsPerSec >= 1_000_000)
+        {
             return $"{opsPerSec / 1_000_000:F2}M ops/s";
+        }
+
         return opsPerSec >= 1_000 ? $"{opsPerSec / 1_000:F2}K ops/s" : $"{opsPerSec:F2} ops/s";
     }
 }

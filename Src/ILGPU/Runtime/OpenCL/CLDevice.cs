@@ -415,7 +415,7 @@ namespace ILGPU.Runtime.OpenCL
                 CLDeviceInfoType.CL_DEVICE_EXTENSIONS);
             foreach (var extension in extensionString.ToUpperInvariant().Split(' '))
                 extensionSet.Add(extension);
-            Extensions = extensionSet.ToImmutableArray();
+            Extensions = [.. extensionSet];
         }
 
         private void InitGenericAddressSpaceSupport()

@@ -139,15 +139,23 @@ public class IntelAMXBenchmarks : IDisposable
         {
             var index = 0;
             for (int y = 0; y < matrixA.IntExtent.Y && index < matrixDataA.Length; y++)
+            {
                 for (int x = 0; x < matrixA.IntExtent.X && index < matrixDataA.Length; x++)
+                {
                     matrixA.View[y, x] = matrixDataA[index++];
+                }
+            }
         }
         if (matrixB != null)
         {
             var index = 0;
             for (int y = 0; y < matrixB.IntExtent.Y && index < matrixDataB.Length; y++)
+            {
                 for (int x = 0; x < matrixB.IntExtent.X && index < matrixDataB.Length; x++)
+                {
                     matrixB.View[y, x] = matrixDataB[index++];
+                }
+            }
         }
         int8DataA?.View.CopyFromCPU(int8A);
         int8DataB?.View.CopyFromCPU(int8B);
@@ -161,8 +169,10 @@ public class IntelAMXBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int>(StandardMatMulKernel);
 
         if (matrixA == null || matrixB == null || matrixC == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize);
         accelerator!.Synchronize();
         
@@ -187,8 +197,10 @@ public class IntelAMXBenchmarks : IDisposable
                 ArrayView2D<float, Stride2D.DenseX>, int>(AMXHardwareKernel);
 
             if (matrixA == null || matrixB == null || matrixC == null)
+            {
                 return 0.0f;
-                
+            }
+
             kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize);
             amxAccelerator.Synchronize();
             
@@ -213,8 +225,10 @@ public class IntelAMXBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int>(AMXTiledMatMulKernel);
 
         if (matrixA == null || matrixB == null || matrixC == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize);
         accelerator!.Synchronize();
         
@@ -231,8 +245,10 @@ public class IntelAMXBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int>(AMXBFloat16Kernel);
 
         if (matrixA == null || matrixB == null || matrixC == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize);
         accelerator!.Synchronize();
         
@@ -249,8 +265,10 @@ public class IntelAMXBenchmarks : IDisposable
             AMXQuantizedKernel);
 
         if (int8DataA == null || int8DataB == null || matrixC == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(TileSize * TileSize, int8DataA.View, int8DataB.View, matrixC.View.AsLinearView(), TileSize);
         accelerator!.Synchronize();
         
@@ -267,8 +285,10 @@ public class IntelAMXBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int, int>(BatchedAMXKernel);
 
         if (matrixA == null || matrixB == null || matrixC == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index3D(BatchSize, TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize, BatchSize);
         accelerator!.Synchronize();
         
@@ -285,8 +305,10 @@ public class IntelAMXBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int>(OptimizedTileKernel);
 
         if (matrixA == null || matrixB == null || matrixC == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index2D(TileSize, TileSize), matrixA.View, matrixB.View, matrixC.View, TileSize);
         accelerator!.Synchronize();
         
@@ -304,8 +326,10 @@ public class IntelAMXBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         // This kernel will be executed on real AMX hardware via ILGPU
         // The AMX accelerator will automatically optimize tile operations
         float sum = 0.0f;
@@ -324,8 +348,10 @@ public class IntelAMXBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         float sum = 0.0f;
         for (int k = 0; k < size; k++)
         {
@@ -342,8 +368,10 @@ public class IntelAMXBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         // Simulate AMX 16x16 tile operations
         const int tileSize = 16;
         var tileX = index.X / tileSize;
@@ -377,8 +405,10 @@ public class IntelAMXBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         float sum = 0.0f;
         for (int k = 0; k < size; k++)
         {
@@ -398,8 +428,10 @@ public class IntelAMXBenchmarks : IDisposable
         int matrixSize)
     {
         if (index >= matrixSize * matrixSize)
+        {
             return;
-            
+        }
+
         var row = index / matrixSize;
         var col = index % matrixSize;
         
@@ -432,8 +464,10 @@ public class IntelAMXBenchmarks : IDisposable
         var col = index.Z;
         
         if (batch >= batchSize || row >= tileSize || col >= tileSize)
+        {
             return;
-            
+        }
+
         // Real AMX-style batched matrix multiplication with tile register usage
         const int AMX_TILE_SIZE = 16; // AMX supports 16x16 tiles
         
@@ -489,8 +523,10 @@ public class IntelAMXBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         // Simulate optimized tile configuration based on data locality
         const int optimalTileSize = 32; // Larger tiles for better cache utilization
         

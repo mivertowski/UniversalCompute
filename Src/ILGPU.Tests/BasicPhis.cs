@@ -26,7 +26,10 @@ namespace ILGPU.Tests
         {
             int result = 0;
             for (int i = c; i < 23; ++i)
+            {
                 result = 1;
+            }
+
             return result;
         }
 
@@ -35,7 +38,10 @@ namespace ILGPU.Tests
         {
             int result = 1;
             for (int i = c; i >= 0; --i)
+            {
                 result <<= 1;
+            }
+
             return result;
         }
 
@@ -44,9 +50,14 @@ namespace ILGPU.Tests
         {
             int result = 0;
             if (c < 23)
+            {
                 result = GetValueLoop(c + 1);
+            }
             else
+            {
                 result += GetValueLoop2(c / 2);
+            }
+
             return result;
         }
 

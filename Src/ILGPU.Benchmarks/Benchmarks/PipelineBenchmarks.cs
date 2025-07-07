@@ -174,8 +174,11 @@ public class PipelineBenchmarks : IDisposable
     [Benchmark]
     public async Task AsynchronousMemoryTransfer()
     {
-        if (accelerator == null) return;
-        
+        if (accelerator == null)
+        {
+            return;
+        }
+
         var tasks = new List<Task>();
         
         for (int i = 0; i < BatchSize; i++)
@@ -204,8 +207,11 @@ public class PipelineBenchmarks : IDisposable
     [Benchmark]
     public async Task OverlappedComputeTransfer()
     {
-        if (accelerator == null) return;
-        
+        if (accelerator == null)
+        {
+            return;
+        }
+
         using var computeStream = accelerator.CreateStream();
         using var transferStream = accelerator.CreateStream();
         

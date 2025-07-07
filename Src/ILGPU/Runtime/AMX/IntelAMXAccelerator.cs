@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Runtime.AMX.Native;
+using ILGPU.Runtime.CPU;
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -416,7 +417,7 @@ namespace ILGPU.Runtime.AMX
                                                       {
                                                           throw new AMXException("Failed to execute AI inference with AMX", ex);
                                                       }
-                                                  });
+                                                  }).ConfigureAwait(false);
 
         #endregion
 

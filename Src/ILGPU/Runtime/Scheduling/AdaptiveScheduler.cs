@@ -442,7 +442,7 @@ namespace ILGPU.Runtime.Scheduling
                 scheduledLevels.Add(new ScheduledExecutionLevel(i, scheduledNodes));
             }
 
-            return new ExecutionSchedule(scheduledLevels.SelectMany(l => l.Nodes).ToList());
+            return new ExecutionSchedule([.. scheduledLevels.SelectMany(l => l.Nodes)]);
         }
 
         private MemoryTransferPlan OptimizeMemoryTransfers(
@@ -532,14 +532,7 @@ namespace ILGPU.Runtime.Scheduling
             var recommendations = new Dictionary<string, ComputeDevice>();
             
             // For high operation count models, recommend GPU
-            if (analysis.TotalOperations > 1000)
-            {
-                recommendations["primary"] = ComputeDevice.GPU;
-            }
-            else
-            {
-                recommendations["primary"] = ComputeDevice.CPU;
-            }
+            recommendations["primary"] = analysis.TotalOperations > 1000 ? ComputeDevice.GPU : ComputeDevice.CPU;
 
             return recommendations;
         }

@@ -96,7 +96,7 @@ namespace ILGPU.Backends.PTX.Analyses
     /// Constructs a new PTX block schedule.
     /// </remarks>
     /// <param name="blocks">The underlying block collection.</param>
-    abstract class PTXBlockSchedule<TOrder, TDirection>(in BasicBlockCollection<TOrder, TDirection> blocks) : PTXBlockSchedule(blocks.EntryBlock, blocks.ToImmutableArray())
+    abstract class PTXBlockSchedule<TOrder, TDirection>(in BasicBlockCollection<TOrder, TDirection> blocks) : PTXBlockSchedule(blocks.EntryBlock, [.. blocks])
         where TOrder : struct, ITraversalOrder
         where TDirection : struct, IControlFlowDirection
     {

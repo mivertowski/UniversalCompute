@@ -139,15 +139,23 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         {
             var index = 0;
             for (int y = 0; y < inputMatrix.IntExtent.Y && index < inputData.Length; y++)
+            {
                 for (int x = 0; x < inputMatrix.IntExtent.X && index < inputData.Length; x++)
+                {
                     inputMatrix.View[y, x] = inputData[index++];
+                }
+            }
         }
         if (weightMatrix != null)
         {
             var index = 0;
             for (int y = 0; y < weightMatrix.IntExtent.Y && index < weightData.Length; y++)
+            {
                 for (int x = 0; x < weightMatrix.IntExtent.X && index < weightData.Length; x++)
+                {
                     weightMatrix.View[y, x] = weightData[index++];
+                }
+            }
         }
         inputVector?.View.CopyFromCPU(vectorData);
     }
@@ -160,8 +168,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int>(StandardMatMulKernel);
 
         if (inputMatrix == null || weightMatrix == null || outputMatrix == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index2D(MatrixSize, MatrixSize), inputMatrix.View, weightMatrix.View, outputMatrix.View, MatrixSize);
         accelerator!.Synchronize();
         
@@ -186,8 +196,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
                 ArrayView2D<float, Stride2D.DenseX>, int>(ANEHardwareKernel);
 
             if (inputMatrix == null || weightMatrix == null || outputMatrix == null)
+            {
                 return 0.0f;
-                
+            }
+
             kernel(new Index2D(MatrixSize, MatrixSize), inputMatrix.View, weightMatrix.View, outputMatrix.View, MatrixSize);
             aneAccelerator.Synchronize();
             
@@ -212,8 +224,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int>(ANEMatMulKernel);
 
         if (inputMatrix == null || weightMatrix == null || outputMatrix == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(new Index2D(MatrixSize, MatrixSize), inputMatrix.View, weightMatrix.View, outputMatrix.View, MatrixSize);
         accelerator!.Synchronize();
         
@@ -230,8 +244,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             ArrayView2D<float, Stride2D.DenseX>, int, int>(ANEConvolutionKernel);
 
         if (inputMatrix == null || weightMatrix == null || outputMatrix == null)
+        {
             return 0.0f;
-            
+        }
+
         var kernelSize = 3;
         kernel(new Index2D(MatrixSize - kernelSize + 1, MatrixSize - kernelSize + 1), 
                inputMatrix.View, weightMatrix.View, outputMatrix.View, MatrixSize, kernelSize);
@@ -250,8 +266,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             ANEFullyConnectedKernel);
 
         if (inputVector == null || weightMatrix == null || outputVector == null)
+        {
             return 0.0f;
-            
+        }
+
         var inputSize = MatrixSize;
         var outputSize = MatrixSize / 2;
         
@@ -272,8 +290,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             ANEBatchedInferenceKernel);
 
         if (inputVector == null || weightMatrix == null || outputVector == null)
+        {
             return 0.0f;
-            
+        }
+
         var hiddenSize = MatrixSize / 4;
         kernel(new Index2D(BatchSize, hiddenSize), inputVector.View, weightMatrix.View, outputVector.View, 
                MatrixSize, hiddenSize, BatchSize);
@@ -292,8 +312,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>>(ANEActivationKernel);
 
         if (inputVector == null || outputVector == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(MatrixSize * BatchSize, inputVector.View, outputVector.View);
         accelerator!.Synchronize();
         
@@ -310,8 +332,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             Index1D, ArrayView<float>, ArrayView<float>, int>(ANEDataFlowKernel);
 
         if (inputVector == null || outputVector == null)
+        {
             return 0.0f;
-            
+        }
+
         kernel(MatrixSize, inputVector.View, outputVector.View, BatchSize);
         accelerator!.Synchronize();
         
@@ -330,8 +354,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         // This kernel will be executed on real ANE hardware via ILGPU
         // The ANE accelerator will automatically optimize neural operations
         float sum = 0.0f;
@@ -350,8 +376,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         float sum = 0.0f;
         for (int k = 0; k < size; k++)
         {
@@ -368,8 +396,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         int size)
     {
         if (index.X >= size || index.Y >= size)
+        {
             return;
-            
+        }
+
         // Simulate ANE FP16 precision and optimized computation
         float sum = 0.0f;
         for (int k = 0; k < size; k++)
@@ -394,8 +424,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
     {
         var outputSize = inputSize - kernelSize + 1;
         if (index.X >= outputSize || index.Y >= outputSize)
+        {
             return;
-            
+        }
+
         float sum = 0.0f;
         for (int ky = 0; ky < kernelSize; ky++)
         {
@@ -427,8 +459,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         int outputSize)
     {
         if (index >= output.Length)
+        {
             return;
-            
+        }
+
         var outputIdx = index % outputSize;
         var batchIdx = index / outputSize;
         var inputOffset = batchIdx * inputSize;
@@ -462,14 +496,18 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         var hidden = index.Y;
         
         if (batch >= batchSize || hidden >= hiddenSize)
+        {
             return;
-            
+        }
+
         var inputOffset = batch * inputSize;
         var outputIdx = batch * hiddenSize + hidden;
         
         if (outputIdx >= output.Length)
+        {
             return;
-            
+        }
+
         // Simulate multi-layer perceptron with ANE optimizations
         float sum1 = 0.0f;
         for (int i = 0; i < inputSize && (inputOffset + i) < input.Length && i < weights.IntExtent.X; i++)
@@ -494,8 +532,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         ArrayView<float> output)
     {
         if (index >= input.Length || index >= output.Length)
+        {
             return;
-            
+        }
+
         var value = input[index];
         
         // ANE-optimized activation functions with proper implementations
@@ -538,8 +578,10 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         int batchSize)
     {
         if (index >= output.Length / batchSize)
+        {
             return;
-            
+        }
+
         // Simulate ANE's optimized data flow with minimal memory access
         for (int batch = 0; batch < batchSize; batch++)
         {
@@ -584,9 +626,16 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         // sin(x) ≈ x - x³/6 + x⁵/120 (for small x)
         // Normalize x to [-π, π] range first
         x = x - ((int)(x / (2.0f * 3.14159f))) * (2.0f * 3.14159f);
-        if (x > 3.14159f) x -= 2.0f * 3.14159f;
-        if (x < -3.14159f) x += 2.0f * 3.14159f;
-        
+        if (x > 3.14159f)
+        {
+            x -= 2.0f * 3.14159f;
+        }
+
+        if (x < -3.14159f)
+        {
+            x += 2.0f * 3.14159f;
+        }
+
         var x2 = x * x;
         return x * (1.0f - x2 / 6.0f + x2 * x2 / 120.0f);
     }
@@ -596,9 +645,16 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         // Fast cosine approximation using Taylor series
         // cos(x) ≈ 1 - x²/2 + x⁴/24
         x = x - ((int)(x / (2.0f * 3.14159f))) * (2.0f * 3.14159f);
-        if (x > 3.14159f) x -= 2.0f * 3.14159f;
-        if (x < -3.14159f) x += 2.0f * 3.14159f;
-        
+        if (x > 3.14159f)
+        {
+            x -= 2.0f * 3.14159f;
+        }
+
+        if (x < -3.14159f)
+        {
+            x += 2.0f * 3.14159f;
+        }
+
         var x2 = x * x;
         return 1.0f - x2 / 2.0f + x2 * x2 / 24.0f;
     }
@@ -607,9 +663,16 @@ public class AppleNeuralEngineBenchmarks : IDisposable
     {
         // Fast exponential approximation
         // e^x ≈ 1 + x + x²/2 + x³/6 (Taylor series, limited terms)
-        if (x > 10.0f) return 22026.5f; // e^10 approximately
-        if (x < -10.0f) return 0.0f;
-        
+        if (x > 10.0f)
+        {
+            return 22026.5f; // e^10 approximately
+        }
+
+        if (x < -10.0f)
+        {
+            return 0.0f;
+        }
+
         var result = 1.0f + x;
         var term = x;
         term *= x / 2.0f;
@@ -623,9 +686,16 @@ public class AppleNeuralEngineBenchmarks : IDisposable
     {
         // High-accuracy tanh approximation using rational function
         // Based on: tanh(x) = (e^x - e^-x) / (e^x + e^-x)
-        if (x > 5.0f) return 1.0f;
-        if (x < -5.0f) return -1.0f;
-        
+        if (x > 5.0f)
+        {
+            return 1.0f;
+        }
+
+        if (x < -5.0f)
+        {
+            return -1.0f;
+        }
+
         // For moderate values, use exponential form with approximation
         if (IntrinsicMath.Abs(x) > 1.0f)
         {

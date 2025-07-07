@@ -63,12 +63,16 @@ public static class HardwareDetection
     public static HardwareInfo GetHardwareInfo()
     {
         if (_cachedInfo != null)
+        {
             return _cachedInfo;
+        }
 
         lock (_lock)
         {
             if (_cachedInfo != null)
+            {
                 return _cachedInfo;
+            }
 
             _cachedInfo = DetectHardware();
             return _cachedInfo;
@@ -142,7 +146,7 @@ public static class HardwareDetection
         {
             Capabilities = capabilities,
             ProcessorName = GetProcessorName(),
-            AvailableDevices = devices.ToArray(),
+            AvailableDevices = [.. devices],
             Properties = properties
         };
     }
@@ -217,7 +221,9 @@ public static class HardwareDetection
     private static (string[] Devices, Dictionary<string, object> Properties)? DetectAppleNeuralEngine()
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
             return null;
+        }
 
         try
         {
@@ -353,8 +359,16 @@ public static class HardwareDetection
         try
         {
             var processorInfo = GetProcessorName().ToUpperInvariant();
-            if (processorInfo.Contains("m3")) return "ANE 3.0";
-            if (processorInfo.Contains("m2")) return "ANE 2.0";
+            if (processorInfo.Contains("m3"))
+            {
+                return "ANE 3.0";
+            }
+
+            if (processorInfo.Contains("m2"))
+            {
+                return "ANE 2.0";
+            }
+
             return processorInfo.Contains("m1") ? "ANE 1.0" : "ANE Unknown";
         }
         catch

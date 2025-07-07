@@ -285,7 +285,7 @@ namespace ILGPU.IR
         /// Converts this mapping object into an array.
         /// </summary>
         /// <returns>The array.</returns>
-        public T[] ToArray() => dataList.ToArray();
+        public T[] ToArray() => [.. dataList];
 
         /// <summary>
         /// Converts this mapping object into an immutable array.

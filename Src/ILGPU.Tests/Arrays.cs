@@ -104,7 +104,10 @@ namespace ILGPU.Tests
             TArraySize arraySize = default;
             var array = new T[arraySize.Length];
             for (int i = 0; i < arraySize.Length; ++i)
+            {
                 array[i] = c;
+            }
+
             data[index] = array[localIndex];
         }
 
@@ -139,7 +142,10 @@ namespace ILGPU.Tests
             {
                 var array = new T[arraySize.Length];
                 for (int i = 0; i < arraySize.Length; ++i)
+                {
                     array[i] = c;
+                }
+
                 data[index] = array[localIndex];
             }
             else
@@ -187,7 +193,9 @@ namespace ILGPU.Tests
         {
             TArraySize arraySize = default;
             for (int i = 0; i < arraySize.Length; ++i)
+            {
                 array[i] = c;
+            }
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -413,7 +421,10 @@ namespace ILGPU.Tests
             var array = new T[arraySize.Length];
             var nestedStruct = new ArrayInStruct<T>(array);
             for (int i = 0; i < arraySize.Length; ++i)
+            {
                 nestedStruct[i] = c;
+            }
+
             data[index] = GetValue(nestedStruct, localIndex);
         }
 
@@ -522,7 +533,9 @@ namespace ILGPU.Tests
                 arraySize.Length,
                 arraySize.Length];
             for (int i = 0; i < array.GetLength(2); ++i)
+            {
                 array[i, i, i, i] = c;
+            }
 
             dataX[index] = array[0, 0, 0, localIndex];
             dataY[index] = array[0, 0, localIndex, 0];
@@ -670,7 +683,9 @@ namespace ILGPU.Tests
             where T : unmanaged
         {
             for (int i = 0; i < view.Length; ++i)
+            {
                 view[i] = value;
+            }
         }
 
         internal static void ArrayAsContiguousViewKernel<T, TArraySize>(
@@ -866,10 +881,7 @@ namespace ILGPU.Tests
         {
             int[] values = [0, 1];
 
-            if (index == values[0])
-                buffer[index] = 42;
-            else
-                buffer[index] = 24;
+            buffer[index] = index == values[0] ? 42 : 24;
         }
 
         [Fact]
@@ -890,10 +902,7 @@ namespace ILGPU.Tests
         {
             int[] values = [0, 1];
 
-            if (Bitwise.And(index == values[1], constant == values[0]))
-                buffer[index] = 42;
-            else
-                buffer[index] = 24;
+            buffer[index] = Bitwise.And(index == values[1], constant == values[0]) ? 42 : 24;
         }
 
         [InlineData(0)]

@@ -370,23 +370,18 @@ namespace ILGPU.FFT
                 fixed (IPPNative.Ipp32fc* pOutput = ippOutput)
                 {
                     // Perform FFT
-                    if (forward)
-                    {
-                        result = IPPNative.ippsFFTFwd_CToC_32fc(
+                    result = forward
+                        ? IPPNative.ippsFFTFwd_CToC_32fc(
+                            new IntPtr(pInput),
+                            new IntPtr(pOutput),
+                            fftSpec,
+                            workBufferMemory)
+                        : IPPNative.ippsFFTInv_CToC_32fc(
                             new IntPtr(pInput),
                             new IntPtr(pOutput),
                             fftSpec,
                             workBufferMemory);
-                    }
-                    else
-                    {
-                        result = IPPNative.ippsFFTInv_CToC_32fc(
-                            new IntPtr(pInput),
-                            new IntPtr(pOutput),
-                            fftSpec,
-                            workBufferMemory);
-                    }
-                    
+
                     CheckIPPResult(result, forward ? "Forward FFT failed" : "Inverse FFT failed");
                 }
                 

@@ -202,7 +202,7 @@ namespace ILGPU.Memory.Unified
                 MemoryPlacement.DeviceLocal,     // largeBuffers
                 MemoryPlacement.HostPinned,      // frequentlyAccessed
                 MemoryPlacement.ReadOnlyOptimized, // readOnly
-                suggestions.Select(s => s.Reason).ToArray() // optimizationHints
+                [.. suggestions.Select(s => s.Reason)] // optimizationHints
             );
         }
 

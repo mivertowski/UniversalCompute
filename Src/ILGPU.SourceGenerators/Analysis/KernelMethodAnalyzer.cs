@@ -38,20 +38,28 @@ namespace ILGPU.SourceGenerators.Analysis
         {
             var methodSymbol = semanticModel.GetDeclaredSymbol(methodSyntax);
             if (methodSymbol == null)
+            {
                 return KernelAnalysisResult.Failed("Method symbol not found");
+            }
 
             // Check if method is static
             if (!methodSymbol.IsStatic)
+            {
                 return KernelAnalysisResult.Failed("Kernel methods must be static");
+            }
 
             // Check return type (should be void)
             if (!methodSymbol.ReturnsVoid)
+            {
                 return KernelAnalysisResult.Failed("Kernel methods must return void");
+            }
 
             // Analyze parameters for AOT compatibility
             var parameterAnalysis = AnalyzeParameters(methodSymbol.Parameters);
             if (!parameterAnalysis.IsValid)
+            {
                 return KernelAnalysisResult.Failed(parameterAnalysis.Error ?? "Parameter analysis failed");
+            }
 
             // Analyze method body for unsupported features
             var bodyAnalysis = AnalyzeMethodBody(methodSyntax);
