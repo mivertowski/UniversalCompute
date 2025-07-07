@@ -290,12 +290,31 @@ namespace ILGPU.Apple.NeuralEngine
         #region Disposal
 
         /// <summary>
+        /// Finalizer for the Apple Neural Engine.
+        /// </summary>
+        ~AppleNeuralEngine()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
         /// Disposes the Apple Neural Engine.
         /// </summary>
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Disposes the Apple Neural Engine.
+        /// </summary>
+        /// <param name="disposing">True if disposing managed resources.</param>
+        private void Dispose(bool disposing)
+        {
             if (!_disposed)
             {
+                // Only dispose unmanaged resources in finalizer
                 if (_aneContext != IntPtr.Zero)
                 {
                     ANENative.ReleaseContext(_aneContext);

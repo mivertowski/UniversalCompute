@@ -354,7 +354,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <param name="disposing">True if disposing.</param>
         protected override void DisposeAcceleratorObject(bool disposing)
         {
-            if (disposing && nativePtr != IntPtr.Zero)
+            if (nativePtr != IntPtr.Zero)
             {
                 if (IsNativeAllocation)
                 {

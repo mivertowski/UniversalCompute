@@ -295,7 +295,6 @@ namespace ILGPU.FFT
             {
                 foreach (var device in _context.GetCudaDevices())
                 {
-#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         using var cudaAccelerator = device.CreateCudaAccelerator(_context);
@@ -315,7 +314,6 @@ namespace ILGPU.FFT
                     {
                         // This CUDA device not available for FFT
                     }
-#pragma warning restore CA1031 // Do not catch general exception types
                 }
             }
             catch

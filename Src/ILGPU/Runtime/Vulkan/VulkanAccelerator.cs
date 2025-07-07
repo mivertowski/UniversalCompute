@@ -553,6 +553,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Prints detailed GPU information.
         /// </summary>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Diagnostic output for developers - localization not required")]
         public void PrintGPUInformation()
         {
             Console.WriteLine($"Vulkan Device Information:");
