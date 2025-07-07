@@ -226,7 +226,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets Neural Engine performance metrics.
         /// </summary>
-        public ANEPerformanceMetrics GetPerformanceMetrics()
+        internal Native.ANEPerformanceMetrics GetPerformanceMetrics()
         {
             ThrowIfDisposed();
             return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : ANENative.GetPerformanceMetrics(_aneContext);
@@ -235,7 +235,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets Neural Engine power consumption information.
         /// </summary>
-        public ANEPowerInfo GetPowerInfo()
+        internal Native.ANEPowerInfo GetPowerInfo()
         {
             ThrowIfDisposed();
             return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : ANENative.GetPowerInfo(_aneContext);
@@ -247,7 +247,7 @@ namespace ILGPU.Apple.NeuralEngine
         public ANEThermalState GetThermalState()
         {
             ThrowIfDisposed();
-            return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : ANENative.GetThermalState(_aneContext);
+            return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : (ANEThermalState)ANENative.GetThermalState(_aneContext);
         }
 
         #endregion

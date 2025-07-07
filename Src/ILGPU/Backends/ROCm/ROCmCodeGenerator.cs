@@ -149,8 +149,7 @@ namespace ILGPU.Backends.ROCm
                 codeBuilder.Append(' ');
                 codeBuilder.Append(paramName);
 
-                // Map parameter to name
-                valueMapping[param] = paramName;
+                // Note: Parameters are Type objects, not IR Values, so they don't go in valueMapping
             }
 
             codeBuilder.AppendLine(")");
@@ -205,15 +204,12 @@ namespace ILGPU.Backends.ROCm
         /// <param name="entryPoint">The entry point.</param>
         private void GenerateBasicOperations(EntryPoint entryPoint)
         {
-            // Walk through the IR blocks and generate basic operations
-            foreach (var block in entryPoint.Blocks)
-            {
-                codeBuilder.AppendLine($"  // Block {block.Name}");
-                
-                // Simplified operation generation for now
-                codeBuilder.AppendLine("  // Basic operations placeholder");
-                codeBuilder.AppendLine("  // TODO: Implement full IR traversal and code generation");
-            }
+            // TODO: To implement full IR traversal, this method needs access to the Method object
+            // EntryPoint only contains type information, not the actual IR blocks
+            // For now, generate a placeholder implementation
+            codeBuilder.AppendLine("  // Placeholder kernel implementation");
+            codeBuilder.AppendLine("  // TODO: Full IR to HIP translation requires Method object access");
+            codeBuilder.AppendLine("  // Consider modifying the code generator architecture to pass both EntryPoint and Method");
         }
 
         /// <summary>

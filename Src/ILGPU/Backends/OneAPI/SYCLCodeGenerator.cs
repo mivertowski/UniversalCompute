@@ -129,7 +129,7 @@ namespace ILGPU.Backends.OneAPI
                     var paramName = $"param_{i}";
                     
                     codeBuilder.AppendLine($"    {paramType} {paramName};");
-                    valueMapping[param] = paramName;
+                    // Note: Parameters are Type objects, not IR Values, so they don't go in valueMapping
                 }
             }
             catch (Exception ex)

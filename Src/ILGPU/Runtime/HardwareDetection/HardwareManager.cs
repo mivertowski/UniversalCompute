@@ -232,11 +232,12 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <summary>
         /// Determines compute capability from HIP device properties.
         /// </summary>
-        private static int DetermineComputeCapability(ROCm.Native.HipDeviceProperties props)
+        private static unsafe int DetermineComputeCapability(ROCm.Native.HipDeviceProperties props)
         {
             // Map architecture information to compute capability
             // This is based on the device name and architecture features
-            var deviceName = props.Name?.ToUpperInvariant() ?? "";
+            byte* namePtr = props.Name;
+            string deviceName = System.Text.Encoding.UTF8.GetString(namePtr, 256).TrimEnd('\0').ToUpperInvariant();
             
             // RDNA3 (gfx11xx)
             if (deviceName.Contains("7900", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7800", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7700", StringComparison.OrdinalIgnoreCase))

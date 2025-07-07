@@ -74,7 +74,7 @@ namespace ILGPU.IR.Values
         protected internal override Value Rebuild(
             IRBuilder builder,
             IRRebuilder rebuilder) =>
-            builder.CreateNull(Location, Type ?? builder.Context.VoidType);
+            builder.CreateNull(Location, Type ?? builder.BaseContext.VoidType);
 
         /// <summary cref="Value.Write{T}(T)"/>
         protected internal override void Write<T>(T writer) { }
