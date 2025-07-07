@@ -211,13 +211,13 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleSum(MethodCallExpression methodCall) => HandleReduction(methodCall, "Sum");
+        private ConstantExpression HandleSum(MethodCallExpression methodCall) => HandleReduction(methodCall, "Sum");
 
-        private Expression HandleAverage(MethodCallExpression methodCall) => HandleReduction(methodCall, "Average");
+        private ConstantExpression HandleAverage(MethodCallExpression methodCall) => HandleReduction(methodCall, "Average");
 
-        private Expression HandleMin(MethodCallExpression methodCall) => HandleReduction(methodCall, "Min");
+        private ConstantExpression HandleMin(MethodCallExpression methodCall) => HandleReduction(methodCall, "Min");
 
-        private Expression HandleMax(MethodCallExpression methodCall) => HandleReduction(methodCall, "Max");
+        private ConstantExpression HandleMax(MethodCallExpression methodCall) => HandleReduction(methodCall, "Max");
 
         /// <summary>
         /// Handles generic reduction operations.

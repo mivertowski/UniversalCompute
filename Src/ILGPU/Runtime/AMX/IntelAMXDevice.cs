@@ -19,6 +19,7 @@ using ILGPU.Runtime.AMX.Native;
 using ILGPU.Util;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 #if WINDOWS
 using System.Management;
 #endif
@@ -232,6 +233,8 @@ namespace ILGPU.Runtime.AMX
         /// Detects processor information and AMX capabilities.
         /// </summary>
         /// <returns>Intel AMX device information or null if not supported.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", 
+            Justification = "Processor detection must be robust and handle any platform-specific failures")]
         private static IntelAMXDevice? DetectProcessorInfo()
         {
 #pragma warning disable CA1031 // Do not catch general exception types
