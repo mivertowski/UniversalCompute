@@ -245,6 +245,7 @@ namespace ILGPU.Runtime.AMX
                 {
                     try
                     {
+#if WINDOWS
                         using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Processor");
                         foreach (ManagementObject obj in searcher.Get())
                         {
@@ -257,6 +258,7 @@ namespace ILGPU.Runtime.AMX
                             maxTurboFrequency = (int)(baseClockFrequency * 1.5); // Estimate turbo
                             break;
                         }
+#endif
                     }
                     catch
                     {
@@ -340,6 +342,7 @@ namespace ILGPU.Runtime.AMX
             {
                 if (OperatingSystem.IsWindows())
                 {
+#if WINDOWS
                     using var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_ComputerSystem");
                     foreach (ManagementObject obj in searcher.Get())
                     {
@@ -347,6 +350,7 @@ namespace ILGPU.Runtime.AMX
                         if (totalMemory != null)
                             return Convert.ToInt64(totalMemory);
                     }
+#endif
                 }
                 else
                 {

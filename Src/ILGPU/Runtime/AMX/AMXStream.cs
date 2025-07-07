@@ -315,17 +315,17 @@ namespace ILGPU.Runtime.AMX
 
         protected internal override unsafe void CopyFrom(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
         {
-            var sourcePtr = sourceView.LoadEffectiveAddress();
+            var sourcePtr = sourceView.LoadEffectiveAddressAsPtr();
             var targetPtr = nativePtr + targetView.Index;
-            Buffer.MemoryCopy(sourcePtr.ToPointer(), targetPtr.ToPointer(), 
+            Buffer.MemoryCopy((void*)sourcePtr, (void*)targetPtr, 
                 LengthInBytes - targetView.Index, targetView.Length);
         }
 
         protected internal override unsafe void CopyTo(AcceleratorStream stream, in ArrayView<byte> sourceView, in ArrayView<byte> targetView)
         {
             var sourcePtr = nativePtr + sourceView.Index;
-            var targetPtr = targetView.LoadEffectiveAddress();
-            Buffer.MemoryCopy(sourcePtr.ToPointer(), targetPtr.ToPointer(), 
+            var targetPtr = targetView.LoadEffectiveAddressAsPtr();
+            Buffer.MemoryCopy((void*)sourcePtr, (void*)targetPtr, 
                 targetView.Length, sourceView.Length);
         }
 

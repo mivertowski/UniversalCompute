@@ -314,7 +314,7 @@ namespace ILGPU.Intel.NPU.Native
             for (long i = 0; i < Math.Min(inputSize, outputSize); i++)
             {
                 var dequantizedInput = input[i] * inputScale;
-                var weightValue = i < inputSize ? HalfHelper.HalfToSingle(weights[i % inputSize]) : 0.0f;
+                var weightValue = i < inputSize ? (float)weights[i % inputSize] : 0.0f;
                 output[i] = dequantizedInput * weightValue * outputScale;
             }
         }

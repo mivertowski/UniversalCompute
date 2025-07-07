@@ -126,7 +126,7 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream && sourceView.Source is ROCmMemoryBuffer sourceBuffer)
+            if (stream is ROCmStream rocmStream && sourceView.Buffer is ROCmMemoryBuffer sourceBuffer)
             {
                 rocmStream.CopyMemoryAsync(
                     sourceBuffer, this,
@@ -136,7 +136,7 @@ namespace ILGPU.Runtime.ROCm
             else
             {
                 // Synchronous fallback
-                var sourcePtr = sourceView.LoadEffectiveAddress();
+                var sourcePtr = sourceView.LoadEffectiveAddressAsPtr();
                 var targetPtr = nativePtr + targetView.Index;
 
                 if (IsNativeAllocation)
@@ -145,7 +145,7 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            targetPtr, sourcePtr, (ulong)targetView.Length, 
+                            targetPtr, sourcePtr, (nuint)targetView.Length, 
                             HipMemcpyKind.HostToDevice);
                         ROCmException.ThrowIfFailed(result);
                     }
@@ -178,7 +178,7 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream && targetView.Source is ROCmMemoryBuffer targetBuffer)
+            if (stream is ROCmStream rocmStream && targetView.Buffer is ROCmMemoryBuffer targetBuffer)
             {
                 rocmStream.CopyMemoryAsync(
                     this, targetBuffer,
@@ -189,7 +189,7 @@ namespace ILGPU.Runtime.ROCm
             {
                 // Synchronous fallback
                 var sourcePtr = nativePtr + sourceView.Index;
-                var targetPtr = targetView.LoadEffectiveAddress();
+                var targetPtr = targetView.LoadEffectiveAddressAsPtr();
 
                 if (IsNativeAllocation)
                 {
@@ -197,7 +197,7 @@ namespace ILGPU.Runtime.ROCm
                     try
                     {
                         var result = ROCmNative.Memcpy(
-                            targetPtr, sourcePtr, (ulong)sourceView.Length,
+                            targetPtr, sourcePtr, (nuint)sourceView.Length,
                             HipMemcpyKind.DeviceToHost);
                         ROCmException.ThrowIfFailed(result);
                     }
@@ -233,7 +233,7 @@ namespace ILGPU.Runtime.ROCm
             {
                 try
                 {
-                    var result = ROCmNative.Memset(ptr, value, (ulong)length);
+                    var result = ROCmNative.Memset(ptr, value, (nuint)length);
                     ROCmException.ThrowIfFailed(result);
                 }
                 catch (Exception)

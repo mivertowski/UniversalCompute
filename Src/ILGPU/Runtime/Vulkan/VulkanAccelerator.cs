@@ -193,7 +193,7 @@ namespace ILGPU.Runtime.Vulkan
             try
             {
                 uint queueFamilyCount = 0;
-                VulkanNative.GetPhysicalDeviceQueueFamilyProperties(Device.PhysicalDevice, ref queueFamilyCount, null);
+                VulkanNative.GetPhysicalDeviceQueueFamilyProperties(Device.PhysicalDevice, ref queueFamilyCount, null!);
 
                 if (queueFamilyCount == 0)
                     return 0;
