@@ -77,11 +77,12 @@ namespace ILGPU.Runtime.ROCm
                     throw new NotSupportedException("Failed to initialize ROCm runtime");
 
                 // Set the current device
-                var result = ROCmNative.SetDevice(device.DeviceId);
+                var rocmDeviceId = ((ROCmDevice)device).ROCmDeviceId;
+                var result = ROCmNative.SetDevice(rocmDeviceId);
                 ROCmException.ThrowIfFailed(result);
 
                 // Store device context (simplified - real implementation would create HIP context)
-                NativePtr = new IntPtr(device.DeviceId + 1); // Dummy context handle
+                NativePtr = new IntPtr(rocmDeviceId + 1); // Dummy context handle
 
                 // Initialize device properties
                 Init(device);

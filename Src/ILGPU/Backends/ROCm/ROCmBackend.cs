@@ -51,9 +51,9 @@ namespace ILGPU.Backends.ROCm
             ROCmCapabilities capabilities)
             : base(
                 context,
-                BackendType.OpenCL, // Use OpenCL as base for now
-                capabilities, // Use ROCm capabilities
-                ArgumentMapper.CreateDefault(context))
+                new ROCmCapabilityContext(capabilities), // Convert to CapabilityContext
+                BackendType.ROCm, // Use ROCm backend type
+                new ROCmArgumentMapper(context))
         {
             InstructionSet = instructionSet;
             Capabilities = capabilities;
@@ -75,6 +75,7 @@ namespace ILGPU.Backends.ROCm
             in BackendContext backendContext,
             in KernelSpecialization specialization)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Generate HIP C++ code from ILGPU IR
@@ -116,6 +117,7 @@ namespace ILGPU.Backends.ROCm
                     kernelInfo,
                     placeholderBinary);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

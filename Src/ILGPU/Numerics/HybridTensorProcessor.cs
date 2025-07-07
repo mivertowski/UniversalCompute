@@ -273,11 +273,13 @@ namespace ILGPU.Numerics.Hybrid
             // Add available accelerators
             foreach (var device in context.Devices)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try 
                 { 
                     acceleratorList.Add(device.CreateAccelerator(context)); 
                 } 
                 catch { }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
             accelerators = [.. acceleratorList];
             stats = new HybridProcessorStats();

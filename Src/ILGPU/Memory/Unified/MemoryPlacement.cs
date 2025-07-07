@@ -299,6 +299,7 @@ namespace ILGPU.Memory.Unified
         {
             get
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // This would check for CUDA runtime availability
@@ -309,6 +310,7 @@ namespace ILGPU.Memory.Unified
                 {
                     return false;
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

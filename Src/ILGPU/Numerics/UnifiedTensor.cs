@@ -446,6 +446,7 @@ namespace ILGPU.Numerics
             // Try to allocate unified memory if supported
             if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // This would use CUDA unified memory
@@ -457,6 +458,7 @@ namespace ILGPU.Numerics
                     // Fall back to pinned memory
                     InitializePinnedMemory();
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
             else
             {

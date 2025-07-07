@@ -57,6 +57,7 @@ namespace ILGPU.Runtime.HardwareDetection
             if (IsInitialized)
                 return;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 Capabilities = DetectHardwareCapabilities();
@@ -69,6 +70,7 @@ namespace ILGPU.Runtime.HardwareDetection
                 IsInitialized = true;
                 System.Diagnostics.Debug.WriteLine($"Hardware detection failed, using fallback: {ex.Message}");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -124,6 +126,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static CUDACapabilities DetectCUDACapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var devices = CudaDevice.GetDevices(_ => true);
@@ -148,6 +151,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -155,6 +159,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static ROCmCapabilities DetectROCmCapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // First check if ROCm runtime is available
@@ -221,6 +226,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -272,6 +278,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static bool CheckROCBlasAvailability()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to detect ROCBlas by checking for library files or environment
@@ -291,6 +298,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -298,6 +306,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static bool CheckROCFFTAvailability()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -315,6 +324,7 @@ namespace ILGPU.Runtime.HardwareDetection
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -322,6 +332,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static OneAPICapabilities DetectOneAPICapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var devices = IntelOneAPIDevice.GetDevices();
@@ -345,6 +356,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -352,6 +364,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static AMXCapabilities DetectAMXCapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var devices = IntelAMXDevice.GetDevices();
@@ -374,6 +387,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -381,6 +395,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static AppleCapabilities DetectAppleCapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -410,6 +425,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -417,6 +433,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static OpenCLCapabilities DetectOpenCLCapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var devices = Array.Empty<CLDevice>(); // TODO: CLDevice.GetDevices() not implemented
@@ -439,6 +456,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -446,6 +464,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static VulkanCapabilities DetectVulkanCapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var devices = Array.Empty<VulkanDevice>(); // TODO: VulkanDevice.GetDevices() not implemented
@@ -468,6 +487,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -475,6 +495,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// </summary>
         private static VelocityCapabilities DetectVelocityCapabilities()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var devices = Array.Empty<VelocityDevice>(); // TODO: VelocityDevice.GetDevices() not implemented
@@ -496,6 +517,7 @@ namespace ILGPU.Runtime.HardwareDetection
                     ErrorMessage = ex.Message
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

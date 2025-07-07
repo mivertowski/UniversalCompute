@@ -120,6 +120,7 @@ namespace ILGPU.Runtime.OneAPI
         {
             if (disposing && NativeQueue != IntPtr.Zero && NativeQueue != new IntPtr(-1))
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     SYCLNative.ReleaseQueue(NativeQueue);
@@ -132,6 +133,7 @@ namespace ILGPU.Runtime.OneAPI
                 {
                     NativeQueue = IntPtr.Zero;
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 
@@ -165,6 +167,7 @@ namespace ILGPU.Runtime.OneAPI
         {
             if (_queue != new IntPtr(-1))
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     SYCLNative.QueueWait(_queue);
@@ -173,6 +176,7 @@ namespace ILGPU.Runtime.OneAPI
                 {
                     // Ignore errors during profiling
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

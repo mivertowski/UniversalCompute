@@ -20,6 +20,7 @@ using ILGPU.IR.Analyses;
 using ILGPU.Runtime.Vulkan.Native;
 using System;
 using System.Collections.Immutable;
+using System.Runtime.InteropServices;
 
 namespace ILGPU.Runtime.Vulkan
 {
@@ -101,40 +102,64 @@ namespace ILGPU.Runtime.Vulkan
         /// </summary>
         private void CreateVulkanInstance()
         {
-            var appInfo = new VkApplicationInfo
-            {
-                sType = VkStructureType.VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                pApplicationName = "ILGPU Universal Compute",
-                applicationVersion = 1,
-                pEngineName = "ILGPU",
-                engineVersion = 1,
-                apiVersion = VulkanNative.VK_API_VERSION_1_1
-            };
-
-            var createInfo = new VkInstanceCreateInfo
-            {
-                sType = VkStructureType.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-                pApplicationInfo = appInfo,
-                enabledLayerCount = 0,
-                enabledExtensionCount = 0
-            };
-
+            // Allocate unmanaged memory for strings
+            var appNamePtr = Marshal.StringToHGlobalAnsi("ILGPU Universal Compute");
+            var engineNamePtr = Marshal.StringToHGlobalAnsi("ILGPU");
+            
             try
             {
-                VkInstance instance;
-                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out instance);
-                Instance = instance;
-                VulkanException.ThrowIfFailed(result);
+                var appInfo = new VkApplicationInfo
+                {
+                    sType = VkStructureType.VK_STRUCTURE_TYPE_APPLICATION_INFO,
+                    pApplicationName = appNamePtr,
+                    applicationVersion = 1,
+                    pEngineName = engineNamePtr,
+                    engineVersion = 1,
+                    apiVersion = VulkanNative.VK_API_VERSION_1_1
+                };
+
+                // Allocate and pin the app info struct
+                var appInfoPtr = Marshal.AllocHGlobal(Marshal.SizeOf<VkApplicationInfo>());
+                try
+                {
+                    Marshal.StructureToPtr(appInfo, appInfoPtr, false);
+                    
+                    var createInfo = new VkInstanceCreateInfo
+                    {
+                        sType = VkStructureType.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+                        pApplicationInfo = appInfoPtr,
+                        enabledLayerCount = 0,
+                        enabledExtensionCount = 0
+                    };
+
+                    try
+                    {
+                        VkInstance instance;
+                        var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out instance);
+                        Instance = instance;
+                        VulkanException.ThrowIfFailed(result);
+                    }
+                    catch (DllNotFoundException)
+                    {
+                        // Vulkan not available - use dummy instance
+                        Instance = new VkInstance { Handle = new IntPtr(-1) };
+                    }
+                    catch (EntryPointNotFoundException)
+                    {
+                        // Vulkan functions not found - use dummy instance
+                        Instance = new VkInstance { Handle = new IntPtr(-1) };
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(appInfoPtr);
+                }
             }
-            catch (DllNotFoundException)
+            finally
             {
-                // Vulkan not available - use dummy instance
-                Instance = new VkInstance { Handle = new IntPtr(-1) };
-            }
-            catch (EntryPointNotFoundException)
-            {
-                // Vulkan functions not found - use dummy instance
-                Instance = new VkInstance { Handle = new IntPtr(-1) };
+                // Free allocated strings
+                Marshal.FreeHGlobal(appNamePtr);
+                Marshal.FreeHGlobal(engineNamePtr);
             }
         }
 
@@ -151,6 +176,7 @@ namespace ILGPU.Runtime.Vulkan
                 return;
             }
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Find compute queue family
@@ -182,6 +208,7 @@ namespace ILGPU.Runtime.Vulkan
                 LogicalDevice = new VkDevice { Handle = new IntPtr(-1) };
                 ComputeQueueFamily = 0;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -190,6 +217,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <returns>Compute queue family index.</returns>
         private uint FindComputeQueueFamily()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 uint queueFamilyCount = 0;
@@ -214,6 +242,7 @@ namespace ILGPU.Runtime.Vulkan
             {
                 return 0; // Fallback
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -493,6 +522,7 @@ namespace ILGPU.Runtime.Vulkan
         {
             if (disposing)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // Cleanup Vulkan resources
@@ -512,6 +542,7 @@ namespace ILGPU.Runtime.Vulkan
                 {
                     // Ignore errors during disposal
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

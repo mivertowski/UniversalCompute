@@ -431,6 +431,7 @@ namespace ILGPU.Runtime.AMX
         {
             if (disposing)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // Release any AMX-specific resources
@@ -440,6 +441,7 @@ namespace ILGPU.Runtime.AMX
                 {
                     // Ignore errors during disposal
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

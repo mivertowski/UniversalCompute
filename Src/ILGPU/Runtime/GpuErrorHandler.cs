@@ -262,6 +262,7 @@ namespace ILGPU.Runtime
             Accelerator? accelerator = null)
         {
             long availableSize = 0;
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 availableSize = accelerator?.MemorySize ?? 0;
@@ -270,6 +271,7 @@ namespace ILGPU.Runtime
             {
                 // Ignore errors when getting available memory
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             return new GpuMemoryException(message, requestedSize, availableSize);
         }
@@ -306,6 +308,7 @@ namespace ILGPU.Runtime
             {
                 foreach (var logger in ErrorLoggers)
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         logger.LogError(exception, operationName, severity, deviceInfo);
@@ -314,6 +317,7 @@ namespace ILGPU.Runtime
                     {
                         // Don't let logger errors break the application
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
             }
 
@@ -329,6 +333,7 @@ namespace ILGPU.Runtime
             {
                 foreach (var logger in ErrorLoggers)
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         logger.LogRecovery(operationName, attempts, lastException, deviceInfo);
@@ -337,6 +342,7 @@ namespace ILGPU.Runtime
                     {
                         // Don't let logger errors break the application
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
             }
 
@@ -372,6 +378,7 @@ namespace ILGPU.Runtime
 
                 case GpuErrorCode.StreamNotReady:
                     // For stream issues, try to synchronize
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         accelerator?.DefaultStream.Synchronize();
@@ -381,6 +388,7 @@ namespace ILGPU.Runtime
                         // If sync fails, just wait
                         Thread.Sleep(delay);
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                     break;
 
                 default:

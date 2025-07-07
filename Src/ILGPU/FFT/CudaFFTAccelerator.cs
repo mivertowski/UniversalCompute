@@ -503,6 +503,7 @@ namespace ILGPU.FFT
         /// </summary>
         private static bool CheckCuFFTAvailability()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to create a simple plan to test availability
@@ -526,6 +527,7 @@ namespace ILGPU.FFT
                 // Other errors might indicate the library is present but not functional
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             return false;
         }

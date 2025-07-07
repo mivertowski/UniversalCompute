@@ -18,6 +18,7 @@
 using ILGPU.Runtime.Vulkan.Native;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace ILGPU.Runtime.Vulkan
 {
@@ -103,7 +104,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the device name.
         /// </summary>
-        public new string Name => Properties.deviceName ?? $"Vulkan Device {DeviceID}";
+        public new string Name => GetDeviceNameFromProperties() ?? $"Vulkan Device {DeviceID}";
 
         /// <summary>
         /// Gets the total device memory in bytes.
@@ -214,55 +215,80 @@ namespace ILGPU.Runtime.Vulkan
             if (!VulkanNative.IsVulkanSupported())
                 return [];
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
-                // Create temporary instance to enumerate devices
-                var appInfo = new VkApplicationInfo
-                {
-                    sType = VkStructureType.VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                    pApplicationName = "ILGPU Device Enumeration",
-                    applicationVersion = 1,
-                    pEngineName = "ILGPU",
-                    engineVersion = 1,
-                    apiVersion = VulkanNative.VK_API_VERSION_1_1
-                };
-
-                var createInfo = new VkInstanceCreateInfo
-                {
-                    sType = VkStructureType.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-                    pApplicationInfo = appInfo
-                };
-
-                var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
-                if (result != VkResult.VK_SUCCESS)
-                    return [];
-
+                // Allocate unmanaged memory for strings
+                var appNamePtr = Marshal.StringToHGlobalAnsi("ILGPU Device Enumeration");
+                var engineNamePtr = Marshal.StringToHGlobalAnsi("ILGPU");
+                
                 try
                 {
-                    // Enumerate physical devices
-                    uint deviceCount = 0;
-                    result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, null!);
-                    if (result != VkResult.VK_SUCCESS || deviceCount == 0)
-                        return [];
-
-                    var physicalDevices = new VkPhysicalDevice[deviceCount];
-                    result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, physicalDevices);
-                    if (result != VkResult.VK_SUCCESS)
-                        return [];
-
-                    // Create device objects
-                    var devices = new VulkanDevice[deviceCount];
-                    for (int i = 0; i < deviceCount; i++)
+                    // Create temporary instance to enumerate devices
+                    var appInfo = new VkApplicationInfo
                     {
-                        VulkanNative.GetPhysicalDeviceProperties(physicalDevices[i], out var properties);
-                        devices[i] = new VulkanDevice(physicalDevices[i], properties);
-                    }
+                        sType = VkStructureType.VK_STRUCTURE_TYPE_APPLICATION_INFO,
+                        pApplicationName = appNamePtr,
+                        applicationVersion = 1,
+                        pEngineName = engineNamePtr,
+                        engineVersion = 1,
+                        apiVersion = VulkanNative.VK_API_VERSION_1_1
+                    };
 
-                    return devices;
+                    // Allocate and pin the app info struct
+                    var appInfoPtr = Marshal.AllocHGlobal(Marshal.SizeOf<VkApplicationInfo>());
+                    try
+                    {
+                        Marshal.StructureToPtr(appInfo, appInfoPtr, false);
+                        
+                        var createInfo = new VkInstanceCreateInfo
+                        {
+                            sType = VkStructureType.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+                            pApplicationInfo = appInfoPtr
+                        };
+
+                        var result = VulkanNative.CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
+                        if (result != VkResult.VK_SUCCESS)
+                            return [];
+
+                        try
+                        {
+                            // Enumerate physical devices
+                            uint deviceCount = 0;
+                            result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, null!);
+                            if (result != VkResult.VK_SUCCESS || deviceCount == 0)
+                                return [];
+
+                            var physicalDevices = new VkPhysicalDevice[deviceCount];
+                            result = VulkanNative.EnumeratePhysicalDevices(instance, ref deviceCount, physicalDevices);
+                            if (result != VkResult.VK_SUCCESS)
+                                return [];
+
+                            // Create device objects
+                            var devices = new VulkanDevice[deviceCount];
+                            for (int i = 0; i < deviceCount; i++)
+                            {
+                                VulkanNative.GetPhysicalDeviceProperties(physicalDevices[i], out var properties);
+                                devices[i] = new VulkanDevice(physicalDevices[i], properties);
+                            }
+
+                            return devices;
+                        }
+                        finally
+                        {
+                            VulkanNative.DestroyInstance(instance, IntPtr.Zero);
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(appInfoPtr);
+                    }
                 }
                 finally
                 {
-                    VulkanNative.DestroyInstance(instance, IntPtr.Zero);
+                    // Free allocated strings
+                    Marshal.FreeHGlobal(appNamePtr);
+                    Marshal.FreeHGlobal(engineNamePtr);
                 }
             }
             catch (DllNotFoundException)
@@ -277,6 +303,7 @@ namespace ILGPU.Runtime.Vulkan
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -346,6 +373,41 @@ namespace ILGPU.Runtime.Vulkan
                    $"Subgroup {WarpSize}, " +
                    $"{MemorySize / (1024 * 1024)} MB, " +
                    $"{GetDeviceTypeDescription()}";
+
+        /// <summary>
+        /// Extracts device name from properties structure.
+        /// </summary>
+        /// <returns>Device name string.</returns>
+        private unsafe string? GetDeviceNameFromProperties()
+        {
+#pragma warning disable CA1031 // Do not catch general exception types
+            try
+            {
+                // Use stackalloc to create buffer on stack
+                Span<byte> deviceNameBytes = stackalloc byte[256];
+                var localProperties = Properties; // Create local copy to access fixed buffer
+                
+                // Copy bytes from fixed buffer to span
+                for (int i = 0; i < 256; i++)
+                {
+                    deviceNameBytes[i] = localProperties.deviceName[i];
+                    if (localProperties.deviceName[i] == 0)
+                        break;
+                }
+                
+                // Find the null terminator
+                int length = 0;
+                for (int i = 0; i < 256 && deviceNameBytes[i] != 0; i++)
+                    length++;
+                    
+                return System.Text.Encoding.UTF8.GetString(deviceNameBytes.Slice(0, length));
+            }
+            catch
+            {
+                return null;
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
+        }
 
         #endregion
 

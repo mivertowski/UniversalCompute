@@ -107,6 +107,7 @@ namespace ILGPU.Runtime.AMX
         /// </summary>
         public void ReleaseTiles()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (IsTileConfigured)
@@ -119,6 +120,7 @@ namespace ILGPU.Runtime.AMX
             {
                 // Ignore errors during tile release
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -221,6 +223,7 @@ namespace ILGPU.Runtime.AMX
         {
             if (disposing)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // Release tile configuration
@@ -230,6 +233,7 @@ namespace ILGPU.Runtime.AMX
                 {
                     // Ignore errors during disposal
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 
@@ -372,7 +376,7 @@ namespace ILGPU.Runtime.AMX
         public string FunctionName { get; }
 
         public AMXCompiledKernel(Context context, byte[] nativeCode, string functionName, KernelInfo info)
-            : base(context, entryPoint: null, info)
+            : base(context, entryPoint: null!, info)
         {
             NativeCode = nativeCode ?? throw new ArgumentNullException(nameof(nativeCode));
             FunctionName = functionName ?? throw new ArgumentNullException(nameof(functionName));

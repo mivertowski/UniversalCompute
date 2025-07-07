@@ -294,6 +294,7 @@ namespace ILGPU.Runtime
         /// </summary>
         private void TrimPoolCallback(object? state)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 TrimPool();
@@ -303,6 +304,7 @@ namespace ILGPU.Runtime
                 // Log the exception but don't let it crash the timer
                 Debug.WriteLine($"MemoryBufferPool trim failed: {ex.Message}");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

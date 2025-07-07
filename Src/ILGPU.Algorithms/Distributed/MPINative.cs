@@ -312,6 +312,7 @@ namespace ILGPU.Algorithms.Distributed
             else
             {
                 // On Linux/Unix, try to check MPI status
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     MPI_Initialized(out int flag);
@@ -321,6 +322,7 @@ namespace ILGPU.Algorithms.Distributed
                 {
                     return false;
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

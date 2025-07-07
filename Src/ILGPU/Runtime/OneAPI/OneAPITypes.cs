@@ -49,6 +49,7 @@ namespace ILGPU.Runtime.OneAPI
             this.accelerator = accelerator;
             
             var totalSize = new UIntPtr((ulong)(length * elementSize));
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 NativePtr = SYCLNative.MallocDevice(
@@ -72,6 +73,7 @@ namespace ILGPU.Runtime.OneAPI
                 NativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((IntPtr)(length * elementSize));
 #pragma warning restore CA2020 // Prevent behavioral change
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -195,6 +197,7 @@ namespace ILGPU.Runtime.OneAPI
         {
             if (!disposed && disposing && NativePtr != IntPtr.Zero)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     SYCLNative.Free(NativePtr, accelerator.ContextHandle);
@@ -202,6 +205,7 @@ namespace ILGPU.Runtime.OneAPI
                 catch
                 {
                     // Fallback: free managed memory
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         System.Runtime.InteropServices.Marshal.FreeHGlobal(NativePtr);
@@ -210,7 +214,9 @@ namespace ILGPU.Runtime.OneAPI
                     {
                         // Ignore errors during disposal
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
                 disposed = true;
             }
         }

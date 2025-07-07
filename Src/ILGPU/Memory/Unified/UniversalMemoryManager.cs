@@ -51,6 +51,7 @@ namespace ILGPU.Memory.Unified
             // Initialize accelerator managers for all available accelerators
             foreach (var device in context.Devices)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     var accelerator = device.CreateAccelerator(context);
@@ -61,6 +62,7 @@ namespace ILGPU.Memory.Unified
                 {
                     // Ignore accelerators that can't be created
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

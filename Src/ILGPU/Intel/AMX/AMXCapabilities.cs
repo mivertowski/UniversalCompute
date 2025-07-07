@@ -17,6 +17,7 @@
 
 using ILGPU.Intel.AMX.Native;
 using System;
+using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
 
 namespace ILGPU.Intel.AMX
@@ -147,6 +148,7 @@ namespace ILGPU.Intel.AMX
         /// <returns>True if AMX is supported; otherwise, false.</returns>
         public static bool IsAMXSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check for AMX support via CPUID
@@ -156,6 +158,7 @@ namespace ILGPU.Intel.AMX
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -170,6 +173,7 @@ namespace ILGPU.Intel.AMX
                     false, 0, 0, 0, 0, 0, false, false, false, 0.0);
             }
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var nativeCapabilities = AMXNative.QueryCapabilities();
@@ -180,6 +184,7 @@ namespace ILGPU.Intel.AMX
                 return new AMXCapabilities(
                     false, 0, 0, 0, 0, 0, false, false, false, 0.0);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private static bool CheckAMXSupport()
@@ -244,6 +249,131 @@ namespace ILGPU.Intel.AMX
     }
 
     /// <summary>
+    /// Represents an Intel AMX tile descriptor with layout and configuration information.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct AMXTileDescriptor
+    {
+        /// <summary>
+        /// Gets or sets the number of rows in the tile (max 16).
+        /// </summary>
+        public byte Rows { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of bytes per row (max 64).
+        /// </summary>
+        public ushort BytesPerRow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the data type for this tile.
+        /// </summary>
+        public AMXDataType DataType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tile ID (0-7).
+        /// </summary>
+        public byte TileId { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this tile is active.
+        /// </summary>
+        public bool IsActive { get; set; }
+
+        /// <summary>
+        /// Gets the size of the tile in bytes.
+        /// </summary>
+        public readonly int TileSize => Rows * BytesPerRow;
+
+        /// <summary>
+        /// Gets the number of elements per row based on the data type.
+        /// </summary>
+        public readonly int ElementsPerRow => DataType switch
+        {
+            AMXDataType.BFloat16 => BytesPerRow / 2,
+            AMXDataType.Int8 => BytesPerRow,
+            AMXDataType.Float32 => BytesPerRow / 4,
+            _ => BytesPerRow / 4
+        };
+
+        /// <summary>
+        /// Creates a new tile descriptor with the specified parameters.
+        /// </summary>
+        /// <param name="tileId">The tile ID (0-7).</param>
+        /// <param name="rows">Number of rows (max 16).</param>
+        /// <param name="bytesPerRow">Bytes per row (max 64).</param>
+        /// <param name="dataType">Data type for the tile.</param>
+        /// <param name="isActive">Whether the tile is active.</param>
+        public AMXTileDescriptor(byte tileId, byte rows, ushort bytesPerRow, AMXDataType dataType, bool isActive = true)
+        {
+            TileId = tileId;
+            Rows = rows;
+            BytesPerRow = bytesPerRow;
+            DataType = dataType;
+            IsActive = isActive;
+        }
+
+        /// <summary>
+        /// Creates a default tile descriptor for matrix operations.
+        /// </summary>
+        /// <param name="tileId">The tile ID.</param>
+        /// <param name="dataType">The data type.</param>
+        /// <returns>A default tile descriptor.</returns>
+        public static AMXTileDescriptor CreateDefault(byte tileId, AMXDataType dataType)
+        {
+            var bytesPerRow = dataType switch
+            {
+                AMXDataType.BFloat16 => (ushort)32, // 16 BF16 elements * 2 bytes
+                AMXDataType.Int8 => (ushort)64,     // 64 INT8 elements * 1 byte
+                AMXDataType.Float32 => (ushort)64,  // 16 FP32 elements * 4 bytes
+                _ => (ushort)64
+            };
+
+            return new AMXTileDescriptor(tileId, 16, bytesPerRow, dataType, true);
+        }
+
+        /// <summary>
+        /// Validates the tile descriptor parameters.
+        /// </summary>
+        /// <returns>True if valid; otherwise, false.</returns>
+        public readonly bool IsValid()
+        {
+            return TileId < 8 && Rows > 0 && Rows <= 16 && BytesPerRow > 0 && BytesPerRow <= 64;
+        }
+    }
+
+    /// <summary>
+    /// Native AMX tile configuration structure for direct memory layout.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct AMXNativeTileConfiguration
+    {
+        /// <summary>
+        /// Palette ID (1 byte).
+        /// </summary>
+        public byte Palette;
+        
+        /// <summary>
+        /// Reserved bytes (15 bytes).
+        /// </summary>
+        public unsafe fixed byte Reserved[15];
+        
+        /// <summary>
+        /// Tile rows configuration (8 bytes, one per tile).
+        /// </summary>
+        public unsafe fixed byte TileRows[8];
+        
+        /// <summary>
+        /// Tile columns configuration (16 bytes, two per tile).
+        /// </summary>
+        public unsafe fixed byte TileColumns[16];
+        
+        /// <summary>
+        /// Additional reserved bytes (24 bytes).
+        /// </summary>
+        public unsafe fixed byte Reserved2[24];
+    }
+
+    /// <summary>
     /// AMX tile configuration for matrix operations.
     /// </summary>
     public sealed class AMXTileConfiguration
@@ -269,17 +399,56 @@ namespace ILGPU.Intel.AMX
         public byte Palette { get; set; }
 
         /// <summary>
+        /// Gets or sets the tile descriptors for all 8 AMX tiles.
+        /// </summary>
+        public AMXTileDescriptor[] Tiles { get; set; } = new AMXTileDescriptor[8];
+
+        /// <summary>
+        /// Converts this configuration to a native configuration structure.
+        /// </summary>
+        /// <returns>Native configuration structure.</returns>
+        public unsafe AMXNativeTileConfiguration ToNative()
+        {
+            var nativeConfig = new AMXNativeTileConfiguration
+            {
+                Palette = Palette
+            };
+
+            // Configure tiles
+            for (int i = 0; i < 8; i++)
+            {
+                var tile = Tiles[i];
+                nativeConfig.TileRows[i] = tile.IsActive ? tile.Rows : (byte)0;
+                nativeConfig.TileColumns[i * 2] = tile.IsActive ? (byte)(tile.BytesPerRow & 0xFF) : (byte)0;
+                nativeConfig.TileColumns[i * 2 + 1] = tile.IsActive ? (byte)((tile.BytesPerRow >> 8) & 0xFF) : (byte)0;
+            }
+
+            return nativeConfig;
+        }
+
+        /// <summary>
         /// Creates a default tile configuration for the given capabilities.
         /// </summary>
         /// <param name="capabilities">The AMX capabilities.</param>
         /// <returns>A default tile configuration.</returns>
-        public static AMXTileConfiguration CreateDefault(AMXCapabilities capabilities) => new()
+        public static AMXTileConfiguration CreateDefault(AMXCapabilities capabilities)
         {
-            DataType = capabilities.SupportsBF16 ? AMXDataType.BFloat16 : AMXDataType.Float32,
-            TileRows = capabilities.MaxTileRows,
-            TileColumns = capabilities.MaxTileColumns,
-            Palette = 1 // Default palette
-        };
+            var config = new AMXTileConfiguration
+            {
+                DataType = capabilities.SupportsBF16 ? AMXDataType.BFloat16 : AMXDataType.Float32,
+                TileRows = capabilities.MaxTileRows,
+                TileColumns = capabilities.MaxTileColumns,
+                Palette = 1 // Default palette
+            };
+
+            // Initialize all 8 tiles with default descriptors
+            for (byte i = 0; i < 8; i++)
+            {
+                config.Tiles[i] = AMXTileDescriptor.CreateDefault(i, config.DataType);
+            }
+
+            return config;
+        }
 
         /// <summary>
         /// Creates a tile configuration optimized for the given data type.
@@ -287,37 +456,59 @@ namespace ILGPU.Intel.AMX
         /// <param name="dataType">The data type.</param>
         /// <param name="capabilities">The AMX capabilities.</param>
         /// <returns>An optimized tile configuration.</returns>
-        public static AMXTileConfiguration CreateForDataType(AMXDataType dataType, AMXCapabilities capabilities) => new()
+        public static AMXTileConfiguration CreateForDataType(AMXDataType dataType, AMXCapabilities capabilities)
         {
-            DataType = dataType,
-            TileRows = capabilities.MaxTileRows,
-            TileColumns = capabilities.MaxTileColumns,
-            Palette = dataType switch
+            var config = new AMXTileConfiguration
             {
-                AMXDataType.BFloat16 => 1,
-                AMXDataType.Int8 => 2,
-                AMXDataType.Float32 => 3,
-                _ => 1
+                DataType = dataType,
+                TileRows = capabilities.MaxTileRows,
+                TileColumns = capabilities.MaxTileColumns,
+                Palette = dataType switch
+                {
+                    AMXDataType.BFloat16 => 1,
+                    AMXDataType.Int8 => 2,
+                    AMXDataType.Float32 => 3,
+                    _ => 1
+                }
+            };
+
+            // Initialize all 8 tiles with descriptors for the specified data type
+            for (byte i = 0; i < 8; i++)
+            {
+                config.Tiles[i] = AMXTileDescriptor.CreateDefault(i, dataType);
             }
-        };
+
+            return config;
+        }
 
         /// <summary>
         /// Creates a new configuration with the specified data type.
         /// </summary>
         /// <param name="dataType">The new data type.</param>
         /// <returns>A new tile configuration.</returns>
-        public AMXTileConfiguration WithDataType(AMXDataType dataType) => new()
+        public AMXTileConfiguration WithDataType(AMXDataType dataType)
         {
-            DataType = dataType,
-            TileRows = TileRows,
-            TileColumns = TileColumns,
-            Palette = dataType switch
+            var config = new AMXTileConfiguration
             {
-                AMXDataType.BFloat16 => 1,
-                AMXDataType.Int8 => 2,
-                AMXDataType.Float32 => 3,
-                _ => Palette
+                DataType = dataType,
+                TileRows = TileRows,
+                TileColumns = TileColumns,
+                Palette = dataType switch
+                {
+                    AMXDataType.BFloat16 => 1,
+                    AMXDataType.Int8 => 2,
+                    AMXDataType.Float32 => 3,
+                    _ => Palette
+                }
+            };
+
+            // Initialize all 8 tiles with descriptors for the new data type
+            for (byte i = 0; i < 8; i++)
+            {
+                config.Tiles[i] = AMXTileDescriptor.CreateDefault(i, dataType);
             }
-        };
+
+            return config;
+        }
     }
 }

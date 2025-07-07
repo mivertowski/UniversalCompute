@@ -141,6 +141,7 @@ namespace ILGPU.Runtime.Vulkan
                 return new VkCommandBuffer { Handle = new IntPtr(-1) };
             }
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var allocateInfo = new VkCommandBufferAllocateInfo
@@ -162,6 +163,7 @@ namespace ILGPU.Runtime.Vulkan
             {
                 return new VkCommandBuffer { Handle = new IntPtr(-1) };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -177,6 +179,7 @@ namespace ILGPU.Runtime.Vulkan
                 return;
             }
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var submitInfo = new VkSubmitInfo
@@ -195,6 +198,7 @@ namespace ILGPU.Runtime.Vulkan
             {
                 // Ignore errors during command buffer submission
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -209,6 +213,7 @@ namespace ILGPU.Runtime.Vulkan
         {
             if (disposing && CommandPool.Handle != IntPtr.Zero && CommandPool.Handle != new IntPtr(-1))
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     VulkanNative.DestroyCommandPool(Accelerator.LogicalDevice, CommandPool, IntPtr.Zero);
@@ -221,6 +226,7 @@ namespace ILGPU.Runtime.Vulkan
                 {
                     CommandPool = new VkCommandPool { Handle = IntPtr.Zero };
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 
@@ -284,6 +290,7 @@ namespace ILGPU.Runtime.Vulkan
         internal VulkanMemoryBuffer(VulkanAccelerator accelerator, long length, int elementSize)
             : base(accelerator, length, elementSize)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to allocate using Vulkan
@@ -308,6 +315,7 @@ namespace ILGPU.Runtime.Vulkan
                 nativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(new IntPtr(LengthInBytes));
                 isNativeAllocation = false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             NativePtr = nativePtr;
         }
@@ -343,12 +351,14 @@ namespace ILGPU.Runtime.Vulkan
             {
                 if (isNativeAllocation)
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         var buffer = new VkBuffer { Handle = nativePtr };
                         VulkanNative.DestroyBuffer(Accelerator.LogicalDevice, buffer, IntPtr.Zero);
                     }
                     catch { }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
                 else
                 {

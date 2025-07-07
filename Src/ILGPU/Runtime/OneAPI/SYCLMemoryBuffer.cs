@@ -15,47 +15,67 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Runtime.ROCm.Native;
+using ILGPU.Runtime.OneAPI.Native;
 using ILGPU.Util;
 using System;
 using System.Runtime.InteropServices;
 
-namespace ILGPU.Runtime.ROCm
+namespace ILGPU.Runtime.OneAPI
 {
     /// <summary>
-    /// A ROCm-specific memory buffer implementation.
+    /// A SYCL-specific memory buffer implementation for Intel OneAPI devices.
     /// </summary>
-    public sealed class ROCmMemoryBuffer : MemoryBuffer
+    public sealed class SYCLMemoryBuffer : MemoryBuffer
     {
         #region Instance
 
         /// <summary>
-        /// The native HIP memory pointer.
+        /// The native SYCL memory pointer.
         /// </summary>
         private IntPtr nativePtr;
 
         /// <summary>
-        /// Gets the associated ROCm accelerator.
+        /// Gets the associated Intel OneAPI accelerator.
         /// </summary>
-        public new ROCmAccelerator Accelerator => base.Accelerator.AsNotNullCast<ROCmAccelerator>();
+        public new IntelOneAPIAccelerator Accelerator => base.Accelerator.AsNotNullCast<IntelOneAPIAccelerator>();
 
         /// <summary>
-        /// Initializes a new ROCm memory buffer.
+        /// Initializes a new SYCL memory buffer.
         /// </summary>
         /// <param name="accelerator">The parent accelerator.</param>
         /// <param name="length">The length of this buffer.</param>
         /// <param name="elementSize">The element size.</param>
-        internal ROCmMemoryBuffer(
-            ROCmAccelerator accelerator,
+        internal SYCLMemoryBuffer(
+            IntelOneAPIAccelerator accelerator,
             long length,
             int elementSize)
             : base(accelerator, length, elementSize)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
-                // Try to allocate using HIP
-                var result = ROCmNative.Malloc(out nativePtr, (ulong)LengthInBytes);
-                ROCmException.ThrowIfFailed(result);
+                var totalSize = new UIntPtr((ulong)LengthInBytes);
+                
+                // Try to allocate using SYCL device memory
+                nativePtr = SYCLNative.MallocDevice(
+                    totalSize,
+                    accelerator.DeviceHandle,
+                    accelerator.ContextHandle);
+
+                if (nativePtr == IntPtr.Zero)
+                {
+                    // Fall back to shared memory allocation
+                    nativePtr = SYCLNative.MallocShared(
+                        totalSize,
+                        accelerator.DeviceHandle,
+                        accelerator.ContextHandle);
+                }
+
+                if (nativePtr == IntPtr.Zero)
+                {
+                    throw new InvalidOperationException("Failed to allocate SYCL memory");
+                }
+
                 IsNativeAllocation = true;
             }
             catch (DllNotFoundException)
@@ -70,12 +90,13 @@ namespace ILGPU.Runtime.ROCm
                 nativePtr = Marshal.AllocHGlobal(new IntPtr(LengthInBytes));
                 IsNativeAllocation = false;
             }
-            catch (ROCmException)
+            catch (Exception)
             {
-                // Fall back to host memory allocation on any ROCm error
+                // Fall back to host memory allocation on any SYCL error
                 nativePtr = Marshal.AllocHGlobal(new IntPtr(LengthInBytes));
                 IsNativeAllocation = false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             NativePtr = nativePtr;
         }
@@ -85,7 +106,7 @@ namespace ILGPU.Runtime.ROCm
         #region Properties
 
         /// <summary>
-        /// Gets whether this buffer uses native HIP allocation.
+        /// Gets whether this buffer uses native SYCL allocation.
         /// </summary>
         public bool IsNativeAllocation { get; }
 
@@ -104,9 +125,25 @@ namespace ILGPU.Runtime.ROCm
             byte value,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream)
+            if (stream is OneAPIStream syclStream && IsNativeAllocation)
             {
-                rocmStream.MemsetAsync(this, targetView.Index, value, targetView.Length);
+#pragma warning disable CA1031 // Do not catch general exception types
+                try
+                {
+                    // Use SYCL async memset
+                    var targetPtr = nativePtr + (nint)targetView.Index;
+                    SYCLNative.Memset(
+                        syclStream.NativeQueue,
+                        targetPtr,
+                        value,
+                        new UIntPtr((ulong)targetView.Length));
+                }
+                catch (Exception)
+                {
+                    // Fall back to synchronous implementation
+                    SetMemoryToValue(targetView.Index, value, targetView.Length);
+                }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
             else
             {
@@ -126,29 +163,51 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream && sourceView.Buffer is ROCmMemoryBuffer sourceBuffer)
+            if (stream is OneAPIStream syclStream && 
+                sourceView.Buffer is SYCLMemoryBuffer sourceBuffer &&
+                IsNativeAllocation && sourceBuffer.IsNativeAllocation)
             {
-                rocmStream.CopyMemoryAsync(
-                    sourceBuffer, this,
-                    sourceView.Index, targetView.Index,
-                    targetView.Length);
+#pragma warning disable CA1031 // Do not catch general exception types
+                try
+                {
+                    // SYCL device-to-device copy
+                    var sourcePtr = sourceBuffer.nativePtr + (nint)sourceView.Index;
+                    var targetPtr = nativePtr + (nint)targetView.Index;
+
+                    SYCLNative.Memcpy(
+                        syclStream.NativeQueue,
+                        targetPtr,
+                        sourcePtr,
+                        new UIntPtr((ulong)targetView.Length));
+                }
+                catch (Exception)
+                {
+                    // Fall back to unsafe copy
+                    var sourcePtr = sourceView.LoadEffectiveAddressAsPtr();
+                    var targetPtr = nativePtr + (nint)targetView.Index;
+                    Buffer.MemoryCopy(
+                        (void*)sourcePtr, (void*)targetPtr,
+                        LengthInBytes - targetView.Index, targetView.Length);
+                }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
             else
             {
                 // Synchronous fallback
                 var sourcePtr = sourceView.LoadEffectiveAddressAsPtr();
-                var targetPtr = nativePtr + targetView.Index;
+                var targetPtr = nativePtr + (nint)targetView.Index;
 
                 if (IsNativeAllocation)
                 {
-                    // Copy from host to device
+                    // Copy from host to device using SYCL
 #pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
-                        var result = ROCmNative.Memcpy(
-                            (IntPtr)targetPtr, (IntPtr)sourcePtr, (ulong)targetView.Length, 
-                            HipMemcpyKind.HostToDevice);
-                        ROCmException.ThrowIfFailed(result);
+                        SYCLNative.Memcpy(
+                            Accelerator.SYCLQueue,
+                            targetPtr,
+                            sourcePtr,
+                            new UIntPtr((ulong)targetView.Length));
                     }
                     catch (Exception)
                     {
@@ -180,29 +239,51 @@ namespace ILGPU.Runtime.ROCm
             in ArrayView<byte> sourceView,
             in ArrayView<byte> targetView)
         {
-            if (stream is ROCmStream rocmStream && targetView.Buffer is ROCmMemoryBuffer targetBuffer)
+            if (stream is OneAPIStream syclStream && 
+                targetView.Buffer is SYCLMemoryBuffer targetBuffer &&
+                IsNativeAllocation && targetBuffer.IsNativeAllocation)
             {
-                rocmStream.CopyMemoryAsync(
-                    this, targetBuffer,
-                    sourceView.Index, targetView.Index,
-                    sourceView.Length);
+#pragma warning disable CA1031 // Do not catch general exception types
+                try
+                {
+                    // SYCL device-to-device copy
+                    var sourcePtr = nativePtr + (nint)sourceView.Index;
+                    var targetPtr = targetBuffer.nativePtr + (nint)targetView.Index;
+
+                    SYCLNative.Memcpy(
+                        syclStream.NativeQueue,
+                        targetPtr,
+                        sourcePtr,
+                        new UIntPtr((ulong)sourceView.Length));
+                }
+                catch (Exception)
+                {
+                    // Fall back to unsafe copy
+                    var sourcePtr = nativePtr + (nint)sourceView.Index;
+                    var targetPtr = targetView.LoadEffectiveAddressAsPtr();
+                    Buffer.MemoryCopy(
+                        (void*)sourcePtr, (void*)targetPtr,
+                        targetView.Length, sourceView.Length);
+                }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
             else
             {
                 // Synchronous fallback
-                var sourcePtr = nativePtr + sourceView.Index;
+                var sourcePtr = nativePtr + (nint)sourceView.Index;
                 var targetPtr = targetView.LoadEffectiveAddressAsPtr();
 
                 if (IsNativeAllocation)
                 {
-                    // Copy from device to host
+                    // Copy from device to host using SYCL
 #pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
-                        var result = ROCmNative.Memcpy(
-                            (IntPtr)targetPtr, (IntPtr)sourcePtr, (ulong)sourceView.Length,
-                            HipMemcpyKind.DeviceToHost);
-                        ROCmException.ThrowIfFailed(result);
+                        SYCLNative.Memcpy(
+                            Accelerator.SYCLQueue,
+                            targetPtr,
+                            sourcePtr,
+                            new UIntPtr((ulong)sourceView.Length));
                     }
                     catch (Exception)
                     {
@@ -231,15 +312,19 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="length">The length in bytes.</param>
         private unsafe void SetMemoryToValue(long offset, byte value, long length)
         {
-            var ptr = nativePtr + offset;
+            var ptr = nativePtr + (nint)offset;
 
             if (IsNativeAllocation)
             {
 #pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
-                    var result = ROCmNative.Memset((IntPtr)ptr, value, (ulong)length);
-                    ROCmException.ThrowIfFailed(result);
+                    // Use SYCL synchronous memset
+                    SYCLNative.Memset(
+                        Accelerator.SYCLQueue,
+                        ptr,
+                        value,
+                        new UIntPtr((ulong)length));
                 }
                 catch (Exception)
                 {
@@ -264,7 +349,7 @@ namespace ILGPU.Runtime.ROCm
         #region Disposal
 
         /// <summary>
-        /// Disposes this ROCm memory buffer.
+        /// Disposes this SYCL memory buffer.
         /// </summary>
         /// <param name="disposing">True if disposing.</param>
         protected override void DisposeAcceleratorObject(bool disposing)
@@ -276,8 +361,8 @@ namespace ILGPU.Runtime.ROCm
 #pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
-                        // Free HIP memory
-                        ROCmNative.Free(nativePtr);
+                        // Free SYCL memory
+                        SYCLNative.Free(nativePtr, Accelerator.ContextHandle);
                     }
                     catch
                     {
@@ -297,47 +382,5 @@ namespace ILGPU.Runtime.ROCm
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// A ROCm-specific page-lock scope implementation.
-    /// </summary>
-    /// <typeparam name="T">The element type.</typeparam>
-    public sealed class ROCmPageLockScope<T> : PageLockScope<T>
-        where T : unmanaged
-    {
-        /// <summary>
-        /// Gets the associated ROCm accelerator.
-        /// </summary>
-        public new ROCmAccelerator Accelerator => base.Accelerator.AsNotNullCast<ROCmAccelerator>();
-
-        /// <summary>
-        /// Initializes a new ROCm page-lock scope.
-        /// </summary>
-        /// <param name="accelerator">The parent accelerator.</param>
-        /// <param name="pinned">The pinned host memory pointer.</param>
-        /// <param name="numElements">The number of elements.</param>
-        internal ROCmPageLockScope(
-            ROCmAccelerator accelerator,
-            IntPtr pinned,
-            long numElements)
-            : base(accelerator, pinned, numElements)
-        {
-            // ROCm page-locking would be implemented here using hipHostRegister
-            // For now, we assume the memory is already pinned
-        }
-
-        /// <summary>
-        /// Disposes this page-lock scope.
-        /// </summary>
-        /// <param name="disposing">True if disposing.</param>
-        protected override void DisposeAcceleratorObject(bool disposing)
-        {
-            if (disposing)
-            {
-                // ROCm page-unlocking would be implemented here using hipHostUnregister
-                // For now, no action needed as we didn't register the memory
-            }
-        }
     }
 }

@@ -267,6 +267,7 @@ namespace ILGPU.Runtime.KernelCache
 
             // Not in cache or invalid - compile new kernel
             // For simplicity, create a basic kernel loading approach
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Use reflection to call LoadKernel method from KernelLoaders
@@ -297,6 +298,7 @@ namespace ILGPU.Runtime.KernelCache
             {
                 // Fall through to error
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             
             throw new InvalidOperationException($"Unable to load kernel for action {action.Method.Name}");
         }

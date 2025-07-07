@@ -56,6 +56,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// <returns>True if AMD OpenCL is available; otherwise, false.</returns>
         internal static bool IsAMDOpenCLSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get platforms and check for AMD
@@ -74,6 +75,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -82,6 +84,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// <returns>Array of AMD platform handles.</returns>
         internal static IntPtr[] GetAMDPlatforms()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get total platform count
@@ -109,6 +112,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -118,6 +122,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// <returns>True if AMD platform; otherwise, false.</returns>
         private static bool IsAMDPlatform(IntPtr platform)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var vendor = GetPlatformInfoString(platform, CLPlatformInfoType.CL_PLATFORM_VENDOR);
@@ -128,6 +133,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -159,6 +165,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// <returns>Array of AMD GPU device handles.</returns>
         internal static IntPtr[] GetAMDDevices()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var platforms = GetAMDPlatforms();
@@ -176,6 +183,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -186,6 +194,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// <returns>Array of device handles.</returns>
         private static IntPtr[] GetDevicesForPlatform(IntPtr platform, CLDeviceType deviceType)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get device count
@@ -202,6 +211,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -272,6 +282,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         {
             var info = new AMDDeviceInfo();
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get basic device info
@@ -315,6 +326,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
                     GlobalMemSize = 8UL * 1024 * 1024 * 1024 // 8GB default
                 };
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -322,6 +334,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// </summary>
         private static string GetDeviceInfoString(IntPtr device, int paramName)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var result = CLApi.GetDeviceInfo(device, (CLDeviceInfoType)paramName, UIntPtr.Zero, null!, out var size);
@@ -336,6 +349,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return string.Empty;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -343,6 +357,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// </summary>
         private static uint GetDeviceInfoUInt32(IntPtr device, int paramName)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var buffer = new byte[4];
@@ -353,6 +368,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return 0;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -360,6 +376,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// </summary>
         private static ulong GetDeviceInfoUInt64(IntPtr device, int paramName)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var buffer = new byte[8];
@@ -370,6 +387,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return 0;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -377,6 +395,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
         /// </summary>
         private static UIntPtr GetDeviceInfoUIntPtr(IntPtr device, CLDeviceInfoType paramName)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var buffer = new byte[IntPtr.Size];
@@ -391,6 +410,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 return UIntPtr.Zero;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

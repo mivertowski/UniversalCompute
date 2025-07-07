@@ -178,6 +178,7 @@ namespace ILGPU.SIMD
             where T : unmanaged, INumber<T>
         {
             // Check if we have a CUDA accelerator available
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 using var context = Context.Create(builder => builder.Default());
@@ -209,6 +210,7 @@ namespace ILGPU.SIMD
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private static bool TryGPUVectorMultiply<T>(
@@ -217,6 +219,7 @@ namespace ILGPU.SIMD
             Span<T> result)
             where T : unmanaged, INumber<T>
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 using var context = Context.Create(builder => builder.Default());
@@ -247,6 +250,7 @@ namespace ILGPU.SIMD
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private static bool TryGPUDotProduct<T>(
@@ -256,6 +260,7 @@ namespace ILGPU.SIMD
             where T : unmanaged, INumber<T>
         {
             result = default;
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 using var context = Context.Create(builder => builder.Default());
@@ -286,6 +291,7 @@ namespace ILGPU.SIMD
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private static bool TryGPUMatrixVector<T>(
@@ -296,6 +302,7 @@ namespace ILGPU.SIMD
             Span<T> result)
             where T : unmanaged, INumber<T>
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 using var context = Context.Create(builder => builder.Default());
@@ -326,6 +333,7 @@ namespace ILGPU.SIMD
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

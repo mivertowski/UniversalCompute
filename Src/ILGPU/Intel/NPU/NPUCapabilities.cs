@@ -198,6 +198,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>True if NPU is available; otherwise, false.</returns>
         public static bool DetectNPU()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 return NPUNative.IsNPUSupported();
@@ -206,6 +207,7 @@ namespace ILGPU.Intel.NPU
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

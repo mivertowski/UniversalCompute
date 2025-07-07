@@ -271,6 +271,7 @@ namespace ILGPU.Runtime.Profiling
 
             disposed = true;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (isProfilingEnabled && !string.IsNullOrEmpty(CurrentSessionId))
@@ -282,6 +283,7 @@ namespace ILGPU.Runtime.Profiling
             {
                 // Ignore errors during disposal
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             Clear();
         }

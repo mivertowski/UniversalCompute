@@ -619,6 +619,7 @@ namespace ILGPU.Backends.Vulkan.Native
         /// <returns>True if Vulkan is available; otherwise, false.</returns>
         internal static bool IsVulkanSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to create a minimal Vulkan instance
@@ -638,6 +639,7 @@ namespace ILGPU.Backends.Vulkan.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

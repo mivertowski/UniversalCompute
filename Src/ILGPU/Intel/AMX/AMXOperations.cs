@@ -46,7 +46,8 @@ namespace ILGPU.Intel.AMX
                 throw new NotSupportedException("AMX is not supported on this processor");
 
             // Configure tiles
-            AMXNative.LoadTileConfig((byte*)&config);
+            var nativeConfig = config.ToNative();
+            AMXNative.LoadTileConfig((byte*)&nativeConfig);
 
             const int tileSize = 16; // Standard AMX tile size
             
@@ -98,7 +99,8 @@ namespace ILGPU.Intel.AMX
                 throw new NotSupportedException("AMX is not supported on this processor");
 
             // Configure tiles
-            AMXNative.LoadTileConfig((byte*)&config);
+            var nativeConfig = config.ToNative();
+            AMXNative.LoadTileConfig((byte*)&nativeConfig);
 
             const int tileSize = 16; // Standard AMX tile size
             
@@ -150,7 +152,8 @@ namespace ILGPU.Intel.AMX
                 throw new NotSupportedException("AMX is not supported on this processor");
 
             // Configure tiles
-            AMXNative.LoadTileConfig((byte*)&config);
+            var nativeConfig = config.ToNative();
+            AMXNative.LoadTileConfig((byte*)&nativeConfig);
 
             const int tileSize = 16; // Standard AMX tile size
             
@@ -202,7 +205,8 @@ namespace ILGPU.Intel.AMX
                 throw new NotSupportedException("AMX is not supported on this processor");
 
             // Configure tiles
-            AMXNative.LoadTileConfig((byte*)&config);
+            var nativeConfig = config.ToNative();
+            AMXNative.LoadTileConfig((byte*)&nativeConfig);
 
             const int tileSize = 16; // Standard AMX tile size
             
@@ -250,13 +254,30 @@ namespace ILGPU.Intel.AMX
         public static AMXTileConfiguration CreateConfiguration(
             AMXDataType dataType,
             int rows = 16,
-            int cols = 16) => new()
+            int cols = 16)
+        {
+            var config = new AMXTileConfiguration
             {
                 DataType = dataType,
                 TileRows = rows,
                 TileColumns = cols,
-                Tiles = new AMXTileDescriptor[8] // AMX supports up to 8 tiles
+                Palette = dataType switch
+                {
+                    AMXDataType.BFloat16 => 1,
+                    AMXDataType.Int8 => 2,
+                    AMXDataType.Float32 => 3,
+                    _ => 1
+                }
             };
+
+            // Initialize all 8 tiles with descriptors for the specified data type
+            for (byte i = 0; i < 8; i++)
+            {
+                config.Tiles[i] = AMXTileDescriptor.CreateDefault(i, dataType);
+            }
+
+            return config;
+        }
 
         #endregion
     }

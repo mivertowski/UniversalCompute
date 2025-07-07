@@ -312,6 +312,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <returns>True if ANE is available; otherwise, false.</returns>
         public static bool IsAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 return RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && 
@@ -321,6 +322,7 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -332,6 +334,7 @@ namespace ILGPU.Apple.NeuralEngine
         {
             if (!IsAvailable()) return null;
             
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var device = AppleNeuralEngineDevice.Default;
@@ -341,6 +344,7 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 return null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

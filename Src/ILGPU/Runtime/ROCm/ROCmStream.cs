@@ -214,6 +214,7 @@ namespace ILGPU.Runtime.ROCm
         {
             if (disposing && NativePtr != IntPtr.Zero && NativePtr != new IntPtr(-1))
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     ROCmNative.StreamDestroy(NativePtr);
@@ -226,6 +227,7 @@ namespace ILGPU.Runtime.ROCm
                 {
                     NativePtr = IntPtr.Zero;
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

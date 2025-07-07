@@ -206,6 +206,7 @@ namespace ILGPU.FFT
 
             foreach (var accelerator in _accelerators.Where(acc => acc.IsAvailable))
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     var estimate = accelerator.EstimatePerformance(length, is2D);
@@ -215,6 +216,7 @@ namespace ILGPU.FFT
                 {
                     // Ignore accelerators that can't provide estimates
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
 
             return estimates;
@@ -263,6 +265,7 @@ namespace ILGPU.FFT
         private void InitializeAccelerators()
         {
             // Try to create IPP FFT accelerator with CPU accelerator
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (IPPCapabilities.DetectIPP())
@@ -280,12 +283,15 @@ namespace ILGPU.FFT
             {
                 // IPP not available
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             // Try to create CUDA FFT accelerators
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 foreach (var device in _context.GetCudaDevices())
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         var cudaAccelerator = device.CreateCudaAccelerator(_context);
@@ -301,12 +307,14 @@ namespace ILGPU.FFT
                     {
                         // This CUDA device not available for FFT
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
             }
             catch
             {
                 // CUDA not available
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             // Additional accelerators can be added here (OpenCL, Apple Accelerate, etc.)
         }
@@ -367,6 +375,7 @@ namespace ILGPU.FFT
             {
                 foreach (var accelerator in _accelerators)
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         accelerator.Dispose();
@@ -375,6 +384,7 @@ namespace ILGPU.FFT
                     {
                         // Ignore disposal errors
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
 
                 _accelerators.Clear();

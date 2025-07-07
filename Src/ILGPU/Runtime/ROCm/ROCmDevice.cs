@@ -18,6 +18,7 @@
 using ILGPU.Runtime.ROCm.Native;
 using System;
 using System.Diagnostics;
+using System.Text;
 
 namespace ILGPU.Runtime.ROCm
 {
@@ -52,7 +53,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the compute capability as a combined version.
         /// </summary>
-        public Version ComputeCapability => new(ComputeCapabilityMajor, ComputeCapabilityMinor);
+        public override Version ComputeCapability => new(ComputeCapabilityMajor, ComputeCapabilityMinor);
 
         /// <summary>
         /// Gets the GPU architecture name.
@@ -123,6 +124,15 @@ namespace ILGPU.Runtime.ROCm
         /// Gets whether the device supports concurrent kernels.
         /// </summary>
         public bool SupportsConcurrentKernels => Properties.ConcurrentKernels != 0;
+
+        /// <summary>
+        /// Gets whether the device supports cooperative kernel launches.
+        /// </summary>
+        /// <remarks>
+        /// Cooperative kernels are supported on ROCm devices based on architecture capabilities.
+        /// Modern GCN 5.0+ and RDNA architectures generally support cooperative launches.
+        /// </remarks>
+        public override bool SupportsCooperativeKernels => SupportsCooperativeLaunch;
 
         /// <summary>
         /// Gets the PCI bus ID.
@@ -201,7 +211,6 @@ namespace ILGPU.Runtime.ROCm
                     // Create a fallback device with minimal properties
                     var fallbackProps = new HipDeviceProperties
                     {
-                        Name = $"ROCm Device {i}",
                         TotalGlobalMem = 8UL * 1024 * 1024 * 1024, // 8GB default
                         MultiProcessorCount = 36, // Typical for mid-range AMD GPU
                         WarpSize = 64, // AMD wavefront size
@@ -211,6 +220,20 @@ namespace ILGPU.Runtime.ROCm
                         Major = 9, // GCN 5.0 equivalent
                         Minor = 0
                     };
+                    
+                    // Set the name using unsafe code
+                    unsafe
+                    {
+                        var nameBytes = Encoding.UTF8.GetBytes($"ROCm Device {i}");
+                        var copyLength = Math.Min(nameBytes.Length, 255); // Leave room for null terminator
+                        
+                        // Copy the bytes directly to the fixed array
+                        for (int j = 0; j < copyLength; j++)
+                        {
+                            fallbackProps.Name[j] = nameBytes[j];
+                        }
+                        fallbackProps.Name[copyLength] = 0; // Null terminator
+                    }
                     devices[i] = new ROCmDevice(i, fallbackProps);
                 }
             }

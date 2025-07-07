@@ -37,6 +37,7 @@ namespace ILGPU.Intel.AMX.Native
             if (!IsAMXSupported())
                 return false;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check if AMX tiles and int8 are supported
@@ -54,6 +55,7 @@ namespace ILGPU.Intel.AMX.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -61,6 +63,7 @@ namespace ILGPU.Intel.AMX.Native
         /// </summary>
         internal static void ReleaseAMX()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 ReleaseTiles();
@@ -69,6 +72,7 @@ namespace ILGPU.Intel.AMX.Native
             {
                 // Ignore errors during cleanup
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -77,6 +81,7 @@ namespace ILGPU.Intel.AMX.Native
         /// <returns>True if AMX is initialized; otherwise, false.</returns>
         internal static unsafe bool IsAMXInitialized()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to configure tiles - this will fail if AMX is not initialized
@@ -88,6 +93,7 @@ namespace ILGPU.Intel.AMX.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -123,25 +129,8 @@ namespace ILGPU.Intel.AMX.Native
         /// <param name="config">The tile configuration.</param>
         internal static unsafe void ConfigureTiles(AMXTileConfiguration config)
         {
-            // Create tile configuration data
-            var configData = stackalloc byte[64]; // AMX config is 64 bytes
-            
-            // Set palette ID
-            configData[0] = config.Palette;
-            
-            // Configure tiles based on data type
-            for (int i = 0; i < 8; i++) // 8 tiles maximum
-            {
-                var offset = 16 + i * 2; // Tile descriptors start at offset 16
-                
-                // Set rows (1 byte) and columns (2 bytes) for each tile
-                configData[offset] = (byte)config.TileRows;
-                configData[offset + 1] = (byte)(config.TileColumns & 0xFF);
-                configData[offset + 16] = (byte)((config.TileColumns >> 8) & 0xFF);
-            }
-
-            // Load configuration using LDTILECFG instruction
-            LoadTileConfig(configData);
+            var nativeConfig = config.ToNative();
+            LoadTileConfig((byte*)&nativeConfig);
         }
 
         /// <summary>
@@ -304,6 +293,7 @@ namespace ILGPU.Intel.AMX.Native
         /// <returns>True if AMX is supported; otherwise, false.</returns>
         internal static bool CheckAMXSupport()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check if we're on x86/x64
@@ -320,6 +310,7 @@ namespace ILGPU.Intel.AMX.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -335,6 +326,7 @@ namespace ILGPU.Intel.AMX.Native
             if (!X86Base.IsSupported)
                 return false;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get CPUID result
@@ -357,6 +349,7 @@ namespace ILGPU.Intel.AMX.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -419,6 +412,7 @@ namespace ILGPU.Intel.AMX.Native
         /// <returns>Estimated bandwidth in GB/s.</returns>
         private static double EstimateAMXBandwidth()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get CPU information to estimate bandwidth
@@ -440,6 +434,7 @@ namespace ILGPU.Intel.AMX.Native
             {
                 return 200.0; // Default conservative estimate
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

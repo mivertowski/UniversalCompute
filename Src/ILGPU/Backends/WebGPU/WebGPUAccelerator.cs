@@ -305,6 +305,7 @@ namespace ILGPU.Backends.WebGPU
         /// <returns>True if WebGPU is available; otherwise, false.</returns>
         public static bool IsAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
 #if BROWSER
@@ -321,6 +322,7 @@ namespace ILGPU.Backends.WebGPU
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -332,6 +334,7 @@ namespace ILGPU.Backends.WebGPU
         {
             if (!IsAvailable()) return null;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var adapter = await WebGPUAdapter.RequestAdapterAsync().ConfigureAwait(false);
@@ -348,6 +351,7 @@ namespace ILGPU.Backends.WebGPU
             {
                 return null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -359,6 +363,7 @@ namespace ILGPU.Backends.WebGPU
         {
             if (!IsAvailable()) return [];
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var adapters = await WebGPUAdapter.EnumerateAdaptersAsync().ConfigureAwait(false);
@@ -381,6 +386,7 @@ namespace ILGPU.Backends.WebGPU
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

@@ -275,6 +275,7 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <returns>True if ROCm is supported; otherwise, false.</returns>
         internal static bool IsROCmSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var result = GetDeviceCount(out int count);
@@ -292,6 +293,7 @@ namespace ILGPU.Runtime.ROCm.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -300,6 +302,7 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <returns>True if initialization succeeded; otherwise, false.</returns>
         internal static bool InitializeROCm()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var result = Initialize(0);
@@ -322,6 +325,7 @@ namespace ILGPU.Runtime.ROCm.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -330,6 +334,7 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <returns>Number of ROCm devices.</returns>
         internal static int GetDeviceCountSafe()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var result = GetDeviceCount(out int count);
@@ -339,6 +344,7 @@ namespace ILGPU.Runtime.ROCm.Native
             {
                 return 0;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -348,6 +354,7 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <returns>Device properties or null if failed.</returns>
         internal static HipDeviceProperties? GetDevicePropertiesSafe(int deviceIndex)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var result = GetDeviceProperties(out var props, deviceIndex);
@@ -357,6 +364,7 @@ namespace ILGPU.Runtime.ROCm.Native
             {
                 return null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -520,10 +528,9 @@ namespace ILGPU.Runtime.ROCm.Native
     /// HIP device properties.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HipDeviceProperties
+    internal unsafe struct HipDeviceProperties
     {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string Name;
+        public fixed byte Name[256];
         
         public ulong TotalGlobalMem;
         public ulong SharedMemPerBlock;
@@ -531,10 +538,8 @@ namespace ILGPU.Runtime.ROCm.Native
         public int WarpSize;
         public ulong MemPitch;
         public int MaxThreadsPerBlock;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public int[] MaxThreadsDim;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public int[] MaxGridSize;
+        public fixed int MaxThreadsDim[3];
+        public fixed int MaxGridSize[3];
         public int ClockRate;
         public ulong TotalConstMem;
         public int Major;
@@ -548,10 +553,8 @@ namespace ILGPU.Runtime.ROCm.Native
         public int CanMapHostMemory;
         public int ComputeMode;
         public int MaxTexture1D;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-        public int[] MaxTexture2D;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
-        public int[] MaxTexture3D;
+        public fixed int MaxTexture2D[2];
+        public fixed int MaxTexture3D[3];
         public int ConcurrentKernels;
         public int EccEnabled;
         public int PciBusId;

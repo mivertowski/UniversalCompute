@@ -210,6 +210,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return ANEGeneration.NotSupported;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (!IsNeuralEngineAvailable())
@@ -233,6 +234,7 @@ namespace ILGPU.Apple.NeuralEngine.Native
             {
                 return ANEGeneration.NotSupported;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -244,15 +246,14 @@ namespace ILGPU.Apple.NeuralEngine.Native
     /// Native ANE device information structure.
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ANEDeviceInfo
+    internal unsafe struct ANEDeviceInfo
     {
         public uint ChipGeneration;
         public uint NumCores;
         public ulong MemorySize;
         public uint MaxFrequencyMHz;
         public uint ThermalDesignPowerWatts;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 64)]
-        public string ChipName;
+        public fixed byte ChipName[64];
     }
 
     /// <summary>
@@ -275,6 +276,108 @@ namespace ILGPU.Apple.NeuralEngine.Native
         public ulong MaxSharedMemory;
         public ulong MaxConstantMemory;
         public int NumCores;
+    }
+
+    #endregion
+
+    #region Support Types
+
+    /// <summary>
+    /// Tensor shape descriptor for ANE operations.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct TensorShape
+    {
+        public int Rank;
+        public int Width;
+        public int Height;
+        public int Depth;
+        public int Channels;
+        public long ElementCount => Width * Height * Depth * Channels;
+    }
+
+    /// <summary>
+    /// ANE generation enumeration.
+    /// </summary>
+    internal enum ANEGeneration
+    {
+        NotSupported = 0,
+        Unknown = 1,
+        ANE1 = 2,    // A-series (iPhone/iPad)
+        ANE2 = 3,    // M1 series
+        ANE3 = 4,    // M2 series
+        ANE4 = 5     // M3/M4 series
+    }
+
+    /// <summary>
+    /// ANE performance metrics structure.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ANEPerformanceMetrics
+    {
+        public double InferenceTimeMs;
+        public double ThroughputTOPS;
+        public double PowerConsumptionWatts;
+        public int UtilizationPercent;
+        public double TemperatureCelsius;
+    }
+
+    /// <summary>
+    /// ANE power information structure.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ANEPowerInfo
+    {
+        public double CurrentPowerWatts;
+        public double AveragePowerWatts;
+        public double PeakPowerWatts;
+        public double ThermalDesignPowerWatts;
+        public int PowerEfficiencyMOPS_W;
+    }
+
+    /// <summary>
+    /// ANE thermal state enumeration.
+    /// </summary>
+    internal enum ANEThermalState
+    {
+        Normal = 0,
+        Fair = 1,
+        Serious = 2,
+        Critical = 3
+    }
+
+    /// <summary>
+    /// ANE convolution parameters.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ANEConvolutionParameters
+    {
+        public int KernelWidth;
+        public int KernelHeight;
+        public int StrideX;
+        public int StrideY;
+        public int PaddingX;
+        public int PaddingY;
+        public int DilationX;
+        public int DilationY;
+        public int Groups;
+        public int InputChannels;
+        public int OutputChannels;
+    }
+
+    /// <summary>
+    /// ANE attention parameters.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ANEAttentionParameters
+    {
+        public int NumHeads;
+        public int HeadDimension;
+        public int SequenceLength;
+        public int BatchSize;
+        public float DropoutRate;
+        public int CausalMask;
+        public float ScaleFactor;
     }
 
     #endregion

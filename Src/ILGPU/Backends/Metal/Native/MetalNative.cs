@@ -250,6 +250,7 @@ namespace ILGPU.Backends.Metal.Native
         /// </summary>
         internal static bool IsMetalSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 return MTLCreateSystemDefaultDevice();
@@ -258,6 +259,7 @@ namespace ILGPU.Backends.Metal.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -360,6 +362,7 @@ namespace ILGPU.Backends.Metal.Native
         /// </summary>
         internal static IntPtr CreateSystemDefaultDevice()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (MTLCreateSystemDefaultDevice())
@@ -373,6 +376,7 @@ namespace ILGPU.Backends.Metal.Native
             {
                 return IntPtr.Zero;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -380,6 +384,7 @@ namespace ILGPU.Backends.Metal.Native
         /// </summary>
         internal static IntPtr[] CopyAllDevices()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var deviceCount = GetDeviceCount();
@@ -396,6 +401,7 @@ namespace ILGPU.Backends.Metal.Native
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

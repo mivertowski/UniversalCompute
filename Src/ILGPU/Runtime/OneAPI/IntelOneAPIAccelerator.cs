@@ -91,7 +91,9 @@ namespace ILGPU.Runtime.OneAPI
                 SYCLDevice = device.NativeDevice;
 
                 // Create SYCL context
-                var result = SYCLNative.CreateContext(1, [SYCLDevice], out SYCLContext);
+                var devices = new IntPtr[] { SYCLDevice };
+                var result = SYCLNative.CreateContext(1, devices, out var syclContext);
+                SYCLContext = syclContext;
                 SYCLException.ThrowIfFailed(result);
 
                 // Create SYCL queue
@@ -99,7 +101,8 @@ namespace ILGPU.Runtime.OneAPI
                     SYCLContext, 
                     SYCLDevice, 
                     SYCLQueueProperties.ProfilingEnable, 
-                    out SYCLQueue);
+                    out var queue);
+                SYCLQueue = queue;
                 SYCLException.ThrowIfFailed(result);
 
                 // Initialize device properties
@@ -135,7 +138,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the memory information of this accelerator.
         /// </summary>
-        public MemoryInfo MemoryInfo => new(Device.MemorySize);
+        public MemoryInfo MemoryInfo => new(Device.MemorySize, Device.MemorySize, 0, 0, 1, true, false, false, 1, 0);
 
         /// <summary>
         /// Gets the maximum grid size supported by this accelerator.
@@ -215,7 +218,7 @@ namespace ILGPU.Runtime.OneAPI
             CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), []);
             return LoadKernelInternal(kernel);
         }
 
@@ -227,7 +230,7 @@ namespace ILGPU.Runtime.OneAPI
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
-            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), ImmutableArray<CompiledKernel.FunctionInfo>.Empty);
+            kernelInfo = new KernelInfo(0, 0, new AllocaKindInformation(), []);
             return LoadKernelInternal(kernel);
         }
 
@@ -446,7 +449,7 @@ namespace ILGPU.Runtime.OneAPI
                                                          try
                                                          {
                                                              // Use Intel GPU for AI inference acceleration
-                                                             ExecuteIntelGPUInference(input, output, modelData, stream?.SYCLQueue ?? SYCLQueue);
+                                                             ExecuteIntelGPUInference(input, output, modelData, stream?.NativeQueue ?? SYCLQueue);
                                                          }
                                                          catch (DllNotFoundException)
                                                          {
@@ -478,6 +481,7 @@ namespace ILGPU.Runtime.OneAPI
         {
             if (disposing)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // Cleanup SYCL resources
@@ -499,6 +503,7 @@ namespace ILGPU.Runtime.OneAPI
                 {
                     // Ignore errors during disposal
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

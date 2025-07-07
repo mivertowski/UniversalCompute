@@ -462,6 +462,7 @@ namespace ILGPU.AI.ONNX
         /// <returns>True if ONNX Runtime is available; otherwise, false.</returns>
         internal static bool IsAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var env = OrtCreateEnv(2, "ILGPU-ONNX");
@@ -480,6 +481,7 @@ namespace ILGPU.AI.ONNX
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -497,6 +499,7 @@ namespace ILGPU.AI.ONNX
         /// <returns>Version string.</returns>
         internal static string GetVersionString()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var ptr = OrtGetVersionString();
@@ -506,6 +509,7 @@ namespace ILGPU.AI.ONNX
             {
                 return "Unknown";
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -527,6 +531,7 @@ namespace ILGPU.AI.ONNX
         /// <returns>Error message.</returns>
         internal static string GetLastErrorMessage()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var ptr = OrtGetLastErrorMessage();
@@ -536,6 +541,7 @@ namespace ILGPU.AI.ONNX
             {
                 return "Unknown error";
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

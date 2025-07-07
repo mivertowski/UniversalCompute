@@ -463,6 +463,7 @@ namespace ILGPU.Backends.OneAPI.Native
         /// </summary>
         internal static int GetNumExecutionUnits(IntPtr device)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Query Intel-specific extension for EU count
@@ -473,6 +474,7 @@ namespace ILGPU.Backends.OneAPI.Native
                 // Fallback: estimate from max compute units
                 return GetDeviceInfo<int>(device, OneAPIDeviceInfo.MaxComputeUnits);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

@@ -222,6 +222,7 @@ namespace ILGPU.Runtime.OneAPI
             if (!SYCLNative.IsSYCLSupported())
                 return [];
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var nativeDevices = SYCLNative.GetIntelGPUDevices();
@@ -245,6 +246,7 @@ namespace ILGPU.Runtime.OneAPI
                     new IntelOneAPIDevice(new IntPtr(-1), GetFallbackDeviceInfo())
                 ];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -283,6 +285,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <returns>Device information structure.</returns>
         private static IntelGPUDeviceInfo GetDeviceInfo(IntPtr nativeDevice)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var info = new IntelGPUDeviceInfo
@@ -313,6 +316,7 @@ namespace ILGPU.Runtime.OneAPI
             {
                 return GetFallbackDeviceInfo();
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -344,6 +348,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <returns>True if double precision is supported.</returns>
         private static bool CheckFloat64Support(IntPtr nativeDevice)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var extensions = SYCLNative.GetDeviceInfoString(nativeDevice, SYCLDeviceInfo.Extensions);
@@ -354,6 +359,7 @@ namespace ILGPU.Runtime.OneAPI
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

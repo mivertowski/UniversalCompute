@@ -147,6 +147,7 @@ namespace ILGPU.Runtime
         /// </summary>
         protected virtual void InitializeMemoryInfo()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 Memory = new MemoryInfo(
@@ -167,6 +168,7 @@ namespace ILGPU.Runtime
                 // If memory info creation fails, use unknown
                 Memory = MemoryInfo.Unknown;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -286,6 +288,29 @@ namespace ILGPU.Runtime
         /// significantly improving performance for frequent allocations.
         /// </remarks>
         public virtual bool SupportsMemoryPools { get; protected set; }
+
+        /// <summary>
+        /// Gets the compute capability version of this device.
+        /// </summary>
+        /// <remarks>
+        /// Compute capability represents the feature set and computational capabilities
+        /// of the device. Different accelerator types use different versioning schemes:
+        /// - CUDA devices use major.minor versions (e.g., 8.6 for RTX 3080)
+        /// - ROCm devices use major.minor versions based on GCN/RDNA architecture
+        /// - Other accelerators may use their own versioning or return 1.0 as default
+        /// </remarks>
+        public virtual Version ComputeCapability { get; protected set; } = new(1, 0);
+
+        /// <summary>
+        /// Gets a value indicating whether this device supports cooperative kernel launches.
+        /// </summary>
+        /// <remarks>
+        /// Cooperative kernels allow thread blocks to synchronize and cooperate during
+        /// execution, enabling more sophisticated parallel algorithms. This feature is
+        /// typically available on modern GPU architectures with compute capability 6.0+
+        /// for CUDA devices and equivalent capabilities for other accelerator types.
+        /// </remarks>
+        public virtual bool SupportsCooperativeKernels { get; protected set; }
 
         #endregion
 

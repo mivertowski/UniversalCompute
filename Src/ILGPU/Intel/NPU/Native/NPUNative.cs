@@ -59,6 +59,7 @@ namespace ILGPU.Intel.NPU.Native
             if (!IsNPUSupported())
                 return false;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Initialize OpenVINO core for NPU
@@ -83,6 +84,7 @@ namespace ILGPU.Intel.NPU.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -90,6 +92,7 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         internal static void ReleaseNPU()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (_isInitialized && _openvinoCore != IntPtr.Zero)
@@ -103,6 +106,7 @@ namespace ILGPU.Intel.NPU.Native
             {
                 // Ignore errors during cleanup
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -464,7 +468,7 @@ namespace ILGPU.Intel.NPU.Native
             try
             {
                 // Try to use OpenVINO Runtime for NPU acceleration
-                ExecuteOpenVINOConvolution(input, kernel, output, 
+                NPUKernels.ExecuteOpenVINOConvolution(input, kernel, output, 
                     batchSize, inputChannels, outputChannels,
                     inputHeight, inputWidth, kernelHeight, kernelWidth,
                     strideHeight, strideWidth, paddingHeight, paddingWidth);
@@ -472,7 +476,7 @@ namespace ILGPU.Intel.NPU.Native
             catch (DllNotFoundException)
             {
                 // Fall back to CPU implementation if OpenVINO is not available
-                ExecuteCPUConvolutionFallback(input, kernel, output,
+                NPUKernels.ExecuteCPUConvolutionFallback(input, kernel, output,
                     batchSize, inputChannels, outputChannels,
                     inputHeight, inputWidth, kernelHeight, kernelWidth,
                     strideHeight, strideWidth, paddingHeight, paddingWidth);
@@ -480,7 +484,7 @@ namespace ILGPU.Intel.NPU.Native
             catch (EntryPointNotFoundException)
             {
                 // Fall back to CPU implementation if OpenVINO functions are not found
-                ExecuteCPUConvolutionFallback(input, kernel, output,
+                NPUKernels.ExecuteCPUConvolutionFallback(input, kernel, output,
                     batchSize, inputChannels, outputChannels,
                     inputHeight, inputWidth, kernelHeight, kernelWidth,
                     strideHeight, strideWidth, paddingHeight, paddingWidth);
@@ -566,6 +570,7 @@ namespace ILGPU.Intel.NPU.Native
         /// <returns>True if NPU is supported; otherwise, false.</returns>
         internal static bool IsNPUSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check for x86 architecture
@@ -579,6 +584,7 @@ namespace ILGPU.Intel.NPU.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -590,6 +596,7 @@ namespace ILGPU.Intel.NPU.Native
             if (!X86Base.IsSupported)
                 return false;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get CPU vendor
@@ -620,6 +627,7 @@ namespace ILGPU.Intel.NPU.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -631,6 +639,7 @@ namespace ILGPU.Intel.NPU.Native
             if (!IsNPUSupported())
                 return NPUGeneration.None;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var cpuid1 = X86Base.CpuId(1, 0);
@@ -648,6 +657,7 @@ namespace ILGPU.Intel.NPU.Native
             {
                 return NPUGeneration.None;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -977,7 +987,7 @@ namespace ILGPU.Intel.NPU.Native
         /// <summary>
         /// Executes convolution using OpenVINO Runtime for NPU acceleration.
         /// </summary>
-        private static unsafe void ExecuteOpenVINOConvolution(
+        internal static unsafe void ExecuteOpenVINOConvolution(
             void* input, void* kernel, void* output,
             int batchSize, int inputChannels, int outputChannels,
             int inputHeight, int inputWidth,
@@ -1016,7 +1026,7 @@ namespace ILGPU.Intel.NPU.Native
         /// <summary>
         /// CPU fallback implementation for convolution.
         /// </summary>
-        private static unsafe void ExecuteCPUConvolutionFallback(
+        internal static unsafe void ExecuteCPUConvolutionFallback(
             void* input, void* kernel, void* output,
             int batchSize, int inputChannels, int outputChannels,
             int inputHeight, int inputWidth,
@@ -1050,51 +1060,51 @@ namespace ILGPU.Intel.NPU.Native
 #if WINDOWS
         [DllImport("openvino", EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
          [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-        private static extern IntPtr CreateInferenceRequest();
+        internal static extern IntPtr CreateInferenceRequest();
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl)]
          [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-        private static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
+        internal static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
          [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-        private static extern void ExecuteInference(IntPtr request);
+        internal static extern void ExecuteInference(IntPtr request);
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl)]
          [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-        private static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
+        internal static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
 
         [DllImport("openvino", EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]
          [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
-        private static extern void ReleaseInferenceRequest(IntPtr request);
+        internal static extern void ReleaseInferenceRequest(IntPtr request);
 #else
         [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_create_infer_request")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-        private static partial IntPtr CreateInferenceRequest();
+        internal static partial IntPtr CreateInferenceRequest();
 
         [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_set_input_tensor", StringMarshalling = StringMarshalling.Utf16)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-        private static partial void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
+        internal static partial void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
 
         [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_infer")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-        private static partial void ExecuteInference(IntPtr request);
+        internal static partial void ExecuteInference(IntPtr request);
 
         [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_get_output_tensor", StringMarshalling = StringMarshalling.Utf16)]
         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-        private static partial void GetOutputTensor(IntPtr request, string name, IntPtr data);
+        internal static partial void GetOutputTensor(IntPtr request, string name, IntPtr data);
 
         [LibraryImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_release")]
         [DefaultDllImportSearchPaths(DllImportSearchPath.SafeDirectories)]
         [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-        private static partial void ReleaseInferenceRequest(IntPtr request);
+        internal static partial void ReleaseInferenceRequest(IntPtr request);
 #endif
 
-        private static void SetConvolutionParameters(IntPtr request, int strideH, int strideW, int padH, int padW)
+        internal static void SetConvolutionParameters(IntPtr request, int strideH, int strideW, int padH, int padW)
         {
             // Set convolution-specific parameters in OpenVINO
             // This would typically be done during model compilation, not inference

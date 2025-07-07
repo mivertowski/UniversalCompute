@@ -164,6 +164,7 @@ namespace ILGPU.Backends.ROCm
         {
             codeBuilder.AppendLine("{");
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Generate basic grid/block indexing
@@ -193,6 +194,7 @@ namespace ILGPU.Backends.ROCm
                 codeBuilder.AppendLine($"  // Error during code generation: {ex.Message}");
                 codeBuilder.AppendLine("  // Placeholder kernel body");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             codeBuilder.AppendLine("}");
         }

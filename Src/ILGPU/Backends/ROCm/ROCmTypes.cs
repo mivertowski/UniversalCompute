@@ -337,4 +337,15 @@ namespace ILGPU.Backends.ROCm
         /// <summary>64-bit integer.</summary>
         INT64
     }
+
+    /// <summary>
+    /// Represents the capability context for ROCm accelerators.
+    /// </summary>
+    internal sealed class ROCmCapabilityContext(ROCmCapabilities capabilities) : Runtime.CapabilityContext
+    {
+        /// <summary>
+        /// Gets the ROCm capabilities.
+        /// </summary>
+        public ROCmCapabilities ROCmCapabilities { get; } = capabilities;
+    }
 }

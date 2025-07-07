@@ -88,6 +88,7 @@ namespace ILGPU.Tests.CPU
             buffer.CopyFromCPU(data);
 
             // Test basic reduction operations if available
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to access reduction operations through algorithms namespace
@@ -121,6 +122,7 @@ namespace ILGPU.Tests.CPU
                 // Reduction operations might not be available in this configuration
                 // This is acceptable for coverage testing
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         [Theory]

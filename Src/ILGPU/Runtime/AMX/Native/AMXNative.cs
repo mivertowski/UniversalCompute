@@ -58,18 +58,15 @@ namespace ILGPU.Runtime.AMX.Native
         /// AMX tile configuration structure.
         /// </summary>
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        internal struct AMXTileConfig
+        internal unsafe struct AMXTileConfig
         {
             public byte palette_id;          // Tile palette ID (0 or 1)
             public byte start_row;           // Starting row (usually 0)
             public byte reserved1;           // Reserved byte
             public byte reserved2;           // Reserved byte
             
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-            public byte[] colsb;            // Bytes per row for each tile (16 tiles max)
-            
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-            public byte[] rows;             // Number of rows for each tile
+            public fixed byte colsb[16];     // Bytes per row for each tile (16 tiles max)
+            public fixed byte rows[16];      // Number of rows for each tile
         }
 
         /// <summary>
@@ -180,6 +177,7 @@ namespace ILGPU.Runtime.AMX.Native
         /// <returns>True if AMX is supported; otherwise, false.</returns>
         internal static bool IsAMXSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check CPUID for AMX support
@@ -197,6 +195,7 @@ namespace ILGPU.Runtime.AMX.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -419,17 +418,22 @@ namespace ILGPU.Runtime.AMX.Native
         /// <param name="n">Matrix columns.</param>
         /// <param name="dataType">Data type for computation.</param>
         /// <returns>Tile configuration.</returns>
-        private static AMXTileConfig CreateTileConfig(int m, int k, int n, AMXDataType dataType)
+        private static unsafe AMXTileConfig CreateTileConfig(int m, int k, int n, AMXDataType dataType)
         {
             var config = new AMXTileConfig
             {
                 palette_id = 1, // Use palette 1 for matrix operations
                 start_row = 0,
                 reserved1 = 0,
-                reserved2 = 0,
-                colsb = new byte[16],
-                rows = new byte[16]
+                reserved2 = 0
             };
+
+            // Initialize fixed arrays to zero
+            for (int i = 0; i < 16; i++)
+            {
+                config.colsb[i] = 0;
+                config.rows[i] = 0;
+            }
 
             // Configure tiles based on data type
             switch (dataType)

@@ -39,6 +39,7 @@ namespace ILGPU.Intel.IPP
         /// <returns>True if IPP is available, false otherwise.</returns>
         public static bool DetectIPP()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to call a basic IPP function
@@ -58,6 +59,7 @@ namespace ILGPU.Intel.IPP
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -73,6 +75,7 @@ namespace ILGPU.Intel.IPP
 
                 var info = new IPPInfo();
 
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     // Initialize IPP
@@ -113,6 +116,7 @@ namespace ILGPU.Intel.IPP
                 {
                     info.IsAvailable = false;
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                 _cachedInfo = info;
                 return info;

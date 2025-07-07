@@ -118,6 +118,7 @@ namespace ILGPU.Runtime
             if (accelerator == null)
                 return Unknown;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var memoryInfo = new DeviceMemoryInfo(
@@ -150,6 +151,7 @@ namespace ILGPU.Runtime
                 // If we can't get device info, return unknown
                 return Unknown;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -162,6 +164,7 @@ namespace ILGPU.Runtime
             if (device == null)
                 return Unknown;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var memoryInfo = new DeviceMemoryInfo(
@@ -193,6 +196,7 @@ namespace ILGPU.Runtime
             {
                 return Unknown;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

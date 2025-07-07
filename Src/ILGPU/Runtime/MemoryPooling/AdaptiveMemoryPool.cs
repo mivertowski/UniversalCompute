@@ -345,6 +345,7 @@ namespace ILGPU.Runtime.MemoryPooling
 
         private void TrimCallback(object? state)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (!disposed)
@@ -356,6 +357,7 @@ namespace ILGPU.Runtime.MemoryPooling
             {
                 // Ignore errors in background trimming
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         private sealed class PooledBuffer(AdaptiveMemoryPool<T> pool, MemoryBuffer1D<T, Stride1D.Dense> buffer, long actualLength) : IPooledMemoryBuffer<T>

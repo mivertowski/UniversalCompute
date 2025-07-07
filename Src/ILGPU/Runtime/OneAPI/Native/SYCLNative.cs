@@ -331,6 +331,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>True if SYCL is supported; otherwise, false.</returns>
         internal static bool IsSYCLSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to get platforms to verify SYCL is available
@@ -349,6 +350,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -357,6 +359,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>Array of Intel GPU device handles.</returns>
         internal static IntPtr[] GetIntelGPUDevices()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get platforms
@@ -397,6 +400,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -406,6 +410,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>True if Intel device; otherwise, false.</returns>
         private static bool IsIntelDevice(IntPtr device)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var vendorName = GetDeviceInfoString(device, SYCLDeviceInfo.Vendor);
@@ -415,6 +420,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -425,6 +431,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>Device information string.</returns>
         internal static string GetDeviceInfoString(IntPtr device, SYCLDeviceInfo infoType)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Get required size
@@ -449,6 +456,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return string.Empty;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -459,6 +467,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>Device information value.</returns>
         internal static uint GetDeviceInfoUInt32(IntPtr device, SYCLDeviceInfo infoType)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var buffer = new byte[4];
@@ -477,6 +486,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return 0;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -487,6 +497,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>Device information value.</returns>
         internal static ulong GetDeviceInfoUInt64(IntPtr device, SYCLDeviceInfo infoType)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var buffer = new byte[8];
@@ -505,6 +516,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return 0;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -616,6 +628,7 @@ namespace ILGPU.Runtime.OneAPI.Native
         /// <returns>Intel GPU architecture.</returns>
         internal static IntelGPUArchitecture DetectIntelArchitecture(IntPtr device)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var deviceName = GetDeviceInfoString(device, SYCLDeviceInfo.Name).ToUpperInvariant();
@@ -654,6 +667,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             {
                 return IntelGPUArchitecture.Unknown;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

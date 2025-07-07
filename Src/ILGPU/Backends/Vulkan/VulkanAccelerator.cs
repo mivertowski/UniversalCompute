@@ -331,6 +331,7 @@ namespace ILGPU.Backends.Vulkan
         {
             if (!IsAvailable()) return null;
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var vulkanInstance = VulkanInstance.Create();
@@ -349,6 +350,7 @@ namespace ILGPU.Backends.Vulkan
             {
                 return null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -360,6 +362,7 @@ namespace ILGPU.Backends.Vulkan
         {
             if (!IsAvailable()) return [];
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var vulkanInstance = VulkanInstance.Create();
@@ -378,6 +381,7 @@ namespace ILGPU.Backends.Vulkan
             {
                 return [];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

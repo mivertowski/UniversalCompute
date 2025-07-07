@@ -492,6 +492,29 @@ namespace ILGPU.Runtime.Cuda
         public string NVMLPCIBusId =>
             $"{PCIDomainId:X4}:{PCIBusId:X2}:{PCIDeviceId:X2}.0";
 
+        /// <summary>
+        /// Gets the compute capability version of this CUDA device.
+        /// </summary>
+        /// <remarks>
+        /// Returns the CUDA compute capability as a Version object where
+        /// the major and minor versions correspond to the CUDA architecture
+        /// (e.g., Version(8,6) for compute capability 8.6).
+        /// </remarks>
+        public override Version ComputeCapability =>
+            Architecture.HasValue 
+                ? new Version(Architecture.Value.Major, Architecture.Value.Minor)
+                : new Version(3, 0);
+
+        /// <summary>
+        /// Gets a value indicating whether this CUDA device supports cooperative kernel launches.
+        /// </summary>
+        /// <remarks>
+        /// Cooperative kernels are supported on CUDA devices with compute capability 6.0+
+        /// and require appropriate driver support.
+        /// </remarks>
+        public override bool SupportsCooperativeKernels =>
+            Architecture >= CudaArchitecture.SM_60;
+
         #endregion
 
         #region Methods

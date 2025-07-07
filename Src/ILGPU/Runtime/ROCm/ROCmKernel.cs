@@ -208,6 +208,7 @@ namespace ILGPU.Runtime.ROCm
             {
                 if (moduleHandle != IntPtr.Zero && moduleHandle != new IntPtr(-1))
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         ROCmNative.ModuleUnload(moduleHandle);
@@ -221,6 +222,7 @@ namespace ILGPU.Runtime.ROCm
                         moduleHandle = IntPtr.Zero;
                         functionHandle = IntPtr.Zero;
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
             }
         }

@@ -179,6 +179,7 @@ namespace ILGPU.ML.Integration
 
             foreach (var device in _scheduler.AvailableDevices)
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     var deviceResult = await ProfileOnDeviceAsync(modelPath, sampleInputs, device).ConfigureAwait(false);
@@ -188,6 +189,7 @@ namespace ILGPU.ML.Integration
                 {
                     results[device] = new DeviceProfilingResult(device, false, 0, 0, ex.Message);
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
 
             return new ModelProfilingResults(results);

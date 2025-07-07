@@ -358,6 +358,7 @@ namespace ILGPU.Intel.NPU
         /// <returns>True if NPU is available; otherwise, false.</returns>
         public static bool IsAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && 
@@ -367,6 +368,7 @@ namespace ILGPU.Intel.NPU
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -378,6 +380,7 @@ namespace ILGPU.Intel.NPU
         {
             if (!IsAvailable()) return null;
             
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // TODO: Implement proper NPU device creation - Device is abstract
@@ -387,6 +390,7 @@ namespace ILGPU.Intel.NPU
             {
                 return null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion

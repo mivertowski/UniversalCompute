@@ -52,6 +52,7 @@ namespace ILGPU.Backends.ROCm
         /// <returns>The compiled binary data.</returns>
         internal byte[] CompileToHSAIL(string sourceCode, string kernelName)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to use system HIP compiler if available
@@ -71,6 +72,7 @@ namespace ILGPU.Backends.ROCm
                 var errorInfo = $"// ROCm compilation error: {ex.Message}\n\n{sourceCode}";
                 return Encoding.UTF8.GetBytes(errorInfo);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -79,6 +81,7 @@ namespace ILGPU.Backends.ROCm
         /// <returns>True if HIP compiler is available; otherwise, false.</returns>
         private static bool IsHipCompilerAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var processInfo = new ProcessStartInfo
@@ -102,6 +105,7 @@ namespace ILGPU.Backends.ROCm
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -151,6 +155,7 @@ namespace ILGPU.Backends.ROCm
             finally
             {
                 // Clean up temporary files
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     if (File.Exists(sourceFile))
@@ -162,6 +167,7 @@ namespace ILGPU.Backends.ROCm
                 {
                     // Ignore cleanup errors
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 
@@ -206,6 +212,7 @@ namespace ILGPU.Backends.ROCm
         /// <returns>The LLVM IR binary.</returns>
         internal static byte[] CompileToLLVMIR(string sourceCode, string kernelName)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 return IsClangAvailable() ? CompileWithClang(sourceCode, kernelName) : CompileToSourceBinary(sourceCode, kernelName);
@@ -215,6 +222,7 @@ namespace ILGPU.Backends.ROCm
                 var errorInfo = $"// LLVM IR compilation error: {ex.Message}\n\n{sourceCode}";
                 return Encoding.UTF8.GetBytes(errorInfo);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -223,6 +231,7 @@ namespace ILGPU.Backends.ROCm
         /// <returns>True if Clang is available; otherwise, false.</returns>
         private static bool IsClangAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var processInfo = new ProcessStartInfo
@@ -246,6 +255,7 @@ namespace ILGPU.Backends.ROCm
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -292,6 +302,7 @@ namespace ILGPU.Backends.ROCm
             finally
             {
                 // Clean up temporary files
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     if (File.Exists(sourceFile))
@@ -303,6 +314,7 @@ namespace ILGPU.Backends.ROCm
                 {
                     // Ignore cleanup errors
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

@@ -202,6 +202,7 @@ namespace ILGPU.Apple.NeuralEngine
             if (!DetectNeuralEngine())
                 return new ANECapabilities();
 
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var nativeCapabilities = ANENative.QueryCapabilities();
@@ -211,6 +212,7 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 return new ANECapabilities();
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -219,6 +221,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <returns>True if ANE is available; otherwise, false.</returns>
         public static bool DetectNeuralEngine()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check if we're on macOS with Apple Silicon
@@ -232,6 +235,7 @@ namespace ILGPU.Apple.NeuralEngine
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>

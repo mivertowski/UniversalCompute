@@ -187,6 +187,7 @@ namespace ILGPU.Runtime.AMX
         /// <returns>Array of Intel AMX devices.</returns>
         public static IntelAMXDevice[] GetDevices()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check if AMX is supported
@@ -204,6 +205,7 @@ namespace ILGPU.Runtime.AMX
                     CreateFallbackDevice()
                 ];
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -232,6 +234,7 @@ namespace ILGPU.Runtime.AMX
         /// <returns>Intel AMX device information or null if not supported.</returns>
         private static IntelAMXDevice? DetectProcessorInfo()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 string processorName = "Intel Processor";
@@ -243,6 +246,7 @@ namespace ILGPU.Runtime.AMX
                 // Try to get detailed processor information on Windows
                 if (OperatingSystem.IsWindows())
                 {
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
 #if WINDOWS
@@ -264,10 +268,12 @@ namespace ILGPU.Runtime.AMX
                     {
                         // Use defaults if WMI fails
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
                 else
                 {
                     // Try to read /proc/cpuinfo on Linux
+#pragma warning disable CA1031 // Do not catch general exception types
                     try
                     {
                         var cpuinfo = System.IO.File.ReadAllText("/proc/cpuinfo");
@@ -290,6 +296,7 @@ namespace ILGPU.Runtime.AMX
                     {
                         // Use defaults if /proc/cpuinfo fails
                     }
+#pragma warning restore CA1031 // Do not catch general exception types
                 }
 
                 // Detect AMX capabilities based on processor generation
@@ -315,6 +322,7 @@ namespace ILGPU.Runtime.AMX
             {
                 return null;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -338,6 +346,7 @@ namespace ILGPU.Runtime.AMX
         /// <returns>System memory size in bytes.</returns>
         private static long GetSystemMemorySize()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 if (OperatingSystem.IsWindows())
@@ -372,6 +381,7 @@ namespace ILGPU.Runtime.AMX
             {
                 // Ignore errors and use default
             }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             // Default to 16GB if detection fails
             return 16L * 1024 * 1024 * 1024;

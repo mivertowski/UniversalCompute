@@ -117,6 +117,7 @@ namespace ILGPU.Backends.OneAPI
         /// <param name="entryPoint">The entry point.</param>
         private void GenerateKernelParameters(EntryPoint entryPoint)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var parameters = entryPoint.Parameters;
@@ -136,6 +137,7 @@ namespace ILGPU.Backends.OneAPI
                 codeBuilder.AppendLine($"    // Error generating parameters: {ex.Message}");
                 codeBuilder.AppendLine("    void* default_param;");
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -224,6 +226,7 @@ namespace ILGPU.Backends.OneAPI
         /// <param name="entryPoint">The entry point.</param>
         private void GenerateKernelBody(EntryPoint entryPoint)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 codeBuilder.AppendLine("        // Kernel body - ILGPU IR translation");
@@ -247,6 +250,7 @@ namespace ILGPU.Backends.OneAPI
                 codeBuilder.AppendLine($"        // Error during IR translation: {ex.Message}");
                 GenerateDefaultKernelBody();
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -416,6 +420,7 @@ namespace ILGPU.Backends.OneAPI
         /// <returns>The compiled binary.</returns>
         internal static byte[] CompileToSPIRV(string sourceCode, string kernelName, OneAPIDeviceType targetDevice)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Check if DPC++ compiler is available
@@ -434,6 +439,7 @@ namespace ILGPU.Backends.OneAPI
                 var errorInfo = $"// SYCL compilation error: {ex.Message}\n\n{sourceCode}";
                 return System.Text.Encoding.UTF8.GetBytes(errorInfo);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -441,6 +447,7 @@ namespace ILGPU.Backends.OneAPI
         /// </summary>
         private static bool IsDPCPPAvailable()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 var processInfo = new System.Diagnostics.ProcessStartInfo
@@ -463,6 +470,7 @@ namespace ILGPU.Backends.OneAPI
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -517,6 +525,7 @@ namespace ILGPU.Backends.OneAPI
             finally
             {
                 // Clean up
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     if (System.IO.File.Exists(sourceFile))
@@ -525,6 +534,7 @@ namespace ILGPU.Backends.OneAPI
                         System.IO.File.Delete(outputFile);
                 }
                 catch { }
+#pragma warning restore CA1031 // Do not catch general exception types
             }
         }
 

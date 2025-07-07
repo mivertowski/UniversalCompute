@@ -908,6 +908,7 @@ namespace ILGPU.Backends.WebGPU
         internal static bool IsWebGPUSupported()
         {
             // For non-browser environments, check for WebGPU native implementation
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // This would check for dawn, wgpu-native, or other WebGPU implementations
@@ -917,6 +918,7 @@ namespace ILGPU.Backends.WebGPU
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
     }
 }

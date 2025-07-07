@@ -494,6 +494,7 @@ namespace ILGPU.Runtime.Vulkan.Native
         /// <returns>True if Vulkan is supported; otherwise, false.</returns>
         internal static bool IsVulkanSupported()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Try to enumerate instance extensions to verify Vulkan is available
@@ -511,6 +512,7 @@ namespace ILGPU.Runtime.Vulkan.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -527,33 +529,58 @@ namespace ILGPU.Runtime.Vulkan.Native
         /// <returns>True if initialization succeeded; otherwise, false.</returns>
         internal static bool InitializeVulkanCompute()
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 // Create minimal Vulkan instance for compute
-                var appInfo = new VkApplicationInfo
+                unsafe
                 {
-                    sType = VkStructureType.VK_STRUCTURE_TYPE_APPLICATION_INFO,
-                    pApplicationName = "ILGPU Universal Compute",
-                    applicationVersion = 1,
-                    pEngineName = "ILGPU",
-                    engineVersion = 1,
-                    apiVersion = VK_API_VERSION_1_1
-                };
+                    var appNamePtr = Marshal.StringToHGlobalAnsi("ILGPU Universal Compute");
+                    var engineNamePtr = Marshal.StringToHGlobalAnsi("ILGPU");
+                    
+                    try
+                    {
+                        var appInfo = new VkApplicationInfo
+                        {
+                            sType = VkStructureType.VK_STRUCTURE_TYPE_APPLICATION_INFO,
+                            pApplicationName = appNamePtr,
+                            applicationVersion = 1,
+                            pEngineName = engineNamePtr,
+                            engineVersion = 1,
+                            apiVersion = VK_API_VERSION_1_1
+                        };
 
-                var createInfo = new VkInstanceCreateInfo
-                {
-                    sType = VkStructureType.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-                    pApplicationInfo = appInfo
-                };
+                        var appInfoPtr = Marshal.AllocHGlobal(Marshal.SizeOf<VkApplicationInfo>());
+                        try
+                        {
+                            Marshal.StructureToPtr(appInfo, appInfoPtr, false);
 
-                var result = CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
-                if (result == VkResult.VK_SUCCESS)
-                {
-                    DestroyInstance(instance, IntPtr.Zero);
-                    return true;
+                            var createInfo = new VkInstanceCreateInfo
+                            {
+                                sType = VkStructureType.VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
+                                pApplicationInfo = appInfoPtr
+                            };
+
+                            var result = CreateInstance(ref createInfo, IntPtr.Zero, out var instance);
+                            if (result == VkResult.VK_SUCCESS)
+                            {
+                                DestroyInstance(instance, IntPtr.Zero);
+                                return true;
+                            }
+
+                            return false;
+                        }
+                        finally
+                        {
+                            Marshal.FreeHGlobal(appInfoPtr);
+                        }
+                    }
+                    finally
+                    {
+                        Marshal.FreeHGlobal(appNamePtr);
+                        Marshal.FreeHGlobal(engineNamePtr);
+                    }
                 }
-
-                return false;
             }
             catch (DllNotFoundException)
             {
@@ -567,6 +594,7 @@ namespace ILGPU.Runtime.Vulkan.Native
             {
                 return false;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         /// <summary>
@@ -746,11 +774,9 @@ namespace ILGPU.Runtime.Vulkan.Native
     {
         public VkStructureType sType;
         public IntPtr pNext;
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string pApplicationName;
+        public IntPtr pApplicationName;
         public uint applicationVersion;
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string pEngineName;
+        public IntPtr pEngineName;
         public uint engineVersion;
         public uint apiVersion;
     }
@@ -761,7 +787,7 @@ namespace ILGPU.Runtime.Vulkan.Native
         public VkStructureType sType;
         public IntPtr pNext;
         public uint flags;
-        public VkApplicationInfo pApplicationInfo;
+        public IntPtr pApplicationInfo;
         public uint enabledLayerCount;
         public IntPtr ppEnabledLayerNames;
         public uint enabledExtensionCount;
@@ -769,17 +795,15 @@ namespace ILGPU.Runtime.Vulkan.Native
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct VkPhysicalDeviceProperties
+    internal unsafe struct VkPhysicalDeviceProperties
     {
         public uint apiVersion;
         public uint driverVersion;
         public uint vendorID;
         public uint deviceID;
         public VkPhysicalDeviceType deviceType;
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
-        public string deviceName;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-        public byte[] pipelineCacheUUID;
+        public fixed byte deviceName[256];
+        public fixed byte pipelineCacheUUID[16];
         public VkPhysicalDeviceLimits limits;
         public VkPhysicalDeviceSparseProperties sparseProperties;
     }
@@ -968,8 +992,7 @@ namespace ILGPU.Runtime.Vulkan.Native
         public uint flags;
         public VkShaderStageFlagBits stage;
         public VkShaderModule module;
-        [MarshalAs(UnmanagedType.LPStr)]
-        public string pName;
+        public IntPtr pName;
         public IntPtr pSpecializationInfo;
     }
 

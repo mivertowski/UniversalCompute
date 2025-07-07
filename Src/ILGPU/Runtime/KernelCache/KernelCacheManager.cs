@@ -330,6 +330,7 @@ namespace ILGPU.Runtime.KernelCache
 
             await Task.Run(() =>
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     var cacheFiles = Directory.GetFiles(options.CacheDirectory, "*.cache");
@@ -343,6 +344,7 @@ namespace ILGPU.Runtime.KernelCache
                 {
                     // Log error but don't throw - preloading is best-effort
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }).ConfigureAwait(false);
         }
 
@@ -360,6 +362,7 @@ namespace ILGPU.Runtime.KernelCache
 
             await Task.Run(() =>
             {
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     foreach (var kvp in cache)
@@ -373,6 +376,7 @@ namespace ILGPU.Runtime.KernelCache
                 {
                     // Log error but don't throw - persistence is best-effort
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
             }).ConfigureAwait(false);
         }
 
@@ -435,6 +439,7 @@ namespace ILGPU.Runtime.KernelCache
         /// <param name="state">Timer state (unused).</param>
         private void PerformMaintenanceCallback(object? state)
         {
+#pragma warning disable CA1031 // Do not catch general exception types
             try
             {
                 PerformMaintenance();
@@ -443,6 +448,7 @@ namespace ILGPU.Runtime.KernelCache
             {
                 // Log error but don't throw from timer callback
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         #endregion
@@ -459,6 +465,7 @@ namespace ILGPU.Runtime.KernelCache
                 maintenanceTimer?.Dispose();
                 
                 // Attempt to persist cache before disposal
+#pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
                     PersistAsync().Wait(TimeSpan.FromSeconds(10));
@@ -467,6 +474,7 @@ namespace ILGPU.Runtime.KernelCache
                 {
                     // Best effort - don't throw in Dispose
                 }
+#pragma warning restore CA1031 // Do not catch general exception types
 
                 Clear();
                 disposed = true;

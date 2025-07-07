@@ -16,7 +16,10 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
+using ILGPU.Backends.ROCm;
 using System;
+using BackendROCmInstructionSet = ILGPU.Backends.ROCm.ROCmInstructionSet;
+using BackendROCmCapabilities = ILGPU.Backends.ROCm.ROCmCapabilities;
 
 namespace ILGPU.Runtime.ROCm
 {
@@ -63,7 +66,7 @@ namespace ILGPU.Runtime.ROCm
             {
                 if (predicate(device))
                 {
-                    builder.Accelerators.Add(new ROCmAcceleratorBuilder(device));
+                    builder.DeviceRegistry.Register(device);
                 }
             }
 
@@ -182,7 +185,45 @@ namespace ILGPU.Runtime.ROCm
         public static Backend CreateROCmBackend(
             this Context context,
             ROCmInstructionSet instruction,
-            ROCmCapabilities capabilities) => new ROCmBackend(context, instruction, capabilities);
+            ROCmCapabilities capabilities) => new ROCmBackend(context, ConvertInstructionSet(instruction), ConvertCapabilities(capabilities));
+
+        /// <summary>
+        /// Converts runtime instruction set to backend instruction set.
+        /// </summary>
+        /// <param name="instruction">The runtime instruction set.</param>
+        /// <returns>The backend instruction set.</returns>
+        private static BackendROCmInstructionSet ConvertInstructionSet(ROCmInstructionSet instruction) => instruction switch
+        {
+            ROCmInstructionSet.GCN3 => new BackendROCmInstructionSet(ROCmArchitecture.GCN3, 8, 0, 3),
+            ROCmInstructionSet.GCN4 => new BackendROCmInstructionSet(ROCmArchitecture.GCN4, 9, 0, 0),
+            ROCmInstructionSet.GCN5 => new BackendROCmInstructionSet(ROCmArchitecture.GCN5, 9, 0, 6),
+            ROCmInstructionSet.RDNA1 => new BackendROCmInstructionSet(ROCmArchitecture.RDNA1, 10, 1, 0),
+            ROCmInstructionSet.RDNA2 => new BackendROCmInstructionSet(ROCmArchitecture.RDNA2, 10, 3, 0),
+            ROCmInstructionSet.RDNA3 => new BackendROCmInstructionSet(ROCmArchitecture.RDNA3, 11, 0, 0),
+            ROCmInstructionSet.RDNA4 => new BackendROCmInstructionSet(ROCmArchitecture.RDNA3, 11, 0, 0), // RDNA4 not defined in backend yet
+            _ => new BackendROCmInstructionSet(ROCmArchitecture.Unknown, 0, 0, 0)
+        };
+
+        /// <summary>
+        /// Converts runtime capabilities to backend capabilities.
+        /// </summary>
+        /// <param name="capabilities">The runtime capabilities.</param>
+        /// <returns>The backend capabilities.</returns>
+        private static BackendROCmCapabilities ConvertCapabilities(ROCmCapabilities capabilities) => 
+            new BackendROCmCapabilities(
+                ROCmArchitecture.GCN5, // Default architecture
+                36, // Default compute units
+                64, // Default wavefront size
+                40, // Default max wavefronts per CU
+                65536, // Default LDS size
+                capabilities.SupportsCooperativeGroups, // Use cooperative groups support
+                true, // Default concurrent kernels
+                capabilities.SupportsUnifiedMemory, // Use unified memory support
+                false, // Default FP16
+                false, // Default packed FP16
+                false, // Default INT8
+                false  // Default matrix ops
+            );
     }
 
     /// <summary>
