@@ -37,7 +37,7 @@ namespace ILGPU.Runtime.MultiGPU
         private readonly ConcurrentQueue<MultiGPUWorkItem> workQueue;
         private readonly Timer? loadBalancingTimer;
         private readonly ConcurrentDictionary<int, double> loadStats;
-        private readonly object lockObject = new();
+        private readonly Lock lockObject = new();
 
         private long totalOperations;
         private TimeSpan totalExecutionTime;

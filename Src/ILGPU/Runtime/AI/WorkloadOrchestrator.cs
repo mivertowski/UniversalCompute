@@ -182,7 +182,7 @@ namespace ILGPU.Runtime.AI
             // Aggregate results if needed
             if (workload.RequiresAggregation)
             {
-                await workload.AggregateResultsAsync(partitions).ConfigureAwait(false);
+                await workload.AggregateResultsAsync(partitions, cancellationToken).ConfigureAwait(false);
             }
         }
 

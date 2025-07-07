@@ -56,7 +56,7 @@ namespace ILGPU.Runtime.Profiling
 
         #region Fields
 
-        private readonly object sessionLock = new();
+        private readonly Lock sessionLock = new();
         private readonly ConcurrentBag<ProfileSessionReport> completedSessions = [];
         private readonly ConcurrentDictionary<string, KernelExecutionRecord> activeKernelExecutions = new();
         private readonly ConcurrentDictionary<string, MemoryOperationRecord> activeMemoryOperations = new();
@@ -393,7 +393,7 @@ namespace ILGPU.Runtime.Profiling
                 FastestExecution = TimeSpan.FromTicks(executions.Min(e => e.ExecutionTime.Ticks)),
                 SlowestExecution = TimeSpan.FromTicks(executions.Max(e => e.ExecutionTime.Ticks)),
                 TotalCompilationTime = TimeSpan.FromTicks(totalCompTime),
-                AverageThroughput = throughputs.Any() ? throughputs.Average() : 0.0,
+                AverageThroughput = throughputs.Count > 0 ? throughputs.Average() : 0.0,
                 KernelStats = kernelStats,
                 TotalThreadsExecuted = totalThreads,
                 CompilationCacheHitRatio = cacheHitRatio
@@ -420,8 +420,8 @@ namespace ILGPU.Runtime.Profiling
             {
                 TotalOperations = operations.Count,
                 TotalBytesTransferred = totalBytes,
-                AverageBandwidth = bandwidths.Any() ? bandwidths.Average() : 0.0,
-                PeakBandwidth = bandwidths.Any() ? bandwidths.Max() : 0.0,
+                AverageBandwidth = bandwidths.Count > 0 ? bandwidths.Average() : 0.0,
+                PeakBandwidth = bandwidths.Count > 0 ? bandwidths.Max() : 0.0,
                 TotalAllocationTime = TimeSpan.FromTicks(
                     operations.Where(o => o.OperationType == MemoryOperationType.Allocation)
                              .Sum(o => o.Duration.Ticks)),
@@ -511,8 +511,8 @@ namespace ILGPU.Runtime.Profiling
                 TotalBytes = totalBytes,
                 TotalTime = TimeSpan.FromTicks(totalTime),
                 AverageTime = TimeSpan.FromTicks(totalTime / operations.Count),
-                AverageBandwidth = bandwidths.Any() ? bandwidths.Average() : 0.0,
-                PeakBandwidth = bandwidths.Any() ? bandwidths.Max() : 0.0,
+                AverageBandwidth = bandwidths.Count > 0 ? bandwidths.Average() : 0.0,
+                PeakBandwidth = bandwidths.Count > 0 ? bandwidths.Max() : 0.0,
                 FailedOperations = failedOps
             };
         }

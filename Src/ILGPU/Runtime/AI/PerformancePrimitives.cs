@@ -515,7 +515,9 @@ namespace ILGPU.Runtime.AI
         protected PerformancePrimitivesBase(Accelerator accelerator)
         {
             Accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
+            #pragma warning disable CA2214 // Do not call overridable methods during construction
             Capabilities = InitializeCapabilities();
+            #pragma warning restore CA2214
         }
 
         /// <summary>

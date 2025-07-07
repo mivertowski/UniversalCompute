@@ -37,7 +37,7 @@ namespace ILGPU.Runtime.KernelCache
         private readonly ConcurrentDictionary<string, DateTime> accessTimes;
         private readonly KernelCacheOptions options;
         private readonly Timer? maintenanceTimer;
-        private readonly object lockObject = new();
+        private readonly Lock lockObject = new();
 
         private long totalHits;
         private long totalMisses;

@@ -17,6 +17,7 @@
 
 using ILGPU.Runtime.Cuda;
 using System;
+using System.Threading;
 
 namespace ILGPU.Runtime.UnifiedMemory
 {
@@ -29,7 +30,7 @@ namespace ILGPU.Runtime.UnifiedMemory
     {
         #region Instance
 
-        private readonly object syncLock = new();
+        private readonly Lock syncLock = new();
         private readonly MemoryBuffer1D<T, Stride1D.Dense>? _underlyingBuffer;
 
         /// <summary>

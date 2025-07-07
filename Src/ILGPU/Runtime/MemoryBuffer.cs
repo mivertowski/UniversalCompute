@@ -28,7 +28,7 @@ namespace ILGPU.Runtime
     {
         #region Instance
 
-        private readonly object _usageInfoLock = new();
+        private readonly Lock _usageInfoLock = new();
         private MemoryUsageInfo _usageInfo;
 
         /// <summary>

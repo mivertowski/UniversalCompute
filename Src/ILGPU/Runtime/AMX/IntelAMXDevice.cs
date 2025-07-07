@@ -318,8 +318,9 @@ namespace ILGPU.Runtime.AMX
                     baseClockFrequency,
                     maxTurboFrequency);
             }
-            catch
+            catch (Exception)
             {
+                // Return null if processor detection fails for any reason
                 return null;
             }
 #pragma warning restore CA1031 // Do not catch general exception types

@@ -36,7 +36,7 @@ namespace ILGPU.Runtime.MemoryPooling
         private readonly ConcurrentDictionary<long, ConcurrentQueue<PooledBuffer>> sizeBuckets;
         private readonly ConcurrentDictionary<PooledBuffer, DateTime> rentedBuffers;
         private readonly Timer trimTimer;
-        private readonly object statsLock = new();
+        private readonly Lock statsLock = new();
         
         private long totalAllocations;
         private long totalDeallocations;

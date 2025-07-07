@@ -34,7 +34,7 @@ namespace ILGPU.Runtime
     /// </remarks>
     public static class GpuErrorHandler
     {
-        private static readonly object ErrorCountLock = new();
+        private static readonly Lock ErrorCountLock = new();
         private static readonly Dictionary<GpuErrorCode, int> ErrorCounts = [];
         private static readonly List<IGpuErrorLogger> ErrorLoggers = [];
 
@@ -279,12 +279,15 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets error statistics.
         /// </summary>
-        /// <returns>A dictionary of error codes and their occurrence counts.</returns>
-        public static IReadOnlyDictionary<GpuErrorCode, int> GetErrorStatistics()
+        /// <value>A dictionary of error codes and their occurrence counts.</value>
+        public static IReadOnlyDictionary<GpuErrorCode, int> ErrorStatistics
         {
-            lock (ErrorCountLock)
+            get
             {
-                return new Dictionary<GpuErrorCode, int>(ErrorCounts);
+                lock (ErrorCountLock)
+                {
+                    return new Dictionary<GpuErrorCode, int>(ErrorCounts);
+                }
             }
         }
 

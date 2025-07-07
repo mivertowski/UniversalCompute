@@ -406,7 +406,7 @@ namespace ILGPU.Runtime.AI
             }
             
             // Default to single accelerator
-            var bestProfile = profiles.FirstOrDefault(p => p.CanExecute(workload)) ?? profiles.First();
+            var bestProfile = profiles.FirstOrDefault(p => p.CanExecute(workload)) ?? profiles[0];
             return new SingleAcceleratorStrategy(bestProfile.Accelerator);
         }
 

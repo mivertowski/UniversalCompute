@@ -55,7 +55,7 @@ public record HardwareInfo
 public static class HardwareDetection
 {
     private static HardwareInfo? _cachedInfo;
-    private static readonly object _lock = new();
+    private static readonly Lock _lock = new();
 
     /// <summary>
     /// Gets comprehensive hardware information with caching.

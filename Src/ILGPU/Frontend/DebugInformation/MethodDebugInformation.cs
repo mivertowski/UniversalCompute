@@ -12,6 +12,7 @@
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Threading;
 
 namespace ILGPU.Frontend.DebugInformation
 {
@@ -92,7 +93,7 @@ namespace ILGPU.Frontend.DebugInformation
         /// <summary>
         /// The internal synchronization object.
         /// </summary>
-        private readonly object syncLock = new();
+        private readonly Lock syncLock = new();
 
         /// <summary>
         /// Constructs method debug information.

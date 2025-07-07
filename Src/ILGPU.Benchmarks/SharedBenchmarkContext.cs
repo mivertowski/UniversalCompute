@@ -15,6 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+
+
 namespace ILGPU.Benchmarks
 {
     /// <summary>
@@ -23,7 +25,7 @@ namespace ILGPU.Benchmarks
     public static class SharedBenchmarkContext
     {
         private static Context? _sharedContext;
-        private static readonly object _lock = new();
+        private static readonly Lock _lock = new();
 
         /// <summary>
         /// Gets or creates a shared ILGPU context for benchmarks.

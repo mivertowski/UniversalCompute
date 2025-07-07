@@ -34,7 +34,7 @@ namespace ILGPU.Memory.Unified
     {
         private readonly Dictionary<IntPtr, MemoryAllocation> _allocations = [];
         private long _totalAllocatedBytes;
-        private readonly object _syncLock = new();
+        private readonly Lock _syncLock = new();
 
         /// <summary>
         /// Gets the associated accelerator.
@@ -173,7 +173,7 @@ namespace ILGPU.Memory.Unified
     public class MemoryUsageTracker : IDisposable
     {
         private readonly Dictionary<Accelerator, MemoryUsageStats> _usageStats = [];
-        private readonly object _syncLock = new();
+        private readonly Lock _syncLock = new();
 
         /// <summary>
         /// Updates usage statistics for an accelerator.

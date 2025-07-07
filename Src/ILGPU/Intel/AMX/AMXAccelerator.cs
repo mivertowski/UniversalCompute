@@ -20,6 +20,7 @@ using ILGPU.Intel.AMX.Native;
 using ILGPU.Runtime;
 using ILGPU.IR.Analyses;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Intel.AMX
 {
@@ -306,6 +307,8 @@ namespace ILGPU.Intel.AMX
     public sealed class AMXStream(AMXAccelerator accelerator) : AcceleratorStream(accelerator)
 #pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+            Justification = "AMXAccelerator is not owned by this stream and should not be disposed")]
         private readonly AMXAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
         /// <summary>

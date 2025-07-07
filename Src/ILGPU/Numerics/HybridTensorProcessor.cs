@@ -259,7 +259,7 @@ namespace ILGPU.Numerics.Hybrid
         private readonly Context context;
         private readonly Accelerator[] accelerators;
         private HybridProcessorStats stats;
-        private readonly object statsLock = new();
+        private readonly Lock statsLock = new();
         private bool disposed;
 
         /// <summary>

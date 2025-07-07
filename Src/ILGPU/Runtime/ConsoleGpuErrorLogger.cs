@@ -77,7 +77,9 @@ namespace ILGPU.Runtime
 
             if (exception.Context.Count > 0)
             {
+                #pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.WriteLine("  Context:");
+                #pragma warning restore CA1303
                 foreach (var kvp in exception.Context)
                 {
                     Console.WriteLine($"    {kvp.Key}: {kvp.Value}");
@@ -88,7 +90,9 @@ namespace ILGPU.Runtime
             if (suggestions != null)
             {
                 bool hasSuggestions = false;
+                #pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.WriteLine("  Recovery Suggestions:");
+                #pragma warning restore CA1303
                 foreach (var suggestion in suggestions)
                 {
                     Console.WriteLine($"    • {suggestion}");
@@ -97,13 +101,17 @@ namespace ILGPU.Runtime
                 
                 if (!hasSuggestions)
                 {
+                    #pragma warning disable CA1303 // Do not pass literals as localized parameters
                     Console.WriteLine("    • No specific suggestions available");
+                    #pragma warning restore CA1303
                 }
             }
 
             if (IncludeStackTrace && severity == ErrorSeverity.Critical && exception.StackTrace != null)
             {
+                #pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.WriteLine("  Stack Trace:");
+                #pragma warning restore CA1303
                 Console.WriteLine($"    {exception.StackTrace.Replace("\n", "\n    ", StringComparison.Ordinal)}");
             }
 

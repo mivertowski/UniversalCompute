@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace ILGPU.Runtime.KernelCache
 {
@@ -28,7 +29,7 @@ namespace ILGPU.Runtime.KernelCache
     public static class AcceleratorKernelCache
     {
         private static readonly Dictionary<Accelerator, IKernelCache> acceleratorCaches = [];
-        private static readonly object lockObject = new();
+        private static readonly Lock lockObject = new();
 
         /// <summary>
         /// Gets or creates a kernel cache for the specified accelerator.

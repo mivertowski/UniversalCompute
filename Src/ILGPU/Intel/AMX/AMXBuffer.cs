@@ -18,6 +18,7 @@
 using ILGPU.Backends;
 using ILGPU.Runtime;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace ILGPU.Intel.AMX
@@ -45,7 +46,7 @@ namespace ILGPU.Intel.AMX
             // Allocate aligned memory for optimal AMX performance
             _nativePtr = AllocateAlignedMemory(_lengthInBytes, 64); // 64-byte alignment for AMX
             if (_nativePtr == IntPtr.Zero)
-                throw new OutOfMemoryException("Failed to allocate AMX buffer memory");
+                throw new InvalidOperationException("Failed to allocate AMX buffer memory");
                 
             // Set the base class NativePtr property
             NativePtr = _nativePtr;
@@ -188,6 +189,8 @@ namespace ILGPU.Intel.AMX
     /// <param name="compiledKernel">The compiled kernel.</param>
     public sealed class AMXKernel(AMXAccelerator accelerator, CompiledKernel compiledKernel) : Kernel(accelerator, compiledKernel, null)
     {
+        [SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed", 
+            Justification = "AMXAccelerator disposal is handled appropriately in DisposeAcceleratorObject")]
         private readonly AMXAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
 

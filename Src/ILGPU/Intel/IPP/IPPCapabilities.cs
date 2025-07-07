@@ -21,6 +21,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using ILGPU.Intel.IPP.Native;
 
 namespace ILGPU.Intel.IPP
@@ -31,7 +32,7 @@ namespace ILGPU.Intel.IPP
     public static class IPPCapabilities
     {
         private static IPPInfo? _cachedInfo;
-        private static readonly object _lockObject = new();
+        private static readonly Lock _lockObject = new();
 
         /// <summary>
         /// Detects if Intel IPP is available on the current system.

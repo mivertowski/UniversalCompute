@@ -169,7 +169,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleSelect(MethodCallExpression methodCall)
+        private ConstantExpression HandleSelect(MethodCallExpression methodCall)
         {
             var source = Visit(methodCall.Arguments[0]);
             var selector = (LambdaExpression)((UnaryExpression)methodCall.Arguments[1]).Operand;
@@ -225,7 +225,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="methodCall">The method call expression.</param>
         /// <param name="operation">The reduction operation name.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleReduction(MethodCallExpression methodCall, string operation)
+        private ConstantExpression HandleReduction(MethodCallExpression methodCall, string operation)
         {
             var source = Visit(methodCall.Arguments[0]);
             var sourceBuffer = GetBuffer(source);
@@ -263,7 +263,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleAny(MethodCallExpression methodCall)
+        private ConstantExpression HandleAny(MethodCallExpression methodCall)
         {
             var source = Visit(methodCall.Arguments[0]);
             var sourceBuffer = GetBuffer(source);
@@ -282,7 +282,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleAll(MethodCallExpression methodCall)
+        private ConstantExpression HandleAll(MethodCallExpression methodCall)
         {
             var source = Visit(methodCall.Arguments[0]);
             var predicate = methodCall.Arguments.Count > 1 ? 

@@ -435,7 +435,11 @@ namespace ILGPU.Runtime.AMX
                 try
                 {
                     // Release any AMX-specific resources
-                    AMXNative.ReleaseTiles();
+                    var result = AMXNative.ReleaseTiles();
+                    if (result != 0)
+                    {
+                        // Log or handle the error if needed, but don't throw during disposal
+                    }
                 }
                 catch
                 {
@@ -454,7 +458,9 @@ namespace ILGPU.Runtime.AMX
         /// </summary>
         public void PrintAMXInformation()
         {
+            #pragma warning disable CA1303 // Do not pass literals as localized parameters
             Console.WriteLine($"Intel AMX Accelerator Information:");
+            #pragma warning restore CA1303
             Console.WriteLine($"  Name: {Name}");
             Console.WriteLine($"  Processor: {Device.ProcessorName}");
             Console.WriteLine($"  AMX Support: {AMXNative.IsAMXSupported()}");

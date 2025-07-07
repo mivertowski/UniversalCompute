@@ -88,7 +88,7 @@ namespace ILGPU.Numerics
         private bool disposed;
         
         // Synchronization
-        private readonly object syncLock = new();
+        private readonly Lock syncLock = new();
 
         /// <summary>
         /// Initializes a new unified tensor.

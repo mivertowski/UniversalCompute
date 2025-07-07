@@ -90,7 +90,7 @@ namespace ILGPU.Runtime.CPU
         /// Shared-memory allocation lock object for synchronizing accesses to the
         /// <see cref="sharedMemory" /> list.
         /// </summary>
-        private readonly object sharedMemoryLock = new();
+        private readonly Lock sharedMemoryLock = new();
 
         #endregion
 

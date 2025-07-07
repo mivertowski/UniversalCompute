@@ -238,8 +238,10 @@ namespace ILGPU.IR.Intrinsics
         protected TypedIntrinsicValueMatcher(ValueKind valueKind)
             : base(valueKind)
         {
+            #pragma warning disable CA2263 // Generic overload not available due to type constraints
             var values = Enum.GetValues(typeof(TValueKind));
-            var basicValues = Enum.GetValues(typeof(BasicValueType));
+            #pragma warning restore CA2263
+            var basicValues = Enum.GetValues<BasicValueType>();
             entries = new T[values.Length, basicValues.Length];
         }
 
