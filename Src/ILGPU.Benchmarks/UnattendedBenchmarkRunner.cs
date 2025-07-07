@@ -15,8 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
 using ILGPU.Benchmarks.Benchmarks;
 using ILGPU.Benchmarks.Infrastructure;
 using Microsoft.Extensions.Logging;
@@ -547,9 +545,7 @@ public class UnattendedBenchmarkRunner
             return $"{opsPerSec / 1_000_000_000:F2}B ops/s";
         if (opsPerSec >= 1_000_000)
             return $"{opsPerSec / 1_000_000:F2}M ops/s";
-        if (opsPerSec >= 1_000)
-            return $"{opsPerSec / 1_000:F2}K ops/s";
-        return $"{opsPerSec:F2} ops/s";
+        return opsPerSec >= 1_000 ? $"{opsPerSec / 1_000:F2}K ops/s" : $"{opsPerSec:F2} ops/s";
     }
 }
 

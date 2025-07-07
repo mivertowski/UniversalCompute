@@ -105,11 +105,11 @@ namespace ILGPU.Analyzers
             var structDeclaration =
                 SF.StructDeclaration(targetSymbol.Name)
                 .WithModifiers(
-                    SF.TokenList(new[]
-                    {
+                    SF.TokenList(
+                    [
                         SF.Token(SyntaxKind.UnsafeKeyword),
                         SF.Token(SyntaxKind.PartialKeyword)
-                    }))
+                    ]))
                 .WithMembers(SF.List(members));
 
             // Enclose in parent declarations.
@@ -298,11 +298,11 @@ namespace ILGPU.Analyzers
                                     SF.SingletonSeparatedList(
                                         SF.Argument(fieldSize)))))))
                 .WithModifiers(
-                    SF.TokenList(new[]
-                    {
+                    SF.TokenList(
+                    [
                         SF.Token(accessibility.ToSyntaxKind()),
                         SF.Token(SyntaxKind.FixedKeyword)
-                    }));
+                    ]));
 
             return fieldDecl;
         }

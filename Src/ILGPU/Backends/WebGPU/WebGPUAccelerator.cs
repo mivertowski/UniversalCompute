@@ -15,13 +15,10 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends;
-using ILGPU.Backends.WebGPU;
 using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.JavaScript;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ILGPU.Backends.WebGPU
@@ -101,14 +98,14 @@ namespace ILGPU.Backends.WebGPU
 
             var commandEncoder = WebGPUDevice.CreateCommandEncoder();
             var passEncoder = commandEncoder.BeginComputePass();
-            
-            passEncoder.SetPipeline(computePipeline);
-            passEncoder.SetBindGroup(0, bindGroup);
-            passEncoder.DispatchWorkgroups(workgroupCountX, workgroupCountY, workgroupCountZ);
-            passEncoder.End();
+
+            WebGPUComputePassEncoder.SetPipeline(computePipeline);
+            WebGPUComputePassEncoder.SetBindGroup(0, bindGroup);
+            WebGPUComputePassEncoder.DispatchWorkgroups(workgroupCountX, workgroupCountY, workgroupCountZ);
+            WebGPUComputePassEncoder.End();
 
             var commandBuffer = commandEncoder.Finish();
-            Queue.Submit(commandBuffer);
+            WebGPUQueue.Submit(commandBuffer);
 
             // Wait for completion
             await WaitForCompletion();
@@ -159,7 +156,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Waits for all GPU operations to complete.
         /// </summary>
-        private async Task WaitForCompletion() =>
+        private static async Task WaitForCompletion() =>
             // WebGPU operations are asynchronous by nature
             // This would typically involve waiting for promises to resolve
             await Task.Delay(1); // Minimal delay - real implementation would wait for GPU
@@ -178,27 +175,27 @@ namespace ILGPU.Backends.WebGPU
 
         protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new WebGPUBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new WebGPUKernel(this, compiledKernel);
+        protected override Kernel LoadKernelInternal(CompiledKernel kernel) => new WebGPUKernel(this, kernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
                 (int)Capabilities.MaxWorkgroupSize,
                 Capabilities.MaxSharedMemorySize);
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override Kernel LoadImplicitlyGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
                 Math.Min(customGroupSize, (int)Capabilities.MaxWorkgroupSize),
                 Capabilities.MaxSharedMemorySize);
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
@@ -254,15 +251,10 @@ namespace ILGPU.Backends.WebGPU
             // WebGPU doesn't support page locking
             null!;
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            if (typeof(TExtension) == typeof(WebGPUWebAssemblyExtension))
-            {
-                return (TExtension)(object)new WebGPUWebAssemblyExtension(this);
-            }
-            
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => typeof(TExtension) == typeof(WebGPUWebAssemblyExtension)
+                ? (TExtension)(object)new WebGPUWebAssemblyExtension(this)
+                :
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by WebGPU accelerator");
-        }
 
         protected override void OnBind()
         {
@@ -291,7 +283,7 @@ namespace ILGPU.Backends.WebGPU
 
         #region Private Methods
 
-        private void InitializeAcceleratorProperties()
+        private static void InitializeAcceleratorProperties()
         {
             // Properties are now handled through the Device base class
             // No direct assignment needed as they are read-only properties
@@ -409,7 +401,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Gets whether running in a WebAssembly environment.
         /// </summary>
-        public bool IsWebAssembly =>
+        public static bool IsWebAssembly =>
 #if BROWSER
             true;
 #else
@@ -422,7 +414,7 @@ namespace ILGPU.Backends.WebGPU
         /// <param name="jsArrayBuffer">JavaScript ArrayBuffer.</param>
         /// <param name="webgpuBuffer">WebGPU buffer.</param>
         /// <returns>Task representing the transfer operation.</returns>
-        public async Task TransferFromJavaScriptAsync(JSObject jsArrayBuffer, WebGPUBuffer webgpuBuffer)
+        public static async Task TransferFromJavaScriptAsync(JSObject jsArrayBuffer, WebGPUBuffer webgpuBuffer)
         {
             if (!IsWebAssembly)
                 throw new NotSupportedException("JavaScript interop only available in WebAssembly");

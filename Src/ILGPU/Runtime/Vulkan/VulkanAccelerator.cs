@@ -18,7 +18,6 @@
 using ILGPU.Backends;
 using ILGPU.IR.Analyses;
 using ILGPU.Runtime.Vulkan.Native;
-using ILGPU.Util;
 using System;
 using System.Collections.Immutable;
 
@@ -231,7 +230,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public new static AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the name of this accelerator.
@@ -261,12 +260,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => Device.MaxSharedMemoryPerGroup;
+        public new static long MaxSharedMemoryPerGroup => VulkanDevice.MaxSharedMemoryPerGroup;
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory => Device.MaxConstantMemory;
+        public new static long MaxConstantMemory => VulkanDevice.MaxConstantMemory;
 
         /// <summary>
         /// Gets the warp size (subgroup size on Vulkan).
@@ -460,7 +459,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <param name="k">Columns in A, rows in B.</param>
         /// <param name="n">Columns in B and C.</param>
         /// <param name="stream">Vulkan stream.</param>
-        public unsafe void ExecuteMatMul(
+        public static unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             VulkanStream? stream = null)

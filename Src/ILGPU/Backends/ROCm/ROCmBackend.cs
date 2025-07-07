@@ -16,11 +16,8 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends.EntryPoints;
-using ILGPU.IR;
 using ILGPU.IR.Analyses;
 using ILGPU.Runtime;
-using ILGPU.Runtime.ROCm;
-using ILGPU.Util;
 using System;
 
 namespace ILGPU.Backends.ROCm
@@ -128,7 +125,7 @@ namespace ILGPU.Backends.ROCm
         /// <summary>
         /// Gets the backend type.
         /// </summary>
-        public string Name => "ROCm";
+        public static string Name => "ROCm";
 
         #endregion
     }

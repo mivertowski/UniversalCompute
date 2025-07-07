@@ -18,7 +18,6 @@
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
 using ILGPU.TensorCores;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 

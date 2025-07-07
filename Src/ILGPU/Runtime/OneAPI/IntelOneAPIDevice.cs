@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Runtime.OneAPI.Native;
-using ILGPU.Util;
 using System;
 using System.Diagnostics;
 
@@ -123,7 +122,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public new static AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -200,7 +199,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the device vendor.
         /// </summary>
-        public string Vendor => "Intel";
+        public static string Vendor => "Intel";
 
         /// <summary>
         /// Gets the device ID.
@@ -246,10 +245,10 @@ namespace ILGPU.Runtime.OneAPI
             catch (Exception)
             {
                 // Return fallback device on any error
-                return new[]
-                {
+                return
+                [
                     new IntelOneAPIDevice(new IntPtr(-1), GetFallbackDeviceInfo())
-                };
+                ];
             }
         }
 

@@ -15,7 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends;
 using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
@@ -105,7 +104,7 @@ namespace ILGPU.Backends.WebGPU
             return _accelerator.CreateComputePipeline(wgslSource, "main");
         }
 
-        private string CompileToWGSL(CompiledKernel compiledKernel) =>
+        private static string CompileToWGSL(CompiledKernel compiledKernel) =>
             // This would contain the actual compilation from ILGPU IR to WGSL
             // For now, return a placeholder WGSL compute shader
 
@@ -129,7 +128,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
 }
 ";
 
-        private (uint workgroupCountX, uint workgroupCountY, uint workgroupCountZ) CalculateWorkgroupConfiguration<TIndex>(TIndex extent)
+        private static (uint workgroupCountX, uint workgroupCountY, uint workgroupCountZ) CalculateWorkgroupConfiguration<TIndex>(TIndex extent)
             where TIndex : struct, IIndex
         {
             const uint workgroupSize = 64; // Common WebGPU workgroup size
@@ -188,7 +187,7 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
             return Task.FromResult(_accelerator.CreateBindGroup(layout, entries));
         }
 
-        private WebGPUBindGroupEntry[] CreateBindGroupEntries(KernelParameters parameters)
+        private static WebGPUBindGroupEntry[] CreateBindGroupEntries(KernelParameters parameters)
         {
             // Convert kernel parameters to WebGPU bind group entries
             // This would handle different parameter types (buffers, textures, uniforms)
@@ -241,7 +240,9 @@ fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
     /// <summary>
     /// WebGPU stream implementation.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class WebGPUStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         private readonly WebGPUAccelerator _accelerator;
 

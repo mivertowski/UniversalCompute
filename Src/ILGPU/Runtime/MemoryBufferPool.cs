@@ -101,8 +101,7 @@ namespace ILGPU.Runtime
             get
             {
                 var total = Volatile.Read(ref totalAllocations);
-                if (total == 0) return 0.0;
-                return (double)Volatile.Read(ref totalHits) / total;
+                return total == 0 ? 0.0 : (double)Volatile.Read(ref totalHits) / total;
             }
         }
 
@@ -421,7 +420,11 @@ namespace ILGPU.Runtime
         public long TotalBytesAllocated { get; } = totalBytesAllocated;
         public long TotalBytesReused { get; } = totalBytesReused;
         public long TotalPooledBytes { get; } = totalPooledBytes;
+#pragma warning disable CA1819 // Properties should not return arrays
         public int[] BucketCounts { get; } = bucketCounts;
+#pragma warning restore CA1819 // Properties should not return arrays
+#pragma warning disable CA1819 // Properties should not return arrays
         public long[] BucketSizes { get; } = bucketSizes;
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 }

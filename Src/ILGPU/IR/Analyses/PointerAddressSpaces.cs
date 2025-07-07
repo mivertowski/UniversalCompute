@@ -472,16 +472,12 @@ namespace ILGPU.IR.Analyses
         /// </summary>
         /// <param name="node">The IR node.</param>
         /// <returns>The initial address space information.</returns>
-        protected AddressSpaceInfo GetInitialInfo(Value node)
-        {
-            if (!(node.Type is AddressSpaceType type))
-                return default;
-            return
-                type.AddressSpace != MemoryAddressSpace.Generic ||
+        protected AddressSpaceInfo GetInitialInfo(Value node) => !(node.Type is AddressSpaceType type)
+                ? default
+                : type.AddressSpace != MemoryAddressSpace.Generic ||
                 !HasFlags(AnalysisFlags.IgnoreGenericAddressSpace)
                 ? type.AddressSpace
                 : default(AddressSpaceInfo);
-        }
 
         /// <summary>
         /// Creates initial analysis data.

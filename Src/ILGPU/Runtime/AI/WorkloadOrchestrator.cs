@@ -300,16 +300,14 @@ namespace ILGPU.Runtime.AI
         {
             if (typeof(T) == typeof(float)) return (T)(object)1.0f;
             if (typeof(T) == typeof(double)) return (T)(object)1.0;
-            if (typeof(T) == typeof(int)) return (T)(object)1;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(int) ? (T)(object)1 : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T GetZero<T>() where T : unmanaged
         {
             if (typeof(T) == typeof(float)) return (T)(object)0.0f;
             if (typeof(T) == typeof(double)) return (T)(object)0.0;
-            if (typeof(T) == typeof(int)) return (T)(object)0;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(int) ? (T)(object)0 : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         /// <summary>
@@ -361,18 +359,15 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         /// <param name="workload">The workload.</param>
         /// <returns>True if can execute; otherwise, false.</returns>
-        public bool CanExecute(IWorkload workload)
-        {
-            if (workload == null) return false;
-            
-            return workload.WorkloadType switch
-            {
-                WorkloadType.MatrixMultiplication => Primitives.Capabilities.SupportsAcceleratedGemm,
-                WorkloadType.Convolution => Primitives.Capabilities.SupportsAcceleratedConvolution,
-                WorkloadType.Attention => Primitives.Capabilities.SupportsAcceleratedAttention,
-                _ => true // Generic workloads can run on any accelerator
-            };
-        }
+        public bool CanExecute(IWorkload workload) => workload == null
+                ? false
+                : workload.WorkloadType switch
+                {
+                    WorkloadType.MatrixMultiplication => Primitives.Capabilities.SupportsAcceleratedGemm,
+                    WorkloadType.Convolution => Primitives.Capabilities.SupportsAcceleratedConvolution,
+                    WorkloadType.Attention => Primitives.Capabilities.SupportsAcceleratedAttention,
+                    _ => true // Generic workloads can run on any accelerator
+                };
     }
 
     /// <summary>

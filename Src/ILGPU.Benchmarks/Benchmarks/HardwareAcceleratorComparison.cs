@@ -173,50 +173,35 @@ public class HardwareAcceleratorComparison : IDisposable
     public float CPUBaseline()
     {
         var cpuAccelerator = availableAccelerators.FirstOrDefault(a => a.Name == "CPU").Accelerator;
-        if (cpuAccelerator == null)
-            return 0.0f;
-
-        return ExecuteMatrixOperation(cpuAccelerator, "CPU Baseline");
+        return cpuAccelerator == null ? 0.0f : ExecuteMatrixOperation(cpuAccelerator, "CPU Baseline");
     }
 
     [Benchmark]
     public float GPUStandard()
     {
         var gpuAccelerator = availableAccelerators.FirstOrDefault(a => a.Name == "GPU").Accelerator;
-        if (gpuAccelerator == null)
-            return 0.0f;
-
-        return ExecuteMatrixOperation(gpuAccelerator, "GPU Standard");
+        return gpuAccelerator == null ? 0.0f : ExecuteMatrixOperation(gpuAccelerator, "GPU Standard");
     }
 
     [Benchmark]
     public float IntelAMXHardware()
     {
         var amxAccelerator = availableAccelerators.FirstOrDefault(a => a.Name == "Intel AMX").Accelerator;
-        if (amxAccelerator == null)
-            return 0.0f;
-
-        return ExecuteMatrixOperation(amxAccelerator, "Intel AMX");
+        return amxAccelerator == null ? 0.0f : ExecuteMatrixOperation(amxAccelerator, "Intel AMX");
     }
 
     [Benchmark]
     public float IntelNPUHardware()
     {
         var npuAccelerator = availableAccelerators.FirstOrDefault(a => a.Name == "Intel NPU").Accelerator;
-        if (npuAccelerator == null)
-            return 0.0f;
-
-        return ExecuteMatrixOperation(npuAccelerator, "Intel NPU");
+        return npuAccelerator == null ? 0.0f : ExecuteMatrixOperation(npuAccelerator, "Intel NPU");
     }
 
     [Benchmark]
     public float AppleANEHardware()
     {
         var aneAccelerator = availableAccelerators.FirstOrDefault(a => a.Name == "Apple ANE").Accelerator;
-        if (aneAccelerator == null)
-            return 0.0f;
-
-        return ExecuteMatrixOperation(aneAccelerator, "Apple ANE");
+        return aneAccelerator == null ? 0.0f : ExecuteMatrixOperation(aneAccelerator, "Apple ANE");
     }
 
     [Benchmark]

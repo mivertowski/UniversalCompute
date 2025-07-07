@@ -121,11 +121,8 @@ namespace ILGPU.Backends.OneAPI.Native
                 IntPtr.Zero,
                 IntPtr.Zero,
                 out var errCode);
-            
-            if (errCode != 0)
-                throw new InvalidOperationException($"Failed to create context: {errCode}");
-            
-            return context;
+
+            return errCode != 0 ? throw new InvalidOperationException($"Failed to create context: {errCode}") : context;
         }
 
         /// <summary>
@@ -151,11 +148,8 @@ namespace ILGPU.Backends.OneAPI.Native
                 device,
                 IntPtr.Zero,
                 out var errCode);
-            
-            if (errCode != 0)
-                throw new InvalidOperationException($"Failed to create queue: {errCode}");
-            
-            return queue;
+
+            return errCode != 0 ? throw new InvalidOperationException($"Failed to create queue: {errCode}") : queue;
         }
 
         /// <summary>
@@ -291,11 +285,10 @@ namespace ILGPU.Backends.OneAPI.Native
                     logSize,
                     logBuffer,
                     out _);
-                
-                if (hresult != 0)
-                    return $"Failed to get build log: HRESULT 0x{hresult:X8}";
-                
-                return Marshal.PtrToStringAnsi(logBuffer) ?? "Failed to read build log";
+
+                return hresult != 0
+                    ? $"Failed to get build log: HRESULT 0x{hresult:X8}"
+                    : Marshal.PtrToStringAnsi(logBuffer) ?? "Failed to read build log";
             }
             finally
             {
@@ -316,7 +309,7 @@ namespace ILGPU.Backends.OneAPI.Native
             IntPtr program,
             uint numDevices,
             [In] IntPtr[] deviceList,
-            [MarshalAs(UnmanagedType.LPStr)] string options,
+            [MarshalAs(UnmanagedType.LPWStr)] string options,
             IntPtr pfnNotify,
             IntPtr userData);
 
@@ -356,17 +349,17 @@ namespace ILGPU.Backends.OneAPI.Native
             {
                 int value = 0;
                 int hresult = clGetDeviceInfo(device, paramName, sizeof(int), &value, out _);
-                if (hresult != 0)
-                    throw new InvalidOperationException($"Failed to get device info (int): HRESULT 0x{hresult:X8}");
-                return (T)(object)value;
+                return hresult != 0
+                    ? throw new InvalidOperationException($"Failed to get device info (int): HRESULT 0x{hresult:X8}")
+                    : (T)(object)value;
             }
             else if (typeof(T) == typeof(long))
             {
                 long value = 0;
                 int hresult = clGetDeviceInfo(device, paramName, sizeof(long), &value, out _);
-                if (hresult != 0)
-                    throw new InvalidOperationException($"Failed to get device info (long): HRESULT 0x{hresult:X8}");
-                return (T)(object)value;
+                return hresult != 0
+                    ? throw new InvalidOperationException($"Failed to get device info (long): HRESULT 0x{hresult:X8}")
+                    : (T)(object)value;
             }
             else if (typeof(T) == typeof(long[]))
             {
@@ -383,11 +376,11 @@ namespace ILGPU.Backends.OneAPI.Native
             {
                 ulong value = 0;
                 int hresult = clGetDeviceInfo(device, paramName, sizeof(ulong), &value, out _);
-                if (hresult != 0)
-                    throw new InvalidOperationException($"Failed to get device info (OneAPIDeviceType): HRESULT 0x{hresult:X8}");
-                return (T)(object)ConvertToDeviceType(value);
+                return hresult != 0
+                    ? throw new InvalidOperationException($"Failed to get device info (OneAPIDeviceType): HRESULT 0x{hresult:X8}")
+                    : (T)(object)ConvertToDeviceType(value);
             }
-            
+
             throw new NotSupportedException($"Type {typeof(T)} not supported for device info query");
         }
 
@@ -529,10 +522,7 @@ namespace ILGPU.Backends.OneAPI.Native
             
             var platforms = new IntPtr[numPlatforms];
             hresult = clGetPlatformIDs(numPlatforms, platforms, out _);
-            if (hresult != 0)
-                throw new InvalidOperationException($"Failed to get platforms: HRESULT 0x{hresult:X8}");
-            
-            return [.. platforms];
+            return hresult != 0 ? throw new InvalidOperationException($"Failed to get platforms: HRESULT 0x{hresult:X8}") : [.. platforms];
         }
 
         /// <summary>
@@ -551,10 +541,7 @@ namespace ILGPU.Backends.OneAPI.Native
             
             var devices = new IntPtr[numDevices];
             hresult = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, numDevices, devices, out _);
-            if (hresult != 0)
-                throw new InvalidOperationException($"Failed to get devices: HRESULT 0x{hresult:X8}");
-            
-            return [.. devices];
+            return hresult != 0 ? throw new InvalidOperationException($"Failed to get devices: HRESULT 0x{hresult:X8}") : [.. devices];
         }
 
         /// <summary>

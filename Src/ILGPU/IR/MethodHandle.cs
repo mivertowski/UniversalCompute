@@ -40,9 +40,9 @@ namespace ILGPU.IR
             if (string.IsNullOrWhiteSpace(serializationString))
                 throw new ArgumentNullException(nameof(serializationString));
             var parts = serializationString.Split('/');
-            if (parts.Length != 2 || !long.TryParse(parts[1], out long id))
-                throw new ArgumentOutOfRangeException(nameof(serializationString));
-            return new MethodHandle(id, parts[0]);
+            return parts.Length != 2 || !long.TryParse(parts[1], out long id)
+                ? throw new ArgumentOutOfRangeException(nameof(serializationString))
+                : new MethodHandle(id, parts[0]);
         }
 
         /// <summary>

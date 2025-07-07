@@ -39,18 +39,14 @@ namespace ILGPU.Runtime
         /// <returns>The allocated memory buffer.</returns>
         /// <exception cref="GpuMemoryException">Thrown when memory allocation fails.</exception>
         public static MemoryBuffer1D<T, Stride1D.Dense> SafeAllocate1D<T>(
-            this Accelerator accelerator, 
+            this Accelerator accelerator,
             long length)
-            where T : unmanaged
-        {
-            if (accelerator == null)
-                throw new ArgumentNullException(nameof(accelerator));
-
-            return GpuErrorHandler.HandleOperation(
+            where T : unmanaged => accelerator == null
+                ? throw new ArgumentNullException(nameof(accelerator))
+                : GpuErrorHandler.HandleOperation(
                 () => accelerator.Allocate1D<T>(length),
                 accelerator,
                 $"Allocate1D<{typeof(T).Name}>[{length}]");
-        }
 
         /// <summary>
         /// Allocates a 2D memory buffer with enhanced error handling.
@@ -65,16 +61,12 @@ namespace ILGPU.Runtime
             this Accelerator accelerator,
             int width,
             int height)
-            where T : unmanaged
-        {
-            if (accelerator == null)
-                throw new ArgumentNullException(nameof(accelerator));
-
-            return GpuErrorHandler.HandleOperation(
+            where T : unmanaged => accelerator == null
+                ? throw new ArgumentNullException(nameof(accelerator))
+                : GpuErrorHandler.HandleOperation(
                 () => accelerator.Allocate2DDenseX<T>(new LongIndex2D(width, height)),
                 accelerator,
                 $"Allocate2D<{typeof(T).Name}>[{width}x{height}]");
-        }
 
         /// <summary>
         /// Loads a 1D kernel with enhanced error handling.
@@ -91,10 +83,9 @@ namespace ILGPU.Runtime
         {
             if (accelerator == null)
                 throw new ArgumentNullException(nameof(accelerator));
-            if (kernelMethod == null)
-                throw new ArgumentNullException(nameof(kernelMethod));
-
-            return GpuErrorHandler.HandleOperation(
+            return kernelMethod == null
+                ? throw new ArgumentNullException(nameof(kernelMethod))
+                : GpuErrorHandler.HandleOperation(
                 () => accelerator.LoadAutoGroupedStreamKernel<Index1D, T>(kernelMethod),
                 accelerator,
                 $"LoadKernel<Action<Index1D, {typeof(T).Name}>>");
@@ -117,10 +108,9 @@ namespace ILGPU.Runtime
         {
             if (accelerator == null)
                 throw new ArgumentNullException(nameof(accelerator));
-            if (kernelMethod == null)
-                throw new ArgumentNullException(nameof(kernelMethod));
-
-            return GpuErrorHandler.HandleOperation(
+            return kernelMethod == null
+                ? throw new ArgumentNullException(nameof(kernelMethod))
+                : GpuErrorHandler.HandleOperation(
                 () => accelerator.LoadAutoGroupedStreamKernel<TIndex, T>(kernelMethod),
                 accelerator,
                 $"LoadAutoGroupedKernel<{typeof(TIndex).Name}, {typeof(T).Name}>");
@@ -151,17 +141,13 @@ namespace ILGPU.Runtime
         /// <exception cref="GpuException">Thrown when synchronization fails.</exception>
         public static Task SafeSynchronizeAsync(
             this AcceleratorStream stream,
-            CancellationToken cancellationToken = default)
-        {
-            if (stream == null)
-                throw new ArgumentNullException(nameof(stream));
-
-            return GpuErrorHandler.HandleOperationAsync(
+            CancellationToken cancellationToken = default) => stream == null
+                ? throw new ArgumentNullException(nameof(stream))
+                : (Task)GpuErrorHandler.HandleOperationAsync(
                 async () => { await stream.SynchronizeAsync().ConfigureAwait(false); return true; },
                 stream.Accelerator,
                 "AsyncStreamSynchronize",
                 cancellationToken);
-        }
 
         /// <summary>
         /// Copies memory from CPU to GPU with enhanced error handling.
@@ -227,12 +213,9 @@ namespace ILGPU.Runtime
         public static Accelerator SafeCreateAccelerator(
             this Context context,
             AcceleratorType acceleratorType,
-            Func<Device[], Device>? deviceSelector = null)
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            return GpuErrorHandler.HandleOperation(() =>
+            Func<Device[], Device>? deviceSelector = null) => context == null
+                ? throw new ArgumentNullException(nameof(context))
+                : GpuErrorHandler.HandleOperation(() =>
             {
                 Device[] devices;
                 switch (acceleratorType)
@@ -285,6 +268,5 @@ namespace ILGPU.Runtime
             },
             null,
             $"CreateAccelerator[{acceleratorType}]");
-        }
     }
 }

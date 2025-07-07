@@ -17,8 +17,6 @@
 
 using ILGPU.Runtime;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices.JavaScript;
 using System.Threading.Tasks;
 
@@ -427,7 +425,7 @@ namespace ILGPU.Backends.WebGPU
         public static async Task<WebGPUAdapter[]> EnumerateAdaptersAsync()
         {
             var adapter = await RequestAdapterAsync();
-            return adapter != null ? new[] { adapter } : Array.Empty<WebGPUAdapter>();
+            return adapter != null ? [adapter] : Array.Empty<WebGPUAdapter>();
         }
 
         /// <summary>
@@ -457,7 +455,7 @@ namespace ILGPU.Backends.WebGPU
 #endif
         }
 
-        private WebGPUAdapterInfo QueryAdapterInfo()
+        private static WebGPUAdapterInfo QueryAdapterInfo()
         {
 #if BROWSER
             if (_jsAdapter != null)
@@ -525,7 +523,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Gets the device queue.
         /// </summary>
-        public WebGPUQueue GetQueue()
+        public static WebGPUQueue GetQueue()
         {
 #if BROWSER
             if (_jsDevice != null)
@@ -540,7 +538,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Creates a command encoder.
         /// </summary>
-        public WebGPUCommandEncoder CreateCommandEncoder()
+        public static WebGPUCommandEncoder CreateCommandEncoder()
         {
 #if BROWSER
             if (_jsDevice != null)
@@ -555,7 +553,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Creates a shader module from WGSL source.
         /// </summary>
-        public WebGPUShaderModule CreateShaderModule(string wgslSource)
+        public static WebGPUShaderModule CreateShaderModule(string wgslSource)
         {
 #if BROWSER
             if (_jsDevice != null)
@@ -573,7 +571,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Creates a compute pipeline.
         /// </summary>
-        public WebGPUComputePipeline CreateComputePipeline(WebGPUShaderModule shaderModule, string entryPoint)
+        public static WebGPUComputePipeline CreateComputePipeline(WebGPUShaderModule shaderModule, string entryPoint)
         {
 #if BROWSER
             if (_jsDevice != null)
@@ -594,7 +592,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Creates a buffer.
         /// </summary>
-        public WebGPUBuffer CreateBuffer(ulong size, WebGPUBufferUsage usage)
+        public static WebGPUBuffer CreateBuffer(ulong size, WebGPUBufferUsage usage)
         {
 #if BROWSER
             if (_jsDevice != null)
@@ -613,7 +611,7 @@ namespace ILGPU.Backends.WebGPU
         /// <summary>
         /// Creates a bind group.
         /// </summary>
-        public WebGPUBindGroup CreateBindGroup(WebGPUBindGroupLayout layout, WebGPUBindGroupEntry[] entries)
+        public static WebGPUBindGroup CreateBindGroup(WebGPUBindGroupLayout layout, WebGPUBindGroupEntry[] entries)
         {
 #if BROWSER
             if (_jsDevice != null)
@@ -651,13 +649,15 @@ namespace ILGPU.Backends.WebGPU
     }
 
     // Placeholder WebGPU wrapper classes - full implementations would contain proper JavaScript interop
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class WebGPUQueue : IDisposable
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         internal JSObject? JSObject { get; private set; }
 
         internal WebGPUQueue(JSObject jsQueue) => JSObject = jsQueue;
 
-        public void Submit(WebGPUCommandBuffer commandBuffer)
+        public static void Submit(WebGPUCommandBuffer commandBuffer)
         {
 #if BROWSER
             JSObject?.Invoke("submit", new[] { commandBuffer.JSObject });
@@ -702,28 +702,28 @@ namespace ILGPU.Backends.WebGPU
 
         internal WebGPUComputePassEncoder(JSObject jsPassEncoder) => JSObject = jsPassEncoder;
 
-        public void SetPipeline(WebGPUComputePipeline pipeline)
+        public static void SetPipeline(WebGPUComputePipeline pipeline)
         {
 #if BROWSER
             JSObject?.Invoke("setPipeline", pipeline.JSObject);
 #endif
         }
 
-        public void SetBindGroup(uint index, WebGPUBindGroup bindGroup)
+        public static void SetBindGroup(uint index, WebGPUBindGroup bindGroup)
         {
 #if BROWSER
             JSObject?.Invoke("setBindGroup", index, bindGroup.JSObject);
 #endif
         }
 
-        public void DispatchWorkgroups(uint x, uint y = 1, uint z = 1)
+        public static void DispatchWorkgroups(uint x, uint y = 1, uint z = 1)
         {
 #if BROWSER
             JSObject?.Invoke("dispatchWorkgroups", x, y, z);
 #endif
         }
 
-        public void End()
+        public static void End()
         {
 #if BROWSER
             JSObject?.Invoke("end");

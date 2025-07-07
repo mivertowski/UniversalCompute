@@ -9,7 +9,6 @@
 // Source License. See LICENSE.txt for details.
 // ---------------------------------------------------------------------------------------
 
-using System;
 using System.Reflection;
 using ILGPU.Benchmarks.Benchmarks;
 using BenchmarkDotNet.Attributes;

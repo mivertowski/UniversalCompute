@@ -260,12 +260,7 @@ namespace ILGPU.Runtime.MultiGPU
             if (workItem == null)
                 throw new ArgumentNullException(nameof(workItem));
 
-            var optimalGpu = SelectOptimalGPU(workItem);
-            if (optimalGpu == null)
-            {
-                throw new InvalidOperationException("No suitable GPU found for the work item");
-            }
-
+            var optimalGpu = SelectOptimalGPU(workItem) ?? throw new InvalidOperationException("No suitable GPU found for the work item");
             try
             {
                 UpdateGPULoad(optimalGpu.Index, 1.0);
@@ -376,13 +371,7 @@ namespace ILGPU.Runtime.MultiGPU
         /// Gets the current load statistics for all GPUs.
         /// </summary>
         /// <returns>Load statistics for each GPU.</returns>
-        public Dictionary<int, double> GetLoadStatistics()
-        {
-            if (disposed)
-                throw new ObjectDisposedException(nameof(MultiGPUOrchestrator));
-
-            return new Dictionary<int, double>(loadStats);
-        }
+        public Dictionary<int, double> GetLoadStatistics() => disposed ? throw new ObjectDisposedException(nameof(MultiGPUOrchestrator)) : new Dictionary<int, double>(loadStats);
 
         /// <summary>
         /// Gets performance metrics for the orchestrator.
@@ -602,10 +591,9 @@ namespace ILGPU.Runtime.MultiGPU
         private GPUInfo? SelectOptimalGPU(MultiGPUWorkItem workItem)
         {
             var candidates = ActiveGPUs.Where(g => workItem.CanExecuteOn(g)).ToList();
-            if (candidates.Count == 0)
-                return null;
-
-            return Options.DistributionStrategy switch
+            return candidates.Count == 0
+                ? null
+                : Options.DistributionStrategy switch
             {
                 WorkDistributionStrategy.PerformanceBased => candidates.OrderByDescending(g => g.PerformanceScore).First(),
                 WorkDistributionStrategy.LoadBased => candidates.OrderBy(g => g.CurrentLoad).First(),

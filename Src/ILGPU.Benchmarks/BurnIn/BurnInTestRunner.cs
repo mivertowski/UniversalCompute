@@ -20,7 +20,6 @@ using ILGPU.Numerics;
 using ILGPU.Numerics.Hybrid;
 using ILGPU.Runtime;
 using ILGPU.SIMD;
-using ILGPU.TensorCores;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using System.Diagnostics;

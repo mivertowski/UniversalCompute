@@ -222,12 +222,10 @@ namespace ILGPU.Core
             // Use reflection to call ToUnifiedTensor for ML.Tensor<T> with INumber<T> constraint
             var method = typeof(TensorExtensions).GetMethod(nameof(ToUnifiedTensor), 
                 [typeof(ILGPU.ML.Tensor<>).MakeGenericType(typeof(T)), typeof(Accelerator)]);
-            
-            if (method != null)
-            {
-                return (ITensorCore<T>)method.Invoke(null, [mlTensor, accelerator])!;
-            }
-            
+
+            return method != null
+                ? (ITensorCore<T>)method.Invoke(null, [mlTensor, accelerator])!
+                :
             throw new ArgumentException($"Cannot convert ML.Tensor<{typeof(T)}> - type must implement INumber<T>");
         }
 

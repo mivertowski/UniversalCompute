@@ -19,7 +19,6 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using ILGPU.Runtime;
-using ILGPU.TensorCores;
 
 namespace ILGPU.ML
 {
@@ -84,12 +83,9 @@ namespace ILGPU.ML
         /// <summary>
         /// Gets the resulting shape from matrix multiplication.
         /// </summary>
-        public TensorShape MatMulResultShape(TensorShape other)
-        {
-            if (!IsMatMulCompatible(other))
-                throw new ArgumentException("Shapes are not compatible for matrix multiplication");
-            return new TensorShape(this[0], other[1]);
-        }
+        public TensorShape MatMulResultShape(TensorShape other) => !IsMatMulCompatible(other)
+                ? throw new ArgumentException("Shapes are not compatible for matrix multiplication")
+                : new TensorShape(this[0], other[1]);
 
         /// <inheritdoc/>
         public bool Equals(TensorShape other)

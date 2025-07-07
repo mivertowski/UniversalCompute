@@ -21,7 +21,6 @@ using ILGPU.Backends;
 using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.OneAPI.Native;
 using System;
-using System.Collections.Immutable;
 
 namespace ILGPU.Runtime.OneAPI
 {
@@ -69,7 +68,9 @@ namespace ILGPU.Runtime.OneAPI
             catch
             {
                 // Fallback: allocate dummy memory
+#pragma warning disable CA2020 // Prevent behavioral change
                 NativePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal((IntPtr)(length * elementSize));
+#pragma warning restore CA2020 // Prevent behavioral change
             }
         }
 
@@ -270,7 +271,9 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the SPIR-V binary code.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public byte[] SPIRVBinary { get; }
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 
     /// <summary>

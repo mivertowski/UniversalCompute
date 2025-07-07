@@ -280,10 +280,9 @@ namespace ILGPU.Frontend.DebugInformation
         {
             if (pdbFileName == null)
                 throw new ArgumentNullException(nameof(pdbFileName));
-            if (!File.Exists(pdbFileName))
-                throw new FileNotFoundException();
-
-            return TryLoadSymbolsInternal(
+            return !File.Exists(pdbFileName)
+                ? throw new FileNotFoundException()
+                : TryLoadSymbolsInternal(
                 assembly,
                 new FileLoader(this, pdbFileName),
                 out assemblyDebugInformation);
@@ -301,16 +300,12 @@ namespace ILGPU.Frontend.DebugInformation
         public bool TryLoadSymbols(
             Assembly assembly,
             Stream pdbStream,
-            [NotNullWhen(true)] out AssemblyDebugInformation? assemblyDebugInformation)
-        {
-            if (pdbStream == null)
-                throw new ArgumentNullException(nameof(pdbStream));
-
-            return TryLoadSymbolsInternal(
+            [NotNullWhen(true)] out AssemblyDebugInformation? assemblyDebugInformation) => pdbStream == null
+                ? throw new ArgumentNullException(nameof(pdbStream))
+                : TryLoadSymbolsInternal(
                 assembly,
                 new StreamLoader(this, pdbStream),
                 out assemblyDebugInformation);
-        }
 
         /// <summary>
         /// Tries to load symbols for the given assembly based on the given

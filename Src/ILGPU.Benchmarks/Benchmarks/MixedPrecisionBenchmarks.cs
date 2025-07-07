@@ -16,9 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using BenchmarkDotNet.Attributes;
-using ILGPU.Numerics;
 using ILGPU.Runtime;
-using ILGPU.TensorCores;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 

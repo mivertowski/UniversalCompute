@@ -20,11 +20,9 @@ using ILGPU.Runtime.AMX;
 using ILGPU.Runtime.Cuda;
 using ILGPU.Runtime.OpenCL;
 using ILGPU.Runtime.OneAPI;
-using ILGPU.Runtime.ROCm;
 using ILGPU.Runtime.Velocity;
 using ILGPU.Runtime.Vulkan;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -761,17 +759,7 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <summary>
         /// Creates a fallback CPU accelerator.
         /// </summary>
-        private static Accelerator CreateFallbackAccelerator(Context context)
-        {
-            if (Capabilities.Velocity.IsSupported)
-            {
-                return context.CreateVelocityAccelerator();
-            }
-            else
-            {
-                return context.CPU;
-            }
-        }
+        private static Accelerator CreateFallbackAccelerator(Context context) => Capabilities.Velocity.IsSupported ? (Accelerator)context.CreateVelocityAccelerator() : context.CPU;
 
         #endregion
 

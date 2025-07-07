@@ -207,32 +207,32 @@ namespace ILGPU.AI.Memory
         /// <summary>
         /// Non-zero values.
         /// </summary>
-        public ArrayView<T> Values;
+        public ArrayView<T> Values { get; set; }
 
         /// <summary>
         /// Row indices of non-zero values.
         /// </summary>
-        public ArrayView<int> RowIndices;
+        public ArrayView<int> RowIndices { get; set; }
 
         /// <summary>
         /// Column indices of non-zero values.
         /// </summary>
-        public ArrayView<int> ColIndices;
+        public ArrayView<int> ColIndices { get; set; }
 
         /// <summary>
         /// Number of rows.
         /// </summary>
-        public int Rows;
+        public int Rows { get; set; }
 
         /// <summary>
         /// Number of columns.
         /// </summary>
-        public int Cols;
+        public int Cols { get; set; }
 
         /// <summary>
         /// Number of non-zero elements.
         /// </summary>
-        public int NonZeroCount;
+        public int NonZeroCount { get; set; }
 
         /// <summary>
         /// Sparsity ratio (0.0 = dense, 1.0 = empty).
@@ -249,32 +249,32 @@ namespace ILGPU.AI.Memory
         /// <summary>
         /// Non-zero values.
         /// </summary>
-        public ArrayView<T> Values;
+        public ArrayView<T> Values { get; set; }
 
         /// <summary>
         /// Column indices of non-zero values.
         /// </summary>
-        public ArrayView<int> ColIndices;
+        public ArrayView<int> ColIndices { get; set; }
 
         /// <summary>
         /// Row pointer array.
         /// </summary>
-        public ArrayView<int> RowPointers;
+        public ArrayView<int> RowPointers { get; set; }
 
         /// <summary>
         /// Number of rows.
         /// </summary>
-        public int Rows;
+        public int Rows { get; set; }
 
         /// <summary>
         /// Number of columns.
         /// </summary>
-        public int Cols;
+        public int Cols { get; set; }
 
         /// <summary>
         /// Number of non-zero elements.
         /// </summary>
-        public int NonZeroCount;
+        public int NonZeroCount { get; set; }
     }
 
     /// <summary>
@@ -353,7 +353,7 @@ namespace ILGPU.AI.Memory
                 }
             }
 
-            throw new OutOfMemoryException("No available memory blocks in AI memory pool");
+            throw new GpuMemoryException("No available memory blocks in AI memory pool");
         }
 
         /// <summary>

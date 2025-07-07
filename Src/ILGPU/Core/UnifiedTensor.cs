@@ -326,9 +326,9 @@ namespace ILGPU.Core
                 return (T)(object)((double)(object)a + (double)(object)b);
             if (typeof(T) == typeof(int))
                 return (T)(object)((int)(object)a + (int)(object)b);
-            if (typeof(T) == typeof(long))
-                return (T)(object)((long)(object)a + (long)(object)b);
-            
+            return typeof(T) == typeof(long)
+                ? (T)(object)((long)(object)a + (long)(object)b)
+                :
             throw new NotSupportedException($"Addition not supported for type {typeof(T)}");
         }
 
@@ -341,9 +341,9 @@ namespace ILGPU.Core
                 return (T)(object)((double)(object)a * (double)(object)b);
             if (typeof(T) == typeof(int))
                 return (T)(object)((int)(object)a * (int)(object)b);
-            if (typeof(T) == typeof(long))
-                return (T)(object)((long)(object)a * (long)(object)b);
-            
+            return typeof(T) == typeof(long)
+                ? (T)(object)((long)(object)a * (long)(object)b)
+                :
             throw new NotSupportedException($"Multiplication not supported for type {typeof(T)}");
         }
 

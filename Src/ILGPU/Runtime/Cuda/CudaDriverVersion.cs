@@ -51,9 +51,9 @@ namespace ILGPU.Runtime.Cuda
         {
             if (major < 0 || major >= MaxMajorVersion)
                 throw new ArgumentOutOfRangeException(nameof(major));
-            if (minor < 0 || minor >= MaxMinVersion)
-                throw new ArgumentOutOfRangeException(nameof(minor));
-            return new CudaDriverVersion(
+            return minor < 0 || minor >= MaxMinVersion
+                ? throw new ArgumentOutOfRangeException(nameof(minor))
+                : new CudaDriverVersion(
                 (major * MajorMultiplier) + (minor * MinorMultiplier));
         }
 

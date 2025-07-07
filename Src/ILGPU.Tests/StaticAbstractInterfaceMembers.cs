@@ -28,9 +28,7 @@ namespace ILGPU.Tests
 
         public static T GeZeroIfBigger<T>(T value, T max) where T : INumber<T>
         {
-            if (value > max)
-                return T.Zero;
-            return value;
+            return value > max ? T.Zero : value;
         }
 
         #region Generic math

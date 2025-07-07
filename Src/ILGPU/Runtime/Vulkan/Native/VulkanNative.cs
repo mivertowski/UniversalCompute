@@ -461,7 +461,7 @@ namespace ILGPU.Runtime.Vulkan.Native
         /// <returns>Array of extension names.</returns>
         internal static string[] EnumerateInstanceExtensions() =>
             // Simplified implementation - would enumerate actual extensions
-            new[] { "VK_EXT_debug_utils", "VK_KHR_surface" };
+            ["VK_EXT_debug_utils", "VK_KHR_surface"];
 
         /// <summary>
         /// Initializes Vulkan compute context.

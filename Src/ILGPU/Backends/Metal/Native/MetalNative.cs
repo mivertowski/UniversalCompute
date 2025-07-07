@@ -401,10 +401,7 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates a new command queue.
         /// </summary>
-        internal static IntPtr NewCommandQueue(IntPtr device)
-        {
-            return MTLDeviceNewCommandQueue(device);
-        }
+        internal static IntPtr NewCommandQueue(IntPtr device) => MTLDeviceNewCommandQueue(device);
 
         /// <summary>
         /// Releases command queue.
@@ -433,12 +430,10 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Allocates Metal buffer memory.
         /// </summary>
-        internal static IntPtr AllocateMemory(ulong sizeInBytes)
-        {
+        internal static IntPtr AllocateMemory(ulong sizeInBytes) =>
             // This would typically be done through the device
             // For now, return a placeholder
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Frees Metal buffer memory.
@@ -452,12 +447,10 @@ namespace ILGPU.Backends.Metal.Native
         /// <summary>
         /// Creates an MPS Graph.
         /// </summary>
-        internal static IntPtr CreateMPSGraph(IntPtr device)
-        {
+        internal static IntPtr CreateMPSGraph(IntPtr device) =>
             // This would create an MPSGraph instance
             // Placeholder for actual MPS Graph creation
-            return IntPtr.Zero;
-        }
+            IntPtr.Zero;
 
         /// <summary>
         /// Creates a compute pipeline state.

@@ -15,11 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends;
-using ILGPU.Backends.Vulkan;
 using ILGPU.Runtime;
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -190,27 +187,27 @@ namespace ILGPU.Backends.Vulkan
 
         protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new VulkanBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new VulkanKernel(this, compiledKernel);
+        protected override Kernel LoadKernelInternal(CompiledKernel kernel) => new VulkanKernel(this, kernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
                 (int)Capabilities.MaxWorkgroupSize,
                 Capabilities.MaxSharedMemorySize);
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override Kernel LoadImplicitlyGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = new KernelInfo(
                 Math.Min(customGroupSize, (int)Capabilities.MaxWorkgroupSize),
                 Capabilities.MaxSharedMemorySize);
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
@@ -267,15 +264,10 @@ namespace ILGPU.Backends.Vulkan
             // Vulkan doesn't support page locking
             null!;
 
-        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider)
-        {
-            if (typeof(TExtension) == typeof(VulkanRayTracingExtension))
-            {
-                return (TExtension)(object)new VulkanRayTracingExtension(this);
-            }
-            
+        public override TExtension CreateExtension<TExtension, TExtensionProvider>(TExtensionProvider provider) => typeof(TExtension) == typeof(VulkanRayTracingExtension)
+                ? (TExtension)(object)new VulkanRayTracingExtension(this)
+                :
             throw new NotSupportedException($"Extension {typeof(TExtension)} not supported by Vulkan accelerator");
-        }
 
         protected override void OnBind()
         {
@@ -305,7 +297,7 @@ namespace ILGPU.Backends.Vulkan
 
         #region Private Methods
 
-        private void InitializeAcceleratorProperties()
+        private static void InitializeAcceleratorProperties()
         {
             // Properties are now handled through the Device base class
             // No direct assignment needed as they are read-only properties
@@ -413,25 +405,17 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         /// <param name="shaderStages">Ray tracing shader stages (raygen, miss, closesthit, etc.).</param>
         /// <returns>Ray tracing pipeline handle.</returns>
-        public IntPtr CreateRayTracingPipeline(VulkanShaderStage[] shaderStages)
-        {
-            if (!IsRayTracingSupported)
-                throw new NotSupportedException("Ray tracing not supported on this device");
-
-            return _accelerator.VulkanDevice.CreateRayTracingPipeline(shaderStages);
-        }
+        public IntPtr CreateRayTracingPipeline(VulkanShaderStage[] shaderStages) => !IsRayTracingSupported
+                ? throw new NotSupportedException("Ray tracing not supported on this device")
+                : VulkanDevice.CreateRayTracingPipeline(shaderStages);
 
         /// <summary>
         /// Creates an acceleration structure for ray tracing.
         /// </summary>
         /// <param name="geometryData">Geometry data for the acceleration structure.</param>
         /// <returns>Acceleration structure handle.</returns>
-        public IntPtr CreateAccelerationStructure(VulkanGeometryData geometryData)
-        {
-            if (!IsRayTracingSupported)
-                throw new NotSupportedException("Ray tracing not supported on this device");
-
-            return _accelerator.VulkanDevice.CreateAccelerationStructure(geometryData);
-        }
+        public IntPtr CreateAccelerationStructure(VulkanGeometryData geometryData) => !IsRayTracingSupported
+                ? throw new NotSupportedException("Ray tracing not supported on this device")
+                : VulkanDevice.CreateAccelerationStructure(geometryData);
     }
 }

@@ -54,7 +54,7 @@ namespace ILGPU.AI.ONNX
         /// <param name="logLevel">Logging level (0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Fatal).</param>
         /// <param name="logId">Identifier for logging.</param>
         /// <returns>Environment handle.</returns>
-        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         internal static extern IntPtr OrtCreateEnv(int logLevel, string logId);
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace ILGPU.AI.ONNX
         /// <param name="modelPath">Path to the ONNX model file.</param>
         /// <param name="options">Session options.</param>
         /// <returns>Session handle.</returns>
-        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         internal static extern IntPtr CreateInferenceSession(string modelPath, IntPtr options);
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace ILGPU.AI.ONNX
         /// </summary>
         /// <param name="options">Session options handle.</param>
         /// <param name="profileFile">Path to the profile output file.</param>
-        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         internal static extern void EnableProfiling(IntPtr options, string profileFile);
 
         #endregion
@@ -163,7 +163,7 @@ namespace ILGPU.AI.ONNX
         /// </summary>
         /// <param name="options">Session options handle.</param>
         /// <param name="device">OpenVINO device (e.g., "CPU", "GPU", "NPU").</param>
-        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+        [DllImport(ONNXRuntimeLibrary, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         internal static extern void AppendExecutionProvider_OpenVINO(IntPtr options, string device);
 
         /// <summary>

@@ -15,9 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.X86;
-
 namespace ILGPU.Benchmarks.Infrastructure;
 
 /// <summary>

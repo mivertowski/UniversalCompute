@@ -17,7 +17,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using ILGPU.Core;
 
 namespace ILGPU.Apple.NeuralEngine.Native
 {

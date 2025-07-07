@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 
 namespace ILGPU.Runtime
@@ -826,14 +825,11 @@ namespace ILGPU.Runtime
         /// Gets a value indicating whether this accelerator supports tensor cores.
         /// </summary>
         /// <returns>True if tensor cores are supported, false otherwise.</returns>
-        public virtual bool SupportsTensorCores()
-        {
-            return AcceleratorType == AcceleratorType.Cuda ||
+        public virtual bool SupportsTensorCores() => AcceleratorType == AcceleratorType.Cuda ||
                    AcceleratorType == AcceleratorType.ROCm ||
                    AcceleratorType == AcceleratorType.IntelAMX ||
                    AcceleratorType == AcceleratorType.AppleNeuralEngine ||
                    AcceleratorType == AcceleratorType.IntelNPU;
-        }
 
         /// <summary>
         /// Gets the supported tensor precisions for this accelerator.

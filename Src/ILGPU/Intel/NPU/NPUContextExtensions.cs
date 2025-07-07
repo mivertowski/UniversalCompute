@@ -73,9 +73,9 @@ namespace ILGPU.Intel.NPU
         public static IntelNPUAccelerator CreateIntelNPUAccelerator(this Context context)
         {
             var devices = context.GetIntelNPUDevices();
-            if (devices.Count < 1)
-                throw new NotSupportedException("No Intel NPU device available");
-            return devices[0].CreateAccelerator(context) as IntelNPUAccelerator
+            return devices.Count < 1
+                ? throw new NotSupportedException("No Intel NPU device available")
+                : devices[0].CreateAccelerator(context) as IntelNPUAccelerator
                 ?? throw new InvalidOperationException("Failed to create Intel NPU accelerator");
         }
 

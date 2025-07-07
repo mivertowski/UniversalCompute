@@ -238,7 +238,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             uint deviceCount,
             byte[] spirvBinary,
             UIntPtr binarySize,
-            [MarshalAs(UnmanagedType.LPStr)] string kernelName,
+            [MarshalAs(UnmanagedType.LPWStr)] string kernelName,
             out IntPtr kernel);
 
         /// <summary>
@@ -298,7 +298,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             try
             {
                 // Try to get platforms to verify SYCL is available
-                var result = GetPlatforms(out uint platformCount, new IntPtr[0]);
+                var result = GetPlatforms(out uint platformCount, []);
                 return result == SYCLResult.Success;
             }
             catch (DllNotFoundException)
@@ -324,7 +324,7 @@ namespace ILGPU.Runtime.OneAPI.Native
             try
             {
                 // Get platforms
-                var result = GetPlatforms(out uint platformCount, new IntPtr[0]);
+                var result = GetPlatforms(out uint platformCount, []);
                 if (result != SYCLResult.Success || platformCount == 0)
                     return Array.Empty<IntPtr>();
 
@@ -338,7 +338,7 @@ namespace ILGPU.Runtime.OneAPI.Native
                 foreach (var platform in platforms)
                 {
                     // Get GPU devices for this platform
-                    result = GetDevices(platform, SYCLDeviceType.GPU, out uint deviceCount, new IntPtr[0]);
+                    result = GetDevices(platform, SYCLDeviceType.GPU, out uint deviceCount, []);
                     if (result == SYCLResult.Success && deviceCount > 0)
                     {
                         var devices = new IntPtr[deviceCount];
@@ -402,10 +402,7 @@ namespace ILGPU.Runtime.OneAPI.Native
                 try
                 {
                     result = GetDeviceInfo(device, infoType, retSize, handle.AddrOfPinnedObject(), out _);
-                    if (result != SYCLResult.Success)
-                        return string.Empty;
-
-                    return System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length - 1);
+                    return result != SYCLResult.Success ? string.Empty : System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length - 1);
                 }
                 finally
                 {
@@ -433,10 +430,7 @@ namespace ILGPU.Runtime.OneAPI.Native
                 try
                 {
                     var result = GetDeviceInfo(device, infoType, new UIntPtr(4), handle.AddrOfPinnedObject(), out _);
-                    if (result != SYCLResult.Success)
-                        return 0;
-
-                    return BitConverter.ToUInt32(buffer, 0);
+                    return result != SYCLResult.Success ? 0 : BitConverter.ToUInt32(buffer, 0);
                 }
                 finally
                 {
@@ -464,10 +458,7 @@ namespace ILGPU.Runtime.OneAPI.Native
                 try
                 {
                     var result = GetDeviceInfo(device, infoType, new UIntPtr(8), handle.AddrOfPinnedObject(), out _);
-                    if (result != SYCLResult.Success)
-                        return 0;
-
-                    return BitConverter.ToUInt64(buffer, 0);
+                    return result != SYCLResult.Success ? 0 : BitConverter.ToUInt64(buffer, 0);
                 }
                 finally
                 {
@@ -613,10 +604,9 @@ namespace ILGPU.Runtime.OneAPI.Native
                 if (deviceName.Contains("UHD", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("GEN11", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("ICL", StringComparison.OrdinalIgnoreCase))
                     return IntelGPUArchitecture.Gen11;
 
-                if (deviceName.Contains("HD", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("GEN9", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("SKL", StringComparison.OrdinalIgnoreCase))
-                    return IntelGPUArchitecture.Gen9;
-
-                return IntelGPUArchitecture.Unknown;
+                return deviceName.Contains("HD", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("GEN9", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("SKL", StringComparison.OrdinalIgnoreCase)
+                    ? IntelGPUArchitecture.Gen9
+                    : IntelGPUArchitecture.Unknown;
             }
             catch
             {

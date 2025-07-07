@@ -16,8 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-using ILGPU.Benchmarks.Benchmarks;
 using ILGPU.Benchmarks.BurnIn;
 using ILGPU.Benchmarks.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,7 +23,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace ILGPU.Benchmarks;
 
@@ -98,8 +95,8 @@ public class Program
                     new SelectionPrompt<string>()
                         .Title("[cyan1]Select benchmark suite to run:[/]")
                         .PageSize(10)
-                        .AddChoices(new[]
-                        {
+                        .AddChoices(
+                        [
                             "Quick Performance Suite",
                             "Tensor Core Benchmarks",
                             "SIMD Performance Tests",
@@ -111,7 +108,7 @@ public class Program
                             "Unattended Benchmarks (GitHub Ready)",
                             "System Information",
                             "Exit"
-                        }));
+                        ]));
 
                 switch (choice)
                 {

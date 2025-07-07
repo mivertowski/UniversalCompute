@@ -17,7 +17,6 @@
 
 using ILGPU.Intel.AMX.Native;
 using System;
-using System.Runtime.CompilerServices;
 
 namespace ILGPU.Intel.AMX
 {

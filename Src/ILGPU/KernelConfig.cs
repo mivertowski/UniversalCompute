@@ -558,12 +558,12 @@ namespace ILGPU
         /// </summary>
         /// <returns>An array of kernel arguments.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly object[] ToArguments() => new object[]
-        {
+        public readonly object[] ToArguments() =>
+        [
             GridDim,
             GroupDim,
             SharedMemoryConfig
-        };
+        ];
 
         #endregion
     }

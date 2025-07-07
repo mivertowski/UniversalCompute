@@ -46,7 +46,7 @@ namespace ILGPU.Apple.NeuralEngine
                 throw new InvalidOperationException("Failed to create Apple Neural Engine context");
 
             Capabilities = ANECapabilities.Query();
-            
+
             // Initialize accelerator properties
             InitializeAcceleratorProperties();
         }
@@ -155,27 +155,27 @@ namespace ILGPU.Apple.NeuralEngine
 
         protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new ANEBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) =>
+        protected override Kernel LoadKernelInternal(CompiledKernel kernel) =>
             // ANE uses specialized operations rather than general kernels
             throw new NotSupportedException(
                 "Apple Neural Engine does not support general kernel loading. " +
                 "Use specialized ANE operations instead.");
 
         protected override Kernel LoadAutoGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = null;
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override Kernel LoadImplicitlyGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = null;
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
@@ -291,7 +291,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// </summary>
         public long MemoryBandwidth => Capabilities.MemoryBandwidth;
 
-        private void InitializeAcceleratorProperties()
+        private static void InitializeAcceleratorProperties()
         {
             // Properties are now computed via overrides
         }
@@ -349,7 +349,9 @@ namespace ILGPU.Apple.NeuralEngine
     /// <summary>
     /// Apple Neural Engine stream implementation.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class ANEStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         /// <summary>
         /// Initializes a new instance of the ANEStream class.
@@ -401,10 +403,12 @@ namespace ILGPU.Apple.NeuralEngine
             : base(accelerator, length, elementSize)
         {
             var sizeInBytes = length * elementSize;
+#pragma warning disable CA2020 // Prevent behavioral change
             _nativePtr = Marshal.AllocHGlobal((IntPtr)sizeInBytes);
+#pragma warning restore CA2020 // Prevent behavioral change
             
             if (_nativePtr == IntPtr.Zero)
-                throw new OutOfMemoryException("Failed to allocate ANE buffer memory");
+                throw new GpuMemoryException("Failed to allocate ANE buffer memory");
                 
             NativePtr = _nativePtr;
         }

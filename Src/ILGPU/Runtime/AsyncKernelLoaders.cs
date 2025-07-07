@@ -317,13 +317,9 @@ namespace ILGPU.Runtime
         /// <returns>A task that completes when all kernels finish.</returns>
         public static Task WhenAllAsync(
             Task[] kernelTasks,
-            CancellationToken cancellationToken = default)
-        {
-            if (kernelTasks is null)
-                throw new ArgumentNullException(nameof(kernelTasks));
-
-            return Task.WhenAll(kernelTasks).WaitAsync(cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => kernelTasks is null
+                ? throw new ArgumentNullException(nameof(kernelTasks))
+                : Task.WhenAll(kernelTasks).WaitAsync(cancellationToken);
 
         /// <summary>
         /// Executes multiple kernels and waits for the first one to complete.
@@ -333,13 +329,9 @@ namespace ILGPU.Runtime
         /// <returns>A task that completes when the first kernel finishes.</returns>
         public static Task<Task> WhenAnyAsync(
             Task[] kernelTasks,
-            CancellationToken cancellationToken = default)
-        {
-            if (kernelTasks is null)
-                throw new ArgumentNullException(nameof(kernelTasks));
-
-            return Task.WhenAny(kernelTasks).WaitAsync(cancellationToken);
-        }
+            CancellationToken cancellationToken = default) => kernelTasks is null
+                ? throw new ArgumentNullException(nameof(kernelTasks))
+                : Task.WhenAny(kernelTasks).WaitAsync(cancellationToken);
 
         /// <summary>
         /// Provides a convenient async pattern for kernel execution with resource cleanup.

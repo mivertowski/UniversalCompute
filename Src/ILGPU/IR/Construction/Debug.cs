@@ -35,13 +35,10 @@ namespace ILGPU.IR.Construction
             location.Assert(message is StringValue);
 
             // Try to simplify debug assertions
-            if (condition is PrimitiveValue primitiveValue &&
-                primitiveValue.RawValue != 0L)
-            {
-                return CreateUndefined();
-            }
-
-            return Append(new DebugAssertOperation(
+            return condition is PrimitiveValue primitiveValue &&
+                primitiveValue.RawValue != 0L
+                ? CreateUndefined()
+                : (ValueReference)Append(new DebugAssertOperation(
                 GetInitializer(location),
                 condition,
                 message));

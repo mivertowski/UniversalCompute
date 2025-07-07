@@ -63,12 +63,7 @@ namespace ILGPU.SourceGenerators.Generators
                 return null;
 
             // Check if this type is likely to be used in kernels
-            if (IsKernelCompatibleType(namedType))
-            {
-                return new KernelTypeInfo(namedType, AnalyzeTypeForKernelUsage(namedType));
-            }
-
-            return null;
+            return IsKernelCompatibleType(namedType) ? new KernelTypeInfo(namedType, AnalyzeTypeForKernelUsage(namedType)) : null;
         }
 
         private static bool IsKernelCompatibleType(INamedTypeSymbol type)
@@ -82,13 +77,10 @@ namespace ILGPU.SourceGenerators.Generators
 
             // Check for specific ILGPU types
             var typeName = type.ToDisplayString();
-            if (typeName.IndexOf("ArrayView", StringComparison.Ordinal) >= 0 || 
+            return typeName.IndexOf("ArrayView", StringComparison.Ordinal) >= 0 || 
                 typeName.IndexOf("MemoryBuffer", StringComparison.Ordinal) >= 0 ||
                 typeName.IndexOf("Index", StringComparison.Ordinal) >= 0 ||
-                typeName.IndexOf("Stride", StringComparison.Ordinal) >= 0)
-                return true;
-
-            return false;
+                typeName.IndexOf("Stride", StringComparison.Ordinal) >= 0;
         }
 
         private static KernelTypeAnalysis AnalyzeTypeForKernelUsage(INamedTypeSymbol type)

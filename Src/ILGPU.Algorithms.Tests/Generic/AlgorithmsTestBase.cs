@@ -142,10 +142,7 @@ namespace ILGPU.Algorithms.Tests
                 if (diff == 0)
                     return true;
 
-                if (x != 0)
-                    return Math.Abs(diff / x) < RelativeError;
-
-                return false;
+                return x != 0 ? Math.Abs(diff / x) < RelativeError : false;
             }
 
             public override int GetHashCode(Half obj)
@@ -181,10 +178,7 @@ namespace ILGPU.Algorithms.Tests
                 if (diff == 0)
                     return true;
 
-                if (x != 0)
-                    return Math.Abs(diff / x) < RelativeError;
-
-                return false;
+                return x != 0 ? Math.Abs(diff / x) < RelativeError : false;
             }
 
             public override int GetHashCode(float obj)
@@ -220,10 +214,7 @@ namespace ILGPU.Algorithms.Tests
                 if (diff == 0)
                     return true;
 
-                if (x != 0)
-                    return Math.Abs(diff / x) < RelativeError;
-
-                return false;
+                return x != 0 ? Math.Abs(diff / x) < RelativeError : false;
             }
 
             public override int GetHashCode(double obj)

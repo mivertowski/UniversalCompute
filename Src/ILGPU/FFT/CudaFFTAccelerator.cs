@@ -532,7 +532,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// CPU fallback implementation for 1D FFT.
         /// </summary>
-        private void FallbackToCP_FFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
+        private static void FallbackToCP_FFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
         {
             var length = (int)input.Length;
             var cpuInput = new Complex[length];
@@ -561,7 +561,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// CPU fallback implementation for 1D real-to-complex FFT.
         /// </summary>
-        private void FallbackToCPU_FFT1DReal(ArrayView<float> input, ArrayView<Complex> output)
+        private static void FallbackToCPU_FFT1DReal(ArrayView<float> input, ArrayView<Complex> output)
         {
             var length = (int)input.Length;
             var cpuInput = new float[length];
@@ -589,7 +589,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// CPU fallback implementation for 1D complex-to-real inverse FFT.
         /// </summary>
-        private void FallbackToCPU_IFFT1DReal(ArrayView<Complex> input, ArrayView<float> output)
+        private static void FallbackToCPU_IFFT1DReal(ArrayView<Complex> input, ArrayView<float> output)
         {
             var length = (int)output.Length;
             var inputLength = length / 2 + 1;

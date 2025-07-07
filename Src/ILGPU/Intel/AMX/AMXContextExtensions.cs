@@ -73,9 +73,9 @@ namespace ILGPU.Intel.AMX
         public static AMXAccelerator CreateAMXAccelerator(this Context context)
         {
             var devices = context.GetAMXDevices();
-            if (devices.Count < 1)
-                throw new NotSupportedException("No AMX device available");
-            return devices[0].CreateAccelerator(context) as AMXAccelerator
+            return devices.Count < 1
+                ? throw new NotSupportedException("No AMX device available")
+                : devices[0].CreateAccelerator(context) as AMXAccelerator
                 ?? throw new InvalidOperationException("Failed to create AMX accelerator");
         }
 

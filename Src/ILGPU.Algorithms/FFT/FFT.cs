@@ -75,7 +75,7 @@ namespace ILGPU.Algorithms.FFT
             AcceleratorStream? stream = null)
         {
             ThrowIfDisposed();
-            ValidateArguments(input, output, Configuration.Size);
+            FFT<T>.ValidateArguments(input, output, Configuration.Size);
 
             var kernel = GetFFT1DKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
@@ -96,7 +96,7 @@ namespace ILGPU.Algorithms.FFT
             AcceleratorStream? stream = null)
         {
             ThrowIfDisposed();
-            ValidateArguments(input, output, Configuration.Size);
+            FFT<T>.ValidateArguments(input, output, Configuration.Size);
 
             var kernel = GetFFT1DKernel(FFTDirection.Inverse);
             var actualStream = stream ?? _accelerator.DefaultStream;
@@ -125,7 +125,7 @@ namespace ILGPU.Algorithms.FFT
             AcceleratorStream? stream = null)
         {
             ThrowIfDisposed();
-            ValidateArguments(input, output, Configuration.Size * batchSize);
+            FFT<T>.ValidateArguments(input, output, Configuration.Size * batchSize);
 
             var kernel = GetBatchedFFT1DKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
@@ -293,7 +293,7 @@ namespace ILGPU.Algorithms.FFT
 
         #region Helper Methods
 
-        private void ValidateArguments(ArrayView<Complex> input, ArrayView<Complex> output, int expectedSize)
+        private static void ValidateArguments(ArrayView<Complex> input, ArrayView<Complex> output, int expectedSize)
         {
             if (input.Length != expectedSize)
                 throw new ArgumentException($"Input size must be {expectedSize}", nameof(input));

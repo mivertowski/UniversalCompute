@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Runtime.Vulkan.Native;
-using ILGPU.Util;
 using System;
 using System.Diagnostics;
 
@@ -126,7 +125,7 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
+        public new static AcceleratorType AcceleratorType => AcceleratorType.Vulkan;
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -146,12 +145,12 @@ namespace ILGPU.Runtime.Vulkan
         /// <summary>
         /// Gets the maximum shared memory per group in bytes.
         /// </summary>
-        public new long MaxSharedMemoryPerGroup => 32 * 1024; // 32KB typical
+        public new static long MaxSharedMemoryPerGroup => 32 * 1024; // 32KB typical
 
         /// <summary>
         /// Gets the maximum constant memory in bytes.
         /// </summary>
-        public new long MaxConstantMemory => 64 * 1024; // 64KB typical
+        public new static long MaxConstantMemory => 64 * 1024; // 64KB typical
 
         /// <summary>
         /// Gets the warp/subgroup size.
@@ -356,7 +355,7 @@ namespace ILGPU.Runtime.Vulkan
         /// Gets a human-readable string of device capabilities.
         /// </summary>
         /// <returns>Device capabilities summary.</returns>
-        public string GetCapabilitiesString() => $"API {(APIVersion >> 22)}.{(APIVersion >> 12) & 0x3FF}, " +
+        public string GetCapabilitiesString() => $"API {APIVersion >> 22}.{(APIVersion >> 12) & 0x3FF}, " +
                    $"Driver 0x{DriverVersion:X8}, " +
                    $"{NumMultiprocessors} CUs, " +
                    $"Subgroup {WarpSize}, " +

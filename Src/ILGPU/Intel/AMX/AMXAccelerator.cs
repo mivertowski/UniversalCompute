@@ -20,9 +20,6 @@ using ILGPU.Intel.AMX.Native;
 using ILGPU.Runtime;
 using ILGPU.IR.Analyses;
 using System;
-using System.Collections.Immutable;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ILGPU.Intel.AMX
 {
@@ -146,25 +143,25 @@ namespace ILGPU.Intel.AMX
 
         protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new AMXBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) => new AMXKernel(this, compiledKernel);
+        protected override Kernel LoadKernelInternal(CompiledKernel kernel) => new AMXKernel(this, kernel);
 
         protected override Kernel LoadAutoGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
             var allocaInfo = default(AllocaKindInformation);
             kernelInfo = new KernelInfo(0, 0, in allocaInfo, []);
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override Kernel LoadImplicitlyGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
             var allocaInfo = default(AllocaKindInformation);
             kernelInfo = new KernelInfo(0, 0, in allocaInfo, []);
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
@@ -305,7 +302,9 @@ namespace ILGPU.Intel.AMX
     /// Initializes a new instance of the AMXStream class.
     /// </remarks>
     /// <param name="accelerator">The AMX accelerator.</param>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class AMXStream(AMXAccelerator accelerator) : AcceleratorStream(accelerator)
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         private readonly AMXAccelerator _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
 
@@ -362,12 +361,9 @@ namespace ILGPU.Intel.AMX
         /// </summary>
         /// <param name="marker">The starting marker.</param>
         /// <returns>The elapsed time.</returns>
-        public override TimeSpan MeasureFrom(ProfilingMarker marker)
-        {
-            if (marker is AMXProfilingMarker amxMarker)
-                return _timestamp - amxMarker._timestamp;
-            throw new ArgumentException("Marker must be an AMX profiling marker", nameof(marker));
-        }
+        public override TimeSpan MeasureFrom(ProfilingMarker marker) => marker is AMXProfilingMarker amxMarker
+                ? _timestamp - amxMarker._timestamp
+                : throw new ArgumentException("Marker must be an AMX profiling marker", nameof(marker));
 
         /// <summary>
         /// Disposes the profiling marker.

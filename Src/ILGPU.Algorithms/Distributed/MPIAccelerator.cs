@@ -17,7 +17,6 @@
 
 using ILGPU.Runtime;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ILGPU.Algorithms.Distributed

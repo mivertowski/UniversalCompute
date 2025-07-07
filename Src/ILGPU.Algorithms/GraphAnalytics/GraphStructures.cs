@@ -379,7 +379,9 @@ namespace ILGPU.Algorithms.GraphAnalytics
         /// <summary>
         /// Size of each component.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public int[] ComponentSizes { get; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Initializes a new connected components result.

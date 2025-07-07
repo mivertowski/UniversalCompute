@@ -65,17 +65,13 @@ namespace ILGPU.Runtime
         /// This method provides proper async/await integration with cancellation support,
         /// enabling modern .NET async patterns for GPU synchronization operations.
         /// </remarks>
-        public Task SynchronizeAsync(CancellationToken cancellationToken)
-        {
-            if (cancellationToken.IsCancellationRequested)
-                return Task.FromCanceled(cancellationToken);
-
-            return Task.Run(() =>
+        public Task SynchronizeAsync(CancellationToken cancellationToken) => cancellationToken.IsCancellationRequested
+                ? Task.FromCanceled(cancellationToken)
+                : Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 Synchronize();
             }, cancellationToken);
-        }
 
         /// <summary>
         /// Makes the associated accelerator the current one for this thread and

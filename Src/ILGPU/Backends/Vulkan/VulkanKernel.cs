@@ -15,7 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends;
 using ILGPU.Runtime;
 using System;
 
@@ -92,7 +91,7 @@ namespace ILGPU.Backends.Vulkan
             return _accelerator.CreateComputePipeline(spirvBytecode, "main", 0);
         }
 
-        private byte[] CompileToSpirV(CompiledKernel compiledKernel) =>
+        private static byte[] CompileToSpirV(CompiledKernel compiledKernel) =>
             // This would contain the actual compilation from ILGPU IR to SPIR-V
             // For now, return a placeholder SPIR-V bytecode
 
@@ -181,7 +180,9 @@ namespace ILGPU.Backends.Vulkan
     /// <summary>
     /// Vulkan stream implementation.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class VulkanStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         private readonly VulkanAccelerator _accelerator;
 

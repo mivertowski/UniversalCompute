@@ -355,8 +355,7 @@ public static class HardwareDetection
             var processorInfo = GetProcessorName().ToUpperInvariant();
             if (processorInfo.Contains("m3")) return "ANE 3.0";
             if (processorInfo.Contains("m2")) return "ANE 2.0";
-            if (processorInfo.Contains("m1")) return "ANE 1.0";
-            return "ANE Unknown";
+            return processorInfo.Contains("m1") ? "ANE 1.0" : "ANE Unknown";
         }
         catch
         {
@@ -436,12 +435,7 @@ public static class SpecializedAcceleratorFactory
         }
 
         // For AMX, we can provide basic intrinsics support without heavy dependencies
-        if (HardwareDetection.IsIntelAMXAvailable())
-        {
-            return new LightweightAMXAccelerator();
-        }
-        
-        return null;
+        return HardwareDetection.IsIntelAMXAvailable() ? new LightweightAMXAccelerator() : (ISpecializedAccelerator?)null;
     }
 
     public static ISpecializedAccelerator? CreateAppleNeuralEngineAccelerator()

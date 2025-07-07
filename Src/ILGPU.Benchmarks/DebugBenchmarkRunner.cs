@@ -14,7 +14,6 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using ILGPU.Benchmarks.Benchmarks;
-using System;
 
 namespace ILGPU.Benchmarks
 {

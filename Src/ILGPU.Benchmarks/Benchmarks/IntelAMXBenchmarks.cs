@@ -18,8 +18,6 @@
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
-using System.Runtime.Intrinsics;
-using System.Runtime.Intrinsics.X86;
 using ILGPU.Benchmarks.Infrastructure;
 using ILGPU.Intel.AMX;
 

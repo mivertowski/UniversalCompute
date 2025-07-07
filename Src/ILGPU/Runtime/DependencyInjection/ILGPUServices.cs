@@ -140,20 +140,16 @@ namespace ILGPU.Runtime.DependencyInjection
             return selectedDevice.CreateAccelerator(context);
         }
 
-        public IReadOnlyList<Device> GetDevices(Context context, AcceleratorType acceleratorType)
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            return acceleratorType switch
-            {
-                AcceleratorType.CPU => EnumerateDevices(context.GetCPUDevices()),
-                AcceleratorType.Cuda => EnumerateDevices(context.GetCudaDevices()),
-                AcceleratorType.OpenCL => EnumerateDevices(context.GetCLDevices()),
-                AcceleratorType.Velocity => EnumerateDevices(context.GetVelocityDevices()),
-                _ => throw new ArgumentException($"Unsupported accelerator type: {acceleratorType}", nameof(acceleratorType))
-            };
-        }
+        public IReadOnlyList<Device> GetDevices(Context context, AcceleratorType acceleratorType) => context == null
+                ? throw new ArgumentNullException(nameof(context))
+                : (IReadOnlyList<Device>)(acceleratorType switch
+                {
+                    AcceleratorType.CPU => EnumerateDevices(context.GetCPUDevices()),
+                    AcceleratorType.Cuda => EnumerateDevices(context.GetCudaDevices()),
+                    AcceleratorType.OpenCL => EnumerateDevices(context.GetCLDevices()),
+                    AcceleratorType.Velocity => EnumerateDevices(context.GetVelocityDevices()),
+                    _ => throw new ArgumentException($"Unsupported accelerator type: {acceleratorType}", nameof(acceleratorType))
+                });
 
         private static List<Device> EnumerateDevices<TDevice>(Context.DeviceCollection<TDevice> deviceCollection)
             where TDevice : Device
@@ -175,10 +171,9 @@ namespace ILGPU.Runtime.DependencyInjection
         {
             if (accelerator == null)
                 throw new ArgumentNullException(nameof(accelerator));
-            if (length <= 0)
-                throw new ArgumentOutOfRangeException(nameof(length), "Length must be positive");
-
-            return accelerator.Allocate1D<T>(length);
+            return length <= 0
+                ? throw new ArgumentOutOfRangeException(nameof(length), "Length must be positive")
+                : accelerator.Allocate1D<T>(length);
         }
     }
 
@@ -191,10 +186,7 @@ namespace ILGPU.Runtime.DependencyInjection
         {
             if (accelerator == null)
                 throw new ArgumentNullException(nameof(accelerator));
-            if (method == null)
-                throw new ArgumentNullException(nameof(method));
-
-            return accelerator.LoadKernel(method);
+            return method == null ? throw new ArgumentNullException(nameof(method)) : accelerator.LoadKernel(method);
         }
 
         public TDelegate LoadKernel<TDelegate>(Accelerator accelerator, System.Reflection.MethodInfo kernelMethod)
@@ -202,10 +194,9 @@ namespace ILGPU.Runtime.DependencyInjection
         {
             if (accelerator == null)
                 throw new ArgumentNullException(nameof(accelerator));
-            if (kernelMethod == null)
-                throw new ArgumentNullException(nameof(kernelMethod));
-
-            return accelerator.LoadKernel<TDelegate>(kernelMethod);
+            return kernelMethod == null
+                ? throw new ArgumentNullException(nameof(kernelMethod))
+                : accelerator.LoadKernel<TDelegate>(kernelMethod);
         }
     }
 }

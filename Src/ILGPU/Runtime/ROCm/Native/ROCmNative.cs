@@ -221,7 +221,7 @@ namespace ILGPU.Runtime.ROCm.Native
         /// <param name="name">Function name.</param>
         /// <returns>Hip error code.</returns>
         [DllImport(HipLibrary, EntryPoint = "hipModuleGetFunction", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern HipError ModuleGetFunction(out IntPtr function, IntPtr module, [MarshalAs(UnmanagedType.LPStr)] string name);
+        internal static extern HipError ModuleGetFunction(out IntPtr function, IntPtr module, [MarshalAs(UnmanagedType.LPWStr)] string name);
 
         /// <summary>
         /// Unloads a module.

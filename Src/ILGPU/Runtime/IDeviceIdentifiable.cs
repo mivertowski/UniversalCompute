@@ -177,12 +177,7 @@ namespace ILGPU.Runtime
         /// <exception cref="InvalidOperationException">
         /// Thrown if this is not a CUDA device.
         /// </exception>
-        public int ToCudaDeviceId()
-        {
-            if (!IsCuda)
-                throw new InvalidOperationException("DeviceId is not a CUDA device");
-            return (int)Value;
-        }
+        public int ToCudaDeviceId() => !IsCuda ? throw new InvalidOperationException("DeviceId is not a CUDA device") : (int)Value;
 
         /// <summary>
         /// Gets the OpenCL platform and device IDs if this is an OpenCL device.

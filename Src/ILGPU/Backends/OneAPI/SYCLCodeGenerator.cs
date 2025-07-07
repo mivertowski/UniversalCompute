@@ -17,12 +17,8 @@
 
 using ILGPU.Backends.EntryPoints;
 using ILGPU.IR;
-using ILGPU.IR.Types;
-using ILGPU.IR.Values;
-using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ILGPU.Backends.OneAPI
@@ -44,7 +40,7 @@ namespace ILGPU.Backends.OneAPI
         internal SYCLCodeGenerator()
         {
             codeBuilder = new StringBuilder();
-            valueMapping = new Dictionary<Value, string>();
+            valueMapping = [];
             variableCounter = 0;
         }
 
@@ -504,10 +500,7 @@ namespace ILGPU.Backends.OneAPI
                     WorkingDirectory = tempDir
                 };
 
-                using var process = System.Diagnostics.Process.Start(processInfo);
-                if (process == null)
-                    throw new InvalidOperationException("Failed to start DPC++ compiler");
-
+                using var process = System.Diagnostics.Process.Start(processInfo) ?? throw new InvalidOperationException("Failed to start DPC++ compiler");
                 process.WaitForExit(30000);
 
                 if (process.ExitCode != 0)
@@ -517,14 +510,9 @@ namespace ILGPU.Backends.OneAPI
                 }
 
                 // Read compiled binary
-                if (System.IO.File.Exists(outputFile))
-                {
-                    return System.IO.File.ReadAllBytes(outputFile);
-                }
-                else
-                {
-                    throw new System.IO.FileNotFoundException("Compiled binary not found");
-                }
+                return System.IO.File.Exists(outputFile)
+                    ? System.IO.File.ReadAllBytes(outputFile)
+                    : throw new System.IO.FileNotFoundException("Compiled binary not found");
             }
             finally
             {

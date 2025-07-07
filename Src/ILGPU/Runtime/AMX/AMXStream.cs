@@ -25,7 +25,9 @@ namespace ILGPU.Runtime.AMX
     /// <summary>
     /// An Intel AMX stream for matrix operations execution.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class AMXStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         #region Instance
 
@@ -131,7 +133,7 @@ namespace ILGPU.Runtime.AMX
         internal unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
-            AMXDataType dataType) => Accelerator.ExecuteMatMul(a, b, c, m, k, n, dataType, this);
+            AMXDataType dataType) => IntelAMXAccelerator.ExecuteMatMul(a, b, c, m, k, n, dataType, this);
 
         /// <summary>
         /// Loads data into an AMX tile.
@@ -263,12 +265,9 @@ namespace ILGPU.Runtime.AMX
         /// </summary>
         /// <param name="marker">The starting marker.</param>
         /// <returns>The elapsed time.</returns>
-        public override TimeSpan MeasureFrom(ProfilingMarker marker)
-        {
-            if (marker is AMXProfilingMarker amxMarker)
-                return _timestamp - amxMarker._timestamp;
-            throw new ArgumentException("Marker must be an AMX profiling marker", nameof(marker));
-        }
+        public override TimeSpan MeasureFrom(ProfilingMarker marker) => marker is AMXProfilingMarker amxMarker
+                ? _timestamp - amxMarker._timestamp
+                : throw new ArgumentException("Marker must be an AMX profiling marker", nameof(marker));
 
         /// <summary>
         /// Disposes this profiling marker.
@@ -366,7 +365,9 @@ namespace ILGPU.Runtime.AMX
     /// </summary>
     public class AMXCompiledKernel : CompiledKernel
     {
+#pragma warning disable CA1819 // Properties should not return arrays
         public byte[] NativeCode { get; }
+#pragma warning restore CA1819 // Properties should not return arrays
         public string FunctionName { get; }
 
         public AMXCompiledKernel(Context context, byte[] nativeCode, string functionName, KernelInfo info)

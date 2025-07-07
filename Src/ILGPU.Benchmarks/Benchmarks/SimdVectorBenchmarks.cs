@@ -18,7 +18,6 @@
 using BenchmarkDotNet.Attributes;
 using ILGPU.SIMD;
 using System.Numerics;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 

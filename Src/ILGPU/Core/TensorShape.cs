@@ -311,13 +311,7 @@ namespace ILGPU.Core
         /// Returns a string representation of this tensor shape.
         /// </summary>
         /// <returns>A string in the format [dim1, dim2, ...].</returns>
-        public override string ToString()
-        {
-            if (dimensions == null || dimensions.Length == 0)
-                return "[]";
-                
-            return $"[{string.Join(", ", dimensions)}]";
-        }
+        public override string ToString() => dimensions == null || dimensions.Length == 0 ? "[]" : $"[{string.Join(", ", dimensions)}]";
 
         #region Helper Methods
 

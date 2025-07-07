@@ -265,9 +265,7 @@ namespace ILGPU.Algorithms.Tests
                 float xMin = 1.0f - x;
                 float x2 = x * x;
                 float result = xMin * xMin + 100.0f * (y - x2) * (y - x2);
-                if (x * x + y * y <= 2.0f)
-                    return result;
-                return float.MaxValue;
+                return x * x + y * y <= 2.0f ? result : float.MaxValue;
             }
 
             public float Evaluate(

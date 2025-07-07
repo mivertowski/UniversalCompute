@@ -18,7 +18,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -56,16 +55,15 @@ namespace ILGPU.SourceGenerators.Analysis
 
             // Analyze method body for unsupported features
             var bodyAnalysis = AnalyzeMethodBody(methodSyntax);
-            if (!bodyAnalysis.IsValid)
-                return KernelAnalysisResult.Failed(bodyAnalysis.Error ?? "Method body analysis failed");
-
-            return KernelAnalysisResult.Success(methodSymbol, parameterAnalysis, bodyAnalysis);
+            return !bodyAnalysis.IsValid
+                ? KernelAnalysisResult.Failed(bodyAnalysis.Error ?? "Method body analysis failed")
+                : KernelAnalysisResult.Success(methodSymbol, parameterAnalysis, bodyAnalysis);
         }
 
         /// <summary>
         /// Analyzes kernel method parameters for AOT compatibility.
         /// </summary>
-        private ParameterAnalysisResult AnalyzeParameters(IEnumerable<IParameterSymbol> parameters)
+        private static ParameterAnalysisResult AnalyzeParameters(IEnumerable<IParameterSymbol> parameters)
         {
             var analyzedParameters = new List<AnalyzedParameter>();
 
@@ -140,12 +138,9 @@ namespace ILGPU.SourceGenerators.Analysis
                 .OfType<AnonymousFunctionExpressionSyntax>()
                 .ToList();
 
-            if (delegateCreations.Count != 0)
-            {
-                return MethodBodyAnalysisResult.Failed("Anonymous functions not supported in AOT kernels");
-            }
-
-            return bodyAnalysis;
+            return delegateCreations.Count != 0
+                ? MethodBodyAnalysisResult.Failed("Anonymous functions not supported in AOT kernels")
+                : bodyAnalysis;
         }
 
         private static bool IsArrayViewType(ITypeSymbol type)
@@ -157,9 +152,7 @@ namespace ILGPU.SourceGenerators.Analysis
         private static ITypeSymbol? GetArrayViewElementType(ITypeSymbol arrayViewType)
         {
             // Extract T from ArrayView<T>
-            if (arrayViewType is INamedTypeSymbol namedType && namedType.TypeArguments.Length > 0)
-                return namedType.TypeArguments[0];
-            return null;
+            return arrayViewType is INamedTypeSymbol namedType && namedType.TypeArguments.Length > 0 ? namedType.TypeArguments[0] : null;
         }
 
         private static bool IsPrimitiveType(ITypeSymbol type)

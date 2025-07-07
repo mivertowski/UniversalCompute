@@ -67,8 +67,10 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets the available memory placements on the current platform.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public static MemoryPlacementInfo[] AvailablePlacements => 
             MemoryPlacementCapabilities.GetAvailablePlacements();
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Gets the total number of managed accelerators.
@@ -304,7 +306,9 @@ namespace ILGPU.Memory.Unified
         /// <summary>
         /// Gets additional optimization hints.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public string[] OptimizationHints { get; } = optimizationHints;
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 
 }

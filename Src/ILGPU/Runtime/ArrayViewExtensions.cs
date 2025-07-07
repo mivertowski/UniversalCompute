@@ -2325,10 +2325,7 @@ namespace ILGPU.Runtime
         /// <returns>A linear 1D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArrayView<T> AsLinearView<T>(this ArrayView2D<T, Stride2D.DenseX> view)
-            where T : unmanaged
-        {
-            return view.AsContiguous();
-        }
+            where T : unmanaged => view.AsContiguous();
 
         /// <summary>
         /// Converts a 3D ArrayView to a linear 1D view for FFT operations.
@@ -2338,10 +2335,7 @@ namespace ILGPU.Runtime
         /// <returns>A linear 1D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArrayView<T> AsLinearView<T>(this ArrayView3D<T, Stride3D.DenseXY> view)
-            where T : unmanaged
-        {
-            return view.AsContiguous();
-        }
+            where T : unmanaged => view.AsContiguous();
 
         /// <summary>
         /// Converts a 1D ArrayView to a 2D view.
@@ -2352,10 +2346,7 @@ namespace ILGPU.Runtime
         /// <returns>A 2D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArrayView2D<T, Stride2D.DenseX> As2DView<T>(this ArrayView<T> view, LongIndex2D extent)
-            where T : unmanaged
-        {
-            return view.As2DView(extent, new Stride2D.DenseX(extent.Y));
-        }
+            where T : unmanaged => view.As2DView(extent, new Stride2D.DenseX(extent.Y));
 
         /// <summary>
         /// Converts a 1D ArrayView to a 3D view.
@@ -2366,9 +2357,6 @@ namespace ILGPU.Runtime
         /// <returns>A 3D view of the same data.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ArrayView3D<T, Stride3D.DenseXY> As3DView<T>(this ArrayView<T> view, LongIndex3D extent)
-            where T : unmanaged
-        {
-            return view.As3DView(extent, new Stride3D.DenseXY(extent.Y * extent.Z, extent.Z));
-        }
+            where T : unmanaged => view.As3DView(extent, new Stride3D.DenseXY(extent.Y * extent.Z, extent.Z));
     }
 }

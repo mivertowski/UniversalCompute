@@ -32,13 +32,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="buffer">The memory buffer.</param>
         /// <returns>A GPU queryable.</returns>
         public static IGPUQueryable<T> AsGPUQueryable<T>(this MemoryBuffer1D<T, Stride1D.Dense> buffer)
-            where T : unmanaged
-        {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
-
-            return new GPUQueryable<T>(buffer.Accelerator, buffer);
-        }
+            where T : unmanaged => buffer == null ? throw new ArgumentNullException(nameof(buffer)) : (IGPUQueryable<T>)new GPUQueryable<T>(buffer.Accelerator, buffer);
 
         /// <summary>
         /// Creates a GPU queryable from an array by copying to GPU memory.
@@ -150,18 +144,14 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="source">The source queryable.</param>
         /// <returns>The sum of all elements.</returns>
         public static T Sum<T>(this IGPUQueryable<T> source)
-            where T : unmanaged
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-
-            return source.Provider.Execute<T>(
+            where T : unmanaged => source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.Execute<T>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Sum),
                     [typeof(T)],
                     source.Expression));
-        }
 
         /// <summary>
         /// Computes the average of a GPU sequence using a GPU reduction kernel.
@@ -170,18 +160,14 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="source">The source queryable.</param>
         /// <returns>The average of all elements.</returns>
         public static double Average<T>(this IGPUQueryable<T> source)
-            where T : unmanaged
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-
-            return source.Provider.Execute<double>(
+            where T : unmanaged => source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.Execute<double>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Average),
                     [typeof(T)],
                     source.Expression));
-        }
 
         /// <summary>
         /// Finds the minimum value in a GPU sequence using a GPU reduction kernel.
@@ -190,18 +176,14 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="source">The source queryable.</param>
         /// <returns>The minimum value.</returns>
         public static T Min<T>(this IGPUQueryable<T> source)
-            where T : unmanaged
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-
-            return source.Provider.Execute<T>(
+            where T : unmanaged => source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.Execute<T>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Min),
                     [typeof(T)],
                     source.Expression));
-        }
 
         /// <summary>
         /// Finds the maximum value in a GPU sequence using a GPU reduction kernel.
@@ -210,18 +192,14 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="source">The source queryable.</param>
         /// <returns>The maximum value.</returns>
         public static T Max<T>(this IGPUQueryable<T> source)
-            where T : unmanaged
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-
-            return source.Provider.Execute<T>(
+            where T : unmanaged => source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.Execute<T>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Max),
                     [typeof(T)],
                     source.Expression));
-        }
 
         /// <summary>
         /// Counts the number of elements in a GPU sequence.
@@ -230,18 +208,14 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="source">The source queryable.</param>
         /// <returns>The number of elements.</returns>
         public static int Count<T>(this IGPUQueryable<T> source)
-            where T : unmanaged
-        {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
-
-            return source.Provider.Execute<int>(
+            where T : unmanaged => source == null
+                ? throw new ArgumentNullException(nameof(source))
+                : source.Provider.Execute<int>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Count),
                     [typeof(T)],
                     source.Expression));
-        }
 
         /// <summary>
         /// Determines whether any element in a GPU sequence satisfies a condition.
@@ -255,10 +229,9 @@ namespace ILGPU.Runtime.LINQ
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
-
-            return source.Provider.Execute<bool>(
+            return predicate == null
+                ? throw new ArgumentNullException(nameof(predicate))
+                : source.Provider.Execute<bool>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.Any),
@@ -284,10 +257,9 @@ namespace ILGPU.Runtime.LINQ
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
-            if (predicate == null)
-                throw new ArgumentNullException(nameof(predicate));
-
-            return source.Provider.Execute<bool>(
+            return predicate == null
+                ? throw new ArgumentNullException(nameof(predicate))
+                : source.Provider.Execute<bool>(
                 System.Linq.Expressions.Expression.Call(
                     typeof(Queryable),
                     nameof(Queryable.All),

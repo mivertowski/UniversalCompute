@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.ML;
-using ILGPU.Runtime;
 using System;
 using System.Linq;
 using Xunit;

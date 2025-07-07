@@ -403,10 +403,7 @@ namespace ILGPU.Numerics.Hybrid
             TensorOperation operation,
             CancellationToken ct) where T : unmanaged, IFloatingPoint<T>
         {
-            var gpuAccelerator = Array.Find(accelerators, a => a.AcceleratorType == AcceleratorType.Cuda);
-            if (gpuAccelerator == null)
-                throw new NotSupportedException("No CUDA accelerator available for tensor core operations");
-
+            var gpuAccelerator = Array.Find(accelerators, a => a.AcceleratorType == AcceleratorType.Cuda) ?? throw new NotSupportedException("No CUDA accelerator available for tensor core operations");
             var startTime = DateTime.UtcNow;
 
             // Execute operation using GPU tensor cores
@@ -427,10 +424,7 @@ namespace ILGPU.Numerics.Hybrid
             TensorOperation operation,
             CancellationToken ct) where T : unmanaged, IFloatingPoint<T>
         {
-            var gpuAccelerator = Array.Find(accelerators, a => a.AcceleratorType != AcceleratorType.CPU);
-            if (gpuAccelerator == null)
-                throw new NotSupportedException("No GPU accelerator available");
-
+            var gpuAccelerator = Array.Find(accelerators, a => a.AcceleratorType != AcceleratorType.CPU) ?? throw new NotSupportedException("No GPU accelerator available");
             var startTime = DateTime.UtcNow;
 
             // Execute operation using GPU general compute

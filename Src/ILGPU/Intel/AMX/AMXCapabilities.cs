@@ -215,15 +215,11 @@ namespace ILGPU.Intel.AMX
         /// Returns a string representation of the AMX capabilities.
         /// </summary>
         /// <returns>A string describing the AMX capabilities.</returns>
-        public override string ToString()
-        {
-            if (!IsSupported)
-                return "Intel AMX: Not Supported";
-
-            return $"Intel AMX: {MaxTiles} tiles, {MaxTileRows}x{MaxTileColumns} max, " +
+        public override string ToString() => !IsSupported
+                ? "Intel AMX: Not Supported"
+                : $"Intel AMX: {MaxTiles} tiles, {MaxTileRows}x{MaxTileColumns} max, " +
                    $"BF16={SupportsBF16}, INT8={SupportsInt8}, FP32={SupportsFloat32}, " +
                    $"Bandwidth={EstimatedBandwidthGBps:F1} GB/s";
-        }
     }
 
     /// <summary>

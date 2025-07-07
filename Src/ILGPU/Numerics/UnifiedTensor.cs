@@ -22,7 +22,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ILGPU.Runtime;
-using ILGPU.TensorCores;
 using ILGPU.SIMD;
 
 namespace ILGPU.Numerics
@@ -273,10 +272,7 @@ namespace ILGPU.Numerics
             // Choose optimal execution based on tensor sizes and capabilities
             if (ShouldUseTensorCores())
                 return await MatMulTensorCoreAsync(other, ct).ConfigureAwait(false);
-            else if (ShouldUseGpu())
-                return await MatMulGpuAsync(otherTensor, ct).ConfigureAwait(false);
-            else
-                return MatMulSimd(other);
+            else return ShouldUseGpu() ? await MatMulGpuAsync(otherTensor, ct).ConfigureAwait(false) : MatMulSimd(other);
         }
 
         /// <inheritdoc/>
@@ -308,11 +304,10 @@ namespace ILGPU.Numerics
         public async Task<ITensor<T>> MatMulTensorCoreAsync(ITensor<T> other, CancellationToken ct = default)
         {
             var otherTensor = other as UnifiedTensor<T> ?? throw new ArgumentException("Other tensor must be UnifiedTensor");
-            
-            if (!Accelerator.SupportsTensorCores())
-                throw new NotSupportedException("Tensor cores not supported on this device");
 
-            return await Task.Run(() =>
+            return !Accelerator.SupportsTensorCores()
+                ? throw new NotSupportedException("Tensor cores not supported on this device")
+                : await Task.Run(() =>
             {
                 // Ensure data is on GPU
                 EnsureGpuData();
@@ -337,10 +332,7 @@ namespace ILGPU.Numerics
                 throw new ArgumentException("Tensors must have the same shape for addition");
 
             // Choose optimal execution strategy
-            if (ShouldUseGpu())
-                return await AddGpuAsync(otherTensor, ct).ConfigureAwait(false);
-            else
-                return AddSimd(other);
+            return ShouldUseGpu() ? await AddGpuAsync(otherTensor, ct).ConfigureAwait(false) : AddSimd(other);
         }
 
         /// <inheritdoc/>
@@ -369,12 +361,9 @@ namespace ILGPU.Numerics
             await AddAsync(other, ct).ConfigureAwait(false);
 
         /// <inheritdoc/>
-        public async Task<ITensor<T>> TransposeAsync(CancellationToken ct = default)
-        {
-            if (Shape.Rank != 2)
-                throw new InvalidOperationException("Transpose only supported for 2D tensors");
-
-            return await Task.Run(() =>
+        public async Task<ITensor<T>> TransposeAsync(CancellationToken ct = default) => Shape.Rank != 2
+                ? throw new InvalidOperationException("Transpose only supported for 2D tensors")
+                : await Task.Run(() =>
             {
                 var resultShape = new TensorShape(Shape[1], Shape[0]);
                 var result = new UnifiedTensor<T>(Accelerator, resultShape, layoutMode);
@@ -391,7 +380,7 @@ namespace ILGPU.Numerics
                     // CPU transpose using SIMD when possible
                     var input = AsReadOnlySpan();
                     var output = result.AsSpan();
-                    
+
                     for (int i = 0; i < Shape[0]; i++)
                     {
                         for (int j = 0; j < Shape[1]; j++)
@@ -403,7 +392,6 @@ namespace ILGPU.Numerics
 
                 return (ITensor<T>)result;
             }, ct).ConfigureAwait(false);
-        }
 
         #endregion
 
@@ -491,10 +479,7 @@ namespace ILGPU.Numerics
                 return MemoryLayoutMode.CpuOptimized;
             else if (Accelerator.AcceleratorType == AcceleratorType.Cuda && Shape.Length > 1024 * 1024)
                 return MemoryLayoutMode.Unified;
-            else if (Accelerator.AcceleratorType != AcceleratorType.CPU)
-                return MemoryLayoutMode.GpuOptimized;
-            else
-                return MemoryLayoutMode.CpuOptimized;
+            else return Accelerator.AcceleratorType != AcceleratorType.CPU ? MemoryLayoutMode.GpuOptimized : MemoryLayoutMode.CpuOptimized;
         }
 
         private void EnsureCpuData()

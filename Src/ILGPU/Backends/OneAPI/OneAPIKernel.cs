@@ -15,12 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using ILGPU.Backends.EntryPoints;
-using ILGPU.Runtime;
-
 #if ENABLE_ONEAPI_ACCELERATOR
 namespace ILGPU.Backends.OneAPI
 {

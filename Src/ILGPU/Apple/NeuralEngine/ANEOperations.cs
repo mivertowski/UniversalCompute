@@ -16,9 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Apple.NeuralEngine.Native;
-using ILGPU.Runtime;
 using System;
-using System.Runtime.CompilerServices;
 
 namespace ILGPU.Apple.NeuralEngine
 {

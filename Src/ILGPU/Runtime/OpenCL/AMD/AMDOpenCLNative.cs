@@ -15,9 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Runtime.OpenCL;
 using System;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Runtime.OpenCL.AMD
 {
@@ -148,10 +146,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             // Get actual value
             var buffer = new byte[size.ToUInt32()];
             result = CLApi.GetPlatformInfo(platform, paramName, size, buffer, out _);
-            if (result != CLError.CL_SUCCESS)
-                return string.Empty;
-
-            return System.Text.Encoding.ASCII.GetString(buffer, 0, buffer.Length - 1);
+            return result != CLError.CL_SUCCESS ? string.Empty : System.Text.Encoding.ASCII.GetString(buffer, 0, buffer.Length - 1);
         }
 
         #endregion
@@ -201,10 +196,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
                 // Get devices
                 var devices = new IntPtr[deviceCount];
                 result = CLApi.GetDeviceIDs(platform, deviceType, deviceCount, devices, out _);
-                if (result != CLError.CL_SUCCESS)
-                    return Array.Empty<IntPtr>();
-
-                return devices;
+                return result != CLError.CL_SUCCESS ? Array.Empty<IntPtr>() : devices;
             }
             catch
             {
@@ -338,10 +330,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
 
                 var buffer = new byte[size.ToUInt32()];
                 result = CLApi.GetDeviceInfo(device, (CLDeviceInfoType)paramName, size, buffer, out _);
-                if (result != CLError.CL_SUCCESS)
-                    return string.Empty;
-
-                return System.Text.Encoding.ASCII.GetString(buffer, 0, buffer.Length - 1);
+                return result != CLError.CL_SUCCESS ? string.Empty : System.Text.Encoding.ASCII.GetString(buffer, 0, buffer.Length - 1);
             }
             catch
             {
@@ -358,10 +347,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 var buffer = new byte[4];
                 var result = CLApi.GetDeviceInfo(device, (CLDeviceInfoType)paramName, new UIntPtr(4), buffer, out _);
-                if (result != CLError.CL_SUCCESS)
-                    return 0;
-
-                return BitConverter.ToUInt32(buffer, 0);
+                return result != CLError.CL_SUCCESS ? 0 : BitConverter.ToUInt32(buffer, 0);
             }
             catch
             {
@@ -378,10 +364,7 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 var buffer = new byte[8];
                 var result = CLApi.GetDeviceInfo(device, (CLDeviceInfoType)paramName, new UIntPtr(8), buffer, out _);
-                if (result != CLError.CL_SUCCESS)
-                    return 0;
-
-                return BitConverter.ToUInt64(buffer, 0);
+                return result != CLError.CL_SUCCESS ? 0 : BitConverter.ToUInt64(buffer, 0);
             }
             catch
             {
@@ -398,10 +381,9 @@ namespace ILGPU.Runtime.OpenCL.AMD
             {
                 var buffer = new byte[IntPtr.Size];
                 var result = CLApi.GetDeviceInfo(device, paramName, new UIntPtr((uint)IntPtr.Size), buffer, out _);
-                if (result != CLError.CL_SUCCESS)
-                    return UIntPtr.Zero;
-
-                return IntPtr.Size == 8 
+                return result != CLError.CL_SUCCESS
+                    ? nuint.Zero
+                    : IntPtr.Size == 8
                     ? new UIntPtr(BitConverter.ToUInt64(buffer, 0))
                     : new UIntPtr(BitConverter.ToUInt32(buffer, 0));
             }
@@ -485,7 +467,7 @@ __kernel void amd_gemm_f32(
 }";
 
             // Create and compile the program
-            var program = CLApi.CreateProgramWithSource(context, 1, new[] { kernelSource }, null, out var result);
+            var program = CLApi.CreateProgramWithSource(context, 1, [kernelSource], null, out var result);
             if (result != CLError.CL_SUCCESS)
                 throw new InvalidOperationException($"Failed to create OpenCL program: {result}");
 
@@ -596,10 +578,9 @@ __kernel void amd_gemm_f32(
                 return AMDGPUArchitecture.GCN2;
 
             // GCN 1.0 (Tahiti/Pitcairn/Cape Verde)
-            if (name.Contains("R9 270") || name.Contains("R9 260") || name.Contains("HD 7") || name.Contains("TAHITI") || name.Contains("PITCAIRN"))
-                return AMDGPUArchitecture.GCN1;
-
-            return AMDGPUArchitecture.Unknown;
+            return name.Contains("R9 270") || name.Contains("R9 260") || name.Contains("HD 7") || name.Contains("TAHITI") || name.Contains("PITCAIRN")
+                ? AMDGPUArchitecture.GCN1
+                : AMDGPUArchitecture.Unknown;
         }
 
         #endregion

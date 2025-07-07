@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Runtime.ROCm.Native;
-using ILGPU.Util;
 using System;
 using System.Diagnostics;
 
@@ -163,20 +162,14 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets the device vendor (AMD).
         /// </summary>
-        public string Vendor => "AMD";
+        public static string Vendor => "AMD";
 
         /// <summary>
         /// Creates an accelerator for this device.
         /// </summary>
         /// <param name="context">The ILGPU context.</param>
         /// <returns>The created accelerator.</returns>
-        public override Accelerator CreateAccelerator(Context context)
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            return new ROCmAccelerator(context, this);
-        }
+        public override Accelerator CreateAccelerator(Context context) => context == null ? throw new ArgumentNullException(nameof(context)) : (Accelerator)new ROCmAccelerator(context, this);
 
         #endregion
 

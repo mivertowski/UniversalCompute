@@ -17,7 +17,6 @@
 
 using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Intrinsics;
 
 namespace ILGPU.Benchmarks.Infrastructure;
 

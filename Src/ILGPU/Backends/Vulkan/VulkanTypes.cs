@@ -18,7 +18,6 @@
 using ILGPU.Backends.Vulkan.Native;
 using ILGPU.Runtime;
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ILGPU.Backends.Vulkan
@@ -150,12 +149,16 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Gets the maximum compute workgroup count.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public uint[] MaxComputeWorkGroupCount { get; internal set; } = new uint[3];
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Gets the maximum compute workgroup size.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public uint[] MaxComputeWorkGroupSize { get; internal set; } = new uint[3];
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Gets the maximum shared memory size.
@@ -315,10 +318,9 @@ namespace ILGPU.Backends.Vulkan
         {
             // Create minimal instance for compute
             var result = VulkanNative.vkCreateInstance(IntPtr.Zero, IntPtr.Zero, out var instance);
-            if (result != VkResult.Success || instance == IntPtr.Zero)
-                throw new InvalidOperationException($"Failed to create Vulkan instance: {result}");
-
-            return new VulkanInstance(instance);
+            return result != VkResult.Success || instance == IntPtr.Zero
+                ? throw new InvalidOperationException($"Failed to create Vulkan instance: {result}")
+                : new VulkanInstance(instance);
         }
 
         /// <summary>
@@ -412,10 +414,9 @@ namespace ILGPU.Backends.Vulkan
         {
             // Create minimal device for compute
             var result = VulkanNative.vkCreateDevice(Handle, IntPtr.Zero, IntPtr.Zero, out var device);
-            if (result != VkResult.Success || device == IntPtr.Zero)
-                throw new InvalidOperationException($"Failed to create Vulkan logical device: {result}");
-
-            return new VulkanDevice(device, Name);
+            return result != VkResult.Success || device == IntPtr.Zero
+                ? throw new InvalidOperationException($"Failed to create Vulkan logical device: {result}")
+                : new VulkanDevice(device, Name);
         }
     }
 
@@ -458,7 +459,7 @@ namespace ILGPU.Backends.Vulkan
         /// Creates a command buffer.
         /// </summary>
         /// <returns>Vulkan command buffer.</returns>
-        public VulkanCommandBuffer CreateCommandBuffer() =>
+        public static VulkanCommandBuffer CreateCommandBuffer() =>
             // Simplified implementation - would create command pool first
             new(IntPtr.Zero);
 
@@ -467,7 +468,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         /// <param name="spirvBytecode">SPIR-V bytecode.</param>
         /// <returns>Shader module handle.</returns>
-        public IntPtr CreateShaderModule(byte[] spirvBytecode) =>
+        public static IntPtr CreateShaderModule(byte[] spirvBytecode) =>
             // Simplified implementation
             IntPtr.Zero;
 
@@ -476,7 +477,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         /// <param name="pushConstantSize">Push constant size.</param>
         /// <returns>Pipeline layout handle.</returns>
-        public IntPtr CreateComputePipelineLayout(uint pushConstantSize) =>
+        public static IntPtr CreateComputePipelineLayout(uint pushConstantSize) =>
             // Simplified implementation
             IntPtr.Zero;
 
@@ -487,7 +488,7 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="pipelineLayout">Pipeline layout handle.</param>
         /// <param name="entryPoint">Entry point name.</param>
         /// <returns>Vulkan compute pipeline.</returns>
-        public VulkanComputePipeline CreateComputePipeline(IntPtr shaderModule, IntPtr pipelineLayout, string entryPoint) =>
+        public static VulkanComputePipeline CreateComputePipeline(IntPtr shaderModule, IntPtr pipelineLayout, string entryPoint) =>
             // Simplified implementation
             new(IntPtr.Zero);
 
@@ -498,7 +499,7 @@ namespace ILGPU.Backends.Vulkan
         /// <param name="usage">Buffer usage.</param>
         /// <param name="memoryType">Memory type.</param>
         /// <returns>Vulkan buffer.</returns>
-        public VulkanBuffer CreateBuffer(ulong size, VulkanBufferUsage usage, VulkanMemoryType memoryType) =>
+        public static VulkanBuffer CreateBuffer(ulong size, VulkanBufferUsage usage, VulkanMemoryType memoryType) =>
             // Simplified implementation
             new(null!, (long)size, 4); // Placeholder
 
@@ -507,7 +508,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         /// <param name="layout">Descriptor set layout.</param>
         /// <returns>Vulkan descriptor set.</returns>
-        public VulkanDescriptorSet CreateDescriptorSet(VulkanDescriptorSetLayout layout) =>
+        public static VulkanDescriptorSet CreateDescriptorSet(VulkanDescriptorSetLayout layout) =>
             // Simplified implementation
             new(IntPtr.Zero);
 
@@ -516,7 +517,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         /// <param name="shaderStages">Shader stages.</param>
         /// <returns>Ray tracing pipeline handle.</returns>
-        public IntPtr CreateRayTracingPipeline(VulkanShaderStage[] shaderStages) =>
+        public static IntPtr CreateRayTracingPipeline(VulkanShaderStage[] shaderStages) =>
             // Simplified implementation for ray tracing
             IntPtr.Zero;
 
@@ -525,7 +526,7 @@ namespace ILGPU.Backends.Vulkan
         /// </summary>
         /// <param name="geometryData">Geometry data.</param>
         /// <returns>Acceleration structure handle.</returns>
-        public IntPtr CreateAccelerationStructure(VulkanGeometryData geometryData) =>
+        public static IntPtr CreateAccelerationStructure(VulkanGeometryData geometryData) =>
             // Simplified implementation for acceleration structures
             IntPtr.Zero;
 
@@ -548,7 +549,9 @@ namespace ILGPU.Backends.Vulkan
     /// <summary>
     /// Vulkan queue wrapper.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class VulkanQueue : IDisposable
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         internal VulkanQueue(IntPtr handle)
         {
@@ -727,7 +730,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from CPU memory to this buffer.
         /// </summary>
-        public unsafe void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
+        public static unsafe void CopyFromCPU(IntPtr source, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would map memory and copy
         }
@@ -735,7 +738,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from this buffer to CPU memory.
         /// </summary>
-        public unsafe void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
+        public static unsafe void CopyToCPU(IntPtr target, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would map memory and copy
         }
@@ -743,7 +746,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from another buffer to this buffer.
         /// </summary>
-        public void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
+        public static void CopyFrom(MemoryBuffer source, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would use vkCmdCopyBuffer
         }
@@ -751,7 +754,7 @@ namespace ILGPU.Backends.Vulkan
         /// <summary>
         /// Copies data from this buffer to another buffer.
         /// </summary>
-        public void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
+        public static void CopyTo(MemoryBuffer target, long sourceOffset, long targetOffset, long length)
         {
             // Simplified implementation - would use vkCmdCopyBuffer
         }

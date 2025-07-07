@@ -180,22 +180,22 @@ namespace ILGPU.Intel.IPP
             if (info.SupportsAVX512)
             {
                 // AVX512 systems can handle larger transforms efficiently
-                return new[] { 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
+                return [64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
             }
             else if (info.SupportsAVX2)
             {
                 // AVX2 systems optimal for medium to large transforms
-                return new[] { 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
+                return [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384];
             }
             else if (info.SupportsSSE42)
             {
                 // SSE4.2 systems good for small to medium transforms
-                return new[] { 16, 32, 64, 128, 256, 512, 1024, 2048, 4096 };
+                return [16, 32, 64, 128, 256, 512, 1024, 2048, 4096];
             }
             else
             {
                 // Older systems limited to smaller transforms
-                return new[] { 8, 16, 32, 64, 128, 256, 512, 1024 };
+                return [8, 16, 32, 64, 128, 256, 512, 1024];
             }
         }
 
@@ -300,7 +300,9 @@ namespace ILGPU.Intel.IPP
         /// <summary>
         /// Array of optimal FFT sizes for this CPU.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public int[] OptimalFFTSizes { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Performance characteristics of this IPP installation.

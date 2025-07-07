@@ -20,9 +20,6 @@ using ILGPU.Numerics;
 using ILGPU.Numerics.AI;
 using ILGPU.Runtime;
 using ILGPU.Runtime.AI;
-using ILGPU.Runtime.CPU;
-using System;
-using System.Threading.Tasks;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 

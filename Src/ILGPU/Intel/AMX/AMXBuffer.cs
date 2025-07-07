@@ -143,9 +143,7 @@ namespace ILGPU.Intel.AMX
             else
             {
                 // Use posix_memalign for Unix-like systems
-                if (posix_memalign(out var ptr, (UIntPtr)alignment, (UIntPtr)size) == 0)
-                    return ptr;
-                return IntPtr.Zero;
+                return posix_memalign(out var ptr, (UIntPtr)alignment, (UIntPtr)size) == 0 ? ptr : nint.Zero;
             }
         }
 

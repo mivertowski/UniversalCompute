@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using System;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Intel.NPU
 {

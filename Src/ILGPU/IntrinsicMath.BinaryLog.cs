@@ -50,13 +50,10 @@ namespace ILGPU
                         return double.PositiveInfinity;
                 }
 
-                if (value == 1.0 &&
-                    (newBase == 0.0 || newBase == double.PositiveInfinity))
-                {
-                    return 0.0;
-                }
-
-                return CPUOnly.Log(value) * CPUOnly.Rcp(CPUOnly.Log(newBase));
+                return value == 1.0 &&
+                    (newBase == 0.0 || newBase == double.PositiveInfinity)
+                    ? 0.0
+                    : CPUOnly.Log(value) * CPUOnly.Rcp(CPUOnly.Log(newBase));
             }
 
             /// <summary>
@@ -91,13 +88,10 @@ namespace ILGPU
                         return float.PositiveInfinity;
                 }
 
-                if (value == 1.0f &&
-                    (newBase == 0.0f || newBase == float.PositiveInfinity))
-                {
-                    return 0.0f;
-                }
-
-                return CPUOnly.Log(value) * CPUOnly.Rcp(CPUOnly.Log(newBase));
+                return value == 1.0f &&
+                    (newBase == 0.0f || newBase == float.PositiveInfinity)
+                    ? 0.0f
+                    : CPUOnly.Log(value) * CPUOnly.Rcp(CPUOnly.Log(newBase));
             }
         }
     }

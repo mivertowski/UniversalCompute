@@ -19,8 +19,6 @@ using ILGPU.Runtime;
 using ILGPU.TensorCores;
 using System;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace ILGPU.MixedPrecision
 {

@@ -65,14 +65,7 @@ namespace ILGPU.Tests
             var expected = Enumerable.Range(0, Length)
                 .Select(x =>
                 {
-                    if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
-                    {
-                        return x + 42;
-                    }
-                    else
-                    {
-                        return x;
-                    }
+                    return Accelerator.AcceleratorType == AcceleratorType.Cuda ? x + 42 : x;
                 })
                 .ToArray();
 
@@ -113,14 +106,7 @@ namespace ILGPU.Tests
                 .Select(x => (double)x)
                 .Select(x =>
                 {
-                    if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
-                    {
-                        return x + 42.0 + 42.0;
-                    }
-                    else
-                    {
-                        return x;
-                    }
+                    return Accelerator.AcceleratorType == AcceleratorType.Cuda ? x + 42.0 + 42.0 : x;
                 })
                 .ToArray();
 
@@ -152,14 +138,7 @@ namespace ILGPU.Tests
             var expected = Enumerable.Range(0, Length)
                 .Select(x =>
                 {
-                    if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
-                    {
-                        return x % Accelerator.WarpSize;
-                    }
-                    else
-                    {
-                        return x;
-                    }
+                    return Accelerator.AcceleratorType == AcceleratorType.Cuda ? x % Accelerator.WarpSize : x;
                 })
                 .ToArray();
 
@@ -200,14 +179,7 @@ namespace ILGPU.Tests
                 {
                     if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
                     {
-                        if (x % 2 == 0)
-                        {
-                            return x % Accelerator.WarpSize;
-                        }
-                        else
-                        {
-                            return 42;
-                        }
+                        return x % 2 == 0 ? x % Accelerator.WarpSize : 42;
                     }
                     else
                     {
@@ -252,14 +224,7 @@ namespace ILGPU.Tests
             var expected = Enumerable.Range(0, Length)
                 .Select(x =>
                 {
-                    if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
-                    {
-                        return 1 + (sbyte)x;
-                    }
-                    else
-                    {
-                        return x;
-                    }
+                    return Accelerator.AcceleratorType == AcceleratorType.Cuda ? 1 + (sbyte)x : x;
                 })
                 .ToArray();
 
@@ -305,14 +270,7 @@ namespace ILGPU.Tests
             var expected = Enumerable.Range(0, Length)
                 .Select(x =>
                 {
-                    if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
-                    {
-                        return (long)(Length - x);
-                    }
-                    else
-                    {
-                        return x;
-                    }
+                    return Accelerator.AcceleratorType == AcceleratorType.Cuda ? (long)(Length - x) : x;
                 })
                 .ToArray();
 
@@ -353,14 +311,7 @@ namespace ILGPU.Tests
             var expected = Enumerable.Range(0, Length)
                 .Select(x =>
                 {
-                    if (Accelerator.AcceleratorType == AcceleratorType.Cuda)
-                    {
-                        return (long)(Length - x);
-                    }
-                    else
-                    {
-                        return x;
-                    }
+                    return Accelerator.AcceleratorType == AcceleratorType.Cuda ? (long)(Length - x) : x;
                 })
                 .ToArray();
 

@@ -405,19 +405,15 @@ namespace ILGPU.Runtime.Scheduling
             return bestDeviceKvp.Key != default ? bestDeviceKvp.Key : fallback;
         }
 
-        private bool CanExecuteOperation(ComputeDevice device, IComputeOperation operation)
-        {
-            if (!_devicePerformance.TryGetValue(device, out var performance))
-                return false;
-
-            return operation switch
-            {
-                MatMulOp => performance.SupportsMatrixOperations,
-                ConvolutionOp => performance.SupportsConvolution,
-                VectorOp => performance.SIMDWidthBits > 0,
-                _ => true
-            };
-        }
+        private bool CanExecuteOperation(ComputeDevice device, IComputeOperation operation) => !_devicePerformance.TryGetValue(device, out var performance)
+                ? false
+                : operation switch
+                {
+                    MatMulOp => performance.SupportsMatrixOperations,
+                    ConvolutionOp => performance.SupportsConvolution,
+                    VectorOp => performance.SIMDWidthBits > 0,
+                    _ => true
+                };
 
         private static double CalculateParallelismLevel(ComputeGraph graph)
         {
@@ -504,15 +500,9 @@ namespace ILGPU.Runtime.Scheduling
             // on the assigned device
             await Task.Delay((int)node.EstimatedTimeMs).ConfigureAwait(false); // Placeholder
 
-        private double EstimateExecutionTime(ComputeNode node, ComputeDevice device)
-        {
-            if (_devicePerformance.TryGetValue(device, out var performance))
-            {
-                return node.Operation.EstimatedFlops / performance.PeakGFLOPS / 1000.0;
-            }
-
-            return node.EstimatedTimeMs;
-        }
+        private double EstimateExecutionTime(ComputeNode node, ComputeDevice device) => _devicePerformance.TryGetValue(device, out var performance)
+                ? node.Operation.EstimatedFlops / performance.PeakGFLOPS / 1000.0
+                : node.EstimatedTimeMs;
 
         private void ThrowIfDisposed()
         {

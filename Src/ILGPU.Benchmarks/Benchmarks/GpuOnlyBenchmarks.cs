@@ -17,7 +17,6 @@
 
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Benchmarks.Benchmarks;
 

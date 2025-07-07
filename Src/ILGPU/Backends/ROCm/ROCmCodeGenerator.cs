@@ -17,12 +17,8 @@
 
 using ILGPU.Backends.EntryPoints;
 using ILGPU.IR;
-using ILGPU.IR.Types;
-using ILGPU.IR.Values;
-using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ILGPU.Backends.ROCm
@@ -56,7 +52,7 @@ namespace ILGPU.Backends.ROCm
             this.instructionSet = instructionSet;
             this.capabilities = capabilities;
             codeBuilder = new StringBuilder();
-            valueMapping = new Dictionary<Value, string>();
+            valueMapping = [];
             variableCounter = 0;
         }
 

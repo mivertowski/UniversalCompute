@@ -63,12 +63,8 @@ namespace ILGPU.Tests
         {
             var method = type.GetMethod(
                 name,
-                BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-            if (method == null)
-            {
-                throw new InvalidOperationException(
+                BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public) ?? throw new InvalidOperationException(
                     $"Could not find kernel method '{name}' of type '{type}'");
-            }
             if (method.IsGenericMethod)
             {
                 if (typeArguments == null)

@@ -237,9 +237,9 @@ namespace ILGPU.Runtime
                 throw new ArgumentOutOfRangeException(nameof(offsetInBytes));
             if (LengthInBytes > 0 && offsetInBytes >= LengthInBytes)
                 throw new ArgumentOutOfRangeException(nameof(offsetInBytes));
-            if (lengthInBytes < 0 || offsetInBytes + lengthInBytes > LengthInBytes)
-                throw new ArgumentOutOfRangeException(nameof(lengthInBytes));
-            return new ArrayView<byte>(this, offsetInBytes, lengthInBytes);
+            return lengthInBytes < 0 || offsetInBytes + lengthInBytes > LengthInBytes
+                ? throw new ArgumentOutOfRangeException(nameof(lengthInBytes))
+                : new ArrayView<byte>(this, offsetInBytes, lengthInBytes);
         }
 
         /// <summary>
@@ -260,9 +260,7 @@ namespace ILGPU.Runtime
             }
             if (Length > 0 && offset >= Length)
                 throw new ArgumentOutOfRangeException(nameof(offset));
-            if (offset + length > Length)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            return new ArrayView<T>(this, offset, length);
+            return offset + length > Length ? throw new ArgumentOutOfRangeException(nameof(length)) : new ArrayView<T>(this, offset, length);
         }
 
         /// <summary>

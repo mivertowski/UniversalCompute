@@ -26,7 +26,9 @@ namespace ILGPU.Runtime.Vulkan
     /// <summary>
     /// A Vulkan stream for asynchronous compute operations.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class VulkanStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         #region Instance
 
@@ -185,7 +187,7 @@ namespace ILGPU.Runtime.Vulkan
                 };
 
                 var result = VulkanNative.QueueSubmit(
-                    Accelerator.ComputeQueue, 1, new[] { submitInfo }, 
+                    Accelerator.ComputeQueue, 1, [submitInfo], 
                     new VkFence { Handle = IntPtr.Zero });
                 VulkanException.ThrowIfFailed(result);
             }
@@ -255,12 +257,9 @@ namespace ILGPU.Runtime.Vulkan
         /// </summary>
         /// <param name="marker">The starting marker.</param>
         /// <returns>The elapsed time.</returns>
-        public override TimeSpan MeasureFrom(ProfilingMarker marker)
-        {
-            if (marker is VulkanProfilingMarker vulkanMarker)
-                return _timestamp - vulkanMarker._timestamp;
-            throw new ArgumentException("Marker must be a Vulkan profiling marker", nameof(marker));
-        }
+        public override TimeSpan MeasureFrom(ProfilingMarker marker) => marker is VulkanProfilingMarker vulkanMarker
+                ? _timestamp - vulkanMarker._timestamp
+                : throw new ArgumentException("Marker must be a Vulkan profiling marker", nameof(marker));
 
         /// <summary>
         /// Disposes this profiling marker.
@@ -386,7 +385,9 @@ namespace ILGPU.Runtime.Vulkan
     /// </summary>
     public class VulkanCompiledKernel : CompiledKernel
     {
+#pragma warning disable CA1819 // Properties should not return arrays
         public byte[] SPIRVBinary { get; }
+#pragma warning restore CA1819 // Properties should not return arrays
         public string EntryPointName { get; }
 
         public VulkanCompiledKernel(Context context, byte[] spirvBinary, string entryPointName, EntryPoint entryPoint)

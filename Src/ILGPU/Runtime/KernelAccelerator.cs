@@ -44,9 +44,9 @@ namespace ILGPU.Runtime
         {
             if (kernel == null)
                 throw new ArgumentNullException(nameof(kernel));
-            if (!(kernel is TCompiledKernel compiledKernel))
-                throw new NotSupportedException(RuntimeErrorMessages.NotSupportedKernel);
-            return CreateKernel(
+            return !(kernel is TCompiledKernel compiledKernel)
+                ? throw new NotSupportedException(RuntimeErrorMessages.NotSupportedKernel)
+                : (Kernel)CreateKernel(
                 compiledKernel,
                 GenerateKernelLauncherMethod(compiledKernel, 0));
         }

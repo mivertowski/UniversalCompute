@@ -16,9 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace ILGPU.Apple.NeuralEngine
 {
@@ -42,7 +40,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Tensor shape.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         int[] Shape { get; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Number of elements.
@@ -159,7 +159,9 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Shape dimensions.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public int[] Dimensions { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Creates a new tensor shape.
@@ -173,7 +175,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Gets the total number of elements in the tensor.
         /// </summary>
-        public long ElementCount
+        public readonly long ElementCount
         {
             get
             {
@@ -327,7 +329,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Network layers.
         /// </summary>
-        public List<NeuralOperation> Layers { get; set; } = new List<NeuralOperation>();
+        public Collection<NeuralOperation> Layers { get; } = [];
 
         /// <summary>
         /// Disposes the network.

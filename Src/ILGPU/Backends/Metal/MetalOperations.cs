@@ -16,9 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends.Metal.Native;
-using ILGPU.Runtime;
 using System;
-using System.Runtime.InteropServices;
 
 namespace ILGPU.Backends.Metal
 {

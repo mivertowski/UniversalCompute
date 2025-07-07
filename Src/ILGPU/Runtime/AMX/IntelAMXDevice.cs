@@ -117,12 +117,12 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the total device memory in bytes (system RAM).
         /// </summary>
-        public new long MemorySize => GetSystemMemorySize();
+        public new static long MemorySize => GetSystemMemorySize();
 
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
+        public new static AcceleratorType AcceleratorType => AcceleratorType.CPU; // AMX is CPU-based
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -167,7 +167,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the device vendor.
         /// </summary>
-        public string Vendor => "Intel";
+        public static string Vendor => "Intel";
 
         /// <summary>
         /// Gets the device ID.
@@ -199,18 +199,15 @@ namespace ILGPU.Runtime.AMX
                     return Array.Empty<IntelAMXDevice>();
 
                 var deviceInfo = DetectProcessorInfo();
-                if (deviceInfo == null)
-                    return Array.Empty<IntelAMXDevice>();
-
-                return new[] { deviceInfo };
+                return deviceInfo == null ? Array.Empty<IntelAMXDevice>() : ([deviceInfo]);
             }
             catch (Exception)
             {
                 // Return fallback device on any error
-                return new[]
-                {
+                return
+                [
                     CreateFallbackDevice()
-                };
+                ];
             }
         }
 

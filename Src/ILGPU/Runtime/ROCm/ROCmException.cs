@@ -16,7 +16,6 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Runtime.ROCm.Native;
-using ILGPU.Util;
 using System;
 using System.Runtime.Serialization;
 
@@ -144,13 +143,7 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="errorCode">The error code to check.</param>
         /// <returns>True if the operation was successful.</returns>
-        internal static bool VerifyResult(HipError errorCode)
-        {
-            if (errorCode == HipError.Success)
-                return true;
-            
-            throw new ROCmException(errorCode);
-        }
+        internal static bool VerifyResult(HipError errorCode) => errorCode == HipError.Success ? true : throw new ROCmException(errorCode);
 
         /// <summary>
         /// Gets an error string for the given error code.

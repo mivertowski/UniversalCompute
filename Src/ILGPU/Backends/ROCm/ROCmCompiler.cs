@@ -136,10 +136,7 @@ namespace ILGPU.Backends.ROCm
                     WorkingDirectory = tempDir
                 };
 
-                using var process = Process.Start(processInfo);
-                if (process == null)
-                    throw new InvalidOperationException("Failed to start hipcc compiler");
-
+                using var process = Process.Start(processInfo) ?? throw new InvalidOperationException("Failed to start hipcc compiler");
                 process.WaitForExit(30000); // 30 second timeout
 
                 if (process.ExitCode != 0)
@@ -149,14 +146,7 @@ namespace ILGPU.Backends.ROCm
                 }
 
                 // Read compiled binary
-                if (File.Exists(objectFile))
-                {
-                    return File.ReadAllBytes(objectFile);
-                }
-                else
-                {
-                    throw new FileNotFoundException("Compiled object file not found");
-                }
+                return File.Exists(objectFile) ? File.ReadAllBytes(objectFile) : throw new FileNotFoundException("Compiled object file not found");
             }
             finally
             {
@@ -214,18 +204,11 @@ namespace ILGPU.Backends.ROCm
         /// <param name="sourceCode">The source code.</param>
         /// <param name="kernelName">The kernel name.</param>
         /// <returns>The LLVM IR binary.</returns>
-        internal byte[] CompileToLLVMIR(string sourceCode, string kernelName)
+        internal static byte[] CompileToLLVMIR(string sourceCode, string kernelName)
         {
             try
             {
-                if (IsClangAvailable())
-                {
-                    return CompileWithClang(sourceCode, kernelName);
-                }
-                else
-                {
-                    return CompileToSourceBinary(sourceCode, kernelName);
-                }
+                return IsClangAvailable() ? CompileWithClang(sourceCode, kernelName) : CompileToSourceBinary(sourceCode, kernelName);
             }
             catch (Exception ex)
             {
@@ -271,7 +254,7 @@ namespace ILGPU.Backends.ROCm
         /// <param name="sourceCode">The source code.</param>
         /// <param name="kernelName">The kernel name.</param>
         /// <returns>The LLVM IR binary.</returns>
-        private byte[] CompileWithClang(string sourceCode, string kernelName)
+        private static byte[] CompileWithClang(string sourceCode, string kernelName)
         {
             var tempDir = Path.GetTempPath();
             var sourceFile = Path.Combine(tempDir, $"{kernelName}.hip");
@@ -294,10 +277,7 @@ namespace ILGPU.Backends.ROCm
                     WorkingDirectory = tempDir
                 };
 
-                using var process = Process.Start(processInfo);
-                if (process == null)
-                    throw new InvalidOperationException("Failed to start clang compiler");
-
+                using var process = Process.Start(processInfo) ?? throw new InvalidOperationException("Failed to start clang compiler");
                 process.WaitForExit(30000);
 
                 if (process.ExitCode != 0)
@@ -307,14 +287,7 @@ namespace ILGPU.Backends.ROCm
                 }
 
                 // Read LLVM IR
-                if (File.Exists(llvmFile))
-                {
-                    return File.ReadAllBytes(llvmFile);
-                }
-                else
-                {
-                    throw new FileNotFoundException("LLVM IR file not found");
-                }
+                return File.Exists(llvmFile) ? File.ReadAllBytes(llvmFile) : throw new FileNotFoundException("LLVM IR file not found");
             }
             finally
             {

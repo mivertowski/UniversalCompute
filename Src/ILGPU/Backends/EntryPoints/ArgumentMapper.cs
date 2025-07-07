@@ -119,10 +119,6 @@ namespace ILGPU.Backends.EntryPoints
         /// <param name="parentTarget">The parent target.</param>
         /// <param name="targetField">The target field.</param>
         [method: MethodImpl(MethodImplOptions.AggressiveInlining)]
-        /// <summary>
-        /// A structure source.
-        /// </summary>
-        /// <typeparam name="TParentTarget">The parent source type.</typeparam>
         protected readonly struct StructureTarget<TParentTarget>(in TParentTarget parentTarget, FieldInfo targetField) : ITarget
             where TParentTarget : struct, ITarget
         {
@@ -893,6 +889,7 @@ namespace ILGPU.Backends.EntryPoints
         /// <param name="mappingHandler">The target mapping handler to use.</param>
         /// <param name="parameters">The parameter collection to map.</param>
         /// <returns>The argument mapping structure type.</returns>
+        [return: DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)]
         private Type CreateArgumentStructType<TMappingHandler, T>(
             in TMappingHandler mappingHandler,
             in ParameterCollection parameters)

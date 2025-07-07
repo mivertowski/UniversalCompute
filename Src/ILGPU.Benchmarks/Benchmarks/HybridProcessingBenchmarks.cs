@@ -16,10 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using BenchmarkDotNet.Attributes;
-using ILGPU;
 using ILGPU.Runtime;
-using ILGPU.Numerics;
-using System;
 
 namespace ILGPU.Benchmarks.Benchmarks
 {

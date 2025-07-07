@@ -148,10 +148,7 @@ namespace ILGPU.FFT
             bool forward = true,
             AcceleratorStream? stream = null)
         {
-            var accelerator = GetBestAccelerator((int)input.Length, false, true);
-            if (accelerator == null)
-                throw new InvalidOperationException("No suitable FFT accelerator available");
-
+            var accelerator = GetBestAccelerator((int)input.Length, false, true) ?? throw new InvalidOperationException("No suitable FFT accelerator available");
             accelerator.FFT1D(input, output, forward, stream);
             return accelerator;
         }
@@ -168,10 +165,7 @@ namespace ILGPU.FFT
             ArrayView<Complex> output,
             AcceleratorStream? stream = null)
         {
-            var accelerator = GetBestAccelerator((int)input.Length, false, true);
-            if (accelerator == null)
-                throw new InvalidOperationException("No suitable FFT accelerator available");
-
+            var accelerator = GetBestAccelerator((int)input.Length, false, true) ?? throw new InvalidOperationException("No suitable FFT accelerator available");
             accelerator.FFT1DReal(input, output, stream);
             return accelerator;
         }
@@ -191,10 +185,7 @@ namespace ILGPU.FFT
             AcceleratorStream? stream = null)
         {
             var size = Math.Max((int)input.Extent.X, (int)input.Extent.Y);
-            var accelerator = GetBestAccelerator(size, true, true);
-            if (accelerator == null)
-                throw new InvalidOperationException("No suitable FFT accelerator available");
-
+            var accelerator = GetBestAccelerator(size, true, true) ?? throw new InvalidOperationException("No suitable FFT accelerator available");
             accelerator.FFT2D(input, output, forward, stream);
             return accelerator;
         }

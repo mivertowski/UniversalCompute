@@ -296,9 +296,9 @@ namespace ILGPU.IR.Construction
         {
             if (type == null)
                 throw location.GetArgumentNullException(nameof(type));
-            if (value != null && type != value.GetType())
-                throw location.GetArgumentException(nameof(type));
-            return type.GetArithmeticBasicValueType() switch
+            return value != null && type != value.GetType()
+                ? throw location.GetArgumentException(nameof(type))
+                : type.GetArithmeticBasicValueType() switch
             {
                 ArithmeticBasicValueType.UInt1 =>
                     CreatePrimitiveValue(location, Convert.ToBoolean(value)),

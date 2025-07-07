@@ -259,7 +259,7 @@ namespace ILGPU.TensorCores
             {
                 var floatData = System.Runtime.InteropServices.MemoryMarshal.Cast<T, float>(data);
                 var floatVector = new Vector<float>(floatData.Slice(index));
-                return System.Runtime.InteropServices.MemoryMarshal.Cast<Vector<float>, Vector<T>>(new[] { floatVector })[0];
+                return System.Runtime.InteropServices.MemoryMarshal.Cast<Vector<float>, Vector<T>>([floatVector])[0];
             }
             throw new NotSupportedException($"Vector conversion not supported for type {typeof(T)}");
         }
@@ -273,7 +273,7 @@ namespace ILGPU.TensorCores
         {
             if (typeof(T) == typeof(float))
             {
-                var floatVector = System.Runtime.InteropServices.MemoryMarshal.Cast<Vector<T>, Vector<float>>(new[] { vector })[0];
+                var floatVector = System.Runtime.InteropServices.MemoryMarshal.Cast<Vector<T>, Vector<float>>([vector])[0];
                 var floatData = System.Runtime.InteropServices.MemoryMarshal.Cast<T, float>(data);
                 floatVector.CopyTo(floatData.Slice(index));
             }

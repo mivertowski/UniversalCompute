@@ -279,9 +279,7 @@ namespace ILGPU
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(BFloat16 left, BFloat16 right)
         {
-            if (left.IsNaN || right.IsNaN)
-                return false;
-            return left.RawValue == right.RawValue;
+            return left.IsNaN || right.IsNaN ? false : left.RawValue == right.RawValue;
         }
 
         /// <summary>

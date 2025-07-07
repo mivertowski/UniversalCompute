@@ -83,16 +83,11 @@ namespace ILGPU.Runtime
         /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task that completes when the kernel execution finishes.</returns>
-        public Task WaitAsync(CancellationToken cancellationToken = default)
-        {
-            if (cancellationToken.CanBeCanceled)
-            {
-                return Task.WhenAny(Task, Task.Delay(-1, cancellationToken))
+        public Task WaitAsync(CancellationToken cancellationToken = default) => cancellationToken.CanBeCanceled
+                ? Task.WhenAny(Task, Task.Delay(-1, cancellationToken))
                     .ContinueWith(t => Task, TaskScheduler.Default)
-                    .Unwrap();
-            }
-            return Task;
-        }
+                    .Unwrap()
+                : Task;
 
         /// <summary>
         /// Synchronously waits for the kernel execution to complete.

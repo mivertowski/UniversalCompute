@@ -146,9 +146,9 @@ namespace ILGPU
             {
                 get
                 {
-                    if (deviceIndex < 0)
-                        throw new ArgumentOutOfRangeException(nameof(deviceIndex));
-                    return deviceIndex < Count
+                    return deviceIndex < 0
+                        ? throw new ArgumentOutOfRangeException(nameof(deviceIndex))
+                        : deviceIndex < Count
                         ? devices[deviceIndex].AsNotNullCast<TDevice>()
                         : throw new NotSupportedException(
                             RuntimeErrorMessages.NotSupportedTargetAccelerator);

@@ -66,42 +66,42 @@ namespace ILGPU.AI.Memory
         /// <summary>
         /// Total memory allocated in bytes.
         /// </summary>
-        public long TotalAllocated;
+        public long TotalAllocated { get; set; }
 
         /// <summary>
         /// Peak memory usage in bytes.
         /// </summary>
-        public long PeakUsage;
+        public long PeakUsage { get; set; }
 
         /// <summary>
         /// Current memory usage in bytes.
         /// </summary>
-        public long CurrentUsage;
+        public long CurrentUsage { get; set; }
 
         /// <summary>
         /// Number of memory allocations.
         /// </summary>
-        public int AllocationCount;
+        public int AllocationCount { get; set; }
 
         /// <summary>
         /// Number of memory deallocations.
         /// </summary>
-        public int DeallocationCount;
+        public int DeallocationCount { get; set; }
 
         /// <summary>
         /// Average allocation size in bytes.
         /// </summary>
-        public double AverageAllocationSize;
+        public double AverageAllocationSize { get; set; }
 
         /// <summary>
         /// Memory fragmentation ratio (0.0 = no fragmentation, 1.0 = highly fragmented).
         /// </summary>
-        public float FragmentationRatio;
+        public float FragmentationRatio { get; set; }
 
         /// <summary>
         /// Cache hit ratio (0.0 = no hits, 1.0 = all hits).
         /// </summary>
-        public float CacheHitRatio;
+        public float CacheHitRatio { get; set; }
     }
 
     /// <summary>
@@ -112,42 +112,42 @@ namespace ILGPU.AI.Memory
         /// <summary>
         /// Recommended memory layout.
         /// </summary>
-        public AIMemoryLayout Layout;
+        public AIMemoryLayout Layout { get; set; }
 
         /// <summary>
         /// Recommended access pattern.
         /// </summary>
-        public AIAccessPattern AccessPattern;
+        public AIAccessPattern AccessPattern { get; set; }
 
         /// <summary>
         /// Recommended tile size.
         /// </summary>
-        public (int Height, int Width) TileSize;
+        public (int Height, int Width) TileSize { get; set; }
 
         /// <summary>
         /// Recommended block size.
         /// </summary>
-        public int BlockSize;
+        public int BlockSize { get; set; }
 
         /// <summary>
         /// Recommended memory alignment.
         /// </summary>
-        public int Alignment;
+        public int Alignment { get; set; }
 
         /// <summary>
         /// Whether to enable prefetching.
         /// </summary>
-        public bool EnablePrefetching;
+        public bool EnablePrefetching { get; set; }
 
         /// <summary>
         /// Expected performance improvement ratio.
         /// </summary>
-        public float ExpectedImprovement;
+        public float ExpectedImprovement { get; set; }
 
         /// <summary>
         /// Confidence level of the recommendation (0.0 to 1.0).
         /// </summary>
-        public float Confidence;
+        public float Confidence { get; set; }
     }
 
     /// <summary>
@@ -171,8 +171,8 @@ namespace ILGPU.AI.Memory
             _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
             _totalMemoryBudget = memoryBudget > 0 ? memoryBudget : _accelerator.MemorySize;
             _memoryUtilizationTarget = 0.8f; // Target 80% utilization
-            _operationStats = new Dictionary<string, MemoryStats>();
-            _recommendations = new Dictionary<string, OptimizationRecommendation>();
+            _operationStats = [];
+            _recommendations = [];
         }
 
         /// <summary>
@@ -326,7 +326,7 @@ namespace ILGPU.AI.Memory
                 var adjustedStrategy = AdjustStrategyByPriority(strategy, priority);
                 
                 // Generate recommendation (simplified - would consider memory conflicts)
-                var recommendation = AnalyzeAndOptimize(operation, 1000000, new[] { typeof(float) }, adjustedStrategy);
+                var recommendation = AnalyzeAndOptimize(operation, 1000000, [typeof(float)], adjustedStrategy);
                 
                 // Adjust recommendation based on global constraints
                 recommendation = AdjustForGlobalConstraints(recommendation, priority, _totalMemoryBudget);
@@ -339,7 +339,7 @@ namespace ILGPU.AI.Memory
 
         #region Private Methods
 
-        private long CalculateMemoryRequirements(long workloadSize, Type[] dataTypes)
+        private static long CalculateMemoryRequirements(long workloadSize, Type[] dataTypes)
         {
             long totalSize = 0;
             foreach (var type in dataTypes)
@@ -355,7 +355,7 @@ namespace ILGPU.AI.Memory
             return totalSize;
         }
 
-        private AIAccessPattern DetermineOptimalAccessPattern(string operationType, long workloadSize) => operationType.ToUpperInvariant() switch
+        private static AIAccessPattern DetermineOptimalAccessPattern(string operationType, long workloadSize) => operationType.ToUpperInvariant() switch
         {
             "convolution" => AIAccessPattern.Tiled,
             "matmul" => AIAccessPattern.Blocked,
@@ -366,7 +366,7 @@ namespace ILGPU.AI.Memory
             _ => workloadSize > 1000000 ? AIAccessPattern.Blocked : AIAccessPattern.Sequential
         };
 
-        private AIMemoryLayout DetermineOptimalLayout(string operationType, OptimizationStrategy strategy, long workloadSize)
+        private static AIMemoryLayout DetermineOptimalLayout(string operationType, OptimizationStrategy strategy, long workloadSize)
         {
             // Base layout on operation type
             var baseLayout = operationType.ToUpperInvariant() switch
@@ -388,7 +388,7 @@ namespace ILGPU.AI.Memory
             };
         }
 
-        private (int Height, int Width) CalculateOptimalTileSize(string operationType, long workloadSize)
+        private static (int Height, int Width) CalculateOptimalTileSize(string operationType, long workloadSize)
         {
             var cacheSize = 64 * 1024; // Assume 64KB L1 cache
             var elementSize = 4; // Float32
@@ -409,7 +409,7 @@ namespace ILGPU.AI.Memory
             };
         }
 
-        private (int tileHeight, int tileWidth, int blockSize) CalculateOptimalSizes(
+        private static (int tileHeight, int tileWidth, int blockSize) CalculateOptimalSizes(
             string operationType, long workloadSize, long memoryRequired)
         {
             var (tileHeight, tileWidth) = CalculateOptimalTileSize(operationType, workloadSize);
@@ -422,7 +422,7 @@ namespace ILGPU.AI.Memory
             return (tileHeight, tileWidth, blockSize);
         }
 
-        private int CalculateOptimalAlignment(Type[] dataTypes, AIAccessPattern accessPattern)
+        private static int CalculateOptimalAlignment(Type[] dataTypes, AIAccessPattern accessPattern)
         {
             // Base alignment on largest data type
             var maxElementSize = dataTypes.Max(t => 
@@ -443,7 +443,7 @@ namespace ILGPU.AI.Memory
             return Math.Max(maxElementSize, baseAlignment);
         }
 
-        private bool ShouldEnablePrefetching(string operationType, AIAccessPattern accessPattern, OptimizationStrategy strategy)
+        private static bool ShouldEnablePrefetching(string operationType, AIAccessPattern accessPattern, OptimizationStrategy strategy)
         {
             // Disable prefetching for random access or when optimizing for memory efficiency
             if (accessPattern == AIAccessPattern.Random || accessPattern == AIAccessPattern.GatherScatter)
@@ -456,7 +456,7 @@ namespace ILGPU.AI.Memory
             return true;
         }
 
-        private float EstimatePerformanceImprovement(
+        private static float EstimatePerformanceImprovement(
             string operationType, AIMemoryLayout layout, AIAccessPattern accessPattern,
             (int Height, int Width) tileSize, int blockSize)
         {
@@ -471,13 +471,13 @@ namespace ILGPU.AI.Memory
             };
             
             // Adjust based on tile/block size optimality
-            var sizeOptimality = (tileSize.Height * tileSize.Width) < 1024 ? 1.1f : 1.0f;
+            var sizeOptimality = tileSize.Height * tileSize.Width < 1024 ? 1.1f : 1.0f;
             var blockOptimality = (blockSize >= 64 && blockSize <= 256) ? 1.05f : 1.0f;
             
             return baseImprovement * sizeOptimality * blockOptimality;
         }
 
-        private float CalculateConfidence(string operationType, long workloadSize)
+        private static float CalculateConfidence(string operationType, long workloadSize)
         {
             // Higher confidence for well-known operation types and sizes
             var operationConfidence = operationType.ToUpperInvariant() switch
@@ -499,20 +499,17 @@ namespace ILGPU.AI.Memory
             return operationConfidence * sizeConfidence;
         }
 
-        private OptimizationStrategy AdjustStrategyByPriority(OptimizationStrategy baseStrategy, float priority)
+        private static OptimizationStrategy AdjustStrategyByPriority(OptimizationStrategy baseStrategy, float priority)
         {
             // High priority operations get latency optimization
             if (priority > 0.6f)
                 return OptimizationStrategy.Latency;
-            
+
             // Low priority operations get memory efficiency
-            if (priority < 0.2f)
-                return OptimizationStrategy.MemoryEfficient;
-            
-            return baseStrategy;
+            return priority < 0.2f ? OptimizationStrategy.MemoryEfficient : baseStrategy;
         }
 
-        private OptimizationRecommendation AdjustForGlobalConstraints(
+        private static OptimizationRecommendation AdjustForGlobalConstraints(
             OptimizationRecommendation recommendation, float priority, long memoryBudget)
         {
             // Reduce tile/block sizes for low priority operations to save memory

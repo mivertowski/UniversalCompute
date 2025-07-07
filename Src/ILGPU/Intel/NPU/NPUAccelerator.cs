@@ -23,7 +23,6 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ILGPU.Apple.NeuralEngine;
-using ILGPU.Numerics;
 
 namespace ILGPU.Intel.NPU
 {
@@ -50,7 +49,7 @@ namespace ILGPU.Intel.NPU
                 throw new InvalidOperationException("Failed to create Intel NPU context");
 
             Capabilities = NPUCapabilities.Query();
-            
+
             // Initialize accelerator properties
             InitializeAcceleratorProperties();
         }
@@ -203,27 +202,27 @@ namespace ILGPU.Intel.NPU
 
         protected override MemoryBuffer AllocateRawInternal(long length, int elementSize) => new NPUBuffer(this, length, elementSize);
 
-        protected override Kernel LoadKernelInternal(CompiledKernel compiledKernel) =>
+        protected override Kernel LoadKernelInternal(CompiledKernel kernel) =>
             // NPU uses specialized operations rather than general kernels
             throw new NotSupportedException(
                 "Intel NPU does not support general kernel loading. " +
                 "Use specialized NPU operations instead.");
 
         protected override Kernel LoadAutoGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = null;
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override Kernel LoadImplicitlyGroupedKernelInternal(
-            CompiledKernel compiledKernel,
+            CompiledKernel kernel,
             int customGroupSize,
             out KernelInfo? kernelInfo)
         {
             kernelInfo = null;
-            return LoadKernelInternal(compiledKernel);
+            return LoadKernelInternal(kernel);
         }
 
         protected override int EstimateMaxActiveGroupsPerMultiprocessorInternal(
@@ -338,7 +337,7 @@ namespace ILGPU.Intel.NPU
         /// </summary>
         public long MemoryBandwidth => (long)Capabilities.MemoryBandwidth;
 
-        private void InitializeAcceleratorProperties()
+        private static void InitializeAcceleratorProperties()
         {
             // Properties are now computed via overrides
         }
@@ -396,7 +395,9 @@ namespace ILGPU.Intel.NPU
     /// <summary>
     /// Intel NPU stream implementation.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class NPUStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         /// <summary>
         /// Initializes a new instance of the NPUStream class.

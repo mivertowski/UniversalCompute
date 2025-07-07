@@ -485,9 +485,7 @@ namespace ILGPU.ML.Integration
     /// Initializes a new instance of the ModelCompilationOptions class.
     /// </remarks>
     [method: SetsRequiredMembers]
-    /// <summary>
-    /// Model compilation options.
-    /// </summary>
+    
     public class ModelCompilationOptions()
     {
 
@@ -630,9 +628,7 @@ namespace ILGPU.ML.Integration
     /// Initializes a new instance of the OptimizedModel class.
     /// </remarks>
     [method: SetsRequiredMembers]
-    /// <summary>
-    /// Optimized model result.
-    /// </summary>
+    
     public class OptimizedModel()
     {
 
@@ -1035,15 +1031,9 @@ namespace ILGPU.ML.Integration
         /// <summary>
         /// Executes a computation on the specified backend.
         /// </summary>
-        public async Task<T> ExecuteAsync<T>(string backendName, Func<Task<T>> computation)
-        {
-            if (!_backends.TryGetValue(backendName, out var backend))
-            {
-                throw new InvalidOperationException($"Backend '{backendName}' not found");
-            }
-
-            return await backend.ExecuteAsync(computation).ConfigureAwait(false);
-        }
+        public async Task<T> ExecuteAsync<T>(string backendName, Func<Task<T>> computation) => !_backends.TryGetValue(backendName, out var backend)
+                ? throw new InvalidOperationException($"Backend '{backendName}' not found")
+                : await backend.ExecuteAsync(computation).ConfigureAwait(false);
 
         /// <summary>
         /// Executes an execution plan with input tensors.

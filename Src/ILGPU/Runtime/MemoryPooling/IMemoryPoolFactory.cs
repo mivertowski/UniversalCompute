@@ -41,14 +41,10 @@ namespace ILGPU.Runtime.MemoryPooling
     public sealed class DefaultMemoryPoolFactory : IMemoryPoolFactory
     {
         /// <inheritdoc/>
-        public IMemoryPool<T> CreatePool<T>(Accelerator accelerator, MemoryPoolConfiguration? configuration = null) 
-            where T : unmanaged
-        {
-            if (accelerator == null)
-                throw new ArgumentNullException(nameof(accelerator));
-
-            return new AdaptiveMemoryPool<T>(accelerator, configuration);
-        }
+        public IMemoryPool<T> CreatePool<T>(Accelerator accelerator, MemoryPoolConfiguration? configuration = null)
+            where T : unmanaged => accelerator == null
+                ? throw new ArgumentNullException(nameof(accelerator))
+                : (IMemoryPool<T>)new AdaptiveMemoryPool<T>(accelerator, configuration);
     }
 
     /// <summary>

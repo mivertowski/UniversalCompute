@@ -56,10 +56,7 @@ namespace ILGPU.Frontend
         /// <param name="method">The target method.</param>
         private void MakeNewObject(MethodBase method)
         {
-            var constructor = method as ConstructorInfo;
-            if (constructor == null)
-                throw Location.GetInvalidOperationException();
-
+            var constructor = method as ConstructorInfo ?? throw Location.GetInvalidOperationException();
             var type = constructor.DeclaringType.AsNotNull();
             var typeNode = Builder.CreateType(type);
             var alloca = CreateTempAlloca(typeNode);

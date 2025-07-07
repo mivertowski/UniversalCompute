@@ -69,10 +69,10 @@ namespace ILGPU.Runtime.LINQ
                 var cpuData = buffer.GetAsArray1D();
                 return cpuData;
             }
-            
-            if (result is IEnumerable<T> enumerable)
-                return enumerable;
-                
+
+            return result is IEnumerable<T> enumerable
+                ? enumerable
+                :
             throw new InvalidOperationException($"Unexpected result type: {result?.GetType()}");
         }
 
@@ -126,17 +126,12 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="node">The method call expression.</param>
         /// <returns>The result of the GPU operation.</returns>
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
+        protected override Expression VisitMethodCall(MethodCallExpression node) =>
             // Handle LINQ methods
-            if (node.Method.DeclaringType == typeof(Queryable) || 
-                node.Method.DeclaringType == typeof(Enumerable))
-            {
-                return HandleLinqMethod(node);
-            }
-
-            return base.VisitMethodCall(node);
-        }
+            node.Method.DeclaringType == typeof(Queryable) ||
+                node.Method.DeclaringType == typeof(Enumerable)
+                ? HandleLinqMethod(node)
+                : base.VisitMethodCall(node);
 
         /// <summary>
         /// Visits a constant expression.
@@ -327,12 +322,9 @@ namespace ILGPU.Runtime.LINQ
         {
             if (expression is ConstantExpression constant)
             {
-                if (constant.Value is IGPUQueryable<int> queryable)
-                    return queryable.Buffer;
-                    
-                return constant.Value;
+                return constant.Value is IGPUQueryable<int> queryable ? queryable.Buffer : constant.Value;
             }
-            
+
             return null;
         }
 
@@ -399,7 +391,7 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="operation">The reduction operation.</param>
         /// <returns>The reduction result.</returns>
         [RequiresUnreferencedCode("Calls ILGPU.Runtime.LINQ.GPUQueryExpressionVisitor.ApplyReduction(Array, String)")]
-        private object ExecuteReductionKernel(object sourceBuffer, string operation)
+        private static object ExecuteReductionKernel(object sourceBuffer, string operation)
         {
             var sourceData = GetBufferData(sourceBuffer);
             return ApplyReduction(sourceData, operation);
@@ -503,20 +495,16 @@ namespace ILGPU.Runtime.LINQ
         /// <param name="operation">The reduction operation.</param>
         /// <returns>The reduction result.</returns>
         [RequiresUnreferencedCode("Calls ILGPU.Runtime.LINQ.GPUQueryExpressionVisitor.ComputeMin(Array)")]
-        private static object ApplyReduction(Array sourceData, string operation)
-        {
-            if (sourceData.Length == 0)
-                throw new InvalidOperationException("Cannot perform reduction on empty sequence");
-
-            return operation switch
-            {
-                "Sum" => ComputeSum(sourceData),
-                "Average" => ComputeAverage(sourceData),
-                "Min" => ComputeMin(sourceData),
-                "Max" => ComputeMax(sourceData),
-                _ => throw new NotSupportedException($"Reduction operation '{operation}' is not supported.")
-            };
-        }
+        private static object ApplyReduction(Array sourceData, string operation) => sourceData.Length == 0
+                ? throw new InvalidOperationException("Cannot perform reduction on empty sequence")
+                : operation switch
+                {
+                    "Sum" => ComputeSum(sourceData),
+                    "Average" => ComputeAverage(sourceData),
+                    "Min" => ComputeMin(sourceData),
+                    "Max" => ComputeMax(sourceData),
+                    _ => throw new NotSupportedException($"Reduction operation '{operation}' is not supported.")
+                };
 
         private static object ComputeSum(Array sourceData)
         {

@@ -16,11 +16,9 @@
 // Change License: Apache License, Version 2.0
 
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using ILGPU.Apple.NeuralEngine.Native;
-using ILGPU.Core;
 
 namespace ILGPU.Apple.NeuralEngine
 {
@@ -104,10 +102,9 @@ namespace ILGPU.Apple.NeuralEngine
             ThrowIfDisposed();
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-
-            return await Task.Run(() =>
+            return input == null
+                ? throw new ArgumentNullException(nameof(input))
+                : await Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -156,10 +153,9 @@ namespace ILGPU.Apple.NeuralEngine
             CancellationToken cancellationToken = default)
         {
             ThrowIfDisposed();
-            if (!Capabilities.SupportsAttention)
-                throw new NotSupportedException("Attention operations not supported on this Neural Engine generation");
-
-            return await Task.Run(() =>
+            return !Capabilities.SupportsAttention
+                ? throw new NotSupportedException("Attention operations not supported on this Neural Engine generation")
+                : await Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
@@ -178,7 +174,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Loads a Core ML model for Neural Engine execution.
         /// </summary>
-        public async Task<CoreMLModel> LoadModelAsync(
+        public static async Task<CoreMLModel> LoadModelAsync(
             string modelPath,
             ANEOptimizationOptions? options = null,
             CancellationToken cancellationToken = default)
@@ -201,7 +197,7 @@ namespace ILGPU.Apple.NeuralEngine
         /// <summary>
         /// Compiles a model specifically for Neural Engine execution.
         /// </summary>
-        public async Task<CoreMLModel> CompileModelAsync(
+        public static async Task<CoreMLModel> CompileModelAsync(
             NeuralNetwork network,
             ANECompilationOptions options,
             CancellationToken cancellationToken = default)
@@ -233,10 +229,7 @@ namespace ILGPU.Apple.NeuralEngine
         public ANEPerformanceMetrics GetPerformanceMetrics()
         {
             ThrowIfDisposed();
-            if (!IsAvailable)
-                throw new NotSupportedException("Neural Engine not available");
-
-            return ANENative.GetPerformanceMetrics(_aneContext);
+            return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : ANENative.GetPerformanceMetrics(_aneContext);
         }
 
         /// <summary>
@@ -245,10 +238,7 @@ namespace ILGPU.Apple.NeuralEngine
         public ANEPowerInfo GetPowerInfo()
         {
             ThrowIfDisposed();
-            if (!IsAvailable)
-                throw new NotSupportedException("Neural Engine not available");
-
-            return ANENative.GetPowerInfo(_aneContext);
+            return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : ANENative.GetPowerInfo(_aneContext);
         }
 
         /// <summary>
@@ -257,10 +247,7 @@ namespace ILGPU.Apple.NeuralEngine
         public ANEThermalState GetThermalState()
         {
             ThrowIfDisposed();
-            if (!IsAvailable)
-                throw new NotSupportedException("Neural Engine not available");
-
-            return ANENative.GetThermalState(_aneContext);
+            return !IsAvailable ? throw new NotSupportedException("Neural Engine not available") : ANENative.GetThermalState(_aneContext);
         }
 
         #endregion
@@ -268,40 +255,29 @@ namespace ILGPU.Apple.NeuralEngine
         #region Private Implementation
 
         private void ExecuteNeuralOperation<T>(NeuralOperation operation, ITensor<T> input, ITensor<T> result)
-            where T : unmanaged
-        {
+            where T : unmanaged =>
             // TODO: Implement proper tensor data access for ANE operations
             throw new NotSupportedException("ANE neural operations not fully implemented - tensor data access needs implementation");
-        }
 
-        private void ExecuteCoreMLInference(CoreMLModel model, ITensor<float> input, ITensor<float> result)
-        {
+        private void ExecuteCoreMLInference(CoreMLModel model, ITensor<float> input, ITensor<float> result) =>
             // TODO: Implement proper CoreML inference with ANE
             throw new NotSupportedException("CoreML inference with ANE not fully implemented");
-        }
 
-        private void ExecuteANEConvolution(ITensor<float> input, ITensor<float> weights, ITensor<float> bias, 
-            ITensor<float> result, ANEConvolutionParameters parameters)
-        {
-            
+        private void ExecuteANEConvolution(ITensor<float> input, ITensor<float> weights, ITensor<float> bias,
+            ITensor<float> result, ANEConvolutionParameters parameters) =>
+
             // TODO: Implement proper tensor data pointer access
             throw new NotSupportedException("ANE convolution tensor access not implemented");
-            
-        }
 
-        private void ExecuteANEAttention(ITensor<float> query, ITensor<float> key, ITensor<float> value, 
-            ITensor<float> result, ANEAttentionParameters parameters)
-        {
+        private void ExecuteANEAttention(ITensor<float> query, ITensor<float> key, ITensor<float> value,
+            ITensor<float> result, ANEAttentionParameters parameters) =>
             // TODO: Implement proper tensor data pointer access
             throw new NotSupportedException("ANE attention tensor access not implemented");
-        }
 
-        private static TensorShape CalculateConvolutionOutputShape(TensorShape inputShape, TensorShape weightsShape, 
-            ANEConvolutionParameters parameters)
-        {
+        private static TensorShape CalculateConvolutionOutputShape(TensorShape inputShape, TensorShape weightsShape,
+            ANEConvolutionParameters parameters) =>
             // TODO: Implement proper TensorShape access - shape indexing not supported
             throw new NotSupportedException("TensorShape convolution calculation not implemented - requires proper shape property access");
-        }
 
         private void ThrowIfDisposed()
         {

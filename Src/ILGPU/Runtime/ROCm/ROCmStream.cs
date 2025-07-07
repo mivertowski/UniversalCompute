@@ -23,7 +23,9 @@ namespace ILGPU.Runtime.ROCm
     /// <summary>
     /// A ROCm stream for asynchronous kernel execution and memory operations.
     /// </summary>
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public sealed class ROCmStream : AcceleratorStream
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         #region Instance
 
@@ -263,12 +265,9 @@ namespace ILGPU.Runtime.ROCm
         /// </summary>
         /// <param name="marker">The starting marker.</param>
         /// <returns>The elapsed time.</returns>
-        public override TimeSpan MeasureFrom(ProfilingMarker marker)
-        {
-            if (marker is ROCmProfilingMarker rocmMarker)
-                return _timestamp - rocmMarker._timestamp;
-            throw new ArgumentException("Marker must be a ROCm profiling marker", nameof(marker));
-        }
+        public override TimeSpan MeasureFrom(ProfilingMarker marker) => marker is ROCmProfilingMarker rocmMarker
+                ? _timestamp - rocmMarker._timestamp
+                : throw new ArgumentException("Marker must be a ROCm profiling marker", nameof(marker));
 
         /// <summary>
         /// Disposes this profiling marker.

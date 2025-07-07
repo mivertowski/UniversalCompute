@@ -46,14 +46,11 @@ namespace ILGPU.IR.Construction
             Location location,
             Value node,
             UnaryArithmeticKind kind,
-            ArithmeticFlags flags)
-        {
+            ArithmeticFlags flags) =>
             // Check for constants
-            if (node is PrimitiveValue value)
-                return UnaryArithmeticFoldConstants(location, value, kind);
-
-            return
-                UnaryArithmeticSimplify(
+            node is PrimitiveValue value
+                ? UnaryArithmeticFoldConstants(location, value, kind)
+                : (ValueReference)(UnaryArithmeticSimplify(
                     location,
                     node,
                     kind,
@@ -62,8 +59,7 @@ namespace ILGPU.IR.Construction
                     GetInitializer(location),
                     node,
                     kind,
-                    flags));
-        }
+                    flags)));
 
         /// <summary>
         /// Inverts a binary arithmetic value.

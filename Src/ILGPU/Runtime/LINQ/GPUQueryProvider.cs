@@ -164,10 +164,7 @@ namespace ILGPU.Runtime.LINQ
                 }
             }
 
-            if (seqType.BaseType != null && seqType.BaseType != typeof(object))
-                return FindIEnumerable(seqType.BaseType);
-
-            return null;
+            return seqType.BaseType != null && seqType.BaseType != typeof(object) ? FindIEnumerable(seqType.BaseType) : null;
         }
 
         #endregion

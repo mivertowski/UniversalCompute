@@ -97,15 +97,10 @@ namespace ILGPU.Backends.IL
             /// <summary>
             /// Returns the default managed type for the given primitive one.
             /// </summary>
-            public Type GetPrimitiveType(PrimitiveType primitiveType)
-            {
-                if (primitiveType.BasicValueType == BasicValueType.Float16 &&
-                    !parent.CapabilityContext.Float16)
-                {
-                    throw VelocityCapabilityContext.GetNotSupportedFloat16Exception();
-                }
-                return scalarProvider.GetPrimitiveType(primitiveType);
-            }
+            public Type GetPrimitiveType(PrimitiveType primitiveType) => primitiveType.BasicValueType == BasicValueType.Float16 &&
+                    !parent.CapabilityContext.Float16
+                    ? throw VelocityCapabilityContext.GetNotSupportedFloat16Exception()
+                    : scalarProvider.GetPrimitiveType(primitiveType);
 
             /// <summary>
             /// Returns the default managed array type for the given array type.

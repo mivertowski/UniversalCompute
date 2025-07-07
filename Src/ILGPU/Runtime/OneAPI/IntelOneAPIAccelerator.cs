@@ -17,7 +17,6 @@
 
 using ILGPU.Backends;
 using ILGPU.Runtime.OneAPI.Native;
-using ILGPU.Util;
 using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
@@ -91,7 +90,7 @@ namespace ILGPU.Runtime.OneAPI
                 SYCLDevice = device.NativeDevice;
 
                 // Create SYCL context
-                var result = SYCLNative.CreateContext(1, new[] { SYCLDevice }, out SYCLContext);
+                var result = SYCLNative.CreateContext(1, [SYCLDevice], out SYCLContext);
                 SYCLException.ThrowIfFailed(result);
 
                 // Create SYCL queue
@@ -125,7 +124,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
+        public new static AcceleratorType AcceleratorType => AcceleratorType.OneAPI;
 
         /// <summary>
         /// Gets the name of this accelerator.
@@ -461,7 +460,7 @@ namespace ILGPU.Runtime.OneAPI
         /// <summary>
         /// Placeholder for Intel GPU AI inference.
         /// </summary>
-        private void ExecuteIntelGPUInference(IntPtr input, IntPtr output, byte[] modelData, IntPtr queue) =>
+        private static void ExecuteIntelGPUInference(IntPtr input, IntPtr output, byte[] modelData, IntPtr queue) =>
             // This would integrate with Intel Extension for PyTorch or OpenVINO
             // For demonstration, simulate the operation
             System.Threading.Thread.Sleep(1); // Simulate AI inference
@@ -514,7 +513,7 @@ namespace ILGPU.Runtime.OneAPI
             Console.WriteLine($"Intel OneAPI Device Information:");
             Console.WriteLine($"  Name: {Name}");
             Console.WriteLine($"  Architecture: {Device.Architecture}");
-            Console.WriteLine($"  Vendor: {Device.Vendor}");
+            Console.WriteLine($"  Vendor: {IntelOneAPIDevice.Vendor}");
             Console.WriteLine($"  Driver Version: {Device.DriverVersion}");
             Console.WriteLine($"  SYCL Version: {Device.SYCLVersion}");
             Console.WriteLine($"  Total Memory: {MemorySize / (1024 * 1024)} MB");

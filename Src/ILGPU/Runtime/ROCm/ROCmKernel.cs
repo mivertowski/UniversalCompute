@@ -31,7 +31,9 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// The compiled HIP kernel binary.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public byte[] KernelBinary { get; }
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// The kernel entry point name.
@@ -162,7 +164,7 @@ namespace ILGPU.Runtime.ROCm
                     (uint)sharedMemorySize,
                     stream.NativePtr,
                     parameters,
-                    new nint[] { IntPtr.Zero });
+                    [IntPtr.Zero]);
 
                 ROCmException.ThrowIfFailed(result);
             }

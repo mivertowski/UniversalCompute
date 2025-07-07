@@ -57,12 +57,9 @@ namespace ILGPU.Backends.Velocity.Vec128
 
         #region Type System
 
-        public override Type GetVectorizedBasicType(BasicValueType basicValueType)
-        {
-            if (basicValueType == BasicValueType.Float16 && !CapabilityContext.Float16)
-                throw VelocityCapabilityContext.GetNotSupportedFloat16Exception();
-            return VectorizedBasicTypeMapping[(int)basicValueType];
-        }
+        public override Type GetVectorizedBasicType(BasicValueType basicValueType) => basicValueType == BasicValueType.Float16 && !CapabilityContext.Float16
+                ? throw VelocityCapabilityContext.GetNotSupportedFloat16Exception()
+                : VectorizedBasicTypeMapping[(int)basicValueType];
 
         #endregion
     }

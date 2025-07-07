@@ -15,7 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using System.Runtime.InteropServices;
 using System.Diagnostics.CodeAnalysis;
 
 #if APPLE_COREML_AVAILABLE

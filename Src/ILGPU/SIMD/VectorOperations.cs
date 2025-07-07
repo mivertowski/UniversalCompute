@@ -134,10 +134,9 @@ namespace ILGPU.SIMD
             if (cfg.AllowGPUVectorization && TryGPUDotProduct(left, right, out T gpuResult))
                 return gpuResult;
 
-            if (cfg.UseCPUFallback)
-                return CPUDotProduct(left, right);
-
-            throw new NotSupportedException("GPU vectorization failed and CPU fallback is disabled");
+            return cfg.UseCPUFallback
+                ? CPUDotProduct(left, right)
+                : throw new NotSupportedException("GPU vectorization failed and CPU fallback is disabled");
         }
 
         /// <summary>
@@ -718,13 +717,9 @@ namespace ILGPU.SIMD
             {
                 return DotProductSse(left, right);
             }
-            else if (AdvSimd.IsSupported)
-            {
-                return DotProductNeon(left, right);
-            }
             else
             {
-                return DotProductGeneric(left, right);
+                return AdvSimd.IsSupported ? DotProductNeon(left, right) : DotProductGeneric(left, right);
             }
         }
 
@@ -1115,13 +1110,7 @@ namespace ILGPU.SIMD
         /// Creates a .NET Vector from GPU array.
         /// </summary>
         public static Vector<T> ToVector<T>(this ReadOnlySpan<T> span)
-            where T : unmanaged, INumber<T>
-        {
-            if (span.Length < Vector<T>.Count)
-                throw new ArgumentException("Span too small for vector");
-            
-            return new Vector<T>(span);
-        }
+            where T : unmanaged, INumber<T> => span.Length < Vector<T>.Count ? throw new ArgumentException("Span too small for vector") : new Vector<T>(span);
 
         /// <summary>
         /// Checks if the current context supports hybrid CPU/GPU vectorization.

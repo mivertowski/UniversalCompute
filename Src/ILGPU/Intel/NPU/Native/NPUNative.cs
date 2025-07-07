@@ -15,8 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Core;
-using ILGPU.Numerics;
 using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
@@ -170,10 +168,7 @@ namespace ILGPU.Intel.NPU.Native
         /// Releases NPU context.
         /// </summary>
         /// <param name="context">NPU context handle.</param>
-        internal static void ReleaseContext(IntPtr context)
-        {
-            ReleaseNPU();
-        }
+        internal static void ReleaseContext(IntPtr context) => ReleaseNPU();
 
         /// <summary>
         /// Synchronizes NPU operations.
@@ -190,21 +185,16 @@ namespace ILGPU.Intel.NPU.Native
         /// </summary>
         /// <param name="size">Size in bytes.</param>
         /// <returns>Pointer to allocated memory.</returns>
-        internal static IntPtr AllocateMemory(ulong size)
-        {
+        internal static IntPtr AllocateMemory(ulong size) =>
             // For simplicity, use system memory allocation
             // Real NPU implementation might have specific memory allocators
-            return Marshal.AllocHGlobal((IntPtr)size);
-        }
+            Marshal.AllocHGlobal((IntPtr)size);
 
         /// <summary>
         /// Frees NPU memory.
         /// </summary>
         /// <param name="ptr">Pointer to memory.</param>
-        internal static void FreeMemory(IntPtr ptr)
-        {
-            Marshal.FreeHGlobal(ptr);
-        }
+        internal static void FreeMemory(IntPtr ptr) => Marshal.FreeHGlobal(ptr);
 
         /// <summary>
         /// Executes convolution operation on NPU.
@@ -325,7 +315,7 @@ namespace ILGPU.Intel.NPU.Native
             {
                 var dequantizedInput = input[i] * inputScale;
                 var weightValue = i < inputSize ? HalfHelper.HalfToSingle(weights[i % inputSize]) : 0.0f;
-                output[i] = (dequantizedInput * weightValue) * outputScale;
+                output[i] = dequantizedInput * weightValue * outputScale;
             }
         }
 
@@ -409,7 +399,7 @@ namespace ILGPU.Intel.NPU.Native
         /// <param name="deviceName">NPU device name.</param>
         /// <returns>Compiled model handle.</returns>
         [DllImport(OpenVINOLibrary, EntryPoint = "ov_core_compile_model", CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr CompileModel(IntPtr core, [MarshalAs(UnmanagedType.LPStr)] string modelPath, [MarshalAs(UnmanagedType.LPStr)] string deviceName);
+        internal static extern IntPtr CompileModel(IntPtr core, [MarshalAs(UnmanagedType.LPWStr)] string modelPath, [MarshalAs(UnmanagedType.LPWStr)] string deviceName);
 
         /// <summary>
         /// Creates inference request for NPU execution.
@@ -992,9 +982,9 @@ namespace ILGPU.Intel.NPU.Native
             {
                 // Set input tensors
                 SetInputTensor(inferRequest, "input", new IntPtr(input), 
-                    new int[] { batchSize, inputChannels, inputHeight, inputWidth });
+                    [batchSize, inputChannels, inputHeight, inputWidth]);
                 SetInputTensor(inferRequest, "kernel", new IntPtr(kernel),
-                    new int[] { outputChannels, inputChannels, kernelHeight, kernelWidth });
+                    [outputChannels, inputChannels, kernelHeight, kernelWidth]);
 
                 // Configure convolution parameters
                 SetConvolutionParameters(inferRequest, strideHeight, strideWidth, paddingHeight, paddingWidth);
@@ -1064,13 +1054,13 @@ namespace ILGPU.Intel.NPU.Native
         [DllImport("libopenvino.so.2520", EntryPoint = "ov_create_infer_request", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr CreateInferenceRequest();
 
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_set_input_tensor", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         private static extern void SetInputTensor(IntPtr request, string name, IntPtr data, int[] shape);
 
         [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_infer", CallingConvention = CallingConvention.Cdecl)]
         private static extern void ExecuteInference(IntPtr request);
 
-        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_get_output_tensor", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
         private static extern void GetOutputTensor(IntPtr request, string name, IntPtr data);
 
         [DllImport("libopenvino.so.2520", EntryPoint = "ov_infer_request_release", CallingConvention = CallingConvention.Cdecl)]

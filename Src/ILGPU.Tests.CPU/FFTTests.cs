@@ -31,7 +31,7 @@ namespace ILGPU.Tests.CPU
         {
         }
 
-        private static readonly int[] TestSizes = { 8, 16, 32, 64, 128 };
+        private static readonly int[] TestSizes = [8, 16, 32, 64, 128];
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]

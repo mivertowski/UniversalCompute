@@ -489,22 +489,18 @@ namespace ILGPU.Runtime.AI
         /// </summary>
         /// <param name="accelerator">The accelerator.</param>
         /// <returns>True if accelerated primitives are available; otherwise, false.</returns>
-        public static bool HasAcceleratedPrimitives(Accelerator accelerator)
-        {
-            if (accelerator == null)
-                return false;
-
-            return accelerator.AcceleratorType switch
-            {
-                AcceleratorType.Cuda => true, // cuBLAS, cuDNN
-                AcceleratorType.Metal => true, // Metal Performance Shaders
-                AcceleratorType.OneAPI => true, // oneMKL, oneDNN
-                AcceleratorType.IntelAMX => true, // AMX instructions
-                AcceleratorType.IntelNPU => true, // NPU acceleration
-                AcceleratorType.AppleNeuralEngine => true, // ANE acceleration
-                _ => false
-            };
-        }
+        public static bool HasAcceleratedPrimitives(Accelerator accelerator) => accelerator == null
+                ? false
+                : accelerator.AcceleratorType switch
+                {
+                    AcceleratorType.Cuda => true, // cuBLAS, cuDNN
+                    AcceleratorType.Metal => true, // Metal Performance Shaders
+                    AcceleratorType.OneAPI => true, // oneMKL, oneDNN
+                    AcceleratorType.IntelAMX => true, // AMX instructions
+                    AcceleratorType.IntelNPU => true, // NPU acceleration
+                    AcceleratorType.AppleNeuralEngine => true, // ANE acceleration
+                    _ => false
+                };
     }
 
     /// <summary>
@@ -1423,8 +1419,7 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (T)(object)0.0f;
             if (typeof(T) == typeof(double)) return (T)(object)0.0;
             if (typeof(T) == typeof(int)) return (T)(object)0;
-            if (typeof(T) == typeof(Half)) return (T)(object)Half.Zero;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(Half) ? (T)(object)Half.Zero : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T Add<T>(T a, T b) where T : unmanaged
@@ -1432,8 +1427,9 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (T)(object)((float)(object)a + (float)(object)b);
             if (typeof(T) == typeof(double)) return (T)(object)((double)(object)a + (double)(object)b);
             if (typeof(T) == typeof(int)) return (T)(object)((int)(object)a + (int)(object)b);
-            if (typeof(T) == typeof(Half)) return (T)(object)((Half)(object)a + (Half)(object)b);
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(Half)
+                ? (T)(object)((Half)(object)a + (Half)(object)b)
+                : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T Multiply<T>(T a, T b) where T : unmanaged
@@ -1441,8 +1437,9 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (T)(object)((float)(object)a * (float)(object)b);
             if (typeof(T) == typeof(double)) return (T)(object)((double)(object)a * (double)(object)b);
             if (typeof(T) == typeof(int)) return (T)(object)((int)(object)a * (int)(object)b);
-            if (typeof(T) == typeof(Half)) return (T)(object)((Half)(object)a * (Half)(object)b);
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(Half)
+                ? (T)(object)((Half)(object)a * (Half)(object)b)
+                : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T Subtract<T>(T a, T b) where T : unmanaged
@@ -1450,8 +1447,9 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (T)(object)((float)(object)a - (float)(object)b);
             if (typeof(T) == typeof(double)) return (T)(object)((double)(object)a - (double)(object)b);
             if (typeof(T) == typeof(int)) return (T)(object)((int)(object)a - (int)(object)b);
-            if (typeof(T) == typeof(Half)) return (T)(object)((Half)(object)a - (Half)(object)b);
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(Half)
+                ? (T)(object)((Half)(object)a - (Half)(object)b)
+                : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T Divide<T>(T a, T b) where T : unmanaged
@@ -1459,16 +1457,18 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (T)(object)((float)(object)a / (float)(object)b);
             if (typeof(T) == typeof(double)) return (T)(object)((double)(object)a / (double)(object)b);
             if (typeof(T) == typeof(int)) return (T)(object)((int)(object)a / (int)(object)b);
-            if (typeof(T) == typeof(Half)) return (T)(object)((Half)(object)a / (Half)(object)b);
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(Half)
+                ? (T)(object)((Half)(object)a / (Half)(object)b)
+                : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T Exp<T>(T x) where T : unmanaged
         {
             if (typeof(T) == typeof(float)) return (T)(object)MathF.Exp((float)(object)x);
             if (typeof(T) == typeof(double)) return (T)(object)Math.Exp((double)(object)x);
-            if (typeof(T) == typeof(Half)) return (T)(object)(Half)MathF.Exp((float)(Half)(object)x);
-            throw new NotSupportedException($"Type {typeof(T)} not supported for Exp");
+            return typeof(T) == typeof(Half)
+                ? (T)(object)(Half)MathF.Exp((float)(Half)(object)x)
+                : throw new NotSupportedException($"Type {typeof(T)} not supported for Exp");
         }
 
         private static bool IsGreaterThan<T>(T a, T b) where T : unmanaged
@@ -1476,8 +1476,9 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (float)(object)a > (float)(object)b;
             if (typeof(T) == typeof(double)) return (double)(object)a > (double)(object)b;
             if (typeof(T) == typeof(int)) return (int)(object)a > (int)(object)b;
-            if (typeof(T) == typeof(Half)) return (Half)(object)a > (Half)(object)b;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(Half)
+                ? (Half)(object)a > (Half)(object)b
+                : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static int[] ComputeFlatIndex(TensorShape shape, long flatIndex)
@@ -1500,16 +1501,16 @@ namespace ILGPU.Runtime.AI
             if (typeof(T) == typeof(float)) return (T)(object)value;
             if (typeof(T) == typeof(double)) return (T)(object)(double)value;
             if (typeof(T) == typeof(Half)) return (T)(object)(Half)value;
-            if (typeof(T) == typeof(int)) return (T)(object)(int)value;
-            throw new NotSupportedException($"Type {typeof(T)} not supported");
+            return typeof(T) == typeof(int) ? (T)(object)(int)value : throw new NotSupportedException($"Type {typeof(T)} not supported");
         }
 
         private static T Sqrt<T>(T x) where T : unmanaged
         {
             if (typeof(T) == typeof(float)) return (T)(object)MathF.Sqrt((float)(object)x);
             if (typeof(T) == typeof(double)) return (T)(object)Math.Sqrt((double)(object)x);
-            if (typeof(T) == typeof(Half)) return (T)(object)(Half)MathF.Sqrt((float)(Half)(object)x);
-            throw new NotSupportedException($"Type {typeof(T)} not supported for Sqrt");
+            return typeof(T) == typeof(Half)
+                ? (T)(object)(Half)MathF.Sqrt((float)(Half)(object)x)
+                : throw new NotSupportedException($"Type {typeof(T)} not supported for Sqrt");
         }
 
         private static int[] ComputeIndicesFromFlat(TensorShape shape, long flatIndex)

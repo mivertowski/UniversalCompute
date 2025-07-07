@@ -15,12 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends;
-using ILGPU.Backends.EntryPoints;
 using ILGPU.Runtime.AMX.Native;
-using ILGPU.Util;
 using System;
-using System.Collections.Immutable;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -100,7 +96,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the accelerator type.
         /// </summary>
-        public new AcceleratorType AcceleratorType => AcceleratorType.CPU;
+        public new static AcceleratorType AcceleratorType => AcceleratorType.CPU;
 
         /// <summary>
         /// Gets the accelerator name.
@@ -110,7 +106,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the memory size in bytes.
         /// </summary>
-        public new long MemorySize => Device.MemorySize;
+        public new static long MemorySize => IntelAMXDevice.MemorySize;
 
         /// <summary>
         /// Gets the maximum grid size.
@@ -125,7 +121,7 @@ namespace ILGPU.Runtime.AMX
         /// <summary>
         /// Gets the warp size.
         /// </summary>
-        public new int WarpSize => 1; // AMX operates on single thread
+        public new static int WarpSize => 1; // AMX operates on single thread
 
         /// <summary>
         /// Gets the number of multiprocessors.
@@ -340,7 +336,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="n">Columns in B and C.</param>
         /// <param name="dataType">Data type for computation.</param>
         /// <param name="stream">AMX stream.</param>
-        internal unsafe void ExecuteMatMul(
+        internal static unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             AMXDataType dataType,
@@ -373,7 +369,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="k">Matrix dimensions.</param>
         /// <param name="n">Matrix dimensions.</param>
         /// <param name="stream">AMX stream.</param>
-        public void ExecuteBF16MatMul(
+        public static void ExecuteBF16MatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             AMXStream? stream = null) => ExecuteMatMul(a, b, c, m, k, n, AMXDataType.BF16, stream);
@@ -388,7 +384,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="k">Matrix dimensions.</param>
         /// <param name="n">Matrix dimensions.</param>
         /// <param name="stream">AMX stream.</param>
-        public void ExecuteINT8MatMul(
+        public static void ExecuteINT8MatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             AMXStream? stream = null) => ExecuteMatMul(a, b, c, m, k, n, AMXDataType.INT8, stream);
@@ -404,7 +400,7 @@ namespace ILGPU.Runtime.AMX
         /// <param name="outputSize">Output feature size.</param>
         /// <param name="dataType">Data type for computation.</param>
         /// <param name="stream">AMX stream.</param>
-        internal async Task ExecuteAIInferenceAsync(
+        internal static async Task ExecuteAIInferenceAsync(
             IntPtr input, IntPtr weights, IntPtr output,
             int batchSize, int inputSize, int outputSize,
             AMXDataType dataType,

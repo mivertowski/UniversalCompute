@@ -223,13 +223,7 @@ namespace ILGPU.Runtime
         /// Returns a string representation of the device error information.
         /// </summary>
         /// <returns>A string representation.</returns>
-        public override string ToString()
-        {
-            if (!IsValid)
-                return "Unknown Device";
-
-            return $"{AcceleratorType} Device '{DeviceName}' (ID: {DeviceId}, Driver: {DriverVersion})";
-        }
+        public override string ToString() => !IsValid ? "Unknown Device" : $"{AcceleratorType} Device '{DeviceName}' (ID: {DeviceId}, Driver: {DriverVersion})";
 
         /// <summary>
         /// Gets the serialization data for this instance.

@@ -208,17 +208,14 @@ namespace ILGPU.Frontend.Intrinsic
             var location = context.Location;
 
             var genericArgs = context.GetMethodGenericArguments();
-            if (context.Method.Name != nameof(Activator.CreateInstance) ||
+            return context.Method.Name != nameof(Activator.CreateInstance) ||
                 context.NumArguments != 0 ||
                 genericArgs.Length != 1 ||
-                !genericArgs[0].IsValueType)
-            {
-                throw context.Location.GetNotSupportedException(
+                !genericArgs[0].IsValueType
+                ? throw context.Location.GetNotSupportedException(
                     ErrorMessages.NotSupportedActivatorOperation,
-                    context.Method.Name);
-            }
-
-            return context.Builder.CreateNull(
+                    context.Method.Name)
+                : (Value)context.Builder.CreateNull(
                 location,
                 context.Builder.CreateType(genericArgs[0]));
         }

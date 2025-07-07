@@ -412,7 +412,7 @@ namespace ILGPU.FFT
         /// <summary>
         /// CPU fallback implementation for 1D FFT.
         /// </summary>
-        private void FallbackToCPU_FFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
+        private static void FallbackToCPU_FFT1D(ArrayView<Complex> input, ArrayView<Complex> output, bool forward)
         {
             var length = (int)input.Length;
             var cpuInput = new Complex[length];

@@ -15,10 +15,8 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace ILGPU.AI.ONNX
@@ -138,7 +136,7 @@ namespace ILGPU.AI.ONNX
         /// <summary>
         /// Gets or sets custom execution provider options.
         /// </summary>
-        public Dictionary<string, string> ProviderOptions { get; set; } = new();
+        public Dictionary<string, string> ProviderOptions { get; set; } = [];
 
         /// <summary>
         /// Creates a default ONNX Runtime configuration.
@@ -199,8 +197,8 @@ namespace ILGPU.AI.ONNX
         {
             ModelPath = modelPath ?? throw new ArgumentNullException(nameof(modelPath));
             Config = config ?? ONNXRuntimeConfig.Default;
-            _inputInfo = new Dictionary<string, ONNXTensorInfo>();
-            _outputInfo = new Dictionary<string, ONNXTensorInfo>();
+            _inputInfo = [];
+            _outputInfo = [];
 
             // Create ONNX Runtime session
             _session = CreateSession(modelPath, Config);
@@ -293,13 +291,7 @@ namespace ILGPU.AI.ONNX
         /// Gets model profiling information.
         /// </summary>
         /// <returns>Profiling data.</returns>
-        public ONNXProfilingInfo GetProfilingInfo()
-        {
-            if (!Config.EnableProfiling)
-                throw new InvalidOperationException("Profiling not enabled");
-
-            return QueryProfilingInfo(_session);
-        }
+        public ONNXProfilingInfo GetProfilingInfo() => !Config.EnableProfiling ? throw new InvalidOperationException("Profiling not enabled") : QueryProfilingInfo(_session);
 
         /// <summary>
         /// Disposes the ONNX model.
@@ -340,7 +332,7 @@ namespace ILGPU.AI.ONNX
             }
         }
 
-        private IntPtr CreateSessionOptions(ONNXRuntimeConfig config)
+        private static IntPtr CreateSessionOptions(ONNXRuntimeConfig config)
         {
             var options = ONNXNative.CreateSessionOptions();
             
@@ -358,7 +350,7 @@ namespace ILGPU.AI.ONNX
             {
                 ONNXNative.SetIntraOpNumThreads(options, config.NumThreads);
             }
-            
+
             // Add execution provider
             AddExecutionProvider(options, config);
             
@@ -371,7 +363,7 @@ namespace ILGPU.AI.ONNX
             return options;
         }
 
-        private void AddExecutionProvider(IntPtr options, ONNXRuntimeConfig config)
+        private static void AddExecutionProvider(IntPtr options, ONNXRuntimeConfig config)
         {
             switch (config.ExecutionProvider)
             {
@@ -431,7 +423,7 @@ namespace ILGPU.AI.ONNX
             }
         }
 
-        private ONNXTensorInfo ExtractTensorInfo(IntPtr typeInfo)
+        private static ONNXTensorInfo ExtractTensorInfo(IntPtr typeInfo)
         {
             var tensorTypeInfo = ONNXNative.CastTypeInfoToTensorInfo(typeInfo);
             var elementType = ONNXNative.GetTensorElementType(tensorTypeInfo);
@@ -512,7 +504,7 @@ namespace ILGPU.AI.ONNX
                           outputNames, outputTensors, outputs.Count);
         }
 
-        private Dictionary<string, ArrayView<float>> ExtractOutputTensors(Dictionary<string, IntPtr> outputs)
+        private static Dictionary<string, ArrayView<float>> ExtractOutputTensors(Dictionary<string, IntPtr> outputs)
         {
             var results = new Dictionary<string, ArrayView<float>>();
 
@@ -527,7 +519,7 @@ namespace ILGPU.AI.ONNX
             return results;
         }
 
-        private unsafe IntPtr CreateTensorFromArrayView(ArrayView<float> data, ONNXTensorInfo info)
+        private static unsafe IntPtr CreateTensorFromArrayView(ArrayView<float> data, ONNXTensorInfo info)
         {
             var dataSize = (ulong)(info.ElementCount * sizeof(float));
             var shape = Array.ConvertAll(info.Shape, x => (long)x);
@@ -541,7 +533,7 @@ namespace ILGPU.AI.ONNX
                 (int)info.ElementType);
         }
 
-        private IntPtr CreateEmptyTensor(ONNXTensorInfo info)
+        private static IntPtr CreateEmptyTensor(ONNXTensorInfo info)
         {
             var shape = Array.ConvertAll(info.Shape, x => (long)x);
             
@@ -551,7 +543,7 @@ namespace ILGPU.AI.ONNX
                 (int)info.ElementType);
         }
 
-        private unsafe ArrayView<float> ExtractArrayViewFromTensor(IntPtr tensor)
+        private static unsafe ArrayView<float> ExtractArrayViewFromTensor(IntPtr tensor)
         {
             var dataPtr = ONNXNative.GetTensorMutableData(tensor);
             if (dataPtr == IntPtr.Zero)
@@ -562,14 +554,14 @@ namespace ILGPU.AI.ONNX
             throw new NotImplementedException("Tensor extraction requires proper memory buffer creation");
         }
 
-        private void ReleaseSession(IntPtr session) => ONNXNative.ReleaseSession(session);
+        private static void ReleaseSession(IntPtr session) => ONNXNative.ReleaseSession(session);
 
-        private ONNXProfilingInfo QueryProfilingInfo(IntPtr session) =>
+        private static ONNXProfilingInfo QueryProfilingInfo(IntPtr session) =>
             // Query profiling information from ONNX Runtime
             new()
             {
                 TotalInferenceTime = 0.0,
-                OperatorTimes = new Dictionary<string, double>(),
+                OperatorTimes = [],
                 MemoryUsage = 0L
             };
 
@@ -589,7 +581,9 @@ namespace ILGPU.AI.ONNX
         /// <summary>
         /// Gets or sets the tensor shape.
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public int[] Shape { get; set; } = Array.Empty<int>();
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Gets the total number of elements.
@@ -680,7 +674,7 @@ namespace ILGPU.AI.ONNX
         /// <summary>
         /// Gets or sets operator execution times.
         /// </summary>
-        public Dictionary<string, double> OperatorTimes { get; set; } = new();
+        public Dictionary<string, double> OperatorTimes { get; set; } = [];
 
         /// <summary>
         /// Gets or sets memory usage in bytes.

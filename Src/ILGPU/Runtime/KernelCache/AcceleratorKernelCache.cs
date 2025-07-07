@@ -184,10 +184,7 @@ namespace ILGPU.Runtime.KernelCache
                 if (disposed)
                     throw new ObjectDisposedException(nameof(CachedKernel<TDelegate>));
 
-                if (cachedKernel != null)
-                    return cachedKernel;
-
-                return LoadKernel();
+                return cachedKernel != null ? cachedKernel : LoadKernel();
             }
         }
 

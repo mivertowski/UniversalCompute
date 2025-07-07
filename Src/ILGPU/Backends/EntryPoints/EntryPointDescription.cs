@@ -56,12 +56,10 @@ namespace ILGPU.Backends.EntryPoints
             // Try to get index type from first parameter
             var firstParamType = parameters[0].ParameterType;
             var indexType = firstParamType.GetIndexType();
-            if (indexType == IndexType.None || indexType > IndexType.Index3D)
-            {
-                throw new NotSupportedException(
-                    ErrorMessages.InvalidEntryPointIndexParameterOfWrongType);
-            }
-            return new EntryPointDescription(methodSource, parameters, indexType);
+            return indexType == IndexType.None || indexType > IndexType.Index3D
+                ? throw new NotSupportedException(
+                    ErrorMessages.InvalidEntryPointIndexParameterOfWrongType)
+                : new EntryPointDescription(methodSource, parameters, indexType);
         }
 
         #endregion

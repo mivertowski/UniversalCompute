@@ -64,13 +64,7 @@ namespace ILGPU.Runtime.UnifiedMemory
         public static UnifiedArrayView<T> AsUnifiedView<T>(
             this MemoryBuffer1D<T, Stride1D.Dense> buffer,
             UnifiedMemoryAccessMode mode = UnifiedMemoryAccessMode.Shared)
-            where T : unmanaged
-        {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
-
-            return new UnifiedArrayView<T>(buffer, mode);
-        }
+            where T : unmanaged => buffer == null ? throw new ArgumentNullException(nameof(buffer)) : new UnifiedArrayView<T>(buffer, mode);
 
         /// <summary>
         /// Performs element-wise operation on unified memory buffers.

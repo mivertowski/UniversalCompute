@@ -15,12 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Intel.AMX.Native;
-using ILGPU.Runtime;
 using System;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Runtime.Intrinsics;
 
 namespace ILGPU.Intel.AMX
 {

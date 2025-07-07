@@ -61,11 +61,7 @@ namespace ILGPU.Runtime.DependencyInjection
             services.TryAddSingleton<MemoryPoolConfiguration>(provider =>
             {
                 var options = provider.GetService<IOptions<ILGPUOptions>>();
-                if (options?.Value?.EnableMemoryPooling == true)
-                {
-                    return options.Value.MemoryPoolConfiguration;
-                }
-                return new MemoryPoolConfiguration();
+                return options?.Value?.EnableMemoryPooling == true ? options.Value.MemoryPoolConfiguration : new MemoryPoolConfiguration();
             });
 
             services.TryAddSingleton<IMemoryPoolFactory, DefaultMemoryPoolFactory>();

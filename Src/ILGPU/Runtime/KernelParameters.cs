@@ -15,8 +15,6 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using System;
-
 namespace ILGPU.Runtime
 {
     /// <summary>
@@ -27,7 +25,9 @@ namespace ILGPU.Runtime
         /// <summary>
         /// Gets or sets the parameter values.
         /// </summary>
-        public object[] Values { get; set; } = new object[0];
+#pragma warning disable CA1819 // Properties should not return arrays
+        public object[] Values { get; set; } = [];
+#pragma warning restore CA1819 // Properties should not return arrays
 
         /// <summary>
         /// Gets the number of parameters.

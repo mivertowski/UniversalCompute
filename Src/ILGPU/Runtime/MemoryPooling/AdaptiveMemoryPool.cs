@@ -313,16 +313,11 @@ namespace ILGPU.Runtime.MemoryPooling
             _ => currentCount < config.MaxBuffersPerSize
         };
 
-        private int GetAdaptiveMaxCount(long bucketSize)
-        {
+        private int GetAdaptiveMaxCount(long bucketSize) =>
             // Larger buffers get fewer slots in the pool
-            if (bucketSize * Unsafe.SizeOf<T>() >= config.LargeBufferThreshold)
-            {
-                return Math.Max(1, config.MaxBuffersPerSize / 4);
-            }
-            
-            return config.MaxBuffersPerSize;
-        }
+            bucketSize * Unsafe.SizeOf<T>() >= config.LargeBufferThreshold
+                ? Math.Max(1, config.MaxBuffersPerSize / 4)
+                : config.MaxBuffersPerSize;
 
         private int GetMinBuffersToKeep(long bucketSize) => config.RetentionPolicy switch
         {

@@ -132,10 +132,7 @@ namespace ILGPU.Runtime.AI
         /// <returns>A task representing the operation.</returns>
         public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default)
         {
-            var strategy = context.Strategy as SingleAcceleratorStrategy;
-            if (strategy == null)
-                throw new InvalidOperationException("Matrix multiplication requires single accelerator strategy");
-
+            var strategy = context.Strategy as SingleAcceleratorStrategy ?? throw new InvalidOperationException("Matrix multiplication requires single accelerator strategy");
             var primitives = PerformancePrimitivesFactory.Create(strategy.TargetAccelerator);
             
             if (C == null)
@@ -154,16 +151,18 @@ namespace ILGPU.Runtime.AI
         {
             if (typeof(TElement) == typeof(float)) return (TElement)(object)1.0f;
             if (typeof(TElement) == typeof(double)) return (TElement)(object)1.0;
-            if (typeof(TElement) == typeof(int)) return (TElement)(object)1;
-            throw new NotSupportedException($"Type {typeof(TElement)} not supported");
+            return typeof(TElement) == typeof(int)
+                ? (TElement)(object)1
+                : throw new NotSupportedException($"Type {typeof(TElement)} not supported");
         }
 
         private static TElement GetZero<TElement>() where TElement : unmanaged
         {
             if (typeof(TElement) == typeof(float)) return (TElement)(object)0.0f;
             if (typeof(TElement) == typeof(double)) return (TElement)(object)0.0;
-            if (typeof(TElement) == typeof(int)) return (TElement)(object)0;
-            throw new NotSupportedException($"Type {typeof(TElement)} not supported");
+            return typeof(TElement) == typeof(int)
+                ? (TElement)(object)0
+                : throw new NotSupportedException($"Type {typeof(TElement)} not supported");
         }
     }
 
@@ -238,10 +237,7 @@ namespace ILGPU.Runtime.AI
         /// <returns>A task representing the operation.</returns>
         public async Task ExecuteAsync(WorkloadExecutionContext context, CancellationToken cancellationToken = default)
         {
-            var strategy = context.Strategy as SingleAcceleratorStrategy;
-            if (strategy == null)
-                throw new InvalidOperationException("Convolution requires single accelerator strategy");
-
+            var strategy = context.Strategy as SingleAcceleratorStrategy ?? throw new InvalidOperationException("Convolution requires single accelerator strategy");
             var primitives = PerformancePrimitivesFactory.Create(strategy.TargetAccelerator);
             
             if (Output == null)

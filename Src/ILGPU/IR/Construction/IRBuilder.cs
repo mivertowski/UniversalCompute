@@ -123,17 +123,12 @@ namespace ILGPU.IR.Construction
         /// <returns>A reference to the requested value.</returns>
         public ValueReference CreateGridIndexValue(
             Location location,
-            DeviceConstantDimension3D dimension)
-        {
-            if (dimension < DeviceConstantDimension3D.X ||
-                dimension > DeviceConstantDimension3D.Z)
-            {
-                throw location.GetArgumentException(nameof(dimension));
-            }
-            return Append(new GridIndexValue(
+            DeviceConstantDimension3D dimension) => dimension < DeviceConstantDimension3D.X ||
+                dimension > DeviceConstantDimension3D.Z
+                ? throw location.GetArgumentException(nameof(dimension))
+                : (ValueReference)Append(new GridIndexValue(
                 GetInitializer(location),
                 dimension));
-        }
 
         /// <summary>
         /// Creates a node that represents a <see cref="Group.Index"/> property.
@@ -143,17 +138,12 @@ namespace ILGPU.IR.Construction
         /// <returns>A reference to the requested value.</returns>
         public ValueReference CreateGroupIndexValue(
             Location location,
-            DeviceConstantDimension3D dimension)
-        {
-            if (dimension < DeviceConstantDimension3D.X ||
-                dimension > DeviceConstantDimension3D.Z)
-            {
-                throw location.GetArgumentException(nameof(dimension));
-            }
-            return Append(new GroupIndexValue(
+            DeviceConstantDimension3D dimension) => dimension < DeviceConstantDimension3D.X ||
+                dimension > DeviceConstantDimension3D.Z
+                ? throw location.GetArgumentException(nameof(dimension))
+                : (ValueReference)Append(new GroupIndexValue(
                 GetInitializer(location),
                 dimension));
-        }
 
         /// <summary>
         /// Creates a node that represents a <see cref="Grid.Dimension"/> property.
@@ -163,17 +153,12 @@ namespace ILGPU.IR.Construction
         /// <returns>A reference to the requested value.</returns>
         public ValueReference CreateGridDimensionValue(
             Location location,
-            DeviceConstantDimension3D dimension)
-        {
-            if (dimension < DeviceConstantDimension3D.X ||
-                dimension > DeviceConstantDimension3D.Z)
-            {
-                throw location.GetArgumentException(nameof(dimension));
-            }
-            return Append(new GridDimensionValue(
+            DeviceConstantDimension3D dimension) => dimension < DeviceConstantDimension3D.X ||
+                dimension > DeviceConstantDimension3D.Z
+                ? throw location.GetArgumentException(nameof(dimension))
+                : (ValueReference)Append(new GridDimensionValue(
                 GetInitializer(location),
                 dimension));
-        }
 
         /// <summary>
         /// Creates a node that represents of a <see cref="Group.Dimension"/> property.
@@ -183,17 +168,12 @@ namespace ILGPU.IR.Construction
         /// <returns>A reference to the requested value.</returns>
         public ValueReference CreateGroupDimensionValue(
             Location location,
-            DeviceConstantDimension3D dimension)
-        {
-            if (dimension < DeviceConstantDimension3D.X ||
-                dimension > DeviceConstantDimension3D.Z)
-            {
-                throw location.GetArgumentException(nameof(dimension));
-            }
-            return Append(new GroupDimensionValue(
+            DeviceConstantDimension3D dimension) => dimension < DeviceConstantDimension3D.X ||
+                dimension > DeviceConstantDimension3D.Z
+                ? throw location.GetArgumentException(nameof(dimension))
+                : (ValueReference)Append(new GroupDimensionValue(
                 GetInitializer(location),
                 dimension));
-        }
 
         /// <summary>
         /// Creates a node that represents the native size of the given type.
@@ -252,14 +232,11 @@ namespace ILGPU.IR.Construction
         /// <param name="location">The current location.</param>
         /// <param name="handle">The runtime handle.</param>
         /// <returns>A reference to the requested value.</returns>
-        public ValueReference CreateRuntimeHandle(Location location, object handle)
-        {
-            if (handle == null)
-                throw location.GetArgumentNullException(nameof(handle));
-            return Append(new HandleValue(
+        public ValueReference CreateRuntimeHandle(Location location, object handle) => handle == null
+                ? throw location.GetArgumentNullException(nameof(handle))
+                : (ValueReference)Append(new HandleValue(
                 GetInitializer(location),
                 handle));
-        }
 
         /// <summary>
         /// Creates a new index structure instance.

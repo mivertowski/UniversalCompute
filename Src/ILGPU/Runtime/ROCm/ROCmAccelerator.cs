@@ -15,16 +15,11 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Backends;
 using ILGPU.Backends.ROCm;
-using ILGPU.Resources;
 using ILGPU.Runtime.ROCm.Native;
 using ILGPU.Util;
 using System;
-using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace ILGPU.Runtime.ROCm
 {
@@ -58,7 +53,7 @@ namespace ILGPU.Runtime.ROCm
         /// <summary>
         /// Gets whether this accelerator supports page-locked memory.
         /// </summary>
-        public bool SupportsPageLockedMemory => true;
+        public static bool SupportsPageLockedMemory => true;
 
         /// <summary>
         /// Gets whether this accelerator supports managed memory.
@@ -356,7 +351,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="k">Columns in A, rows in B.</param>
         /// <param name="n">Columns in B and C.</param>
         /// <param name="stream">ROCm stream.</param>
-        public unsafe void ExecuteMatMul(
+        public static unsafe void ExecuteMatMul(
             IntPtr a, IntPtr b, IntPtr c,
             int m, int k, int n,
             ROCmStream? stream = null)

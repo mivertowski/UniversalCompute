@@ -46,18 +46,12 @@ namespace ILGPU.Memory.Unified
             }
         }
 
-        public virtual ArrayView2D<T, Stride2D.DenseX> As2DView(int width, int height)
-        {
-            if (width * height > Length)
-                throw new ArgumentException("2D view dimensions exceed buffer size");
-            return View.As2DView(new LongIndex2D(width, height));
-        }
-        public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth)
-        {
-            if (width * height * depth > Length)
-                throw new ArgumentException("3D view dimensions exceed buffer size");
-            return View.As3DView(new LongIndex3D(width, height, depth));
-        }
+        public virtual ArrayView2D<T, Stride2D.DenseX> As2DView(int width, int height) => width * height > Length
+                ? throw new ArgumentException("2D view dimensions exceed buffer size")
+                : View.As2DView(new LongIndex2D(width, height));
+        public virtual ArrayView3D<T, Stride3D.DenseXY> As3DView(int width, int height, int depth) => width * height * depth > Length
+                ? throw new ArgumentException("3D view dimensions exceed buffer size")
+                : View.As3DView(new LongIndex3D(width, height, depth));
         public virtual void CopyFromCPU(ReadOnlySpan<T> source)
         {
             if (source.Length > Length)
@@ -104,9 +98,7 @@ namespace ILGPU.Memory.Unified
         {
             // Default implementation - data is already available if native buffer exists
             // Derived classes should override for specific migration logic
-            var nativeBuffer = GetNativeBuffer(accelerator);
-            if (nativeBuffer == null)
-                throw new InvalidOperationException($"Buffer not available on accelerator {accelerator.Name}");
+            var nativeBuffer = GetNativeBuffer(accelerator) ?? throw new InvalidOperationException($"Buffer not available on accelerator {accelerator.Name}");
         }
         public virtual Task EnsureAvailableAsync(Accelerator accelerator) =>
             // Default async implementation delegates to sync version

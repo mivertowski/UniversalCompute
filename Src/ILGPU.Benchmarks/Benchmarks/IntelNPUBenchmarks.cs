@@ -18,7 +18,6 @@
 using BenchmarkDotNet.Attributes;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
-using ILGPU.Benchmarks.Infrastructure;
 using ILGPU.Intel.NPU;
 
 namespace ILGPU.Benchmarks.Benchmarks;

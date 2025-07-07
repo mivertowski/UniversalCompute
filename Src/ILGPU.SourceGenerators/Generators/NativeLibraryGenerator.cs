@@ -553,10 +553,7 @@ namespace ILGPU.SourceGenerators.Generators
                 return "@event";
             if (parameterName == "object")
                 return "@object";
-            if (parameterName == "string")
-                return "@string";
-            
-            return parameterName;
+            return parameterName == "string" ? "@string" : parameterName;
         }
 
         private static Dictionary<string, LibraryImplementation> GetLibraryToImplementationMapping(Dictionary<string, string> libraryNames)

@@ -16,9 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.Backends;
-using ILGPU.Resources;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace ILGPU.Runtime.ROCm
 {
@@ -96,10 +94,9 @@ namespace ILGPU.Runtime.ROCm
                 throw new NotSupportedException("ROCm is not supported on this system");
 
             var devices = ROCmDevice.GetDevices();
-            if (deviceId < 0 || deviceId >= devices.Length)
-                throw new ArgumentOutOfRangeException(nameof(deviceId), $"Device ID {deviceId} is out of range [0, {devices.Length - 1}]");
-
-            return new ROCmAccelerator(context, devices[deviceId]);
+            return deviceId < 0 || deviceId >= devices.Length
+                ? throw new ArgumentOutOfRangeException(nameof(deviceId), $"Device ID {deviceId} is out of range [0, {devices.Length - 1}]")
+                : new ROCmAccelerator(context, devices[deviceId]);
         }
 
         /// <summary>
@@ -108,13 +105,7 @@ namespace ILGPU.Runtime.ROCm
         /// <param name="context">The ILGPU context.</param>
         /// <param name="device">The ROCm device.</param>
         /// <returns>The created accelerator.</returns>
-        public static ROCmAccelerator CreateROCmAccelerator(this Context context, ROCmDevice device)
-        {
-            if (device == null)
-                throw new ArgumentNullException(nameof(device));
-
-            return new ROCmAccelerator(context, device);
-        }
+        public static ROCmAccelerator CreateROCmAccelerator(this Context context, ROCmDevice device) => device == null ? throw new ArgumentNullException(nameof(device)) : new ROCmAccelerator(context, device);
 
         /// <summary>
         /// Gets all available ROCm devices.
