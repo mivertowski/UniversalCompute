@@ -92,31 +92,32 @@ namespace ILGPU.Runtime.HardwareDetection
         /// <returns>Hardware capabilities.</returns>
         private static HardwareCapabilities DetectHardwareCapabilities()
         {
-            var capabilities = new HardwareCapabilities();
+            var capabilities = new HardwareCapabilities
+            {
+                // Detect NVIDIA CUDA support
+                CUDA = DetectCUDACapabilities(),
 
-            // Detect NVIDIA CUDA support
-            capabilities.CUDA = DetectCUDACapabilities();
+                // Detect AMD ROCm/HIP support
+                ROCm = DetectROCmCapabilities(),
 
-            // Detect AMD ROCm/HIP support
-            capabilities.ROCm = DetectROCmCapabilities();
+                // Detect Intel OneAPI/SYCL support
+                OneAPI = DetectOneAPICapabilities(),
 
-            // Detect Intel OneAPI/SYCL support
-            capabilities.OneAPI = DetectOneAPICapabilities();
+                // Detect Intel AMX support
+                AMX = DetectAMXCapabilities(),
 
-            // Detect Intel AMX support
-            capabilities.AMX = DetectAMXCapabilities();
+                // Detect Apple hardware support
+                Apple = DetectAppleCapabilities(),
 
-            // Detect Apple hardware support
-            capabilities.Apple = DetectAppleCapabilities();
+                // Detect OpenCL support
+                OpenCL = DetectOpenCLCapabilities(),
 
-            // Detect OpenCL support
-            capabilities.OpenCL = DetectOpenCLCapabilities();
+                // Detect Vulkan support
+                Vulkan = DetectVulkanCapabilities(),
 
-            // Detect Vulkan support
-            capabilities.Vulkan = DetectVulkanCapabilities();
-
-            // Detect Velocity (SIMD) support
-            capabilities.Velocity = DetectVelocityCapabilities();
+                // Detect Velocity (SIMD) support
+                Velocity = DetectVelocityCapabilities()
+            };
 
             return capabilities;
         }
@@ -236,8 +237,12 @@ namespace ILGPU.Runtime.HardwareDetection
         {
             // Map architecture information to compute capability
             // This is based on the device name and architecture features
-            byte* namePtr = props.Name;
-            string deviceName = System.Text.Encoding.UTF8.GetString(namePtr, 256).TrimEnd('\0').ToUpperInvariant();
+            string deviceName;
+            unsafe
+            {
+                byte* namePtr = props.Name;
+                deviceName = System.Text.Encoding.UTF8.GetString(namePtr, 256).TrimEnd('\0').ToUpperInvariant();
+            }
             
             // RDNA3 (gfx11xx)
             if (deviceName.Contains("7900", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7800", StringComparison.OrdinalIgnoreCase) || deviceName.Contains("7700", StringComparison.OrdinalIgnoreCase))
