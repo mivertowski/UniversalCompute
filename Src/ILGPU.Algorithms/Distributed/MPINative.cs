@@ -315,7 +315,8 @@ namespace ILGPU.Algorithms.Distributed
 #pragma warning disable CA1031 // Do not catch general exception types
                 try
                 {
-                    MPI_Initialized(out int flag);
+                    var result = MPI_Initialized(out int flag);
+                    if (result != 0) return false; // Handle MPI error
                     return flag != 0;
                 }
                 catch
@@ -430,7 +431,12 @@ namespace ILGPU.Algorithms.Distributed
         {
             if (comm != _worldCommunicator) // Don't free world communicator
             {
-                MPI_Comm_free(ref comm);
+                var result = MPI_Comm_free(ref comm);
+                if (result != 0)
+                {
+                    // Log MPI error but don't throw in cleanup
+                    System.Diagnostics.Debug.WriteLine($"MPI_Comm_free failed with error code: {result}");
+                }
             }
         }
 
@@ -574,7 +580,12 @@ namespace ILGPU.Algorithms.Distributed
         {
             if (_initialized)
             {
-                MPI_Finalize();
+                var result = MPI_Finalize();
+                if (result != 0)
+                {
+                    // Log MPI error but don't throw in shutdown
+                    System.Diagnostics.Debug.WriteLine($"MPI_Finalize failed with error code: {result}");
+                }
                 _initialized = false;
                 _worldCommunicator = IntPtr.Zero;
             }

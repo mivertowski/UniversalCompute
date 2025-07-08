@@ -94,7 +94,7 @@ namespace ILGPU.Tests.CPU
             try
             {
                 // Try to access reduction operations through algorithms namespace
-                var sumKernel = accelerator.LoadStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
+                var sumKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
                     (index, input, output) =>
                     {
                         if (index == 0)
@@ -143,7 +143,7 @@ namespace ILGPU.Tests.CPU
             buffer.CopyFromCPU(data);
 
             // Test prefix scan (cumulative sum)
-            var scanKernel = accelerator.LoadStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
+            var scanKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
                 (index, input, output) =>
                 {
                     float sum = 0;
@@ -186,7 +186,7 @@ namespace ILGPU.Tests.CPU
             buffer.CopyFromCPU(data);
 
             // Test simple bubble sort kernel for small arrays
-            var sortKernel = accelerator.LoadStreamKernel<Index1D, ArrayView<float>>(
+            var sortKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>>(
                 (index, array) =>
                 {
                     // Simple bubble sort implementation
@@ -279,7 +279,7 @@ namespace ILGPU.Tests.CPU
             maskKernel(size, inputBuffer.View, maskBuffer.View);
 
             // Simple compaction kernel (filter)
-            var compactKernel = accelerator.LoadStreamKernel<Index1D, ArrayView<float>, ArrayView<int>, ArrayView<float>>(
+            var compactKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<int>, ArrayView<float>>(
                 (index, input, mask, output) =>
                 {
                     if (index == 0)
@@ -389,7 +389,7 @@ namespace ILGPU.Tests.CPU
             buffer2.CopyFromCPU(vector2);
 
             // Vector dot product kernel
-            var dotProductKernel = accelerator.LoadStreamKernel<Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>>(
+            var dotProductKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>>(
                 (index, a, b, result) =>
                 {
                     if (index == 0)
