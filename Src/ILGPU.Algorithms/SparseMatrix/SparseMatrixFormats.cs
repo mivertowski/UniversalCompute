@@ -215,13 +215,13 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Clear the dense matrix
             var clearKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView2D<T, Stride2D.DenseX>>(ClearDenseMatrixKernel);
-            clearKernel(actualStream, new Index2D(NumRows, NumCols), denseMatrix.View);
+            clearKernel(new Index2D(NumRows, NumCols), denseMatrix.View);
 
             // Fill from CSR data
             var fillKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<T>, ArrayView2D<T, Stride2D.DenseX>>(
                 CSRToDenseKernel);
-            fillKernel(actualStream, NumRows, RowPtr.View, ColIndices.View, Values.View, denseMatrix.View);
+            fillKernel(NumRows, RowPtr.View, ColIndices.View, Values.View, denseMatrix.View);
 
             actualStream.Synchronize();
             return denseMatrix;
@@ -572,13 +572,13 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Clear the dense matrix
             var clearKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView2D<T, Stride2D.DenseX>>(ClearDenseMatrixKernel);
-            clearKernel(actualStream, new Index2D(NumRows, NumCols), denseMatrix.View);
+            clearKernel(new Index2D(NumRows, NumCols), denseMatrix.View);
 
             // Fill from BSR data
             var fillKernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<T>, ArrayView2D<T, Stride2D.DenseX>,
                 int, int>(BSRToDenseKernel);
-            fillKernel(actualStream, NumBlockRows, 
+            fillKernel(NumBlockRows, 
                 RowPtr.View, ColIndices.View, Values.View, denseMatrix.View, BlockRowSize, BlockColSize);
 
             actualStream.Synchronize();

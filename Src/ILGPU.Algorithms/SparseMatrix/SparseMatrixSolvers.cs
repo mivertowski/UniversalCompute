@@ -174,13 +174,13 @@ namespace ILGPU.Algorithms.SparseMatrix
             ClearVector(matrix.Accelerator, solution.View, actualStream);
 
             // r = b - A*x (x = 0, so r = b)
-            rhs.CopyTo(r.View, actualStream);
+            r.View.CopyFrom(rhs);
 
             // Apply preconditioner: z = M^-1 * r
             if (preconditioner != null)
                 ApplyPreconditioner(preconditioner, r.View, z.View, actualStream);
             else
-                r.View.CopyTo(z.View, actualStream);
+                z.View.CopyFrom(r.View);
 
             z.View.CopyTo(p.View, actualStream);
 
@@ -215,7 +215,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 if (preconditioner != null)
                     ApplyPreconditioner(preconditioner, r.View, z.View, actualStream);
                 else
-                    r.View.CopyTo(z.View, actualStream);
+                    z.View.CopyFrom(r.View);
 
                 var rznew = DotProduct(matrix.Accelerator, r.View, z.View, actualStream);
                 var beta = rznew / rzold;

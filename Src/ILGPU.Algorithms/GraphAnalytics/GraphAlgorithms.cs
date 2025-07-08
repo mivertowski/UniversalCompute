@@ -247,14 +247,14 @@ namespace ILGPU.Algorithms.GraphAnalytics
             while (hasChanges && iteration < maxIterations)
             {
                 // Copy current component IDs to new array
-                componentIds.View.CopyTo(newComponentIds.View, actualStream);
+                componentIds.View.CopyTo(newComponentIds.View);
 
                 // Propagate labels
                 var propagateKernel = accelerator.LoadAutoGroupedStreamKernel<
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<int>, ArrayView<int>>(
                     PropagateLabelsKernel);
 
-                propagateKernel(actualStream, graph.NumVertices,
+                propagateKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, componentIds.View, newComponentIds.View);
 
                 // Check for changes (simplified)
@@ -322,21 +322,21 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var initValue = 1.0f / graph.NumVertices;
             var initKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, float>(
                 InitializeUniformKernel);
-            initKernel(actualStream, graph.NumVertices, pagerank.View, initValue);
+            initKernel(graph.NumVertices, pagerank.View, initValue);
 
             // Power iteration
             for (int iteration = 0; iteration < maxIterations; iteration++)
             {
                 // Clear new PageRank values
                 var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>>(ClearFloatArrayKernel);
-                clearKernel(actualStream, graph.NumVertices, newPagerank.View);
+                clearKernel(graph.NumVertices, newPagerank.View);
 
                 // Compute new PageRank values
                 var pagerankKernel = accelerator.LoadAutoGroupedStreamKernel<
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<float>, ArrayView<int>,
                     ArrayView<float>, float, float>(PageRankKernel);
 
-                pagerankKernel(actualStream, graph.NumVertices,
+                pagerankKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, pagerank.View, outDegrees.View,
                     newPagerank.View, dampingFactor, initValue);
 
@@ -367,7 +367,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
 
             var betweenness = accelerator.Allocate1D<float>(graph.NumVertices);
             var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>>(ClearFloatArrayKernel);
-            clearKernel(actualStream, graph.NumVertices, betweenness.View);
+            clearKernel(graph.NumVertices, betweenness.View);
 
             // For each vertex as source, compute single-source betweenness contribution
             for (int source = 0; source < graph.NumVertices; source++)
@@ -380,7 +380,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     Index1D, ArrayView<float>, ArrayView<float>, ArrayView<int>>(
                     AccumulateBetweennessKernel);
                 
-                accumKernel(actualStream, graph.NumVertices, 
+                accumKernel(graph.NumVertices, 
                     betweenness.View, bfsResult.Distances.View, bfsResult.Predecessors.View);
                 
                 bfsResult.Dispose();
@@ -390,7 +390,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var normalizationFactor = graph.NumVertices > 2 ? 2.0f / ((graph.NumVertices - 1) * (graph.NumVertices - 2)) : 1.0f;
             var normalizeKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, float>(
                 NormalizeArrayKernel);
-            normalizeKernel(actualStream, graph.NumVertices, betweenness.View, normalizationFactor);
+            normalizeKernel(graph.NumVertices, betweenness.View, normalizationFactor);
 
             return new CentralityResult(betweenness: betweenness);
         }

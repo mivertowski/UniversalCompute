@@ -222,7 +222,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var kernel = Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>>(GetDegreesKernel);
             
-            kernel(Accelerator.DefaultStream, NumVertices, RowPtr.View, degrees.View);
+            kernel(NumVertices, RowPtr.View, degrees.View);
             Accelerator.DefaultStream.Synchronize();
             
             return degrees;

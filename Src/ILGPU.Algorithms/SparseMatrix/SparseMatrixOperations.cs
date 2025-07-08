@@ -58,7 +58,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<T>, ArrayView<T>, 
                 ArrayView<T>, T, T>(SpMVKernel);
 
-            spMVKernel(actualStream, matrix.NumRows,
+            spMVKernel(matrix.NumRows,
                 matrix.RowPtr.View, matrix.ColIndices.View, matrix.Values.View,
                 x, y, alpha, beta);
 
@@ -95,7 +95,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<T>, ArrayView<T>,
                 ArrayView<T>, T, T, int, int>(BSRSpMVKernel);
 
-            bsrSpMVKernel(actualStream, matrix.NumBlockRows,
+            bsrSpMVKernel(matrix.NumBlockRows,
                 matrix.RowPtr.View, matrix.ColIndices.View, matrix.Values.View,
                 x, y, alpha, beta, matrix.BlockRowSize, matrix.BlockColSize);
 
@@ -131,7 +131,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<int>, ArrayView<int>, 
                 ArrayView<int>>(CountSpMMNonZerosKernel);
 
-            countKernel(actualStream, matrixA.NumRows,
+            countKernel(matrixA.NumRows,
                 matrixA.RowPtr.View, matrixA.ColIndices.View,
                 matrixB.RowPtr.View, matrixB.ColIndices.View,
                 resultRowNnz.View);
@@ -150,7 +150,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 ArrayView<int>, ArrayView<int>, ArrayView<T>,
                 ArrayView<int>, ArrayView<int>, ArrayView<T>>(ComputeSpMMValuesKernel);
 
-            computeKernel(actualStream, matrixA.NumRows,
+            computeKernel(matrixA.NumRows,
                 matrixA.RowPtr.View, matrixA.ColIndices.View, matrixA.Values.View,
                 matrixB.RowPtr.View, matrixB.ColIndices.View, matrixB.Values.View,
                 resultRowPtr.View, resultColIndices.View, resultValues.View);
