@@ -259,10 +259,20 @@ namespace ILGPU.Algorithms.FFT
             if (output.Length != Configuration.Size / 2 + 1)
                 throw new ArgumentException($"Output size must be {Configuration.Size / 2 + 1}", nameof(output));
 
-            var kernel = GetRealFFTKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(new Index1D((int)input.Length), input, output, Plan);
+            // Handle type conversion for real FFT
+            if (typeof(T) == typeof(float))
+            {
+                var floatKernel = _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<Complex>, FFTPlan>(
+                    FFTKernels.RealToComplexForward);
+                var floatInput = (ArrayView<float>)(object)input;
+                floatKernel(new Index1D((int)input.Length), floatInput, output, Plan);
+            }
+            else
+            {
+                throw new NotSupportedException($"Real FFT not supported for type {typeof(T)}");
+            }
             actualStream.Synchronize();
         }
 
@@ -285,11 +295,10 @@ namespace ILGPU.Algorithms.FFT
             if (output.Length != Configuration.Size)
                 throw new ArgumentException($"Output size must be {Configuration.Size}", nameof(output));
 
-            var kernel = GetRealFFTKernel(FFTDirection.Inverse);
             var actualStream = stream ?? _accelerator.DefaultStream;
-
-            kernel(new Index1D((int)input.Length), input, output, Plan);
-            actualStream.Synchronize();
+            
+            // Complex-to-real inverse FFT not implemented yet
+            throw new NotImplementedException("Complex-to-real inverse FFT not implemented yet");
         }
 
         #endregion
@@ -366,69 +375,110 @@ namespace ILGPU.Algorithms.FFT
             ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan> 
             GetFFT2DRowKernel(FFTDirection direction)
         {
-            return _accelerator.LoadAutoGroupedStreamKernel<
-                Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
-                ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(
-                direction == FFTDirection.Forward 
-                    ? FFTKernels.FFT2DRowForward 
-                    : FFTKernels.FFT2DRowInverse);
+            if (direction == FFTDirection.Forward)
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
+                    ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(FFTKernels.FFT2DRowForward);
+            }
+            else
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
+                    ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(FFTKernels.FFT2DRowInverse);
+            }
         }
 
         private Action<Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
             ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan> 
             GetFFT2DColumnKernel(FFTDirection direction)
         {
-            return _accelerator.LoadAutoGroupedStreamKernel<
-                Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
-                ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(
-                direction == FFTDirection.Forward 
-                    ? FFTKernels.FFT2DColumnForward 
-                    : FFTKernels.FFT2DColumnInverse);
+            if (direction == FFTDirection.Forward)
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
+                    ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(FFTKernels.FFT2DColumnForward);
+            }
+            else
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
+                    ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(FFTKernels.FFT2DColumnInverse);
+            }
         }
 
         private Action<Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
             ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan> 
             GetFFT3DKernelX(FFTDirection direction)
         {
-            return _accelerator.LoadAutoGroupedStreamKernel<
-                Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
-                ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(
-                direction == FFTDirection.Forward 
-                    ? FFTKernels.FFT3DXForward 
-                    : FFTKernels.FFT3DXInverse);
+            if (direction == FFTDirection.Forward)
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
+                    ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(FFTKernels.FFT3DXForward);
+            }
+            else
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
+                    ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(FFTKernels.FFT3DXInverse);
+            }
         }
 
         private Action<Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
             ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan> 
             GetFFT3DKernelY(FFTDirection direction)
         {
-            return _accelerator.LoadAutoGroupedStreamKernel<
-                Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
-                ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(
-                direction == FFTDirection.Forward 
-                    ? FFTKernels.FFT3DYForward 
-                    : FFTKernels.FFT3DYInverse);
+            if (direction == FFTDirection.Forward)
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
+                    ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(FFTKernels.FFT3DYForward);
+            }
+            else
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
+                    ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(FFTKernels.FFT3DYInverse);
+            }
         }
 
         private Action<Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
             ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan> 
             GetFFT3DKernelZ(FFTDirection direction)
         {
-            return _accelerator.LoadAutoGroupedStreamKernel<
-                Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
-                ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(
-                direction == FFTDirection.Forward 
-                    ? FFTKernels.FFT3DZForward 
-                    : FFTKernels.FFT3DZInverse);
+            if (direction == FFTDirection.Forward)
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
+                    ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(FFTKernels.FFT3DZForward);
+            }
+            else
+            {
+                return _accelerator.LoadAutoGroupedStreamKernel<
+                    Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
+                    ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(FFTKernels.FFT3DZInverse);
+            }
         }
 
         private Action<Index1D, ArrayView<T>, ArrayView<Complex>, FFTPlan> 
             GetRealFFTKernel(FFTDirection direction)
         {
-            return direction == FFTDirection.Forward
-                ? _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<T>, ArrayView<Complex>, FFTPlan>(
-                    FFTKernels.RealToComplexForward)
-                : throw new NotImplementedException("Complex-to-real kernel");
+            if (direction == FFTDirection.Forward)
+            {
+                // Cast T to float for the kernel since RealToComplexForward expects float
+                if (typeof(T) == typeof(float))
+                {
+                    var kernel = _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<Complex>, FFTPlan>(
+                        FFTKernels.RealToComplexForward);
+                    return (Action<Index1D, ArrayView<T>, ArrayView<Complex>, FFTPlan>)(object)kernel;
+                }
+                throw new NotSupportedException($"Real FFT not supported for type {typeof(T)}");
+            }
+            else
+            {
+                throw new NotImplementedException("Complex-to-real kernel");
+            }
         }
 
         private void ThrowIfDisposed()
