@@ -18,6 +18,7 @@
 using ILGPU.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ILGPU.Algorithms.ComputerVision
 {
@@ -51,7 +52,7 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <summary>Corner response map</summary>
         public MemoryBuffer2D<float, Stride2D.DenseX> ResponseMap { get; }
         /// <summary>Detected corner points</summary>
-        public List<FeaturePoint> Corners { get; }
+        public IReadOnlyList<FeaturePoint> Corners { get; }
 
         public CornerDetectionResult(
             MemoryBuffer2D<float, Stride2D.DenseX> responseMap,
@@ -325,7 +326,7 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <param name="threshold">Blob response threshold.</param>
         /// <param name="stream">Accelerator stream for execution.</param>
         /// <returns>Detected blob features.</returns>
-        public static List<FeaturePoint> LaplacianOfGaussianBlobs(
+        public static IReadOnlyList<FeaturePoint> LaplacianOfGaussianBlobs(
             Image<float> image,
             float minSigma = 1.0f,
             float maxSigma = 10.0f,

@@ -24,7 +24,7 @@ namespace ILGPU.Tests
     /// </remarks>
     /// <param name="methodName">The associated method name.</param>
     [AttributeUsage(AttributeTargets.Method)]
-    internal sealed class KernelMethodAttribute(string methodName) : Attribute
+    public sealed class KernelMethodAttribute(string methodName) : Attribute
     {
 
         /// <summary>
