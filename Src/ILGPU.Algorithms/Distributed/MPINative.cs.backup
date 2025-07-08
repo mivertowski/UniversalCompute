@@ -92,7 +92,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="rank">Output rank.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Comm_rank(IntPtr comm, out int rank);
 
         /// <summary>
@@ -102,7 +101,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="size">Output size.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Comm_size(IntPtr comm, out int size);
 
         /// <summary>
@@ -113,7 +111,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="newcomm">Output new communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Comm_create(IntPtr comm, IntPtr group, out IntPtr newcomm);
 
         /// <summary>
@@ -122,7 +119,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator to free.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Comm_free(ref IntPtr comm);
 
         #endregion
@@ -140,7 +136,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Send(IntPtr buf, int count, int datatype, int dest, int tag, IntPtr comm);
 
         /// <summary>
@@ -155,7 +150,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="status">Status information.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Recv(IntPtr buf, int count, int datatype, int source, int tag, IntPtr comm, IntPtr status);
 
         /// <summary>
@@ -170,7 +164,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="request">Request handle.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Isend(IntPtr buf, int count, int datatype, int dest, int tag, IntPtr comm, out IntPtr request);
 
         /// <summary>
@@ -185,7 +178,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="request">Request handle.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Irecv(IntPtr buf, int count, int datatype, int source, int tag, IntPtr comm, out IntPtr request);
 
         /// <summary>
@@ -196,7 +188,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="status">Status information.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Test(ref IntPtr request, out int flag, IntPtr status);
 
         /// <summary>
@@ -206,7 +197,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="status">Status information.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Wait(ref IntPtr request, IntPtr status);
 
         #endregion
@@ -219,7 +209,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Barrier(IntPtr comm);
 
         /// <summary>
@@ -232,7 +221,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Bcast(IntPtr buffer, int count, int datatype, int root, IntPtr comm);
 
         /// <summary>
@@ -246,7 +234,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Allreduce(IntPtr sendbuf, IntPtr recvbuf, int count, int datatype, int op, IntPtr comm);
 
         /// <summary>
@@ -261,7 +248,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Reduce(IntPtr sendbuf, IntPtr recvbuf, int count, int datatype, int op, int root, IntPtr comm);
 
         /// <summary>
@@ -277,7 +263,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Scatter(IntPtr sendbuf, int sendcount, int sendtype, IntPtr recvbuf, int recvcount, int recvtype, int root, IntPtr comm);
 
         /// <summary>
@@ -293,7 +278,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Gather(IntPtr sendbuf, int sendcount, int sendtype, IntPtr recvbuf, int recvcount, int recvtype, int root, IntPtr comm);
 
         /// <summary>
@@ -308,7 +292,6 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="comm">Communicator.</param>
         /// <returns>Error code.</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        [DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.SafeDirectories)]
         private static extern int MPI_Alltoall(IntPtr sendbuf, int sendcount, int sendtype, IntPtr recvbuf, int recvcount, int recvtype, IntPtr comm);
 
         #endregion

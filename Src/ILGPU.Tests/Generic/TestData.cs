@@ -26,7 +26,7 @@ namespace ILGPU.Tests
     /// <summary>
     /// Implements a test data helper.
     /// </summary>
-    public static class TestData
+    internal static class TestData
     {
         /// <summary>
         /// Creates a new serializable test data instance.
@@ -45,7 +45,7 @@ namespace ILGPU.Tests
     /// Wraps a test value.
     /// </summary>
     /// <typeparam name="T">The value to wrap.</typeparam>
-    public class TestData<T> : IXunitSerializable
+    internal class TestData<T> : IXunitSerializable
     {
         public TestData()
         {
@@ -140,7 +140,7 @@ namespace ILGPU.Tests
 
     }
 
-    public static class PairStruct
+    internal static class PairStruct
     {
         public static PairStruct<float, float> MaxFloats =>
             new(float.MaxValue, float.MaxValue);
@@ -150,7 +150,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    public struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
+    internal struct PairStruct<T1, T2>(T1 val0, T2 val1) : IXunitSerializable
         where T1 : struct
         where T2 : struct
     {
