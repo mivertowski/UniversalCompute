@@ -62,7 +62,7 @@ namespace ILGPU.Tests.CPU
                 // Perform FFT
                 fft.Forward1D(inputBuffer.View, outputBuffer.View);
                 
-                var result = outputBuffer.View.GetAsArray();
+                var result = outputBuffer.View.AsContiguous().GetAsArray();
                 
                 // Verify result: should have peak at frequency bin 1
                 Assert.True(result.Length == size);
@@ -101,7 +101,7 @@ namespace ILGPU.Tests.CPU
                 // Perform real FFT
                 fft.ForwardReal(inputBuffer.View, outputBuffer.View);
                 
-                var result = outputBuffer.View.GetAsArray();
+                var result = outputBuffer.View.AsContiguous().GetAsArray();
                 
                 // Verify result size
                 Assert.True(result.Length == size / 2 + 1);
@@ -144,7 +144,7 @@ namespace ILGPU.Tests.CPU
                 // Perform inverse real FFT
                 fftAccelerator.IFFT1DReal(inputBuffer.View, outputBuffer.View);
                 
-                var result = outputBuffer.View.GetAsArray();
+                var result = outputBuffer.View.AsContiguous().GetAsArray();
                 
                 // Verify result size and basic properties
                 Assert.True(result.Length == size);
@@ -193,7 +193,7 @@ namespace ILGPU.Tests.CPU
             // Perform 2D FFT
             fftAccelerator.FFT2D(inputBuffer.View, outputBuffer.View);
             
-            var result = outputBuffer.GetAsArray();
+            var result = outputBuffer.View.AsContiguous().GetAsArray();
             
             // Verify result size
             Assert.True(result.Length == size * size);
@@ -253,7 +253,7 @@ namespace ILGPU.Tests.CPU
                 // Verify each batch result
                 for (int b = 0; b < batchCount; b++)
                 {
-                    var result = buffers[b * 2 + 1].GetAsArray();
+                    var result = buffers[b * 2 + 1].View.AsContiguous().GetAsArray();
                     
                     // Each batch should have peak at different frequency
                     var peakIndex = b + 1;
@@ -301,7 +301,7 @@ namespace ILGPU.Tests.CPU
             // Perform IPP FFT
             fftAccelerator.FFT1D(inputBuffer.View, outputBuffer.View);
             
-            var result = outputBuffer.GetAsArray();
+            var result = outputBuffer.View.AsContiguous().GetAsArray();
             
             // Verify result
             Assert.True(result.Length == size);
@@ -342,7 +342,7 @@ namespace ILGPU.Tests.CPU
             // Inverse FFT
             fftAccelerator.IFFT1DReal(complexBuffer.View, resultBuffer.View);
             
-            var result = resultBuffer.GetAsArray();
+            var result = resultBuffer.View.AsContiguous().GetAsArray();
             
             // Verify round-trip accuracy
             for (int i = 0; i < size; i++)

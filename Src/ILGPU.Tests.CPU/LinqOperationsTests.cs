@@ -250,7 +250,7 @@ namespace ILGPU.Tests.CPU
             using var outputBuffer = accelerator.Allocate1D<int>(sourceData.Length);
             
             transformedQueryable.ExecuteTo(outputBuffer);
-            var actual = outputBuffer.GetAsArray();
+            var actual = outputBuffer.View.AsContiguous().GetAsArray();
             
             Assert.Equal(expected, actual);
         }

@@ -278,8 +278,7 @@ public class HardwareAcceleratorComparison : IDisposable
                 Index1D, ArrayView<float>, ArrayView<float>, int, int>(AMXOptimizedKernel),
             IntelNPUAccelerator => accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, ArrayView<float>, int, int>(NPUOptimizedKernel),
-            AppleNeuralEngineAccelerator => accelerator.LoadAutoGroupedStreamKernel<
-                Index1D, ArrayView<float>, ArrayView<float>, int, int>(ANEOptimizedKernel),
+            // Note: AppleNeuralEngineAccelerator is implemented as CPUAccelerator, so it uses the generic kernel
             _ => accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, ArrayView<float>, int, int>(GenericKernel)
         };

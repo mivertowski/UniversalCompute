@@ -32,7 +32,6 @@ public class AppleNeuralEngineBenchmarks : IDisposable
 {
     private Context? context;
     private Accelerator? accelerator;
-    private AppleNeuralEngineAccelerator? aneAccelerator;
     private bool hasRealANE;
     private MemoryBuffer2D<float, Stride2D.DenseX>? inputMatrix;
     private MemoryBuffer2D<float, Stride2D.DenseX>? weightMatrix;
@@ -62,12 +61,8 @@ public class AppleNeuralEngineBenchmarks : IDisposable
                 try
                 {
                     accelerator = context.CreateANEAccelerator(0);
-                    aneAccelerator = accelerator as AppleNeuralEngineAccelerator;
-                    if (aneAccelerator == null)
-                    {
-                        Console.WriteLine("⚠️ ANE hardware detected but accelerator creation failed, falling back to simulation");
-                        hasRealANE = false;
-                    }
+                    // ANE accelerator created successfully as CPU accelerator with ANE mode
+                    Console.WriteLine("✅ ANE accelerator initialized successfully");
                 }
                 catch (Exception ex)
                 {
@@ -182,7 +177,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
     [Benchmark]
     public float ANERealHardware()
     {
-        if (!hasRealANE || aneAccelerator == null)
+        if (!hasRealANE || accelerator == null)
         {
             // Fall back to simulation when real ANE not available
             return ANESimulatedMatrixMultiplication();
@@ -191,7 +186,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         try
         {
             // Use real Apple Neural Engine hardware
-            var kernel = aneAccelerator.LoadAutoGroupedStreamKernel<
+            var kernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, 
                 ArrayView2D<float, Stride2D.DenseX>, int>(ANEHardwareKernel);
 
@@ -201,7 +196,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             }
 
             kernel(new Index2D(MatrixSize, MatrixSize), inputMatrix.View, weightMatrix.View, outputMatrix.View, MatrixSize);
-            aneAccelerator.Synchronize();
+            accelerator.Synchronize();
             
             var result = outputMatrix.GetAsArray2D();
             Console.WriteLine("🚀 Executed on real Apple Neural Engine hardware");
@@ -728,7 +723,6 @@ public class AppleNeuralEngineBenchmarks : IDisposable
         outputMatrix?.Dispose();
         inputVector?.Dispose();
         outputVector?.Dispose();
-        aneAccelerator?.Dispose();
         accelerator?.Dispose();
         context?.Dispose();
     }

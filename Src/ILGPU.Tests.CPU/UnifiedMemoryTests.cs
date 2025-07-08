@@ -90,7 +90,7 @@ namespace ILGPU.Tests.CPU
             }
             
             // Verify data
-            var data = buffer.GetAsArray();
+            var data = buffer.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 Assert.Equal(i * 2, data[i]);
@@ -120,7 +120,7 @@ namespace ILGPU.Tests.CPU
             stream.Synchronize();
             
             // Verify transformation
-            var result = buffer.GetAsArray();
+            var result = buffer.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 Assert.Equal(i * 2 + 1, result[i]);
@@ -148,7 +148,7 @@ namespace ILGPU.Tests.CPU
             }, stream).ConfigureAwait(false);
             
             // Verify transformation
-            var result = buffer.GetAsArray();
+            var result = buffer.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 var expected = i * 0.5f * (i * 0.5f);
@@ -177,7 +177,7 @@ namespace ILGPU.Tests.CPU
             UnifiedMemoryOperations.Add(left, right, result, accelerator);
             
             // Verify result
-            var resultData = result.GetAsArray();
+            var resultData = result.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 Assert.Equal(i + i * 2, resultData[i]);
@@ -203,7 +203,7 @@ namespace ILGPU.Tests.CPU
             UnifiedMemoryOperations.MultiplyScalar(buffer, scalar, result, accelerator);
             
             // Verify result
-            var resultData = result.GetAsArray();
+            var resultData = result.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 Assert.Equal(i * scalar, resultData[i], 5);
@@ -251,7 +251,7 @@ namespace ILGPU.Tests.CPU
             await AsyncUnifiedMemoryOperations.AddAsync(left, right, result, accelerator).ConfigureAwait(false);
             
             // Verify result
-            var resultData = result.GetAsArray();
+            var resultData = result.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 var expected = i * 0.1f + i * 0.2f;
@@ -279,7 +279,7 @@ namespace ILGPU.Tests.CPU
             stream.Synchronize();
             
             // Verify copy
-            var destData = destination.GetAsArray();
+            var destData = destination.View.AsContiguous().GetAsArray();
             for (int i = 0; i < length; i++)
             {
                 Assert.Equal(Math.Sqrt(i), destData[i], 10);
@@ -349,7 +349,7 @@ namespace ILGPU.Tests.CPU
             }
             
             // Verify data after unpinning
-            var data = buffer.GetAsArray();
+            var data = buffer.View.AsContiguous().GetAsArray();
             for (int i = 0; i < data.Length; i++)
             {
                 Assert.Equal(i * 100, data[i]);

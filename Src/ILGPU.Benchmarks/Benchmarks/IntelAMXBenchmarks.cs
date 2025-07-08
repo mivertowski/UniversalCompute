@@ -269,7 +269,7 @@ public class IntelAMXBenchmarks : IDisposable
             return 0.0f;
         }
 
-        kernel(TileSize * TileSize, int8DataA.View, int8DataB.View, matrixC.View.AsLinearView(), TileSize);
+        kernel(TileSize * TileSize, int8DataA.View, int8DataB.View, matrixC.View.AsContiguous(), TileSize);
         accelerator!.Synchronize();
         
         var result = matrixC.GetAsArray2D();
