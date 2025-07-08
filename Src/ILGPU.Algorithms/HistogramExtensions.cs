@@ -190,6 +190,7 @@ namespace ILGPU.Algorithms
             where TLocator : struct, IComputeMultiBinOperation<T, TBinType, TIncrementor>
         {
             HistogramWorkKernel<T, TStride, TBinType, TIncrementor, TLocator>(
+                new Index1D(0),
                 view,
                 histogram,
                 out var histogramDidOverflow,
@@ -228,6 +229,7 @@ namespace ILGPU.Algorithms
             where TLocator : struct, IComputeMultiBinOperation<T, TBinType, TIncrementor>
         {
             HistogramWorkKernel<T, TStride, TBinType, TIncrementor, TLocator>(
+                new Index1D(0),
                 view,
                 histogram,
                 out _,

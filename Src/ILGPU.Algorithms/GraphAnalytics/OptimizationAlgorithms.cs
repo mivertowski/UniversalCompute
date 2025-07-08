@@ -129,14 +129,14 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var initKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<float>, ArrayView<bool>, int, int>(
                 InitializePushRelabelKernel);
-            initKernel(actualStream, graph.NumVertices, 
+            initKernel(graph.NumVertices, 
                 heights.View, excesses.View, activeVertices.View, source, sink);
 
             // Initialize source excess
             var sourceExcess = ComputeSourceExcess(accelerator, graph.RowPtr.View, capacities, source, actualStream);
             var setExcessKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, int, float>(SetExcessKernel);
-            setExcessKernel(actualStream, 1, excesses.View, source, sourceExcess);
+            setExcessKernel(1, excesses.View, source, sourceExcess);
 
             // Push-relabel iterations
             bool hasWork = true;
@@ -150,7 +150,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<float>, ArrayView<float>,
                     ArrayView<int>, ArrayView<float>, ArrayView<bool>>(PushKernel);
 
-                pushKernel(actualStream, graph.NumVertices,
+                pushKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, capacities, flows.View,
                     heights.View, excesses.View, activeVertices.View);
 
@@ -159,7 +159,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<float>, ArrayView<float>,
                     ArrayView<int>, ArrayView<float>, ArrayView<bool>, int>(RelabelKernel);
 
-                relabelKernel(actualStream, graph.NumVertices,
+                relabelKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, capacities, flows.View,
                     heights.View, excesses.View, activeVertices.View, sink);
 
@@ -204,8 +204,8 @@ namespace ILGPU.Algorithms.GraphAnalytics
 
             // Clear initial flows
             var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>>(ClearFloatArrayKernel);
-            clearKernel(actualStream, graph.NumEdges, flows.View);
-            clearKernel(actualStream, graph.NumVertices, potentials.View);
+            clearKernel(graph.NumEdges, flows.View);
+            clearKernel(graph.NumVertices, potentials.View);
 
             float totalCost = 0.0f;
             float totalFlow = 0.0f;
@@ -275,7 +275,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                 Index1D, ArrayView<float>, ArrayView<float>, ArrayView<int>, ArrayView<int>,
                 ArrayView2D<float, Stride2D.DenseX>, int, int>(InitializeHungarianKernel);
 
-            initHungarianKernel(actualStream, leftVertices,
+            initHungarianKernel(leftVertices,
                 leftLabels.View, rightLabels.View, leftMatching.View, rightMatching.View,
                 weights, leftVertices, rightVertices);
 
@@ -380,12 +380,12 @@ namespace ILGPU.Algorithms.GraphAnalytics
             // Initialize Prim's algorithm
             var initPrimKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<bool>, ArrayView<float>, ArrayView<int>>(InitializePrimKernel);
-            initPrimKernel(actualStream, graph.NumVertices, inMST.View, minWeight.View, parent.View);
+            initPrimKernel(graph.NumVertices, inMST.View, minWeight.View, parent.View);
 
             // Start from vertex 0
             var startKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<bool>, ArrayView<float>>(StartPrimKernel);
-            startKernel(actualStream, 1, inMST.View, minWeight.View);
+            startKernel(1, inMST.View, minWeight.View);
 
             float totalWeight = 0.0f;
 
@@ -399,7 +399,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                 // Add vertex to MST
                 var addVertexKernel = accelerator.LoadAutoGroupedStreamKernel<
                     Index1D, ArrayView<bool>, int>(AddVertexToMSTKernel);
-                addVertexKernel(actualStream, 1, inMST.View, minVertex);
+                addVertexKernel(1, inMST.View, minVertex);
 
                 totalWeight += GetVertexWeight(accelerator, minWeight.View, minVertex, actualStream);
 
@@ -408,7 +408,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<float>, ArrayView<bool>,
                     ArrayView<float>, ArrayView<int>, int>(UpdatePrimWeightsKernel);
 
-                updateWeightsKernel(actualStream, graph.NumVertices,
+                updateWeightsKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, graph.Values!.View, inMST.View,
                     minWeight.View, parent.View, minVertex);
             }
@@ -442,8 +442,8 @@ namespace ILGPU.Algorithms.GraphAnalytics
 
             // Initialize
             var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<bool>>(ClearBoolArrayKernel);
-            clearKernel(actualStream, graph.NumVertices, vertexCover.View);
-            clearKernel(actualStream, graph.NumEdges, edgeCovered.View);
+            clearKernel(graph.NumVertices, vertexCover.View);
+            clearKernel(graph.NumEdges, edgeCovered.View);
 
             int coverSize = 0;
             bool hasUncoveredEdges = true;
@@ -457,7 +457,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                 // Add vertex to cover
                 var addToCoverKernel = accelerator.LoadAutoGroupedStreamKernel<
                     Index1D, ArrayView<bool>, int>(AddVertexToCoverKernel);
-                addToCoverKernel(actualStream, 1, vertexCover.View, maxDegreeVertex);
+                addToCoverKernel(1, vertexCover.View, maxDegreeVertex);
                 coverSize++;
 
                 // Mark edges as covered
@@ -465,7 +465,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<bool>, ArrayView<bool>, int>(
                     MarkEdgesCoveredKernel);
 
-                markEdgesKernel(actualStream, graph.NumVertices,
+                markEdgesKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, vertexCover.View, edgeCovered.View, maxDegreeVertex);
 
                 // Update degrees (remove covered edges)
@@ -473,7 +473,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<bool>, ArrayView<int>>(
                     UpdateDegreesKernel);
 
-                updateDegreesKernel(actualStream, graph.NumVertices,
+                updateDegreesKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, edgeCovered.View, vertexDegree.View);
 
                 // Check if all edges are covered (simplified)
@@ -507,7 +507,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var complementKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<bool>, ArrayView<bool>>(ComplementBoolArrayKernel);
 
-            complementKernel(actualStream, graph.NumVertices, coverResult.BooleanSolution!.View, independentSet.View);
+            complementKernel(graph.NumVertices, coverResult.BooleanSolution!.View, independentSet.View);
 
             // Count independent set size
             var setSize = CountTrueBits(accelerator, independentSet.View, actualStream);

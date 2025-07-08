@@ -203,8 +203,8 @@ namespace ILGPU.Algorithms.Distributed
             if (mpiAccelerator.IsRoot)
             {
                 // Step 4: Sort all samples and select pivots
-                SortLocal(mpiAccelerator.LocalAccelerator, allSamples.View, actualStream);
-                pivots = SelectPivots(allSamples.View, size - 1);
+                SortLocal<T>(mpiAccelerator.LocalAccelerator, allSamples.View, actualStream);
+                pivots = SelectPivots<T>(allSamples.View, size - 1);
             }
             else
             {
@@ -213,7 +213,7 @@ namespace ILGPU.Algorithms.Distributed
             
             // Step 5: Broadcast pivots to all processes
             var pivotsBuffer = mpiAccelerator.LocalAccelerator.Allocate1D(pivots);
-            mpiAccelerator.Broadcast(pivotsBuffer.View, actualStream);
+            mpiAccelerator.Broadcast<T>(pivotsBuffer.View, actualStream);
             
             // Step 6: Partition local data based on pivots
             var partitions = PartitionData(mpiAccelerator.LocalAccelerator, localData, pivotsBuffer.View, actualStream);
@@ -253,11 +253,11 @@ namespace ILGPU.Algorithms.Distributed
             // Calculate send counts and displacements
             var sendCounts = CalculateSendCounts((int)localData.Length, targetSizes, rank);
             var sendBuffer = mpiAccelerator.LocalAccelerator.Allocate1D<T>(localData.Length);
-            localData.CopyTo(sendBuffer.View);
+            sendBuffer.View.CopyFrom(localData);
 
             // Perform all-to-all exchange
             var recvBuffer = mpiAccelerator.LocalAccelerator.Allocate1D<T>(targetSizes[rank]);
-            mpiAccelerator.AllToAll(sendBuffer.View, recvBuffer.View, actualStream);
+            mpiAccelerator.AllToAll<T>(sendBuffer.View, recvBuffer.View, actualStream);
 
             return recvBuffer.View;
         }
@@ -297,7 +297,7 @@ namespace ILGPU.Algorithms.Distributed
             // Initialize: r = b - A*x, p = r
             DistributedMatrixVectorMultiply(mpiAccelerator, matrix, solution, Ap.View, actualStream);
             ComputeResidual(mpiAccelerator.LocalAccelerator, rhs, Ap.View, r.View, actualStream);
-            r.View.CopyTo(p.View, actualStream);
+            r.View.CopyTo(p.View);
 
             var rsold = DistributedDotProduct(mpiAccelerator, r.View, r.View, actualStream);
 
@@ -364,7 +364,7 @@ namespace ILGPU.Algorithms.Distributed
             var localDotArray = new float[] { localDot };
             var globalDotArray = new float[1];
             
-            mpiAccelerator.Reduce(
+            mpiAccelerator.Reduce<float>(
                 mpiAccelerator.LocalAccelerator.Allocate1D(localDotArray).View,
                 mpiAccelerator.LocalAccelerator.Allocate1D(globalDotArray).View,
                 MPIOperation.Sum,
@@ -522,7 +522,7 @@ namespace ILGPU.Algorithms.Distributed
                     if (index < rVec.Length)
                         rVec[index] = bVec[index] - AxVec[index];
                 });
-            kernel(stream, r.IntExtent, b, Ax, r);
+            kernel(r.IntExtent, b, Ax, r);
         }
 
         private static void UpdateSolution(Accelerator accelerator, ArrayView<float> x, ArrayView<float> p, float alpha, AcceleratorStream stream)
@@ -533,7 +533,7 @@ namespace ILGPU.Algorithms.Distributed
                     if (index < xVec.Length)
                         xVec[index] += a * pVec[index];
                 });
-            kernel(stream, x.IntExtent, x, p, alpha);
+            kernel(x.IntExtent, x, p, alpha);
         }
 
         private static void UpdateResidual(Accelerator accelerator, ArrayView<float> r, ArrayView<float> Ap, float alpha, AcceleratorStream stream)
@@ -544,7 +544,7 @@ namespace ILGPU.Algorithms.Distributed
                     if (index < rVec.Length)
                         rVec[index] -= a * ApVec[index];
                 });
-            kernel(stream, r.IntExtent, r, Ap, alpha);
+            kernel(r.IntExtent, r, Ap, alpha);
         }
 
         private static void UpdateSearchDirection(Accelerator accelerator, ArrayView<float> p, ArrayView<float> r, float beta, AcceleratorStream stream)
@@ -555,7 +555,7 @@ namespace ILGPU.Algorithms.Distributed
                     if (index < pVec.Length)
                         pVec[index] = rVec[index] + b * pVec[index];
                 });
-            kernel(stream, p.IntExtent, p, r, beta);
+            kernel(p.IntExtent, p, r, beta);
         }
 
         private static float ComputeLocalDotProduct(Accelerator accelerator, ArrayView<float> x, ArrayView<float> y, AcceleratorStream stream)

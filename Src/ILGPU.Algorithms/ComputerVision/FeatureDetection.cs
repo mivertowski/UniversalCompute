@@ -670,7 +670,7 @@ namespace ILGPU.Algorithms.ComputerVision
                     var gaussian = (float)Math.Exp(-r2 / (2 * sigma2));
                     var laplacian = (r2 - 2 * sigma2) / sigma4;
                     
-                    coefficients[y * size + x] = -laplacian * gaussian / (IntrinsicMath.PI * sigma4);
+                    coefficients[y * size + x] = (float)(-laplacian * gaussian / (IntrinsicMath.PI * sigma4));
                 }
             }
 

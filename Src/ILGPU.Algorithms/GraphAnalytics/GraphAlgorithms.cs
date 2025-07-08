@@ -61,7 +61,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var initKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, ArrayView<int>, ArrayView<bool>, int>(
                 InitializeBellmanFordKernel);
-            initKernel(actualStream, graph.NumVertices, distances.View, predecessors.View, visited.View, source);
+            initKernel(graph.NumVertices, distances.View, predecessors.View, visited.View, source);
 
             // Relaxation loop (V-1 iterations)
             var relaxKernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -70,7 +70,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
 
             for (int iteration = 0; iteration < graph.NumVertices - 1; iteration++)
             {
-                relaxKernel(actualStream, graph.NumVertices,
+                relaxKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View,
                     graph.Values?.View ?? new ArrayView<float>(),
                     distances.View, predecessors.View);
@@ -114,7 +114,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var initKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, ArrayView<int>, ArrayView<bool>, ArrayView<bool>, int>(
                 InitializeDeltaSteppingKernel);
-            initKernel(actualStream, graph.NumVertices, 
+            initKernel(graph.NumVertices, 
                 distances.View, predecessors.View, visited.View, currentFrontier.View, source);
 
             // Delta-stepping iterations
@@ -123,7 +123,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             {
                 // Clear next frontier
                 var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<bool>>(ClearBoolArrayKernel);
-                clearKernel(actualStream, graph.NumVertices, nextFrontier.View);
+                clearKernel(graph.NumVertices, nextFrontier.View);
 
                 // Process current frontier
                 var deltaStepKernel = accelerator.LoadAutoGroupedStreamKernel<
@@ -131,7 +131,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
                     ArrayView<int>, ArrayView<bool>, ArrayView<bool>, ArrayView<bool>, float>(
                     graph.IsWeighted ? DeltaStepWeightedKernel : DeltaStepUnweightedKernel);
 
-                deltaStepKernel(actualStream, graph.NumVertices,
+                deltaStepKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, graph.Values?.View ?? new ArrayView<float>(),
                     distances.View, predecessors.View, visited.View, currentFrontier.View, nextFrontier.View, delta);
 
@@ -181,7 +181,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var initKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>, ArrayView<int>, ArrayView<bool>, ArrayView<bool>, int>(
                 InitializeBFSKernel);
-            initKernel(actualStream, graph.NumVertices,
+            initKernel(graph.NumVertices,
                 distances.View, predecessors.View, visited.View, currentLevel.View, source);
 
             float currentDistance = 0;
@@ -191,14 +191,14 @@ namespace ILGPU.Algorithms.GraphAnalytics
             {
                 // Clear next level
                 var clearKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<bool>>(ClearBoolArrayKernel);
-                clearKernel(actualStream, graph.NumVertices, nextLevel.View);
+                clearKernel(graph.NumVertices, nextLevel.View);
 
                 // Expand current level
                 var bfsKernel = accelerator.LoadAutoGroupedStreamKernel<
                     Index1D, ArrayView<int>, ArrayView<int>, ArrayView<float>, ArrayView<int>,
                     ArrayView<bool>, ArrayView<bool>, ArrayView<bool>, float>(BFSKernel);
 
-                bfsKernel(actualStream, graph.NumVertices,
+                bfsKernel(graph.NumVertices,
                     graph.RowPtr.View, graph.ColIndices.View, distances.View, predecessors.View,
                     visited.View, currentLevel.View, nextLevel.View, currentDistance + 1);
 
@@ -237,7 +237,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
             var newComponentIds = accelerator.Allocate1D<int>(graph.NumVertices);
 
             var initKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<int>>(InitializeComponentsKernel);
-            initKernel(actualStream, graph.NumVertices, componentIds.View);
+            initKernel(graph.NumVertices, componentIds.View);
 
             // Label propagation iterations
             bool hasChanges = true;

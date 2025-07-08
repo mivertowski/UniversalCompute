@@ -80,7 +80,7 @@ namespace ILGPU.Algorithms.FFT
             var kernel = GetFFT1DKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, Plan);
+            kernel(new Index1D((int)input.Length), input, output, Plan);
             actualStream.Synchronize();
         }
 
@@ -101,12 +101,12 @@ namespace ILGPU.Algorithms.FFT
             var kernel = GetFFT1DKernel(FFTDirection.Inverse);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, Plan);
+            kernel(new Index1D((int)input.Length), input, output, Plan);
             
             // Normalize by 1/N for inverse transform
             var normalizeKernel = _accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<Complex>, float>(FFTKernels.Normalize);
-            normalizeKernel(output.Length, output, 1.0f / Configuration.Size);
+            normalizeKernel(new Index1D((int)output.Length), output, 1.0f / Configuration.Size);
             
             actualStream.Synchronize();
         }
@@ -130,7 +130,7 @@ namespace ILGPU.Algorithms.FFT
             var kernel = GetBatchedFFT1DKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, Plan, batchSize);
+            kernel(new Index1D((int)input.Length), input, output, Plan, batchSize);
             actualStream.Synchronize();
         }
 
@@ -156,11 +156,12 @@ namespace ILGPU.Algorithms.FFT
 
             // Perform row-wise FFT
             var rowKernel = GetFFT2DRowKernel(FFTDirection.Forward);
-            rowKernel(actualStream, input, output, Plan);
+            var extent2D = new Index2D(input.IntExtent.X, input.IntExtent.Y);
+            rowKernel(extent2D, input, output, Plan);
 
             // Perform column-wise FFT
             var colKernel = GetFFT2DColumnKernel(FFTDirection.Forward);
-            colKernel(actualStream, output, output, Plan);
+            colKernel(extent2D, output, output, Plan);
 
             actualStream.Synchronize();
         }
@@ -183,11 +184,12 @@ namespace ILGPU.Algorithms.FFT
 
             // Perform column-wise inverse FFT
             var colKernel = GetFFT2DColumnKernel(FFTDirection.Inverse);
-            colKernel(actualStream, input, output, Plan);
+            var extent2D = new Index2D(input.IntExtent.X, input.IntExtent.Y);
+            colKernel(extent2D, input, output, Plan);
 
             // Perform row-wise inverse FFT
             var rowKernel = GetFFT2DRowKernel(FFTDirection.Inverse);
-            rowKernel(actualStream, output, output, Plan);
+            rowKernel(extent2D, output, output, Plan);
 
             // Normalize by 1/(width*height)
             var normalizeKernel = _accelerator.LoadAutoGroupedStreamKernel<
@@ -220,15 +222,16 @@ namespace ILGPU.Algorithms.FFT
 
             // Perform FFT along X dimension
             var xKernel = GetFFT3DKernelX(FFTDirection.Forward);
-            xKernel(actualStream, input, output, Plan);
+            var extent3D = new Index3D(input.IntExtent.X, input.IntExtent.Y, input.IntExtent.Z);
+            xKernel(extent3D, input, output, Plan);
 
             // Perform FFT along Y dimension
             var yKernel = GetFFT3DKernelY(FFTDirection.Forward);
-            yKernel(actualStream, output, output, Plan);
+            yKernel(extent3D, output, output, Plan);
 
             // Perform FFT along Z dimension
             var zKernel = GetFFT3DKernelZ(FFTDirection.Forward);
-            zKernel(actualStream, output, output, Plan);
+            zKernel(extent3D, output, output, Plan);
 
             actualStream.Synchronize();
         }
@@ -259,7 +262,7 @@ namespace ILGPU.Algorithms.FFT
             var kernel = GetRealFFTKernel(FFTDirection.Forward);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, Plan);
+            kernel(new Index1D((int)input.Length), input, output, Plan);
             actualStream.Synchronize();
         }
 
@@ -285,7 +288,7 @@ namespace ILGPU.Algorithms.FFT
             var kernel = GetRealFFTKernel(FFTDirection.Inverse);
             var actualStream = stream ?? _accelerator.DefaultStream;
 
-            kernel(actualStream, input, output, Plan);
+            kernel(new Index1D((int)input.Length), input, output, Plan);
             actualStream.Synchronize();
         }
 
@@ -324,106 +327,106 @@ namespace ILGPU.Algorithms.FFT
                 throw new InvalidOperationException("FFT configured for different dimensions");
         }
 
-        private Action<AcceleratorStream, ArrayView<Complex>, ArrayView<Complex>, FFTPlan> 
+        private Action<Index1D, ArrayView<Complex>, ArrayView<Complex>, FFTPlan> 
             GetFFT1DKernel(FFTDirection direction)
         {
             return Configuration.Algorithm switch
             {
-                FFTAlgorithm.Radix2 => _accelerator.LoadStreamKernel<
-                    ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
+                FFTAlgorithm.Radix2 => _accelerator.LoadAutoGroupedStreamKernel<
+                    Index1D, ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
                     direction == FFTDirection.Forward 
                         ? FFTKernels.CooleyTukeyForward1D 
                         : FFTKernels.CooleyTukeyInverse1D),
                 
-                FFTAlgorithm.Radix4 => _accelerator.LoadStreamKernel<
-                    ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
+                FFTAlgorithm.Radix4 => _accelerator.LoadAutoGroupedStreamKernel<
+                    Index1D, ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
                     direction == FFTDirection.Forward 
                         ? FFTKernels.Radix4Forward1D 
                         : FFTKernels.Radix4Inverse1D),
                 
-                _ => _accelerator.LoadStreamKernel<
-                    ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
+                _ => _accelerator.LoadAutoGroupedStreamKernel<
+                    Index1D, ArrayView<Complex>, ArrayView<Complex>, FFTPlan>(
                     direction == FFTDirection.Forward 
                         ? FFTKernels.MixedRadixForward1D 
                         : FFTKernels.MixedRadixInverse1D)
             };
         }
 
-        private Action<AcceleratorStream, ArrayView<Complex>, ArrayView<Complex>, FFTPlan, int> 
+        private Action<Index1D, ArrayView<Complex>, ArrayView<Complex>, FFTPlan, int> 
             GetBatchedFFT1DKernel(FFTDirection direction)
         {
-            return _accelerator.LoadStreamKernel<
-                ArrayView<Complex>, ArrayView<Complex>, FFTPlan, int>(
+            return _accelerator.LoadAutoGroupedStreamKernel<
+                Index1D, ArrayView<Complex>, ArrayView<Complex>, FFTPlan, int>(
                 direction == FFTDirection.Forward 
                     ? FFTKernels.BatchedForward1D 
                     : FFTKernels.BatchedInverse1D);
         }
 
-        private Action<AcceleratorStream, ArrayView2D<Complex, Stride2D.DenseX>, 
+        private Action<Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
             ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan> 
             GetFFT2DRowKernel(FFTDirection direction)
         {
-            return _accelerator.LoadStreamKernel<
-                ArrayView2D<Complex, Stride2D.DenseX>, 
+            return _accelerator.LoadAutoGroupedStreamKernel<
+                Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
                 ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(
                 direction == FFTDirection.Forward 
                     ? FFTKernels.FFT2DRowForward 
                     : FFTKernels.FFT2DRowInverse);
         }
 
-        private Action<AcceleratorStream, ArrayView2D<Complex, Stride2D.DenseX>, 
+        private Action<Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
             ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan> 
             GetFFT2DColumnKernel(FFTDirection direction)
         {
-            return _accelerator.LoadStreamKernel<
-                ArrayView2D<Complex, Stride2D.DenseX>, 
+            return _accelerator.LoadAutoGroupedStreamKernel<
+                Index2D, ArrayView2D<Complex, Stride2D.DenseX>, 
                 ArrayView2D<Complex, Stride2D.DenseX>, FFTPlan>(
                 direction == FFTDirection.Forward 
                     ? FFTKernels.FFT2DColumnForward 
                     : FFTKernels.FFT2DColumnInverse);
         }
 
-        private Action<AcceleratorStream, ArrayView3D<Complex, Stride3D.DenseXY>, 
+        private Action<Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
             ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan> 
             GetFFT3DKernelX(FFTDirection direction)
         {
-            return _accelerator.LoadStreamKernel<
-                ArrayView3D<Complex, Stride3D.DenseXY>, 
+            return _accelerator.LoadAutoGroupedStreamKernel<
+                Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
                 ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(
                 direction == FFTDirection.Forward 
                     ? FFTKernels.FFT3DXForward 
                     : FFTKernels.FFT3DXInverse);
         }
 
-        private Action<AcceleratorStream, ArrayView3D<Complex, Stride3D.DenseXY>, 
+        private Action<Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
             ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan> 
             GetFFT3DKernelY(FFTDirection direction)
         {
-            return _accelerator.LoadStreamKernel<
-                ArrayView3D<Complex, Stride3D.DenseXY>, 
+            return _accelerator.LoadAutoGroupedStreamKernel<
+                Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
                 ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(
                 direction == FFTDirection.Forward 
                     ? FFTKernels.FFT3DYForward 
                     : FFTKernels.FFT3DYInverse);
         }
 
-        private Action<AcceleratorStream, ArrayView3D<Complex, Stride3D.DenseXY>, 
+        private Action<Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
             ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan> 
             GetFFT3DKernelZ(FFTDirection direction)
         {
-            return _accelerator.LoadStreamKernel<
-                ArrayView3D<Complex, Stride3D.DenseXY>, 
+            return _accelerator.LoadAutoGroupedStreamKernel<
+                Index3D, ArrayView3D<Complex, Stride3D.DenseXY>, 
                 ArrayView3D<Complex, Stride3D.DenseXY>, FFTPlan>(
                 direction == FFTDirection.Forward 
                     ? FFTKernels.FFT3DZForward 
                     : FFTKernels.FFT3DZInverse);
         }
 
-        private Action<AcceleratorStream, ArrayView<T>, ArrayView<Complex>, FFTPlan> 
+        private Action<Index1D, ArrayView<T>, ArrayView<Complex>, FFTPlan> 
             GetRealFFTKernel(FFTDirection direction)
         {
             return direction == FFTDirection.Forward
-                ? _accelerator.LoadStreamKernel<ArrayView<T>, ArrayView<Complex>, FFTPlan>(
+                ? _accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<T>, ArrayView<Complex>, FFTPlan>(
                     FFTKernels.RealToComplexForward)
                 : throw new NotImplementedException("Complex-to-real kernel");
         }
@@ -443,7 +446,7 @@ namespace ILGPU.Algorithms.FFT
         {
             if (!_disposed)
             {
-                Plan?.Dispose();
+                Plan.Release();
                 _disposed = true;
             }
         }
