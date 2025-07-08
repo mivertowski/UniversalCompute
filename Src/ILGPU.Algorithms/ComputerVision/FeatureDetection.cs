@@ -96,8 +96,8 @@ namespace ILGPU.Algorithms.ComputerVision
             var accelerator = image.Accelerator;
 
             // Compute image gradients
-            var gradX = new Image<float>(accelerator, image.Width, image.Height, 1);
-            var gradY = new Image<float>(accelerator, image.Width, image.Height, 1);
+            using var gradX = new Image<float>(accelerator, image.Width, image.Height, 1);
+            using var gradY = new Image<float>(accelerator, image.Width, image.Height, 1);
             
             ImageProcessing.SobelEdgeDetection(image, gradX, gradY, stream: actualStream);
 
@@ -144,8 +144,6 @@ namespace ILGPU.Algorithms.ComputerVision
             var corners = ExtractCorners(accelerator, responseMap.View, threshold, actualStream);
 
             // Cleanup intermediate buffers
-            gradX.Dispose();
-            gradY.Dispose();
             Ixx.Dispose();
             Iyy.Dispose();
             Ixy.Dispose();
@@ -176,8 +174,8 @@ namespace ILGPU.Algorithms.ComputerVision
             var accelerator = image.Accelerator;
 
             // Compute gradients (same as Harris)
-            var gradX = new Image<float>(accelerator, image.Width, image.Height, 1);
-            var gradY = new Image<float>(accelerator, image.Width, image.Height, 1);
+            using var gradX = new Image<float>(accelerator, image.Width, image.Height, 1);
+            using var gradY = new Image<float>(accelerator, image.Width, image.Height, 1);
             
             ImageProcessing.SobelEdgeDetection(image, gradX, gradY, stream: actualStream);
 
@@ -224,8 +222,6 @@ namespace ILGPU.Algorithms.ComputerVision
             var corners = ExtractCorners(accelerator, responseMap.View, threshold, actualStream);
 
             // Cleanup
-            gradX.Dispose();
-            gradY.Dispose();
             Ixx.Dispose();
             Iyy.Dispose();
             Ixy.Dispose();
