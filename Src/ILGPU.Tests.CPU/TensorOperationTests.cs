@@ -16,6 +16,7 @@
 // Change License: Apache License, Version 2.0
 
 using ILGPU.ML;
+using ILGPU.Runtime.CPU;
 using System;
 using System.Linq;
 using Xunit;
@@ -72,7 +73,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorCreationTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(2, 3);
@@ -95,7 +96,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorFactoryMethodsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(2, 3);
@@ -121,7 +122,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorCopyOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(3, 2);
@@ -144,7 +145,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorReshapeTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var originalShape = new TensorShape(2, 6);
@@ -170,7 +171,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorTransposeTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(2, 3);
@@ -191,7 +192,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorElementWiseAdditionTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(2, 3);
@@ -216,7 +217,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorElementWiseMultiplicationTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(2, 2);
@@ -241,7 +242,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorReLUTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var shape = new TensorShape(6);
@@ -259,7 +260,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorMatrixMultiplicationTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             // Test basic matrix multiplication: A(2x3) * B(3x2) = C(2x2)
@@ -292,7 +293,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorSoftmax2DTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             // Test 2D softmax (batch processing)
@@ -330,7 +331,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorSoftmaxNDTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             // Test N-dimensional softmax
@@ -364,7 +365,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void TensorInvalidOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             // Test invalid tensor creation

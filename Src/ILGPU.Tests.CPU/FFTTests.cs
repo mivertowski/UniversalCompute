@@ -17,6 +17,7 @@
 
 using ILGPU.FFT;
 using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
 using System;
 using System.Numerics;
 using Xunit;
@@ -37,7 +38,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void FFT1DComplexTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new CudaFFTAccelerator(accelerator); // CPU fallback
 
@@ -63,7 +64,7 @@ namespace ILGPU.Tests.CPU
                 // Perform FFT
                 fftAccelerator.FFT1D(inputBuffer.View, outputBuffer.View);
                 
-                var result = outputBuffer.GetAsArray();
+                var result = outputBuffer.View.GetAsArray();
                 
                 // Verify result: should have peak at frequency bin 1
                 Assert.True(result.Length == size);
@@ -76,7 +77,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void FFT1DRealTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new CudaFFTAccelerator(accelerator);
 
@@ -102,7 +103,7 @@ namespace ILGPU.Tests.CPU
                 // Perform real FFT
                 fftAccelerator.FFT1DReal(inputBuffer.View, outputBuffer.View);
                 
-                var result = outputBuffer.GetAsArray();
+                var result = outputBuffer.View.GetAsArray();
                 
                 // Verify result size
                 Assert.True(result.Length == size / 2 + 1);
@@ -114,7 +115,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void IFFT1DRealTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new CudaFFTAccelerator(accelerator);
 
@@ -142,7 +143,7 @@ namespace ILGPU.Tests.CPU
                 // Perform inverse real FFT
                 fftAccelerator.IFFT1DReal(inputBuffer.View, outputBuffer.View);
                 
-                var result = outputBuffer.GetAsArray();
+                var result = outputBuffer.View.GetAsArray();
                 
                 // Verify result size and basic properties
                 Assert.True(result.Length == size);
@@ -161,7 +162,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void FFT2DTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new CudaFFTAccelerator(accelerator);
 
@@ -209,7 +210,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void FFTBatchTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new CudaFFTAccelerator(accelerator);
 
@@ -274,7 +275,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void IPPFFTTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new IPPFFTAccelerator(accelerator);
 
@@ -310,7 +311,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void FFTRoundTripTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
             var fftAccelerator = new CudaFFTAccelerator(accelerator);
 

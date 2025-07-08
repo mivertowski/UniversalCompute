@@ -15,7 +15,9 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU.Algorithms.PTX;
 using ILGPU.Runtime;
+using ILGPU.Runtime.CPU;
 using System;
 using System.Linq;
 using Xunit;
@@ -35,7 +37,7 @@ namespace ILGPU.Tests.CPU
         public void PTXMathFunctionsTest(TestConfiguration config)
         {
             // Test our implemented PTX math functions
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             // Test IsNaN functions
@@ -78,7 +80,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void ReductionOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 1024;
@@ -129,7 +131,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void ScanOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 16;
@@ -171,7 +173,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void SortingOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 32;
@@ -219,7 +221,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void ParallelPrimitivesTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 256;
@@ -255,7 +257,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void FilterOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 100;
@@ -310,7 +312,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void MatrixOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var M = 4;
@@ -372,7 +374,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void VectorOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 1000;
@@ -416,7 +418,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void MemoryPatternTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var size = 512;
@@ -459,7 +461,7 @@ namespace ILGPU.Tests.CPU
         [MemberData(nameof(TestConfigurations))]
         public void AtomicOperationsTest(TestConfiguration config)
         {
-            using var context = new Context();
+            using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             var numThreads = 100;
