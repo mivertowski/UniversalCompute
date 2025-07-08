@@ -230,7 +230,9 @@ namespace ILGPU.Algorithms.GraphAnalytics
                 // Update potentials
                 UpdatePotentials(accelerator, potentials.View, pathResult.Distances, actualStream);
 
-                pathResult.Dispose();
+                // Dispose the components of the tuple
+                pathResult.Path.Dispose();
+                pathResult.Distances.Dispose();
                 iteration++;
             }
 
@@ -529,7 +531,7 @@ namespace ILGPU.Algorithms.GraphAnalytics
 
             if (index == source)
             {
-                heights[index] = heights.Length;
+                heights[index] = (int)heights.Length;
                 activeVertices[index] = true;
             }
             else if (index == sink)

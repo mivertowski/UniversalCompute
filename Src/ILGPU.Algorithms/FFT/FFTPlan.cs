@@ -24,29 +24,36 @@ namespace ILGPU.Algorithms.FFT
     /// <summary>
     /// FFT plan containing pre-computed twiddle factors and configuration.
     /// </summary>
-    public sealed class FFTPlan : IDisposable
+    public struct FFTPlan
     {
         private readonly Accelerator _accelerator;
         private readonly FFTConfiguration _config;
         private MemoryBuffer1D<Complex, Stride1D.Dense>? _twiddleFactors;
         private MemoryBuffer1D<int, Stride1D.Dense>? _bitReversalTable;
-        private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the FFTPlan class.
+        /// Gets the log base 2 of the FFT size.
+        /// </summary>
+        public int LogN { get; private set; }
+
+        /// <summary>
+        /// Gets whether the FFT size is a power of two.
+        /// </summary>
+        public bool IsPowerOfTwo { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the FFTPlan struct.
         /// </summary>
         private FFTPlan(Accelerator accelerator, FFTConfiguration config)
         {
-            _accelerator = accelerator ?? throw new ArgumentNullException(nameof(accelerator));
-            _config = config ?? throw new ArgumentNullException(nameof(config));
+            _accelerator = accelerator;
+            _config = config;
+            _twiddleFactors = null;
+            _bitReversalTable = null;
             
             // Pre-compute values
-            LogN = (int)Math.Log2(_config.Size);
-            IsPowerOfTwo = (_config.Size & (_config.Size - 1)) == 0;
-            
-            // Initialize buffers
-            InitializeTwiddleFactors();
-            InitializeBitReversalTable();
+            LogN = (int)Math.Log2(config.Size);
+            IsPowerOfTwo = (config.Size & (config.Size - 1)) == 0;
         }
 
         /// <summary>
@@ -54,25 +61,16 @@ namespace ILGPU.Algorithms.FFT
         /// </summary>
         public FFTConfiguration Configuration => _config;
 
-        /// <summary>
-        /// Gets the log base 2 of the FFT size.
-        /// </summary>
-        public int LogN { get; }
-
-        /// <summary>
-        /// Gets whether the FFT size is a power of two.
-        /// </summary>
-        public bool IsPowerOfTwo { get; }
 
         /// <summary>
         /// Gets the twiddle factors buffer.
         /// </summary>
-        public ArrayView<Complex> TwiddleFactors => _twiddleFactors?.View ?? throw new ObjectDisposedException(nameof(FFTPlan));
+        public ArrayView<Complex> TwiddleFactors => _twiddleFactors?.View ?? default;
 
         /// <summary>
         /// Gets the bit reversal table.
         /// </summary>
-        public ArrayView<int> BitReversalTable => _bitReversalTable?.View ?? throw new ObjectDisposedException(nameof(FFTPlan));
+        public ArrayView<int> BitReversalTable => _bitReversalTable?.View ?? default;
 
         /// <summary>
         /// Creates an FFT plan for the specified configuration.
@@ -100,7 +98,13 @@ namespace ILGPU.Algorithms.FFT
             // Validate algorithm compatibility
             ValidateAlgorithmCompatibility(config);
             
-            return new FFTPlan(accelerator, config);
+            var plan = new FFTPlan(accelerator, config);
+            
+            // Initialize buffers
+            plan.InitializeTwiddleFactors();
+            plan.InitializeBitReversalTable();
+            
+            return plan;
         }
 
         /// <summary>
@@ -382,16 +386,12 @@ namespace ILGPU.Algorithms.FFT
         }
 
         /// <summary>
-        /// Disposes the FFT plan and releases resources.
+        /// Releases the resources used by the FFT plan.
         /// </summary>
-        public void Dispose()
+        public void Release()
         {
-            if (!_disposed)
-            {
-                _twiddleFactors?.Dispose();
-                _bitReversalTable?.Dispose();
-                _disposed = true;
-            }
+            _twiddleFactors?.Dispose();
+            _bitReversalTable?.Dispose();
         }
     }
 }

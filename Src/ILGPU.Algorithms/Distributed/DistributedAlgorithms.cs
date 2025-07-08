@@ -495,7 +495,7 @@ namespace ILGPU.Algorithms.Distributed
             var totalSize = 0;
             foreach (var partition in partitions)
             {
-                totalSize += partition.Length;
+                totalSize += (int)partition.Length;
             }
             
             return mpiAccelerator.LocalAccelerator.Allocate1D<T>(totalSize).View;

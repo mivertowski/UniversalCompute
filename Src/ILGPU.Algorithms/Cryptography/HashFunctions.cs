@@ -251,6 +251,7 @@ namespace ILGPU.Algorithms.Cryptography
 
         #region Kernel Implementations
 
+        [Kernel]
         private static void SHA256Kernel(
             Index1D index,
             ArrayView<byte> data,
@@ -310,6 +311,7 @@ namespace ILGPU.Algorithms.Cryptography
             Atomic.Add(ref hash[7], h);
         }
 
+        [Kernel]
         private static void BatchSHA256Kernel(
             Index1D index,
             ArrayView<byte> data,
@@ -342,6 +344,7 @@ namespace ILGPU.Algorithms.Cryptography
                 results[resultStart + i] = h[i];
         }
 
+        [Kernel]
         private static void BLAKE2bKernel(
             Index1D index,
             ArrayView<byte> data,
@@ -355,12 +358,13 @@ namespace ILGPU.Algorithms.Cryptography
             
             var blockStart = index * blockSize;
             var isLastBlock = blockStart + blockSize >= dataLength;
-            var blockLength = isLastBlock ? dataLength - blockStart : blockSize;
+            var blockLength = isLastBlock ? (int)(dataLength - blockStart) : blockSize;
             
             // Process BLAKE2b block (simplified)
             ProcessBLAKE2bBlock(data, state, parameters, blockStart, blockLength, isLastBlock);
         }
 
+        [Kernel]
         private static void KeccakKernel(
             Index1D index,
             ArrayView<byte> data,

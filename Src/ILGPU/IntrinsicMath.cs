@@ -648,5 +648,65 @@ namespace ILGPU
             MathF.CopySign(x, y);
 
         #endregion
+
+        #region Mathematical Constants
+
+        /// <summary>
+        /// Gets the mathematical constant PI (π).
+        /// </summary>
+        public static double PI => Math.PI;
+
+        /// <summary>
+        /// Gets the mathematical constant PI (π) as a float.
+        /// </summary>
+        public static float PIf => MathF.PI;
+
+        #endregion
+
+        #region Trigonometric Functions
+
+        /// <summary>
+        /// Returns the angle whose tangent is the quotient of two specified numbers.
+        /// </summary>
+        /// <param name="y">The y coordinate of a point.</param>
+        /// <param name="x">The x coordinate of a point.</param>
+        /// <returns>An angle, θ, measured in radians.</returns>
+        [MathIntrinsic(MathIntrinsicKind.Atan2F)]
+        public static double Atan2(double y, double x) =>
+            Math.Atan2(y, x);
+
+        /// <summary>
+        /// Returns the angle whose tangent is the quotient of two specified numbers.
+        /// </summary>
+        /// <param name="y">The y coordinate of a point.</param>
+        /// <param name="x">The x coordinate of a point.</param>
+        /// <returns>An angle, θ, measured in radians.</returns>
+        [MathIntrinsic(MathIntrinsicKind.Atan2F)]
+        public static float Atan2(float y, float x) =>
+            MathF.Atan2(y, x);
+
+        #endregion
+
+        #region Square Root
+
+        /// <summary>
+        /// Returns the square root of a specified number.
+        /// </summary>
+        /// <param name="value">The number whose square root is to be found.</param>
+        /// <returns>The positive square root of value.</returns>
+        [MathIntrinsic(MathIntrinsicKind.SqrtF)]
+        public static double Sqrt(double value) =>
+            Math.Sqrt(value);
+
+        /// <summary>
+        /// Returns the square root of a specified number.
+        /// </summary>
+        /// <param name="value">The number whose square root is to be found.</param>
+        /// <returns>The positive square root of value.</returns>
+        [MathIntrinsic(MathIntrinsicKind.SqrtF)]
+        public static float Sqrt(float value) =>
+            MathF.Sqrt(value);
+
+        #endregion
     }
 }

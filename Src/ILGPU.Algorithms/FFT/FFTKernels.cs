@@ -31,78 +31,35 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Cooley-Tukey radix-2 forward FFT kernel.
         /// </summary>
+        [Kernel]
         public static void CooleyTukeyForward1D(
             Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
         {
-            var n = input.Length;
-            var logN = plan.LogN;
-
-            // Bit-reversal permutation
-            BitReversalPermutation(input, output, (int)n);
-
-            // Cooley-Tukey FFT
-            for (int s = 1; s <= logN; s++)
-            {
-                var m = 1 << s;
-                var wm = Complex.FromPolarCoordinates(1.0, -2.0 * Math.PI / m);
-
-                for (int k = 0; k < n; k += m)
-                {
-                    var w = Complex.One;
-                    for (int j = 0; j < m / 2; j++)
-                    {
-                        var t = w * output[k + j + m / 2];
-                        var u = output[k + j];
-                        output[k + j] = u + t;
-                        output[k + j + m / 2] = u - t;
-                        w *= wm;
-                    }
-                }
-            }
+            if (index != 0) return; // Only one thread should execute the entire FFT
+            CooleyTukeyForward1DImpl(input, output, plan);
         }
 
         /// <summary>
         /// Cooley-Tukey radix-2 inverse FFT kernel.
         /// </summary>
+        [Kernel]
         public static void CooleyTukeyInverse1D(
             Index1D index,
             ArrayView<Complex> input,
             ArrayView<Complex> output,
             FFTPlan plan)
         {
-            var n = input.Length;
-            var logN = plan.LogN;
-
-            // Bit-reversal permutation
-            BitReversalPermutation(input, output, (int)n);
-
-            // Cooley-Tukey inverse FFT
-            for (int s = 1; s <= logN; s++)
-            {
-                var m = 1 << s;
-                var wm = Complex.FromPolarCoordinates(1.0, 2.0 * Math.PI / m);
-
-                for (int k = 0; k < n; k += m)
-                {
-                    var w = Complex.One;
-                    for (int j = 0; j < m / 2; j++)
-                    {
-                        var t = w * output[k + j + m / 2];
-                        var u = output[k + j];
-                        output[k + j] = u + t;
-                        output[k + j + m / 2] = u - t;
-                        w *= wm;
-                    }
-                }
-            }
+            if (index != 0) return; // Only one thread should execute the entire FFT
+            CooleyTukeyInverse1DImpl(input, output, plan);
         }
 
         /// <summary>
         /// Radix-4 forward FFT kernel.
         /// </summary>
+        [Kernel]
         public static void Radix4Forward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -160,6 +117,7 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Radix-4 inverse FFT kernel.
         /// </summary>
+        [Kernel]
         public static void Radix4Inverse1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -215,6 +173,7 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Mixed-radix forward FFT kernel.
         /// </summary>
+        [Kernel]
         public static void MixedRadixForward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -223,12 +182,13 @@ namespace ILGPU.Algorithms.FFT
         {
             // Implement mixed-radix FFT for non-power-of-2 sizes
             // This is a placeholder - real implementation would handle various factors
-            CooleyTukeyForward1D(input, output, plan);
+            CooleyTukeyForward1DImpl(input, output, plan);
         }
 
         /// <summary>
         /// Mixed-radix inverse FFT kernel.
         /// </summary>
+        [Kernel]
         public static void MixedRadixInverse1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -236,12 +196,13 @@ namespace ILGPU.Algorithms.FFT
             FFTPlan plan)
         {
             // Implement mixed-radix inverse FFT
-            CooleyTukeyInverse1D(input, output, plan);
+            CooleyTukeyInverse1DImpl(input, output, plan);
         }
 
         /// <summary>
         /// Batched forward 1D FFT kernel.
         /// </summary>
+        [Kernel]
         public static void BatchedForward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -258,13 +219,14 @@ namespace ILGPU.Algorithms.FFT
                 var inputSlice = input.SubView(offset, signalSize);
                 var outputSlice = output.SubView(offset, signalSize);
                 
-                CooleyTukeyForward1D(inputSlice, outputSlice, plan);
+                CooleyTukeyForward1DImpl(inputSlice, outputSlice, plan);
             }
         }
 
         /// <summary>
         /// Batched inverse 1D FFT kernel.
         /// </summary>
+        [Kernel]
         public static void BatchedInverse1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -280,7 +242,7 @@ namespace ILGPU.Algorithms.FFT
                 var inputSlice = input.SubView(offset, signalSize);
                 var outputSlice = output.SubView(offset, signalSize);
                 
-                CooleyTukeyInverse1D(inputSlice, outputSlice, plan);
+                CooleyTukeyInverse1DImpl(inputSlice, outputSlice, plan);
             }
         }
 
@@ -663,6 +625,81 @@ namespace ILGPU.Algorithms.FFT
         {
             if (index.X >= data.IntExtent.X || index.Y >= data.IntExtent.Y) return;
             data[index] *= scale;
+        }
+
+        /// <summary>
+        /// Implementation of Cooley-Tukey forward FFT (non-kernel).
+        /// </summary>
+        private static void CooleyTukeyForward1DImpl(
+            ArrayView<Complex> input,
+            ArrayView<Complex> output,
+            FFTPlan plan)
+        {
+            var n = input.Length;
+            var logN = plan.LogN;
+
+            // Bit-reversal permutation
+            BitReversalPermutation(input, output, (int)n);
+
+            // Cooley-Tukey FFT
+            for (int s = 1; s <= logN; s++)
+            {
+                var m = 1 << s;
+                var wm = Complex.FromPolarCoordinates(1.0, -2.0 * Math.PI / m);
+
+                for (int k = 0; k < n; k += m)
+                {
+                    var w = Complex.One;
+                    for (int j = 0; j < m / 2; j++)
+                    {
+                        var t = w * output[k + j + m / 2];
+                        var u = output[k + j];
+                        output[k + j] = u + t;
+                        output[k + j + m / 2] = u - t;
+                        w *= wm;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Implementation of Cooley-Tukey inverse FFT (non-kernel).
+        /// </summary>
+        private static void CooleyTukeyInverse1DImpl(
+            ArrayView<Complex> input,
+            ArrayView<Complex> output,
+            FFTPlan plan)
+        {
+            var n = input.Length;
+            var logN = plan.LogN;
+
+            BitReversalPermutation(input, output, (int)n);
+
+            // Cooley-Tukey inverse FFT
+            for (int s = 1; s <= logN; s++)
+            {
+                var m = 1 << s;
+                var wm = Complex.FromPolarCoordinates(1.0, 2.0 * Math.PI / m); // Positive for inverse
+
+                for (int k = 0; k < n; k += m)
+                {
+                    var w = Complex.One;
+                    for (int j = 0; j < m / 2; j++)
+                    {
+                        var t = w * output[k + j + m / 2];
+                        var u = output[k + j];
+                        output[k + j] = u + t;
+                        output[k + j + m / 2] = u - t;
+                        w *= wm;
+                    }
+                }
+            }
+
+            // Normalize
+            for (int i = 0; i < n; i++)
+            {
+                output[i] /= n;
+            }
         }
 
         /// <summary>

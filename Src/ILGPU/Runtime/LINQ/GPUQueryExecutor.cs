@@ -145,7 +145,7 @@ namespace ILGPU.Runtime.LINQ
         /// </summary>
         /// <param name="methodCall">The method call expression.</param>
         /// <returns>The result expression.</returns>
-        private Expression HandleLinqMethod(MethodCallExpression methodCall)
+        private ConstantExpression HandleLinqMethod(MethodCallExpression methodCall)
         {
             var methodName = methodCall.Method.Name;
 

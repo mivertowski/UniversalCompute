@@ -351,6 +351,7 @@ namespace ILGPU.Algorithms.Cryptography
 
         #region Kernel Implementations
 
+        [Kernel]
         private static void AESKernel(
             Index1D index,
             ArrayView<byte> input,
@@ -406,6 +407,7 @@ namespace ILGPU.Algorithms.Cryptography
                 output[outputOffset + i] = block[i];
         }
 
+        [Kernel]
         private static void ChaCha20Kernel(
             Index1D index,
             ArrayView<byte> input,
@@ -432,6 +434,7 @@ namespace ILGPU.Algorithms.Cryptography
             }
         }
 
+        [Kernel]
         private static void Salsa20Kernel(
             Index1D index,
             ArrayView<byte> input,
@@ -458,6 +461,7 @@ namespace ILGPU.Algorithms.Cryptography
             }
         }
 
+        [Kernel]
         private static void BatchAESKernel(
             Index1D index,
             ArrayView<byte> batchedInput,

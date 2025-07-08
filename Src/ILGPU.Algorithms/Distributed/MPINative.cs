@@ -568,9 +568,9 @@ namespace ILGPU.Algorithms.Distributed
         }
 
         /// <summary>
-        /// Finalizes MPI.
+        /// Shuts down MPI (finalizes MPI context).
         /// </summary>
-        public static void Finalize()
+        public static void Shutdown()
         {
             if (_initialized)
             {

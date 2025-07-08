@@ -342,6 +342,7 @@ namespace ILGPU.Algorithms.ComputerVision
 
         #region Kernel Implementations
 
+        [Kernel]
         private static void RGBToGrayKernel(
             Index2D index,
             ArrayView<byte> rgbData,
@@ -370,6 +371,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void RGBToHSVKernel(
             Index2D index,
             ArrayView<float> rgbData,
@@ -418,6 +420,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void HSVToRGBKernel(
             Index2D index,
             ArrayView<float> hsvData,
@@ -474,6 +477,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void ConvolutionKernel(
             Index2D index,
             ArrayView<float> input,
@@ -517,6 +521,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void GradientMagnitudeKernel(
             Index2D index,
             ArrayView<float> gradX,
@@ -535,6 +540,7 @@ namespace ILGPU.Algorithms.ComputerVision
             magnitude[idx] = IntrinsicMath.Sqrt(gx * gx + gy * gy);
         }
 
+        [Kernel]
         private static void MedianFilterKernel(
             Index2D index,
             ArrayView<byte> input,
@@ -556,6 +562,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void ResizeKernel(
             Index2D index,
             ArrayView<byte> input,
@@ -612,6 +619,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void RotateKernel(
             Index2D index,
             ArrayView<byte> input,
@@ -673,6 +681,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void WarpAffineKernel(
             Index2D index,
             ArrayView<byte> input,

@@ -9,8 +9,10 @@
 // Source License. See LICENSE.txt for details.
 // ---------------------------------------------------------------------------------------
 
+using ILGPU.Runtime;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace ILGPU.Algorithms
 {
@@ -143,5 +145,20 @@ namespace ILGPU.Algorithms
             Target = "array")]
         public static void SetValue<T>(this T[,,] array, T value, Index3D index) =>
             array[index.X, index.Y, index.Z] = value;
+
+        /// <summary>
+        /// Copies the contents of an ArrayView to a new array on the CPU.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="view">The source ArrayView.</param>
+        /// <returns>A new array containing the data from the ArrayView.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T[] ToArray<T>(this ArrayView<T> view)
+            where T : unmanaged
+        {
+            var result = new T[view.Length];
+            view.CopyToCPU(result);
+            return result;
+        }
     }
 }

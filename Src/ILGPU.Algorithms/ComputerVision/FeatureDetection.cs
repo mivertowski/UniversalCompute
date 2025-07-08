@@ -410,6 +410,7 @@ namespace ILGPU.Algorithms.ComputerVision
 
         #region Helper Methods and Kernels
 
+        [Kernel]
         private static void ComputeStructureTensorKernel(
             Index2D index,
             ArrayView<float> gradX,
@@ -433,6 +434,7 @@ namespace ILGPU.Algorithms.ComputerVision
             Ixy[x, y] = gx * gy;
         }
 
+        [Kernel]
         private static void HarrisResponseKernel(
             Index2D index,
             ArrayView2D<float, Stride2D.DenseX> Ixx,
@@ -456,6 +458,7 @@ namespace ILGPU.Algorithms.ComputerVision
             response[x, y] = det - k * trace * trace;
         }
 
+        [Kernel]
         private static void ShiTomasiResponseKernel(
             Index2D index,
             ArrayView2D<float, Stride2D.DenseX> Ixx,
@@ -480,6 +483,7 @@ namespace ILGPU.Algorithms.ComputerVision
             response[x, y] = discriminant >= 0 ? (trace - IntrinsicMath.Sqrt(discriminant)) * 0.5f : 0;
         }
 
+        [Kernel]
         private static void ComputeGradientDirectionKernel(
             Index2D index,
             ArrayView<float> gradX,
@@ -499,6 +503,7 @@ namespace ILGPU.Algorithms.ComputerVision
             direction[idx] = IntrinsicMath.Atan2(gy, gx);
         }
 
+        [Kernel]
         private static void NonMaximumSuppressionKernel(
             Index2D index,
             ArrayView<float> magnitude,
@@ -554,6 +559,7 @@ namespace ILGPU.Algorithms.ComputerVision
             suppressed[idx] = (mag >= mag1 && mag >= mag2) ? mag : 0;
         }
 
+        [Kernel]
         private static void HysteresisThresholdingKernel(
             Index2D index,
             ArrayView<float> suppressed,
@@ -585,6 +591,7 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
+        [Kernel]
         private static void FindBlobsKernel(
             Index2D index,
             ArrayView<FeaturePoint> blobs,

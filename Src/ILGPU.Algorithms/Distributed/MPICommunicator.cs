@@ -252,7 +252,7 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="destRank">Destination process rank.</param>
         /// <param name="tag">Message tag.</param>
         /// <returns>Request handle.</returns>
-        public async Task<MPIRequest> SendAsync<T>(T[] data, int destRank, int tag = 0) where T : unmanaged
+        public Task<MPIRequest> SendAsync<T>(T[] data, int destRank, int tag = 0) where T : unmanaged
         {
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
             var ptr = handle.AddrOfPinnedObject();
@@ -268,7 +268,7 @@ namespace ILGPU.Algorithms.Distributed
                 handle.Free();
             });
             
-            return request;
+            return Task.FromResult(request);
         }
 
         /// <summary>
@@ -279,7 +279,7 @@ namespace ILGPU.Algorithms.Distributed
         /// <param name="srcRank">Source process rank.</param>
         /// <param name="tag">Message tag.</param>
         /// <returns>Request handle.</returns>
-        public async Task<MPIRequest> ReceiveAsync<T>(int count, int srcRank, int tag = 0) where T : unmanaged
+        public Task<MPIRequest> ReceiveAsync<T>(int count, int srcRank, int tag = 0) where T : unmanaged
         {
             var data = new T[count];
             var handle = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -297,7 +297,7 @@ namespace ILGPU.Algorithms.Distributed
                 handle.Free();
             });
             
-            return request;
+            return Task.FromResult(request);
         }
 
         #endregion
