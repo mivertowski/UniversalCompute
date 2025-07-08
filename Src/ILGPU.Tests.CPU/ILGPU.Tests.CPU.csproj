@@ -39,6 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Src\ILGPU\ILGPU.csproj" />
     <ProjectReference Include="..\ILGPU.Tests\ILGPU.Tests.csproj" />
+    <ProjectReference Include="..\ILGPU.Algorithms\ILGPU.Algorithms.csproj" />
   </ItemGroup>
 
   <ItemGroup>

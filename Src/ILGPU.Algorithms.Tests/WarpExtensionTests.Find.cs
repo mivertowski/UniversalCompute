@@ -12,6 +12,7 @@
 using ILGPU.Algorithms.ScanReduceOperations;
 using ILGPU.AtomicOperations;
 using ILGPU.Runtime;
+using ILGPU.Tests;
 using ILGPU.Util;
 using System;
 using System.Runtime.CompilerServices;

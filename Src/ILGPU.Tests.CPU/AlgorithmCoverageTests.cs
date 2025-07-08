@@ -15,7 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
-using ILGPU.Algorithms.PTX;
+using ILGPU.Algorithms;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using System;
@@ -34,46 +34,46 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
-        public void PTXMathFunctionsTest(TestConfiguration config)
+        public void XMathFunctionsTest(TestConfiguration config)
         {
             // Test our implemented PTX math functions
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
 
             // Test IsNaN functions
-            Assert.True(PTXMath.IsNaN(float.NaN));
-            Assert.False(PTXMath.IsNaN(1.0f));
-            Assert.True(PTXMath.IsNaN(double.NaN));
-            Assert.False(PTXMath.IsNaN(1.0));
+            Assert.True(XMath.IsNaN(float.NaN));
+            Assert.False(XMath.IsNaN(1.0f));
+            Assert.True(XMath.IsNaN(double.NaN));
+            Assert.False(XMath.IsNaN(1.0));
 
             // Test IsInfinity functions
-            Assert.True(PTXMath.IsInfinity(float.PositiveInfinity));
-            Assert.True(PTXMath.IsInfinity(float.NegativeInfinity));
-            Assert.False(PTXMath.IsInfinity(1.0f));
-            Assert.True(PTXMath.IsInfinity(double.PositiveInfinity));
-            Assert.False(PTXMath.IsInfinity(1.0));
+            Assert.True(XMath.IsInfinity(float.PositiveInfinity));
+            Assert.True(XMath.IsInfinity(float.NegativeInfinity));
+            Assert.False(XMath.IsInfinity(1.0f));
+            Assert.True(XMath.IsInfinity(double.PositiveInfinity));
+            Assert.False(XMath.IsInfinity(1.0));
 
             // Test Rcp (reciprocal) functions
-            Assert.True(Math.Abs(PTXMath.Rcp(2.0f) - 0.5f) < 0.001f);
-            Assert.True(Math.Abs(PTXMath.Rcp(4.0) - 0.25) < 0.001);
+            Assert.True(Math.Abs(XMath.Rcp(2.0f) - 0.5f) < 0.001f);
+            Assert.True(Math.Abs(XMath.Rcp(4.0) - 0.25) < 0.001);
 
             // Test Sqrt functions
-            Assert.True(Math.Abs(PTXMath.Sqrt(4.0f) - 2.0f) < 0.001f);
-            Assert.True(Math.Abs(PTXMath.Sqrt(9.0) - 3.0) < 0.001);
+            Assert.True(Math.Abs(XMath.Sqrt(4.0f) - 2.0f) < 0.001f);
+            Assert.True(Math.Abs(XMath.Sqrt(9.0) - 3.0) < 0.001);
 
             // Test trigonometric functions
-            Assert.True(Math.Abs(PTXMath.Sin(0.0f) - 0.0f) < 0.001f);
-            Assert.True(Math.Abs(PTXMath.Cos(0.0f) - 1.0f) < 0.001f);
-            Assert.True(Math.Abs(PTXMath.Sin(0.0) - 0.0) < 0.001);
-            Assert.True(Math.Abs(PTXMath.Cos(0.0) - 1.0) < 0.001);
+            Assert.True(Math.Abs(XMath.Sin(0.0f) - 0.0f) < 0.001f);
+            Assert.True(Math.Abs(XMath.Cos(0.0f) - 1.0f) < 0.001f);
+            Assert.True(Math.Abs(XMath.Sin(0.0) - 0.0) < 0.001);
+            Assert.True(Math.Abs(XMath.Cos(0.0) - 1.0) < 0.001);
 
             // Test exponential functions
-            Assert.True(Math.Abs(PTXMath.Exp2(3.0f) - 8.0f) < 0.001f);
-            Assert.True(Math.Abs(PTXMath.Exp2(4.0) - 16.0) < 0.001);
+            Assert.True(Math.Abs(XMath.Exp2(3.0f) - 8.0f) < 0.001f);
+            Assert.True(Math.Abs(XMath.Exp2(4.0) - 16.0) < 0.001);
 
             // Test logarithmic functions
-            Assert.True(Math.Abs(PTXMath.Log2(8.0f) - 3.0f) < 0.001f);
-            Assert.True(Math.Abs(PTXMath.Log2(16.0) - 4.0) < 0.001);
+            Assert.True(Math.Abs(XMath.Log2(8.0f) - 3.0f) < 0.001f);
+            Assert.True(Math.Abs(XMath.Log2(16.0) - 4.0) < 0.001);
         }
 
         [Theory]
