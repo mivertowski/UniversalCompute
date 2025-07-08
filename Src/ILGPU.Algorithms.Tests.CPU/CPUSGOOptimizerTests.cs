@@ -62,11 +62,11 @@ namespace ILGPU.Algorithms.Tests.CPU
                 return current < proposed;
             }
 
-            public static float Result =>
+            public float Result =>
                 new OptimizationTests.HimmelblauFunction().Result;
-            public static float[] LowerBounds =>
+            public float[] LowerBounds =>
                 new OptimizationTests.HimmelblauFunction().LowerBounds;
-            public static float[] UpperBounds =>
+            public float[] UpperBounds =>
                 new OptimizationTests.HimmelblauFunction().UpperBounds;
         }
 
@@ -88,11 +88,11 @@ namespace ILGPU.Algorithms.Tests.CPU
                 return current < proposed;
             }
 
-            public static float Result =>
+            public float Result =>
                 new OptimizationTests.EasomFunction().Result;
-            public static float[] LowerBounds =>
+            public float[] LowerBounds =>
                 new OptimizationTests.EasomFunction().LowerBounds;
-            public static float[] UpperBounds =>
+            public float[] UpperBounds =>
                 new OptimizationTests.EasomFunction().UpperBounds;
         }
         /// <summary>
@@ -113,11 +113,11 @@ namespace ILGPU.Algorithms.Tests.CPU
                 return current < proposed;
             }
 
-            public static float Result =>
+            public float Result =>
                 new OptimizationTests.ShafferFunction4().Result;
-            public static float[] LowerBounds =>
+            public float[] LowerBounds =>
                 new OptimizationTests.ShafferFunction4().LowerBounds;
-            public static float[] UpperBounds =>
+            public float[] UpperBounds =>
                 new OptimizationTests.ShafferFunction4().UpperBounds;
         }
 
@@ -139,11 +139,11 @@ namespace ILGPU.Algorithms.Tests.CPU
                 return current < proposed;
             }
 
-            public static float Result =>
+            public float Result =>
                 new OptimizationTests.RosenbrockDisk().Result;
-            public static float[] LowerBounds =>
+            public float[] LowerBounds =>
                 new OptimizationTests.RosenbrockDisk().LowerBounds;
-            public static float[] UpperBounds =>
+            public float[] UpperBounds =>
                 new OptimizationTests.RosenbrockDisk().UpperBounds;
         }
 
@@ -166,11 +166,11 @@ namespace ILGPU.Algorithms.Tests.CPU
             }
 
 
-            public static float Result =>
+            public float Result =>
                 new OptimizationTests.GomezAndLevyFunction().Result;
-            public static float[] LowerBounds =>
+            public float[] LowerBounds =>
                 new OptimizationTests.GomezAndLevyFunction().LowerBounds;
-            public static float[] UpperBounds =>
+            public float[] UpperBounds =>
                 new OptimizationTests.GomezAndLevyFunction().UpperBounds;
         }
 
