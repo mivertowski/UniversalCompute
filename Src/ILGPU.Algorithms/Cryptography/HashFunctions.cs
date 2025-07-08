@@ -52,7 +52,7 @@ namespace ILGPU.Algorithms.Cryptography
             var sha256Kernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<byte>, ArrayView<uint>, ArrayView<uint>, int>(SHA256Kernel);
             
-            sha256Kernel(actualStream, numBlocks, dataBuffer.View, hashBuffer.View, constantsBuffer.View, 64);
+            sha256Kernel(numBlocks, dataBuffer.View, hashBuffer.View, constantsBuffer.View, 64);
             actualStream.Synchronize();
             
             // Get result
@@ -113,7 +113,7 @@ namespace ILGPU.Algorithms.Cryptography
                 Index1D, ArrayView<byte>, ArrayView<int>, ArrayView<uint>, ArrayView<uint>, int>(
                 BatchSHA256Kernel);
             
-            batchSHA256Kernel(actualStream, numInputs, dataBuffer.View, sizesBuffer.View, 
+            batchSHA256Kernel(numInputs, dataBuffer.View, sizesBuffer.View, 
                 resultsBuffer.View, constantsBuffer.View, maxSize);
             actualStream.Synchronize();
             
@@ -186,7 +186,7 @@ namespace ILGPU.Algorithms.Cryptography
                 Index1D, ArrayView<byte>, ArrayView<ulong>, ArrayView<ulong>, int, int, int>(
                 BLAKE2bKernel);
             
-            blake2bKernel(actualStream, numBlocks, dataBuffer.View, stateBuffer.View, 
+            blake2bKernel(numBlocks, dataBuffer.View, stateBuffer.View, 
                 paramBuffer.View, processData.Length, hashSize, 128);
             actualStream.Synchronize();
             
@@ -233,7 +233,7 @@ namespace ILGPU.Algorithms.Cryptography
             var keccakKernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<byte>, ArrayView<ulong>, int, int>(KeccakKernel);
             
-            keccakKernel(actualStream, numBlocks, dataBuffer.View, stateBuffer.View, rate, 24);
+            keccakKernel(numBlocks, dataBuffer.View, stateBuffer.View, rate, 24);
             actualStream.Synchronize();
             
             // Extract hash (first 256 bits = 32 bytes)
@@ -251,7 +251,6 @@ namespace ILGPU.Algorithms.Cryptography
 
         #region Kernel Implementations
 
-        [Kernel]
         private static void SHA256Kernel(
             Index1D index,
             ArrayView<byte> data,
@@ -311,7 +310,6 @@ namespace ILGPU.Algorithms.Cryptography
             Atomic.Add(ref hash[7], h);
         }
 
-        [Kernel]
         private static void BatchSHA256Kernel(
             Index1D index,
             ArrayView<byte> data,
@@ -344,7 +342,6 @@ namespace ILGPU.Algorithms.Cryptography
                 results[resultStart + i] = h[i];
         }
 
-        [Kernel]
         private static void BLAKE2bKernel(
             Index1D index,
             ArrayView<byte> data,
@@ -364,7 +361,6 @@ namespace ILGPU.Algorithms.Cryptography
             ProcessBLAKE2bBlock(data, state, parameters, blockStart, blockLength, isLastBlock);
         }
 
-        [Kernel]
         private static void KeccakKernel(
             Index1D index,
             ArrayView<byte> data,

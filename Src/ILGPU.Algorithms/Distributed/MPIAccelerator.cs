@@ -91,7 +91,7 @@ namespace ILGPU.Algorithms.Distributed
                 
                 // Copy local portion directly
                 var localPortion = rootData.SubView(0, elementsPerProcess);
-                localBuffer.CopyFrom(localPortion, actualStream);
+                localBuffer.CopyFrom(localPortion);
                 
                 // Send portions to other processes
                 for (int destRank = 1; destRank < Size; destRank++)
@@ -141,7 +141,7 @@ namespace ILGPU.Algorithms.Distributed
                 
                 // Copy local portion directly
                 var localPortion = rootBuffer.SubView(0, elementsPerProcess);
-                localPortion.CopyFrom(localData, actualStream);
+                localPortion.CopyFrom(localData);
                 actualStream.Synchronize();
                 
                 // Receive portions from other processes

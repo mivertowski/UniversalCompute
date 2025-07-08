@@ -106,7 +106,7 @@ namespace ILGPU.Algorithms.FFT
             // Normalize by 1/N for inverse transform
             var normalizeKernel = _accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<Complex>, float>(FFTKernels.Normalize);
-            normalizeKernel(actualStream, output.Length, output, 1.0f / Configuration.Size);
+            normalizeKernel(output.Length, output, 1.0f / Configuration.Size);
             
             actualStream.Synchronize();
         }
@@ -193,7 +193,7 @@ namespace ILGPU.Algorithms.FFT
             var normalizeKernel = _accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView2D<Complex, Stride2D.DenseX>, float>(FFTKernels.Normalize2D);
             var normalizeExtent = new Index2D(output.IntExtent.X, output.IntExtent.Y);
-            normalizeKernel(actualStream, normalizeExtent, output, 1.0f / (output.IntExtent.X * output.IntExtent.Y));
+            normalizeKernel(normalizeExtent, output, 1.0f / (output.IntExtent.X * output.IntExtent.Y));
 
             actualStream.Synchronize();
         }

@@ -218,7 +218,7 @@ namespace ILGPU.Algorithms.ComputerVision
         {
             var actualStream = stream ?? Accelerator.DefaultStream;
             var cloned = new Image<T>(Accelerator, Width, Height, Channels);
-            Data.View.CopyTo(cloned.Data.View, actualStream);
+            Data.View.CopyTo(cloned.Data.View);
             actualStream.Synchronize();
             return cloned;
         }

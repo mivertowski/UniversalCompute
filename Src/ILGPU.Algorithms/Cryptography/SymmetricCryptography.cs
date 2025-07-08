@@ -72,7 +72,7 @@ namespace ILGPU.Algorithms.Cryptography
                 int, int, int, bool>(AESKernel);
 
             var numBlocks = plaintext.Length / 16;
-            aesKernel(actualStream, numBlocks, plaintextBuffer.View, ciphertextBuffer.View,
+            aesKernel(numBlocks, plaintextBuffer.View, ciphertextBuffer.View,
                 keyBuffer.View, ivBuffer.View, aesKey.Rounds, (int)mode, 16, true);
 
             actualStream.Synchronize();
@@ -130,7 +130,7 @@ namespace ILGPU.Algorithms.Cryptography
                 int, int, int, bool>(AESKernel);
 
             var numBlocks = ciphertext.Length / 16;
-            aesKernel(actualStream, numBlocks, ciphertextBuffer.View, plaintextBuffer.View,
+            aesKernel(numBlocks, ciphertextBuffer.View, plaintextBuffer.View,
                 keyBuffer.View, ivBuffer.View, aesKey.Rounds, (int)mode, 16, false);
 
             actualStream.Synchronize();
@@ -191,7 +191,7 @@ namespace ILGPU.Algorithms.Cryptography
                 uint, int>(ChaCha20Kernel);
 
             var numBlocks = (data.Length + 63) / 64; // ChaCha20 processes 64-byte blocks
-            chachaKernel(actualStream, numBlocks, dataBuffer.View, outputBuffer.View,
+            chachaKernel(numBlocks, dataBuffer.View, outputBuffer.View,
                 keyBuffer.View, nonceBuffer.View, counter, data.Length);
 
             actualStream.Synchronize();
@@ -252,7 +252,7 @@ namespace ILGPU.Algorithms.Cryptography
                 ulong, int>(Salsa20Kernel);
 
             var numBlocks = (data.Length + 63) / 64; // Salsa20 processes 64-byte blocks
-            salsaKernel(actualStream, numBlocks, dataBuffer.View, outputBuffer.View,
+            salsaKernel(numBlocks, dataBuffer.View, outputBuffer.View,
                 keyBuffer.View, nonceBuffer.View, counter, data.Length);
 
             actualStream.Synchronize();
@@ -320,7 +320,7 @@ namespace ILGPU.Algorithms.Cryptography
                 Index1D, ArrayView<byte>, ArrayView<byte>, ArrayView<int>, int, int>(
                 BatchAESKernel);
 
-            batchKernel(actualStream, plaintexts.Length, plaintextBuffer.View, 
+            batchKernel(plaintexts.Length, plaintextBuffer.View, 
                 batchedCiphertext.View, lengthBuffer.View, maxLength, (int)mode);
 
             actualStream.Synchronize();
@@ -351,7 +351,6 @@ namespace ILGPU.Algorithms.Cryptography
 
         #region Kernel Implementations
 
-        [Kernel]
         private static void AESKernel(
             Index1D index,
             ArrayView<byte> input,
@@ -407,7 +406,6 @@ namespace ILGPU.Algorithms.Cryptography
                 output[outputOffset + i] = block[i];
         }
 
-        [Kernel]
         private static void ChaCha20Kernel(
             Index1D index,
             ArrayView<byte> input,
@@ -434,7 +432,6 @@ namespace ILGPU.Algorithms.Cryptography
             }
         }
 
-        [Kernel]
         private static void Salsa20Kernel(
             Index1D index,
             ArrayView<byte> input,
@@ -461,7 +458,6 @@ namespace ILGPU.Algorithms.Cryptography
             }
         }
 
-        [Kernel]
         private static void BatchAESKernel(
             Index1D index,
             ArrayView<byte> batchedInput,

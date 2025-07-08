@@ -59,7 +59,7 @@ namespace ILGPU.Algorithms.Distributed
                 int>(MatrixMultiplyKernel);
 
             // Perform local matrix multiplication
-            matmulKernel(actualStream, new Index2D(globalN, localM), matrixA, matrixB, result, K);
+            matmulKernel(new Index2D(globalN, localM), matrixA, matrixB, result, K);
             
             actualStream.Synchronize();
             
@@ -92,7 +92,7 @@ namespace ILGPU.Algorithms.Distributed
                 ArrayView<float>>(MatrixVectorKernel);
 
             // Perform local matrix-vector multiplication
-            matvecKernel(actualStream, result.IntExtent, matrix, vector, result);
+            matvecKernel(result.IntExtent, matrix, vector, result);
             
             actualStream.Synchronize();
             mpiAccelerator.Barrier();
@@ -125,7 +125,7 @@ namespace ILGPU.Algorithms.Distributed
             var localSumArray = new T[] { localSum };
             var globalSumArray = new T[1];
             
-            mpiAccelerator.Reduce(
+            mpiAccelerator.Reduce<T>(
                 mpiAccelerator.LocalAccelerator.Allocate1D(localSumArray).View,
                 mpiAccelerator.LocalAccelerator.Allocate1D(globalSumArray).View,
                 MPIOperation.Sum,
@@ -157,7 +157,7 @@ namespace ILGPU.Algorithms.Distributed
             var localMaxArray = new T[] { localMax };
             var globalMaxArray = new T[1];
             
-            mpiAccelerator.Reduce(
+            mpiAccelerator.Reduce<T>(
                 mpiAccelerator.LocalAccelerator.Allocate1D(localMaxArray).View,
                 mpiAccelerator.LocalAccelerator.Allocate1D(globalMaxArray).View,
                 MPIOperation.Max,
@@ -253,7 +253,7 @@ namespace ILGPU.Algorithms.Distributed
             // Calculate send counts and displacements
             var sendCounts = CalculateSendCounts((int)localData.Length, targetSizes, rank);
             var sendBuffer = mpiAccelerator.LocalAccelerator.Allocate1D<T>(localData.Length);
-            localData.CopyTo(sendBuffer.View, actualStream);
+            localData.CopyTo(sendBuffer.View);
 
             // Perform all-to-all exchange
             var recvBuffer = mpiAccelerator.LocalAccelerator.Allocate1D<T>(targetSizes[rank]);

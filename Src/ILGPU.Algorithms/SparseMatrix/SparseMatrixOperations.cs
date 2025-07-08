@@ -251,7 +251,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Initialize: r = b - A*x, p = r
             SpMV(matrix, solution, Ap.View, 1.0f, 0.0f, actualStream);
             ComputeResidual(matrix.Accelerator, rhs, Ap.View, r.View, actualStream);
-            r.View.CopyTo(p.View, actualStream);
+            r.View.CopyTo(p.View);
 
             var rsold = DotProduct(matrix.Accelerator, r.View, r.View, actualStream);
 
@@ -330,8 +330,8 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Initialize
             SpMV(matrix, solution, v.View, 1.0f, 0.0f, actualStream);
             ComputeResidual(matrix.Accelerator, rhs, v.View, r.View, actualStream);
-            r.View.CopyTo(r0.View, actualStream);
-            r.View.CopyTo(p.View, actualStream);
+            r.View.CopyTo(r0.View);
+            r.View.CopyTo(p.View);
 
             var rho = DotProduct(matrix.Accelerator, r0.View, r.View, actualStream);
 
@@ -343,7 +343,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 var alpha = rho / DotProduct(matrix.Accelerator, r0.View, v.View, actualStream);
 
                 // s = r - alpha * v
-                r.View.CopyTo(s.View, actualStream);
+                r.View.CopyTo(s.View);
                 AXPY(matrix.Accelerator, s.View, v.View, -alpha, actualStream);
 
                 // Check if s is small enough
@@ -365,7 +365,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 AXPY(matrix.Accelerator, solution, s.View, omega, actualStream);
 
                 // r = s - omega * t
-                s.View.CopyTo(r.View, actualStream);
+                s.View.CopyTo(r.View);
                 AXPY(matrix.Accelerator, r.View, t.View, -omega, actualStream);
 
                 var rNorm = Math.Sqrt(DotProduct(matrix.Accelerator, r.View, r.View, actualStream));
@@ -532,7 +532,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Compute prefix sum on GPU (simplified implementation)
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>>(PrefixSumKernel);
-            kernel(stream, rowNnz.Length, rowNnz, rowPtr.View);
+            kernel(rowNnz.Length, rowNnz, rowPtr.View);
             
             return rowPtr;
         }
@@ -621,7 +621,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < rVec.Length)
                         rVec[index] = bVec[index] - AxVec[index];
                 });
-            kernel(stream, r.IntExtent, b, Ax, r);
+            kernel(r.IntExtent, b, Ax, r);
         }
 
         private static float DotProduct(Accelerator accelerator, ArrayView<float> x, ArrayView<float> y, AcceleratorStream stream)
@@ -639,7 +639,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < yVec.Length)
                         yVec[index] += a * xVec[index];
                 });
-            kernel(stream, y.IntExtent, y, x, alpha);
+            kernel(y.IntExtent, y, x, alpha);
         }
 
         private static void UpdateSearchDirection(Accelerator accelerator, ArrayView<float> p, ArrayView<float> r, float beta, AcceleratorStream stream)
@@ -650,7 +650,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < pVec.Length)
                         pVec[index] = rVec[index] + b * pVec[index];
                 });
-            kernel(stream, p.IntExtent, p, r, beta);
+            kernel(p.IntExtent, p, r, beta);
         }
 
         private static void ScaleAndAdd(Accelerator accelerator, ArrayView<float> y, ArrayView<float> x, float scale, AcceleratorStream stream)
@@ -661,7 +661,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < yVec.Length)
                         yVec[index] = xVec[index] + s * yVec[index];
                 });
-            kernel(stream, y.IntExtent, y, x, scale);
+            kernel(y.IntExtent, y, x, scale);
         }
 
         #endregion

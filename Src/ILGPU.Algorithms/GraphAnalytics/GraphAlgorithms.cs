@@ -399,7 +399,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
 
         #region Kernel Implementations
 
-        [Kernel]
         private static void InitializeBellmanFordKernel(
             Index1D index,
             ArrayView<float> distances,
@@ -422,7 +421,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             predecessors[index] = NO_PREDECESSOR;
         }
 
-        [Kernel]
         private static void RelaxEdgesWeightedKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -447,7 +445,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             }
         }
 
-        [Kernel]
         private static void RelaxEdgesUnweightedKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -471,7 +468,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             }
         }
 
-        [Kernel]
         private static void InitializeDeltaSteppingKernel(
             Index1D index,
             ArrayView<float> distances,
@@ -496,7 +492,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             visited[index] = false;
         }
 
-        [Kernel]
         private static void DeltaStepWeightedKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -535,7 +530,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             }
         }
 
-        [Kernel]
         private static void DeltaStepUnweightedKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -568,7 +562,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             }
         }
 
-        [Kernel]
         private static void InitializeBFSKernel(
             Index1D index,
             ArrayView<float> distances,
@@ -594,7 +587,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             predecessors[index] = NO_PREDECESSOR;
         }
 
-        [Kernel]
         private static void BFSKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -621,14 +613,12 @@ namespace ILGPU.Algorithms.GraphAnalytics
             }
         }
 
-        [Kernel]
         private static void InitializeComponentsKernel(Index1D index, ArrayView<int> componentIds)
         {
             if (index < componentIds.Length)
                 componentIds[index] = index;
         }
 
-        [Kernel]
         private static void PropagateLabelsKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -652,14 +642,12 @@ namespace ILGPU.Algorithms.GraphAnalytics
             newComponentIds[index] = minLabel;
         }
 
-        [Kernel]
         private static void InitializeUniformKernel(Index1D index, ArrayView<float> array, float value)
         {
             if (index < array.Length)
                 array[index] = value;
         }
 
-        [Kernel]
         private static void PageRankKernel(
             Index1D index,
             ArrayView<int> rowPtr,
@@ -685,7 +673,6 @@ namespace ILGPU.Algorithms.GraphAnalytics
             newPagerank[index] = (1.0f - dampingFactor) * baseValue + dampingFactor * sum;
         }
 
-        [Kernel]
         private static void AccumulateBetweennessKernel(
             Index1D index,
             ArrayView<float> betweenness,
@@ -700,21 +687,18 @@ namespace ILGPU.Algorithms.GraphAnalytics
             }
         }
 
-        [Kernel]
         private static void ClearBoolArrayKernel(Index1D index, ArrayView<bool> array)
         {
             if (index < array.Length)
                 array[index] = false;
         }
 
-        [Kernel]
         private static void ClearFloatArrayKernel(Index1D index, ArrayView<float> array)
         {
             if (index < array.Length)
                 array[index] = 0.0f;
         }
 
-        [Kernel]
         private static void NormalizeArrayKernel(Index1D index, ArrayView<float> array, float factor)
         {
             if (index < array.Length)

@@ -111,7 +111,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>,
                 ArrayView2D<float, Stride2D.DenseX>, int, int>(ComputeStructureTensorKernel);
 
-            structureTensorKernel(actualStream, new Index2D(image.Width, image.Height),
+            structureTensorKernel(new Index2D(image.Width, image.Height),
                 gradX.Data.View, gradY.Data.View, Ixx.View, Iyy.View, Ixy.View,
                 image.Width, image.Height);
 
@@ -137,7 +137,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>, float>(
                 HarrisResponseKernel);
 
-            harrisKernel(actualStream, new Index2D(image.Width, image.Height),
+            harrisKernel(new Index2D(image.Width, image.Height),
                 smoothIxx.View, smoothIyy.View, smoothIxy.View, responseMap.View, k);
 
             // Non-maximum suppression and thresholding
@@ -191,7 +191,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>,
                 ArrayView2D<float, Stride2D.DenseX>, int, int>(ComputeStructureTensorKernel);
 
-            structureTensorKernel(actualStream, new Index2D(image.Width, image.Height),
+            structureTensorKernel(new Index2D(image.Width, image.Height),
                 gradX.Data.View, gradY.Data.View, Ixx.View, Iyy.View, Ixy.View,
                 image.Width, image.Height);
 
@@ -217,7 +217,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 ArrayView2D<float, Stride2D.DenseX>, ArrayView2D<float, Stride2D.DenseX>>(
                 ShiTomasiResponseKernel);
 
-            shiTomasiKernel(actualStream, new Index2D(image.Width, image.Height),
+            shiTomasiKernel(new Index2D(image.Width, image.Height),
                 smoothIxx.View, smoothIyy.View, smoothIxy.View, responseMap.View);
 
             // Extract corners
@@ -281,7 +281,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int, int>(
                 ComputeGradientDirectionKernel);
 
-            directionKernel(actualStream, new Index2D(image.Width, image.Height),
+            directionKernel(new Index2D(image.Width, image.Height),
                 gradX.Data.View, gradY.Data.View, direction.Data.View, image.Width, image.Height);
 
             // Step 4: Non-maximum suppression
@@ -291,7 +291,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int, int>(
                 NonMaximumSuppressionKernel);
 
-            nmsKernel(actualStream, new Index2D(image.Width, image.Height),
+            nmsKernel(new Index2D(image.Width, image.Height),
                 magnitude.Data.View, direction.Data.View, suppressed.Data.View, image.Width, image.Height);
 
             // Step 5: Double thresholding and edge tracking by hysteresis
@@ -301,7 +301,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<float>, ArrayView<byte>, float, float, int, int>(
                 HysteresisThresholdingKernel);
 
-            hysteresisKernel(actualStream, new Index2D(image.Width, image.Height),
+            hysteresisKernel(new Index2D(image.Width, image.Height),
                 suppressed.Data.View, edges.Data.View, lowThreshold, highThreshold, image.Width, image.Height);
 
             // Cleanup intermediate images
@@ -380,7 +380,7 @@ namespace ILGPU.Algorithms.ComputerVision
             // Process scale triplets for local maxima detection
             for (int i = 1; i < numSigma - 1; i++)
             {
-                blobDetectionKernel(actualStream, new Index2D(image.Width, image.Height),
+                blobDetectionKernel(new Index2D(image.Width, image.Height),
                     localMaxima.View, maxCount.View,
                     scaleResponses[i - 1].View, scaleResponses[i].View, scaleResponses[i + 1].View,
                     sigmas[i - 1], sigmas[i], sigmas[i + 1], image.Width, image.Height, threshold);
@@ -410,7 +410,6 @@ namespace ILGPU.Algorithms.ComputerVision
 
         #region Helper Methods and Kernels
 
-        [Kernel]
         private static void ComputeStructureTensorKernel(
             Index2D index,
             ArrayView<float> gradX,
@@ -434,7 +433,6 @@ namespace ILGPU.Algorithms.ComputerVision
             Ixy[x, y] = gx * gy;
         }
 
-        [Kernel]
         private static void HarrisResponseKernel(
             Index2D index,
             ArrayView2D<float, Stride2D.DenseX> Ixx,
@@ -458,7 +456,6 @@ namespace ILGPU.Algorithms.ComputerVision
             response[x, y] = det - k * trace * trace;
         }
 
-        [Kernel]
         private static void ShiTomasiResponseKernel(
             Index2D index,
             ArrayView2D<float, Stride2D.DenseX> Ixx,
@@ -483,7 +480,6 @@ namespace ILGPU.Algorithms.ComputerVision
             response[x, y] = discriminant >= 0 ? (trace - IntrinsicMath.Sqrt(discriminant)) * 0.5f : 0;
         }
 
-        [Kernel]
         private static void ComputeGradientDirectionKernel(
             Index2D index,
             ArrayView<float> gradX,
@@ -503,7 +499,6 @@ namespace ILGPU.Algorithms.ComputerVision
             direction[idx] = IntrinsicMath.Atan2(gy, gx);
         }
 
-        [Kernel]
         private static void NonMaximumSuppressionKernel(
             Index2D index,
             ArrayView<float> magnitude,
@@ -559,7 +554,6 @@ namespace ILGPU.Algorithms.ComputerVision
             suppressed[idx] = (mag >= mag1 && mag >= mag2) ? mag : 0;
         }
 
-        [Kernel]
         private static void HysteresisThresholdingKernel(
             Index2D index,
             ArrayView<float> suppressed,
@@ -591,7 +585,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void FindBlobsKernel(
             Index2D index,
             ArrayView<FeaturePoint> blobs,

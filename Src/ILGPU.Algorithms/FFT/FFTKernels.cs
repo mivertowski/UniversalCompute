@@ -15,6 +15,7 @@
 // Change Date: 2029-06-24
 // Change License: Apache License, Version 2.0
 
+using ILGPU;
 using ILGPU.Runtime;
 using System;
 using System.Numerics;
@@ -31,7 +32,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Cooley-Tukey radix-2 forward FFT kernel.
         /// </summary>
-        [Kernel]
         public static void CooleyTukeyForward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -45,7 +45,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Cooley-Tukey radix-2 inverse FFT kernel.
         /// </summary>
-        [Kernel]
         public static void CooleyTukeyInverse1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -59,7 +58,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Radix-4 forward FFT kernel.
         /// </summary>
-        [Kernel]
         public static void Radix4Forward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -117,7 +115,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Radix-4 inverse FFT kernel.
         /// </summary>
-        [Kernel]
         public static void Radix4Inverse1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -173,7 +170,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Mixed-radix forward FFT kernel.
         /// </summary>
-        [Kernel]
         public static void MixedRadixForward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -188,7 +184,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Mixed-radix inverse FFT kernel.
         /// </summary>
-        [Kernel]
         public static void MixedRadixInverse1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -202,7 +197,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Batched forward 1D FFT kernel.
         /// </summary>
-        [Kernel]
         public static void BatchedForward1D(
             Index1D index,
             ArrayView<Complex> input,
@@ -226,7 +220,6 @@ namespace ILGPU.Algorithms.FFT
         /// <summary>
         /// Batched inverse 1D FFT kernel.
         /// </summary>
-        [Kernel]
         public static void BatchedInverse1D(
             Index1D index,
             ArrayView<Complex> input,

@@ -379,7 +379,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Invert diagonal elements
             var invDiagonalKernel = matrix.Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>>(InvertDiagonalKernel);
-            invDiagonalKernel(actualStream, diagonal.Length, diagonal);
+            invDiagonalKernel(diagonal.Length, diagonal);
 
             // Convert diagonal to host array
             var diagonalHost = new float[diagonal.Length];
@@ -469,7 +469,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                 Index1D, ArrayView<int>, ArrayView<int>, ArrayView<float>, ArrayView<float>>(
                 ExtractDiagonalKernel);
 
-            kernel(stream, matrix.NumRows, matrix.RowPtr.View, matrix.ColIndices.View, matrix.Values.View, diagonal.View);
+            kernel(matrix.NumRows, matrix.RowPtr.View, matrix.ColIndices.View, matrix.Values.View, diagonal.View);
             return diagonal;
         }
 
@@ -565,7 +565,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < yVec.Length)
                         yVec[index] += a * xVec[index];
                 });
-            kernel(stream, y.IntExtent, y, x, alpha);
+            kernel(y.IntExtent, y, x, alpha);
         }
 
         private static void UpdateSearchDirection(Accelerator accelerator, ArrayView<float> p, ArrayView<float> z, float beta, AcceleratorStream stream)
@@ -576,7 +576,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < pVec.Length)
                         pVec[index] = zVec[index] + b * pVec[index];
                 });
-            kernel(stream, p.IntExtent, p, z, beta);
+            kernel(p.IntExtent, p, z, beta);
         }
 
         private static void ClearVector(Accelerator accelerator, ArrayView<float> vector, AcceleratorStream stream)
@@ -587,7 +587,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < vec.Length)
                         vec[index] = 0.0f;
                 });
-            kernel(stream, vector.IntExtent, vector);
+            kernel(vector.IntExtent, vector);
         }
 
         private static void VectorAdd(Accelerator accelerator, ArrayView<float> result, ArrayView<float> x, float scale, AcceleratorStream stream)
@@ -598,7 +598,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < res.Length)
                         res[index] += s * xVec[index];
                 });
-            kernel(stream, result.IntExtent, result, x, scale);
+            kernel(result.IntExtent, result, x, scale);
         }
 
         private static void VectorScale(Accelerator accelerator, ArrayView<float> result, ArrayView<float> x, float scale, AcceleratorStream stream)
@@ -609,7 +609,7 @@ namespace ILGPU.Algorithms.SparseMatrix
                     if (index < res.Length)
                         res[index] = s * xVec[index];
                 });
-            kernel(stream, result.IntExtent, result, x, scale);
+            kernel(result.IntExtent, result, x, scale);
         }
 
         private static void ApplyGivensRotation(ArrayView2D<float, Stride2D.DenseX> H, int i, int j, float c, float s)

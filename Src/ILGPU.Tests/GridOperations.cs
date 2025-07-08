@@ -84,7 +84,8 @@ namespace ILGPU.Tests
             kernel((1, 2), buffer.View);
             Accelerator.Synchronize();
 
-            var data = buffer.GetAsArray();
+            var data = new int[buffer.Length];
+            buffer.CopyToCPU(data);
             int expected = 1;
 
             Assert.Equal(expected, data[0]);

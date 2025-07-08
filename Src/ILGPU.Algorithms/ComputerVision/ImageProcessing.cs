@@ -45,7 +45,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var kernel = rgbImage.Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView<byte>, ArrayView<byte>, int, int>(RGBToGrayKernel);
 
-            kernel(actualStream, new Index2D(rgbImage.Width, rgbImage.Height),
+            kernel(new Index2D(rgbImage.Width, rgbImage.Height),
                 rgbImage.Data.View, grayImage.Data.View, rgbImage.Stride, grayImage.Stride);
 
             actualStream.Synchronize();
@@ -69,7 +69,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var kernel = rgbImage.Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView<float>, ArrayView<float>, int>(RGBToHSVKernel);
 
-            kernel(actualStream, new Index2D(rgbImage.Width, rgbImage.Height),
+            kernel(new Index2D(rgbImage.Width, rgbImage.Height),
                 rgbImage.Data.View, hsvImage.Data.View, rgbImage.Stride);
 
             actualStream.Synchronize();
@@ -93,7 +93,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var kernel = hsvImage.Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView<float>, ArrayView<float>, int>(HSVToRGBKernel);
 
-            kernel(actualStream, new Index2D(hsvImage.Width, hsvImage.Height),
+            kernel(new Index2D(hsvImage.Width, hsvImage.Height),
                 hsvImage.Data.View, rgbImage.Data.View, hsvImage.Stride);
 
             actualStream.Synchronize();
@@ -129,7 +129,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<float>, ArrayView<float>, ArrayView<float>,
                 int, int, int, int, int, int, int, int>(ConvolutionKernel);
 
-            convKernel(actualStream, new Index2D(outputImage.Width, outputImage.Height),
+            convKernel(new Index2D(outputImage.Width, outputImage.Height),
                 inputImage.Data.View, outputImage.Data.View, kernel.Coefficients.View,
                 inputImage.Width, inputImage.Height, inputImage.Channels,
                 kernel.Width, kernel.Height, kernel.CenterX, kernel.CenterY, (int)borderMode);
@@ -192,7 +192,7 @@ namespace ILGPU.Algorithms.ComputerVision
                     Index2D, ArrayView<float>, ArrayView<float>, ArrayView<float>, int, int>(
                     GradientMagnitudeKernel);
 
-                magKernel(actualStream, new Index2D(inputImage.Width, inputImage.Height),
+                magKernel(new Index2D(inputImage.Width, inputImage.Height),
                     gradientX.Data.View, gradientY.Data.View, magnitude.Data.View,
                     inputImage.Width, inputImage.Height);
             }
@@ -222,7 +222,7 @@ namespace ILGPU.Algorithms.ComputerVision
             var kernel = inputImage.Accelerator.LoadAutoGroupedStreamKernel<
                 Index2D, ArrayView<byte>, ArrayView<byte>, int, int, int, int>(MedianFilterKernel);
 
-            kernel(actualStream, new Index2D(outputImage.Width, outputImage.Height),
+            kernel(new Index2D(outputImage.Width, outputImage.Height),
                 inputImage.Data.View, outputImage.Data.View,
                 inputImage.Width, inputImage.Height, inputImage.Channels, kernelSize);
 
@@ -258,7 +258,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<byte>, ArrayView<byte>, int, int, int, int, int, float, float, int>(
                 ResizeKernel);
 
-            kernel(actualStream, new Index2D(outputImage.Width, outputImage.Height),
+            kernel(new Index2D(outputImage.Width, outputImage.Height),
                 inputImage.Data.View, outputImage.Data.View,
                 inputImage.Width, inputImage.Height, outputImage.Width, outputImage.Height,
                 inputImage.Channels, scaleX, scaleY, (int)interpolation);
@@ -296,7 +296,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<byte>, ArrayView<byte>, int, int, int, int, int,
                 float, float, float, float, float, float, int>(RotateKernel);
 
-            kernel(actualStream, new Index2D(outputImage.Width, outputImage.Height),
+            kernel(new Index2D(outputImage.Width, outputImage.Height),
                 inputImage.Data.View, outputImage.Data.View,
                 inputImage.Width, inputImage.Height, outputImage.Width, outputImage.Height,
                 inputImage.Channels, cx, cy, cosA, sinA, cx, cy, (int)interpolation);
@@ -329,7 +329,7 @@ namespace ILGPU.Algorithms.ComputerVision
                 Index2D, ArrayView<byte>, ArrayView<byte>, ArrayView<float>,
                 int, int, int, int, int, int>(WarpAffineKernel);
 
-            kernel(actualStream, new Index2D(outputImage.Width, outputImage.Height),
+            kernel(new Index2D(outputImage.Width, outputImage.Height),
                 inputImage.Data.View, outputImage.Data.View, matrixBuffer.View,
                 inputImage.Width, inputImage.Height, outputImage.Width, outputImage.Height,
                 inputImage.Channels, (int)interpolation);
@@ -342,7 +342,6 @@ namespace ILGPU.Algorithms.ComputerVision
 
         #region Kernel Implementations
 
-        [Kernel]
         private static void RGBToGrayKernel(
             Index2D index,
             ArrayView<byte> rgbData,
@@ -371,7 +370,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void RGBToHSVKernel(
             Index2D index,
             ArrayView<float> rgbData,
@@ -420,7 +418,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void HSVToRGBKernel(
             Index2D index,
             ArrayView<float> hsvData,
@@ -477,7 +474,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void ConvolutionKernel(
             Index2D index,
             ArrayView<float> input,
@@ -521,7 +517,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void GradientMagnitudeKernel(
             Index2D index,
             ArrayView<float> gradX,
@@ -540,7 +535,6 @@ namespace ILGPU.Algorithms.ComputerVision
             magnitude[idx] = IntrinsicMath.Sqrt(gx * gx + gy * gy);
         }
 
-        [Kernel]
         private static void MedianFilterKernel(
             Index2D index,
             ArrayView<byte> input,
@@ -562,7 +556,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void ResizeKernel(
             Index2D index,
             ArrayView<byte> input,
@@ -619,7 +612,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void RotateKernel(
             Index2D index,
             ArrayView<byte> input,
@@ -681,7 +673,6 @@ namespace ILGPU.Algorithms.ComputerVision
             }
         }
 
-        [Kernel]
         private static void WarpAffineKernel(
             Index2D index,
             ArrayView<byte> input,
