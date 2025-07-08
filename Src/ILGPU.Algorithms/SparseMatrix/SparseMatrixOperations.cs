@@ -532,7 +532,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Compute prefix sum on GPU (simplified implementation)
             var kernel = accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<int>, ArrayView<int>>(PrefixSumKernel);
-            kernel(rowNnz.Length, rowNnz, rowPtr.View);
+            kernel(new Index1D((int)rowNnz.Length), rowNnz, rowPtr.View);
             
             return rowPtr;
         }

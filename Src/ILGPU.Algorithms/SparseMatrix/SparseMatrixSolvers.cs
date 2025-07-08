@@ -182,7 +182,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             else
                 z.View.CopyFrom(r.View);
 
-            z.View.CopyTo(p.View, actualStream);
+            p.View.CopyFrom(z.View);
 
             var rzold = DotProduct(matrix.Accelerator, r.View, z.View, actualStream);
             float residualNorm = 0.0f;
@@ -379,7 +379,7 @@ namespace ILGPU.Algorithms.SparseMatrix
             // Invert diagonal elements
             var invDiagonalKernel = matrix.Accelerator.LoadAutoGroupedStreamKernel<
                 Index1D, ArrayView<float>>(InvertDiagonalKernel);
-            invDiagonalKernel(diagonal.Length, diagonal);
+            invDiagonalKernel(new Index1D((int)diagonal.Length), diagonal.View);
 
             // Convert diagonal to host array
             var diagonalHost = new float[diagonal.Length];
