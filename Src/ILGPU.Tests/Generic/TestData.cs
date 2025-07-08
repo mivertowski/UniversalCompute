@@ -92,7 +92,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    internal struct EmptyStruct : IXunitSerializable, IEquatable<EmptyStruct>
+    public struct EmptyStruct : IXunitSerializable, IEquatable<EmptyStruct>
     {
         public readonly void Deserialize(IXunitSerializationInfo info) { }
 
@@ -183,7 +183,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    internal struct TestStruct : IXunitSerializable, IEquatable<TestStruct>
+    public struct TestStruct : IXunitSerializable, IEquatable<TestStruct>
     {
         public int X;
         public long Y;
@@ -229,7 +229,7 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
-    internal struct TestStruct<T> : IXunitSerializable, IValueStructure<T>
+    public struct TestStruct<T> : IXunitSerializable, IValueStructure<T>
         where T : struct
     {
         public byte Val0;
