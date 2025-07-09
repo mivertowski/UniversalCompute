@@ -34,6 +34,7 @@ namespace ILGPU.Tests.CPU
     /// Forces use of debug configuration in O1 and O2 builds.
     /// </param>
     /// <param name="prepareContext">The context preparation handler.</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1515:Consider making types internal", Justification = "Base class must be accessible to generated configurations")]
     public abstract class CPUTestContext(
         OptimizationLevel optimizationLevel,
         bool enableAssertions,
@@ -48,7 +49,7 @@ namespace ILGPU.Tests.CPU
         /// <summary>
         /// The name of the environment variable to control the kind of all CPU tests.
         /// </summary>
-        public static readonly string CPUKindEnvVariable = "ILGPU_CPU_TEST_KIND";
+        public const string CPUKindEnvVariable = "ILGPU_CPU_TEST_KIND";
 
         /// <summary>
         /// Gets the <see cref="CPUDeviceKind"/> based on the environment variable

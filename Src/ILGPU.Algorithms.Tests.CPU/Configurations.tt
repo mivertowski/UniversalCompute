@@ -51,6 +51,7 @@ namespace ILGPU.Algorithms.Tests.CPU
     }
 
     [CollectionDefinition("CPUContextCollection<#= config #>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1515:Consider making types internal", Justification = "xUnit collection definitions must be public")]
     public class CPUContextCollection<#= config #> :
         ICollectionFixture<CPUTestContext<#= config #>> { }
 

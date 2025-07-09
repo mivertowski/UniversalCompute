@@ -26,6 +26,7 @@ namespace ILGPU.Algorithms.Tests.CPU
     /// Contains tests to verify the functionality of the CPU-specialized
     /// <see cref="SGOOptimizer{T,TEvalType}"/> class.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1515:Consider making types internal", Justification = "Test class must be public for xUnit")]
     public class CPUSGOOptimizerTests
     {
         #region CPU Functions
