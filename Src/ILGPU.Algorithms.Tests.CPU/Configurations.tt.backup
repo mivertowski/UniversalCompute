@@ -28,7 +28,7 @@ namespace ILGPU.Algorithms.Tests.CPU
 <# foreach (var (test, level, collection) in configurations) { #>
 <#      var name = $"CPU{test}_{level}"; #>
     [Collection("CPUContextCollection<#= collection #>")]
-    internal sealed partial class <#= name #> : <#= test #>
+    public sealed partial class <#= name #> : <#= test #>
     {
         public <#= name #>(
             ITestOutputHelper output,
@@ -39,7 +39,7 @@ namespace ILGPU.Algorithms.Tests.CPU
 
 <# } #>
 <# foreach (var (config, level) in TestConfig.AllConfigurations) { #>
-    internal class CPUTestContext<#= config #> : CPUTestContext
+    public class CPUTestContext<#= config #> : CPUTestContext
     {
         public CPUTestContext<#= config #>()
             : base(
