@@ -89,7 +89,7 @@ public class IntelAMXBenchmarks : IDisposable
             }
 
             // Allocate memory for matrix operations
-            matrixA = accelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
+            matrixA = accelerator!.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
             matrixB = accelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
             matrixC = accelerator.Allocate2DDenseX<float>(new Index2D(TileSize, TileSize));
             

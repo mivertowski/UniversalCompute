@@ -270,11 +270,13 @@ public sealed partial class IntelAMXAccelerator : ISpecializedAccelerator
                 for (int ow = 0; ow < outputWidth; ow++)
                 {
                     float sum = 0;
-                    
+
                     // Extract convolution window and use AMX for computation
+#pragma warning disable CA2014 // Do not use stackalloc in loops
                     var windowData = stackalloc float[kernelSize * kernelSize];
                     var kernelData = stackalloc float[kernelSize * kernelSize];
-                    
+#pragma warning restore CA2014 // Do not use stackalloc in loops
+
                     for (int kh = 0; kh < kernelSize; kh++)
                     {
                         for (int kw = 0; kw < kernelSize; kw++)

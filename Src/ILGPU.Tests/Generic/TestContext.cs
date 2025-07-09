@@ -18,7 +18,9 @@ namespace ILGPU.Tests
     /// <summary>
     /// Provides contexts for different configurations.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class TestContext : DisposeBase
+#pragma warning restore CA1515 // Consider making public types internal
     {
         /// <summary>
         /// Constructs a new context provider.

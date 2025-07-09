@@ -31,21 +31,27 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Algorithms.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract partial class OptimizationTests(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
+#pragma warning restore CA1515 // Consider making public types internal
     {
 
 #if NET7_0_OR_GREATER
 
         #region Objectives
 
+#pragma warning disable CA1515 // Consider making public types internal
         public interface IPredefineTestFunction
+#pragma warning restore CA1515 // Consider making public types internal
         {
             float Result { get; }
             float[] LowerBounds { get; }
             float[] UpperBounds { get; }
         }
 
+#pragma warning disable CA1515 // Consider making public types internal
         public readonly record struct DistanceF32x2(float Constant) :
+#pragma warning restore CA1515 // Consider making public types internal
             IOptimizationFunction<Float32x2, float, float>
         {
             public float Evaluate(
@@ -74,7 +80,9 @@ namespace ILGPU.Algorithms.Tests
         /// Represents the Himmelblau function:
         /// https://en.wikipedia.org/wiki/Test_functions_for_optimization
         /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
         public readonly record struct HimmelblauFunction :
+#pragma warning restore CA1515 // Consider making public types internal
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
@@ -127,7 +135,9 @@ namespace ILGPU.Algorithms.Tests
         /// Represents the Easom function:
         /// https://en.wikipedia.org/wiki/Test_functions_for_optimization
         /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
         public readonly record struct EasomFunction :
+#pragma warning restore CA1515 // Consider making public types internal
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
@@ -180,7 +190,9 @@ namespace ILGPU.Algorithms.Tests
         /// Represents the Shaffer function N4:
         /// https://en.wikipedia.org/wiki/Test_functions_for_optimization
         /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
         public readonly record struct ShafferFunction4 :
+#pragma warning restore CA1515 // Consider making public types internal
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
@@ -233,7 +245,9 @@ namespace ILGPU.Algorithms.Tests
         /// Represents the Rosenbrock function constrained to a disk
         /// https://en.wikipedia.org/wiki/Test_functions_for_optimization
         /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
         public readonly record struct RosenbrockDisk :
+#pragma warning restore CA1515 // Consider making public types internal
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
@@ -287,7 +301,9 @@ namespace ILGPU.Algorithms.Tests
         /// Represents the Gomez and Levy function:
         /// https://en.wikipedia.org/wiki/Test_functions_for_optimization
         /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
         public readonly record struct GomezAndLevyFunction :
+#pragma warning restore CA1515 // Consider making public types internal
             IOptimizationFunction<Float32x2, float, float>,
             IPredefineTestFunction
         {
@@ -347,7 +363,9 @@ namespace ILGPU.Algorithms.Tests
 
         #region MemberData
 
+#pragma warning disable CA1515 // Consider making public types internal
         public record OptimizerConfig<TElementType>(
+#pragma warning restore CA1515 // Consider making public types internal
             int NumIterations,
             int NumParticles,
             int NumDimensions,

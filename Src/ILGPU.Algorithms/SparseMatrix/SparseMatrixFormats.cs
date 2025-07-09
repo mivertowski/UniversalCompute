@@ -109,7 +109,9 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <param name="colIndices">Column indices of non-zero elements.</param>
         /// <param name="values">Values of non-zero elements.</param>
         /// <returns>CSR matrix.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static CSRMatrix<T> FromCOO(
+#pragma warning restore CA1000 // Do not declare static members on generic types
             Accelerator accelerator,
             int numRows,
             int numCols,
@@ -169,7 +171,9 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <param name="accelerator">ILGPU accelerator.</param>
         /// <param name="diagonal">Diagonal values.</param>
         /// <returns>Diagonal CSR matrix.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static CSRMatrix<T> CreateDiagonal(Accelerator accelerator, T[] diagonal)
+#pragma warning restore CA1000 // Do not declare static members on generic types
         {
             var n = diagonal.Length;
             var rowPtr = new int[n + 1];
@@ -193,7 +197,9 @@ namespace ILGPU.Algorithms.SparseMatrix
         /// <param name="accelerator">ILGPU accelerator.</param>
         /// <param name="size">Matrix size.</param>
         /// <returns>Identity CSR matrix.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static CSRMatrix<T> CreateIdentity(Accelerator accelerator, int size)
+#pragma warning restore CA1000 // Do not declare static members on generic types
         {
             var diagonal = new T[size];
             for (int i = 0; i < size; i++)

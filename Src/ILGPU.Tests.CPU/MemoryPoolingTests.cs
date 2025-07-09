@@ -24,7 +24,9 @@ using Xunit;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class MemoryPoolingTests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private readonly Context context;
         private readonly Accelerator accelerator;
@@ -214,7 +216,7 @@ namespace ILGPU.Tests.CPU
         {
             using var pool = new AdaptiveMemoryPool<int>(accelerator);
 
-            var buffer = await pool.RentAsync(1000).ConfigureAwait(false);
+            var buffer = await pool.RentAsync(1000);
             Assert.NotNull(buffer);
             Assert.True(buffer.Length >= 1000);
 

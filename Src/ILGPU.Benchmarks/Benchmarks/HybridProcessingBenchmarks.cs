@@ -87,7 +87,7 @@ namespace ILGPU.Benchmarks.Benchmarks
             var kernel = cpuAccelerator!.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>, ArrayView<float>>(
                 (index, a, b, c) => c[index] = a[index] + b[index]);
 
-            using var result = cpuAccelerator.Allocate1D<float>(ProblemSize);
+            using var result = cpuAccelerator!.Allocate1D<float>(ProblemSize);
             kernel((Index1D)ProblemSize, cpuBuffer!.View, cpuBuffer.View, result.View);
             cpuAccelerator.Synchronize();
 
@@ -126,7 +126,7 @@ namespace ILGPU.Benchmarks.Benchmarks
             var preprocessKernel = cpuAccelerator!.LoadAutoGroupedStreamKernel<Index1D, ArrayView<float>, ArrayView<float>>(
                 (index, input, output) => output[index] = input[index] / 2.0f);
 
-            using var preprocessed = cpuAccelerator.Allocate1D<float>(ProblemSize);
+            using var preprocessed = cpuAccelerator!.Allocate1D<float>(ProblemSize);
             preprocessKernel((Index1D)ProblemSize, cpuBuffer!.View, preprocessed.View);
             cpuAccelerator.Synchronize();
 

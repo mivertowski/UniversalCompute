@@ -645,18 +645,19 @@ namespace ILGPU.Algorithms
         }
 
         /// <summary>
-        /// Performs the first radix-sort pass.
+        /// Radixes the sort kernel1.
         /// </summary>
-        /// <typeparam name="T">The element type.</typeparam>
-        /// <typeparam name="TStride">The stride of all elements.</typeparam>
-        /// <typeparam name="TOperation">The radix-sort operation.</typeparam>
-        /// <typeparam name="TSpecialization">The specialization type.</typeparam>
-        /// <param name="view">The input view to use.</param>
-        /// <param name="counter">The global counter view.</param>
-        /// <param name="groupSize">The number of threads in the group.</param>
-        /// <param name="numGroups">The number of virtually launched groups.</param>
-        /// <param name="paddedLength">The padded length of the input view.</param>
-        /// <param name="shift">The bit shift to use.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TStride">The type of the stride.</typeparam>
+        /// <typeparam name="TOperation">The type of the operation.</typeparam>
+        /// <typeparam name="TSpecialization">The type of the specialization.</typeparam>
+        /// <param name="index">The index.</param>
+        /// <param name="view">The view.</param>
+        /// <param name="counter">The counter.</param>
+        /// <param name="groupSize">Size of the group.</param>
+        /// <param name="numGroups">The number groups.</param>
+        /// <param name="paddedLength">Length of the padded.</param>
+        /// <param name="shift">The shift.</param>
         internal static void RadixSortKernel1<T, TStride, TOperation, TSpecialization>(
             Index1D index,
             ArrayView1D<T, TStride> view,
@@ -837,19 +838,20 @@ namespace ILGPU.Algorithms
             index < Index1D.One ? 0 : counter[index - Index1D.One];
 
         /// <summary>
-        /// Performs the second radix-sort pass.
+        /// Radixes the sort kernel2.
         /// </summary>
-        /// <typeparam name="T">The element type.</typeparam>
-        /// <typeparam name="TInputStride">The stride of the input view.</typeparam>
-        /// <typeparam name="TOutputStride">The stride of the output view.</typeparam>
-        /// <typeparam name="TOperation">The radix-sort operation.</typeparam>
-        /// <typeparam name="TSpecialization">The specialization type.</typeparam>
-        /// <param name="input">The input view to use.</param>
-        /// <param name="output">The output view to use.</param>
-        /// <param name="counter">The global counter view.</param>
-        /// <param name="numGroups">The number of virtually launched groups.</param>
-        /// <param name="paddedLength">The padded length of the input view.</param>
-        /// <param name="shift">The bit shift to use.</param>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TInputStride">The type of the input stride.</typeparam>
+        /// <typeparam name="TOutputStride">The type of the output stride.</typeparam>
+        /// <typeparam name="TOperation">The type of the operation.</typeparam>
+        /// <typeparam name="TSpecialization">The type of the specialization.</typeparam>
+        /// <param name="index">The index.</param>
+        /// <param name="input">The input.</param>
+        /// <param name="output">The output.</param>
+        /// <param name="counter">The counter.</param>
+        /// <param name="numGroups">The number groups.</param>
+        /// <param name="paddedLength">Length of the padded.</param>
+        /// <param name="shift">The shift.</param>
         internal static void RadixSortKernel2<
             T,
             TInputStride,

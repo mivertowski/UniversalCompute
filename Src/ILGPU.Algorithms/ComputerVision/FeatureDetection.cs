@@ -28,16 +28,34 @@ namespace ILGPU.Algorithms.ComputerVision
     public struct FeaturePoint
     {
         /// <summary>X coordinate</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float X;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Y coordinate</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float Y;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Response strength</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float Response;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Scale or size</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float Scale;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Orientation angle</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float Angle;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FeaturePoint"/> struct.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="response">The response.</param>
+        /// <param name="scale">The scale.</param>
+        /// <param name="angle">The angle.</param>
         public FeaturePoint(float x, float y, float response, float scale = 1.0f, float angle = 0.0f)
         {
             X = x; Y = y; Response = response; Scale = scale; Angle = angle;
@@ -54,14 +72,27 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <summary>Detected corner points</summary>
         public IReadOnlyList<FeaturePoint> Corners { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CornerDetectionResult"/> class.
+        /// </summary>
+        /// <param name="responseMap">The response map.</param>
+        /// <param name="corners">The corners.</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// responseMap
+        /// or
+        /// corners
+        /// </exception>
         public CornerDetectionResult(
             MemoryBuffer2D<float, Stride2D.DenseX> responseMap,
-            List<FeaturePoint> corners)
+            IReadOnlyList<FeaturePoint> corners)
         {
             ResponseMap = responseMap ?? throw new ArgumentNullException(nameof(responseMap));
             Corners = corners ?? throw new ArgumentNullException(nameof(corners));
         }
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             ResponseMap?.Dispose();

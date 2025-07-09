@@ -84,7 +84,7 @@ public class AppleNeuralEngineBenchmarks : IDisposable
             }
 
             // Allocate memory for neural engine operations
-            inputMatrix = accelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
+            inputMatrix = accelerator!.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
             weightMatrix = accelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
             outputMatrix = accelerator.Allocate2DDenseX<float>(new Index2D(MatrixSize, MatrixSize));
             

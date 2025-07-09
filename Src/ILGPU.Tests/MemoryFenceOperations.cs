@@ -16,7 +16,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class MemoryFenceOperations(
+#pragma warning restore CA1515 // Consider making public types internal
         ITestOutputHelper output,
         TestContext testContext) : TestBase(output, testContext)
     {

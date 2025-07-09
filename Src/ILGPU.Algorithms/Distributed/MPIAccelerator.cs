@@ -442,7 +442,7 @@ namespace ILGPU.Algorithms.Distributed
             where T : unmanaged
         {
             var actualStream = stream ?? LocalAccelerator.DefaultStream;
-            actualStream.Synchronize();
+            await actualStream.SynchronizeAsync().ConfigureAwait(false);
             
             var hostBuffer = new T[data.Length];
             data.CopyToCPU(hostBuffer);
@@ -467,12 +467,12 @@ namespace ILGPU.Algorithms.Distributed
             // When request completes, copy data to GPU
             _ = Task.Run(async () =>
             {
-                await request.Wait();
+                await request.Wait().ConfigureAwait(false);
                 var hostBuffer = request.GetData<T>();
                 data.CopyFromCPU(hostBuffer);
                 
                 var actualStream = stream ?? LocalAccelerator.DefaultStream;
-                actualStream.Synchronize();
+                await actualStream.SynchronizeAsync().ConfigureAwait(false);
             });
             
             return request;

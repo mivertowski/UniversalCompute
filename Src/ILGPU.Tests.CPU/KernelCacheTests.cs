@@ -30,7 +30,9 @@ namespace ILGPU.Tests.CPU
     /// <summary>
     /// Tests for kernel caching system with version management.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public class KernelCacheTests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         #region Fields
 
@@ -94,7 +96,7 @@ namespace ILGPU.Tests.CPU
             Assert.True(found);
             Assert.NotNull(entry);
             Assert.Equal(version, entry.Version);
-            Assert.Equal(key, entry.Metadata.ContainsKey("CacheKey") ? entry.Metadata["CacheKey"] : key);
+            Assert.Equal(key, entry.Metadata.TryGetValue("CacheKey", out object value) ? value : key);
         }
 
         [Fact]
@@ -300,10 +302,10 @@ namespace ILGPU.Tests.CPU
             using var cache = new KernelCacheManager(options);
             
             // Test async preload (should complete without error)
-            await cache.PreloadAsync().ConfigureAwait(false);
+            await cache.PreloadAsync();
             
             // Test async persist (should complete without error)
-            await cache.PersistAsync().ConfigureAwait(false);
+            await cache.PersistAsync();
         }
 
         #endregion
@@ -371,7 +373,7 @@ namespace ILGPU.Tests.CPU
 
         [Fact]
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Test infrastructure needs to collect all exceptions from concurrent operations")]
-        public void KernelCache_ConcurrentAccess()
+        public async Task KernelCache_ConcurrentAccess()
         {
             const int threadCount = 10;
             const int kernelsPerThread = 50;
@@ -405,7 +407,7 @@ namespace ILGPU.Tests.CPU
                 });
             }
             
-            Task.WaitAll(tasks);
+            await Task.WhenAll(tasks);
             
             // Verify no exceptions occurred
             Assert.Empty(exceptions);
@@ -533,9 +535,9 @@ namespace ILGPU.Tests.CPU
             Assert.NotEqual(version1, version3); // Different compiler version
             Assert.NotEqual(version2, version3); // Different compiler version and optimization
             
-            Assert.Contains("1.0.0", version1);
-            Assert.Contains("O2", version1);
-            Assert.Contains("x64", version1);
+            Assert.Contains("1.0.0", version1, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("O2", version1, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("x64", version1, StringComparison.OrdinalIgnoreCase);
         }
 
         #endregion

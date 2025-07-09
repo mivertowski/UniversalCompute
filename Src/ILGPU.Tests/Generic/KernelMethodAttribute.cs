@@ -24,7 +24,9 @@ namespace ILGPU.Tests
     /// </remarks>
     /// <param name="methodName">The associated method name.</param>
     [AttributeUsage(AttributeTargets.Method)]
+#pragma warning disable CA1515 // Consider making public types internal
     public sealed class KernelMethodAttribute(string methodName) : Attribute
+#pragma warning restore CA1515 // Consider making public types internal
     {
 
         /// <summary>

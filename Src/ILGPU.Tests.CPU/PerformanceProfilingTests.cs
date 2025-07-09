@@ -26,7 +26,9 @@ using Xunit;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class PerformanceProfilingTests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private readonly Context context;
         private readonly Accelerator accelerator;
@@ -250,12 +252,12 @@ namespace ILGPU.Tests.CPU
             var tempFile = System.IO.Path.GetTempFileName();
             try
             {
-                await profiler.ExportAsync(tempFile, ProfileExportFormat.Json).ConfigureAwait(false);
+                await profiler.ExportAsync(tempFile, ProfileExportFormat.Json);
                 Assert.True(System.IO.File.Exists(tempFile));
                 
-                var content = await System.IO.File.ReadAllTextAsync(tempFile).ConfigureAwait(false);
-                Assert.Contains("Export Test", content);
-                Assert.Contains("TestEvent", content);
+                var content = await System.IO.File.ReadAllTextAsync(tempFile);
+                Assert.Contains("Export Test", content, StringComparison.OrdinalIgnoreCase);
+                Assert.Contains("TestEvent", content, StringComparison.OrdinalIgnoreCase);
             }
             finally
             {
@@ -279,12 +281,12 @@ namespace ILGPU.Tests.CPU
             var tempFile = System.IO.Path.GetTempFileName();
             try
             {
-                await profiler.ExportAsync(tempFile, ProfileExportFormat.Csv).ConfigureAwait(false);
+                await profiler.ExportAsync(tempFile, ProfileExportFormat.Csv);
                 Assert.True(System.IO.File.Exists(tempFile));
                 
-                var content = await System.IO.File.ReadAllTextAsync(tempFile).ConfigureAwait(false);
-                Assert.Contains("SessionId,KernelName", content);
-                Assert.Contains("TestKernel", content);
+                var content = await System.IO.File.ReadAllTextAsync(tempFile);
+                Assert.Contains("SessionId,KernelName", content, StringComparison.OrdinalIgnoreCase);
+                Assert.Contains("TestKernel", content, StringComparison.OrdinalIgnoreCase);
             }
             finally
             {

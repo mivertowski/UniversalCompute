@@ -24,7 +24,9 @@ using Xunit;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class UnifiedMemoryTests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private readonly Context context;
         private readonly Accelerator accelerator;
@@ -145,7 +147,7 @@ namespace ILGPU.Tests.CPU
             await buffer.TransformAsync((index, view) =>
             {
                 view[index] = view[index] * view[index];
-            }, stream).ConfigureAwait(false);
+            }, stream);
             
             // Verify transformation
             var result = buffer.View.AsContiguous().GetAsArray();
@@ -248,7 +250,7 @@ namespace ILGPU.Tests.CPU
             }
             
             // Perform async addition
-            await AsyncUnifiedMemoryOperations.AddAsync(left, right, result, accelerator).ConfigureAwait(false);
+            await AsyncUnifiedMemoryOperations.AddAsync(left, right, result, accelerator);
             
             // Verify result
             var resultData = result.View.AsContiguous().GetAsArray();

@@ -20,7 +20,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class BasicLoops(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private const int Length = 128;
 

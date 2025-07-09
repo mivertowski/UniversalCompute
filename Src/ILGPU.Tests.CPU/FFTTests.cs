@@ -26,7 +26,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class FFTTests : TestBase
+#pragma warning restore CA1515 // Consider making public types internal
     {
         public FFTTests(ITestOutputHelper output, TestContext testContext)
             : base(output, testContext)
@@ -37,7 +39,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void FFT1DComplexTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -76,7 +82,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void FFT1DRealTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -114,7 +124,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void IFFT1DRealTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -155,7 +169,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void FFT2DTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -200,7 +218,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void FFTBatchTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -264,7 +286,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void CPUFFTTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -297,7 +323,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void FFTRoundTripTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);

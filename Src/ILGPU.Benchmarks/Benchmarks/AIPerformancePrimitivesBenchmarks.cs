@@ -277,11 +277,11 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
     }
 
     [Benchmark]
-    public async Task<double> MemoryBandwidth_CopyAsync()
+    public Task<double> MemoryBandwidth_CopyAsync()
     {
         if (primitives == null || inputTensor == null || outputTensor == null)
         {
-            return 0.0;
+            return Task.FromResult(0.0);
         }
 
         var start = DateTime.UtcNow;
@@ -290,7 +290,7 @@ public class AIPerformancePrimitivesBenchmarks : IDisposable
         
         // Calculate memory bandwidth (GB/s)
         long bytes = inputTensor.Shape.Length * sizeof(float) * 2; // Read + Write
-        return bytes / elapsed.TotalSeconds / 1e9;
+        return Task.FromResult(bytes / elapsed.TotalSeconds / 1e9);
     }
 
     private void InitializeTensors()

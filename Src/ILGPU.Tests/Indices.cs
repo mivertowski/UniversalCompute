@@ -14,7 +14,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class Indices(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
+#pragma warning restore CA1515 // Consider making public types internal
     {
         [Theory]
         [InlineData(1, 1_000_000, 1_000_000, 1, 0)]

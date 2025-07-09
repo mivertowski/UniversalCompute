@@ -524,6 +524,11 @@ namespace ILGPU.Algorithms.FFT
     public enum FFTDimensions
     {
         /// <summary>
+        /// The none
+        /// </summary>
+        None,
+
+        /// <summary>
         /// 1D FFT.
         /// </summary>
         OneD = 1,

@@ -27,7 +27,9 @@ namespace ILGPU.Tests.CPU
     /// <summary>
     /// Tests for LINQ-style GPU operations.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public class LinqOperationsTests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         #region Fields
 

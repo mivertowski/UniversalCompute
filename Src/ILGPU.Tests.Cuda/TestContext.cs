@@ -28,7 +28,9 @@ namespace ILGPU.Tests.Cuda
     /// Forces use of debug configuration in O1 and O2 builds.
     /// </param>
     /// <param name="prepareContext">The context preparation handler.</param>
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class CudaTestContext(
+#pragma warning restore CA1515 // Consider making public types internal
         OptimizationLevel optimizationLevel,
         bool enableAssertions,
         bool forceDebugConfig,

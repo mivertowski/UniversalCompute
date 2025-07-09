@@ -25,7 +25,9 @@ namespace ILGPU.Tests.CPU
     /// <summary>
     /// Tests for the modernized Device API properties.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public class DeviceAPITests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private readonly Context context;
         private readonly Accelerator accelerator;

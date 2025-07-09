@@ -89,7 +89,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
         }
 
         kernel(DataSize, buffer.View, bufferB.View);
-        accelerator.Synchronize();
+        accelerator!.Synchronize();
 
         var result = bufferB.GetAsArray1D();
         return result[0];
@@ -147,7 +147,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             {
                 for (int x = 0; x < bufferB.IntExtent.X && indexB < dim * dim; x++)
                 {
-                    bufferB.View[y, x] = hostData[indexB++];
+                    bufferB.View[y, x] = hostData![indexB++];
                 }
             }
 
@@ -193,7 +193,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             {
                 for (int x = 0; x < matrixB.IntExtent.X && indexMB < dim * dim; x++)
                 {
-                    matrixB.View[y, x] = hostData[indexMB++];
+                    matrixB.View[y, x] = hostData![indexMB++];
                 }
             }
 
@@ -253,7 +253,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             return 0.0f;
         }
 
-        using var result = accelerator.Allocate1D<float>(DataSize);
+        using var result = accelerator!.Allocate1D<float>(DataSize);
         kernel(DataSize, buffer.View, result.View, 1);
         accelerator.Synchronize();
 
@@ -273,7 +273,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             return 0.0f;
         }
 
-        using var result = accelerator.Allocate1D<float>(DataSize);
+        using var result = accelerator!.Allocate1D<float>(DataSize);
         kernel(DataSize, buffer.View, result.View);
         accelerator.Synchronize();
 
@@ -293,7 +293,7 @@ public class UnifiedMemoryBenchmarks : IDisposable
             return 0.0f;
         }
 
-        using var result = accelerator.Allocate1D<float>(DataSize);
+        using var result = accelerator!.Allocate1D<float>(DataSize);
         kernel(DataSize, buffer.View, result.View, DataSize);
         accelerator.Synchronize();
 

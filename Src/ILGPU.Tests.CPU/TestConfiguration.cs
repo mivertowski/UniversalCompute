@@ -23,7 +23,9 @@ namespace ILGPU.Tests.CPU
     /// <summary>
     /// Test configuration for CPU-specific tests.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public class TestConfiguration
+#pragma warning restore CA1515 // Consider making public types internal
     {
         /// <summary>
         /// Initializes a new test configuration.
@@ -55,7 +57,9 @@ namespace ILGPU.Tests.CPU
     /// <summary>
     /// Base class for CPU tests with test configuration support.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class TestBase : ILGPU.Tests.TestBase
+#pragma warning restore CA1515 // Consider making public types internal
     {
         /// <summary>
         /// Initializes a new test base.

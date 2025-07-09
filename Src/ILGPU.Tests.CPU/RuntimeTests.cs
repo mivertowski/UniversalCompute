@@ -17,7 +17,9 @@ using Xunit;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class CPURuntimeTests
+#pragma warning restore CA1515 // Consider making public types internal
     {
         internal static void TestCustomDeviceSetup_ImplicitKernel(
             Index1D index,

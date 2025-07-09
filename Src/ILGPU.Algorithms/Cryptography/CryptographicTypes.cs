@@ -93,8 +93,20 @@ namespace ILGPU.Algorithms.Cryptography
     /// </summary>
     public struct Hash256
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong Word0, Word1, Word2, Word3;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Hash256"/> struct.
+        /// </summary>
+        /// <param name="w0">The w0.</param>
+        /// <param name="w1">The w1.</param>
+        /// <param name="w2">The w2.</param>
+        /// <param name="w3">The w3.</param>
         public Hash256(ulong w0, ulong w1, ulong w2, ulong w3)
         {
             Word0 = w0; Word1 = w1; Word2 = w2; Word3 = w3;
@@ -147,8 +159,25 @@ namespace ILGPU.Algorithms.Cryptography
     /// </summary>
     public struct Hash512
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong Word0, Word1, Word2, Word3, Word4, Word5, Word6, Word7;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Hash512"/> struct.
+        /// </summary>
+        /// <param name="w0">The w0.</param>
+        /// <param name="w1">The w1.</param>
+        /// <param name="w2">The w2.</param>
+        /// <param name="w3">The w3.</param>
+        /// <param name="w4">The w4.</param>
+        /// <param name="w5">The w5.</param>
+        /// <param name="w6">The w6.</param>
+        /// <param name="w7">The w7.</param>
         public Hash512(ulong w0, ulong w1, ulong w2, ulong w3, ulong w4, ulong w5, ulong w6, ulong w7)
         {
             Word0 = w0; Word1 = w1; Word2 = w2; Word3 = w3;
@@ -203,12 +232,23 @@ namespace ILGPU.Algorithms.Cryptography
     public struct AESKey
     {
         /// <summary>Key size in bits</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public int KeySize;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Round keys for encryption</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public uint[] RoundKeys;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Number of rounds</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public int Rounds;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AESKey"/> struct.
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <exception cref="System.ArgumentException">AES key must be 128, 192, or 256 bits</exception>
         public AESKey(byte[] key)
         {
             if (key.Length != 16 && key.Length != 24 && key.Length != 32)
@@ -246,12 +286,29 @@ namespace ILGPU.Algorithms.Cryptography
     public struct ECPoint
     {
         /// <summary>X coordinate</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong[] X;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Y coordinate</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong[] Y;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Whether the point is at infinity</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public bool IsInfinity;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ECPoint"/> struct.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="isInfinity">if set to <c>true</c> [is infinity].</param>
+        /// <exception cref="System.ArgumentNullException">
+        /// x
+        /// or
+        /// y
+        /// </exception>
         public ECPoint(ulong[] x, ulong[] y, bool isInfinity = false)
         {
             X = x ?? throw new ArgumentNullException(nameof(x));
@@ -271,15 +328,25 @@ namespace ILGPU.Algorithms.Cryptography
     public struct ECCurve
     {
         /// <summary>Prime modulus</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong[] P;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Curve parameter A</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong[] A;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Curve parameter B</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong[] B;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Generator point</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ECPoint G;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         /// <summary>Order of the generator</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong[] N;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
         /// <summary>
         /// Creates secp256k1 curve parameters.
@@ -306,8 +373,20 @@ namespace ILGPU.Algorithms.Cryptography
     /// </summary>
     public struct BigInteger256
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public ulong Word0, Word1, Word2, Word3;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BigInteger256"/> struct.
+        /// </summary>
+        /// <param name="w0">The w0.</param>
+        /// <param name="w1">The w1.</param>
+        /// <param name="w2">The w2.</param>
+        /// <param name="w3">The w3.</param>
         public BigInteger256(ulong w0, ulong w1, ulong w2, ulong w3)
         {
             Word0 = w0; Word1 = w1; Word2 = w2; Word3 = w3;
@@ -368,6 +447,13 @@ namespace ILGPU.Algorithms.Cryptography
         /// <summary>Error message if operation failed</summary>
         public string? ErrorMessage { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CryptoResult{T}"/> class.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <param name="success">if set to <c>true</c> [success].</param>
+        /// <param name="error">The error.</param>
+        /// <exception cref="System.ArgumentNullException">data</exception>
         public CryptoResult(MemoryBuffer1D<T, Stride1D.Dense> data, bool success, string? error = null)
         {
             Data = data ?? throw new ArgumentNullException(nameof(data));
@@ -390,12 +476,25 @@ namespace ILGPU.Algorithms.Cryptography
     public struct CryptoRNGState
     {
         /// <summary>Internal state words</summary>
-        public ulong State0, State1, State2, State3;
-        /// <summary>Counter for stream ciphers</summary>
-        public ulong Counter;
-        /// <summary>Key for keyed PRNGs</summary>
-        public ulong[] Key;
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
+        public ulong State0, State1, State2, State3;
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
+        /// <summary>Counter for stream ciphers</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
+        public ulong Counter;
+#pragma warning restore CA1051 // Do not declare visible instance fields
+        /// <summary>Key for keyed PRNGs</summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
+        public ulong[] Key;
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CryptoRNGState"/> struct.
+        /// </summary>
+        /// <param name="seed">The seed.</param>
+        /// <exception cref="System.ArgumentException">Seed must have at least 4 elements</exception>
         public CryptoRNGState(ulong[] seed)
         {
             if (seed.Length < 4) throw new ArgumentException("Seed must have at least 4 elements");
@@ -415,13 +514,17 @@ namespace ILGPU.Algorithms.Cryptography
     public static class CryptoConstants
     {
         /// <summary>SHA-256 initial hash values</summary>
+#pragma warning disable CA1707 // Identifiers should not contain underscores
         public static readonly uint[] SHA256_H = {
+#pragma warning restore CA1707 // Identifiers should not contain underscores
             0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
             0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
         };
 
         /// <summary>SHA-256 round constants</summary>
+#pragma warning disable CA1707 // Identifiers should not contain underscores
         public static readonly uint[] SHA256_K = {
+#pragma warning restore CA1707 // Identifiers should not contain underscores
             0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
             0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
             0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -433,7 +536,9 @@ namespace ILGPU.Algorithms.Cryptography
         };
 
         /// <summary>AES S-box</summary>
+#pragma warning disable CA1707 // Identifiers should not contain underscores
         public static readonly byte[] AES_SBOX = {
+#pragma warning restore CA1707 // Identifiers should not contain underscores
             0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
             0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
             0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
@@ -453,6 +558,8 @@ namespace ILGPU.Algorithms.Cryptography
         };
 
         /// <summary>ChaCha20 constants</summary>
+#pragma warning disable CA1707 // Identifiers should not contain underscores
         public static readonly uint[] CHACHA20_CONSTANTS = { 0x61707865, 0x3320646e, 0x79622d32, 0x6b206574 };
+#pragma warning restore CA1707 // Identifiers should not contain underscores
     }
 }

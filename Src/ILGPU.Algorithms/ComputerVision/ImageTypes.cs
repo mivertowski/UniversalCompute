@@ -243,7 +243,9 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <param name="channels">Number of channels.</param>
         /// <param name="data">Host pixel data.</param>
         /// <returns>New image.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static Image<T> FromHostArray(Accelerator accelerator, int width, int height, int channels, T[] data)
+#pragma warning restore CA1000 // Do not declare static members on generic types
         {
             return new Image<T>(accelerator, width, height, channels, data);
         }
@@ -266,8 +268,19 @@ namespace ILGPU.Algorithms.ComputerVision
     /// </summary>
     public struct RGB24
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public byte R, G, B;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RGB24"/> struct.
+        /// </summary>
+        /// <param name="r">The r.</param>
+        /// <param name="g">The g.</param>
+        /// <param name="b">The b.</param>
         public RGB24(byte r, byte g, byte b)
         {
             R = r; G = g; B = b;
@@ -279,8 +292,21 @@ namespace ILGPU.Algorithms.ComputerVision
     /// </summary>
     public struct RGBA32
     {
-        public byte R, G, B, A;
+        /// <summary>
+        /// 
+        /// </summary>
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
+        public byte R, G, B, A;
+#pragma warning restore CA1051 // Do not declare visible instance fields
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RGBA32"/> struct.
+        /// </summary>
+        /// <param name="r">The r.</param>
+        /// <param name="g">The g.</param>
+        /// <param name="b">The b.</param>
+        /// <param name="a">a.</param>
         public RGBA32(byte r, byte g, byte b, byte a = 255)
         {
             R = r; G = g; B = b; A = a;
@@ -292,8 +318,19 @@ namespace ILGPU.Algorithms.ComputerVision
     /// </summary>
     public struct RGBF32
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float R, G, B;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RGBF32"/> struct.
+        /// </summary>
+        /// <param name="r">The r.</param>
+        /// <param name="g">The g.</param>
+        /// <param name="b">The b.</param>
         public RGBF32(float r, float g, float b)
         {
             R = r; G = g; B = b;
@@ -305,8 +342,20 @@ namespace ILGPU.Algorithms.ComputerVision
     /// </summary>
     public struct RGBAF32
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float R, G, B, A;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RGBAF32"/> struct.
+        /// </summary>
+        /// <param name="r">The r.</param>
+        /// <param name="g">The g.</param>
+        /// <param name="b">The b.</param>
+        /// <param name="a">a.</param>
         public RGBAF32(float r, float g, float b, float a = 1.0f)
         {
             R = r; G = g; B = b; A = a;
@@ -318,8 +367,18 @@ namespace ILGPU.Algorithms.ComputerVision
     /// </summary>
     public struct Point2D
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public float X, Y;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Point2D"/> struct.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
         public Point2D(float x, float y)
         {
             X = x; Y = y;
@@ -331,15 +390,47 @@ namespace ILGPU.Algorithms.ComputerVision
     /// </summary>
     public struct Rectangle
     {
+        /// <summary>
+        /// 
+        /// </summary>
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public int X, Y, Width, Height;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Rectangle"/> struct.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        /// <param name="y">The y.</param>
+        /// <param name="width">The width.</param>
+        /// <param name="height">The height.</param>
         public Rectangle(int x, int y, int width, int height)
         {
             X = x; Y = y; Width = width; Height = height;
         }
 
+        /// <summary>
+        /// Gets the right.
+        /// </summary>
+        /// <value>
+        /// The right.
+        /// </value>
         public int Right => X + Width;
+
+        /// <summary>
+        /// Gets the bottom.
+        /// </summary>
+        /// <value>
+        /// The bottom.
+        /// </value>
         public int Bottom => Y + Height;
+
+        /// <summary>
+        /// Gets the center.
+        /// </summary>
+        /// <value>
+        /// The center.
+        /// </value>
         public Point2D Center => new Point2D(X + Width / 2.0f, Y + Height / 2.0f);
     }
 
@@ -409,7 +500,9 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <param name="size">Kernel size (must be odd).</param>
         /// <param name="sigma">Gaussian standard deviation.</param>
         /// <returns>Gaussian kernel.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static ConvolutionKernel<float> CreateGaussian(Accelerator accelerator, int size, float sigma)
+#pragma warning restore CA1000 // Do not declare static members on generic types
         {
             if (size % 2 == 0) throw new ArgumentException("Kernel size must be odd");
 
@@ -442,7 +535,9 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <param name="accelerator">ILGPU accelerator.</param>
         /// <param name="direction">Gradient direction (0=X, 1=Y).</param>
         /// <returns>Sobel kernel.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static ConvolutionKernel<float> CreateSobel(Accelerator accelerator, int direction)
+#pragma warning restore CA1000 // Do not declare static members on generic types
         {
             float[] coefficients;
             
@@ -464,7 +559,9 @@ namespace ILGPU.Algorithms.ComputerVision
         /// <param name="accelerator">ILGPU accelerator.</param>
         /// <param name="size">Kernel size.</param>
         /// <returns>Box filter kernel.</returns>
+#pragma warning disable CA1000 // Do not declare static members on generic types
         public static ConvolutionKernel<float> CreateBox(Accelerator accelerator, int size)
+#pragma warning restore CA1000 // Do not declare static members on generic types
         {
             var value = 1.0f / (size * size);
             var coefficients = new float[size * size];

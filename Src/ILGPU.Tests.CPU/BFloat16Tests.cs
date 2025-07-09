@@ -20,7 +20,9 @@ using Xunit;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class BFloat16Tests
+#pragma warning restore CA1515 // Consider making public types internal
     {
         [Fact]
         public void BFloat16_Constants_AreCorrect()

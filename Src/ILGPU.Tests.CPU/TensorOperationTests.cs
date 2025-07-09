@@ -24,16 +24,24 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class TensorOperationTests : TestBase
+#pragma warning restore CA1515 // Consider making public types internal
     {
+#pragma warning disable xUnit1041 // Fixture arguments to test classes must have fixture sources
         public TensorOperationTests(ITestOutputHelper output, TestContext testContext)
+#pragma warning restore xUnit1041 // Fixture arguments to test classes must have fixture sources
             : base(output, testContext)
         {
         }
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorShapeTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             // Test tensor shape creation and validation
             var shape1D = new TensorShape(10);
@@ -71,7 +79,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorCreationTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -94,7 +106,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorFactoryMethodsTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -120,7 +136,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorCopyOperationsTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -143,7 +163,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorReshapeTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -169,7 +193,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorTransposeTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -190,7 +218,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorElementWiseAdditionTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -215,7 +247,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorElementWiseMultiplicationTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -240,7 +276,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorReLUTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -258,7 +298,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorMatrixMultiplicationTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -291,7 +335,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorSoftmax2DTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -329,7 +377,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable IDE0060 // Remove unused parameter
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
         public void TensorSoftmaxNDTest(TestConfiguration config)
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -363,7 +415,11 @@ namespace ILGPU.Tests.CPU
 
         [Theory]
         [MemberData(nameof(TestConfigurations))]
+#pragma warning disable xUnit1026 // Theory methods should use all of their parameters
+#pragma warning disable IDE0060 // Remove unused parameter
         public void TensorInvalidOperationsTest(TestConfiguration config)
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore xUnit1026 // Theory methods should use all of their parameters
         {
             using var context = Context.CreateDefault();
             using var accelerator = context.CreateCPUAccelerator(0);
@@ -391,6 +447,8 @@ namespace ILGPU.Tests.CPU
             // Test incompatible element-wise operations
             Assert.Throws<ArgumentException>(() => tensor.Add(tensor2));
             Assert.Throws<ArgumentException>(() => tensor.Multiply(tensor2));
+
+            tensor2.Dispose();
         }
     }
 }

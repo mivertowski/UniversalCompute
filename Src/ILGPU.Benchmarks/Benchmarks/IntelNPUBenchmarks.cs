@@ -58,7 +58,7 @@ public class IntelNPUBenchmarks : IDisposable
                 Console.WriteLine("🚀 Detected Intel NPU - using real hardware acceleration!");
                 try
                 {
-                    ilgpuAccelerator = context.CreateNPUAccelerator(0);
+                    ilgpuAccelerator = context!.CreateNPUAccelerator(0);
                     npuAccelerator = ilgpuAccelerator as IntelNPUAccelerator;
                     if (npuAccelerator == null)
                     {
@@ -80,7 +80,7 @@ public class IntelNPUBenchmarks : IDisposable
             // Set up ILGPU for fallback/comparison if not using real NPU
             if (!hasRealNPU)
             {
-                var device = context.GetPreferredDevice(preferCPU: false) ?? 
+                var device = context!.GetPreferredDevice(preferCPU: false) ?? 
                             context.GetPreferredDevice(preferCPU: true);
                 ilgpuAccelerator = device.CreateAccelerator(context);
             }
@@ -91,7 +91,7 @@ public class IntelNPUBenchmarks : IDisposable
 
             // Allocate memory for neural network operations
             var totalElements = NetworkSize * NetworkSize;
-            inputBuffer = ilgpuAccelerator.Allocate1D<float>(totalElements);
+            inputBuffer = ilgpuAccelerator!.Allocate1D<float>(totalElements);
             weightBuffer = ilgpuAccelerator.Allocate1D<float>(totalElements);
             biasBuffer = ilgpuAccelerator.Allocate1D<float>(NetworkSize);
             outputBuffer = ilgpuAccelerator.Allocate1D<float>(NetworkSize * BatchSize);

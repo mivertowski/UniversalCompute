@@ -92,7 +92,9 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
+#pragma warning disable CA1515 // Consider making public types internal
     public struct EmptyStruct : IXunitSerializable, IEquatable<EmptyStruct>
+#pragma warning restore CA1515 // Consider making public types internal
     {
         public readonly void Deserialize(IXunitSerializationInfo info) { }
 
@@ -183,7 +185,9 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
+#pragma warning disable CA1515 // Consider making public types internal
     public struct TestStruct : IXunitSerializable, IEquatable<TestStruct>
+#pragma warning restore CA1515 // Consider making public types internal
     {
         public int X;
         public long Y;
@@ -229,7 +233,9 @@ namespace ILGPU.Tests
     }
 
     [Serializable]
+#pragma warning disable CA1515 // Consider making public types internal
     public struct TestStruct<T> : IXunitSerializable, IValueStructure<T>
+#pragma warning restore CA1515 // Consider making public types internal
         where T : struct
     {
         public byte Val0;
@@ -653,7 +659,9 @@ namespace ILGPU.Tests
     /// <summary>
     /// An abstraction to inline a specialized sizes.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public interface ILength : IXunitSerializable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         int Length { get; }
     }

@@ -23,7 +23,9 @@ using Xunit;
 
 namespace ILGPU.Algorithms.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     partial class WarpExtensionTests
+#pragma warning restore CA1515 // Consider making public types internal
     {
         internal readonly struct LaneEntry(int distance, int laneIndex) :
             IScanReduceOperation<LaneEntry>,

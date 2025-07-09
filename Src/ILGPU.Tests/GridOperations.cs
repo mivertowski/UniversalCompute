@@ -19,7 +19,9 @@ using Xunit.Abstractions;
 namespace ILGPU.Tests
 {
     [Collection("DimensionOperations")]
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class GridOperations(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
+#pragma warning restore CA1515 // Consider making public types internal
     {
         internal static void GridDimensionKernel(
             ArrayView1D<int, Stride1D.Dense> data)

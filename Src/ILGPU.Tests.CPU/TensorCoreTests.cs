@@ -23,7 +23,9 @@ using Xunit;
 
 namespace ILGPU.Tests.CPU
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public class TensorCoreTests : IDisposable
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private readonly Context context;
         private readonly Accelerator accelerator;

@@ -22,7 +22,9 @@ using Xunit.Abstractions;
 
 namespace ILGPU.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class BasicMovement(ITestOutputHelper output, TestContext textContext) : TestBase(output, textContext)
+#pragma warning restore CA1515 // Consider making public types internal
     {
         private const int MaxLength = 32;
 

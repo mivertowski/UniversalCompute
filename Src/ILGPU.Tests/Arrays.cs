@@ -25,7 +25,9 @@ using static ILGPU.Tests.EnumValues;
 
 namespace ILGPU.Tests
 {
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class Arrays(ITestOutputHelper output, TestContext testContext) : TestBase(output, testContext)
+#pragma warning restore CA1515 // Consider making public types internal
     {
         public static TheoryData<object, object> ArraySimpleTestData =>
             new()
@@ -446,7 +448,9 @@ namespace ILGPU.Tests
             Verify(buffer.View, expected);
         }
 
+#pragma warning disable CA1515 // Consider making public types internal
         public struct MyData<T>
+#pragma warning restore CA1515 // Consider making public types internal
             where T : unmanaged
         {
             public T[] First;

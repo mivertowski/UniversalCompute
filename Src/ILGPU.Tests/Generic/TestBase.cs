@@ -24,7 +24,9 @@ namespace ILGPU.Tests
     /// <summary>
     /// The test base class for all tests.
     /// </summary>
+#pragma warning disable CA1515 // Consider making public types internal
     public abstract class TestBase : DisposeBase
+#pragma warning restore CA1515 // Consider making public types internal
     {
         #region Static
 
